@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Optimizer 廃止後 四半期健全性チェックリスト（SOQL版／Org Check 不使用）</title>
+<style>
+body { font-family: -apple-system, "Hiragino Sans", sans-serif; max-width: 1100px; margin: 2em auto; padding: 0 1em; line-height: 1.6; color: #222; }
+.print-btn { position: fixed; top: 1em; right: 1em; background: #0176d3; color: #fff; border: none; padding: 0.7em 1.4em; border-radius: 6px; font-size: 1em; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2); z-index: 1000; }
+.print-btn:hover { background: #032d60; }
+@media print { .print-btn { display: none; } body { max-width: none; margin: 0; } table { font-size: 0.78em; page-break-inside: avoid; } h2 { page-break-after: avoid; } pre { font-size: 0.7em; } }
+h1 { color: #032d60; border-bottom: 3px solid #032d60; padding-bottom: 0.3em; }
+h2 { color: #0176d3; border-left: 5px solid #0176d3; padding-left: 0.5em; margin-top: 2em; }
+h3 { color: #032d60; margin-top: 1.5em; }
+table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.92em; }
+th { background: #032d60; color: #fff; padding: 0.6em; text-align: left; }
+td { border: 1px solid #ddd; padding: 0.5em; vertical-align: top; }
+tr:nth-child(even) { background: #f7f9fb; }
+.check { width: 1.5em; text-align: center; }
+.warning { background: #ffebee; padding: 0.8em; border-left: 5px solid #c62828; margin: 1em 0; }
+.summary { background: #e8f5e9; padding: 1em; border-left: 5px solid #2e7d32; margin: 1em 0; }
+code { background: #f0f0f0; padding: 0.1em 0.3em; border-radius: 3px; font-size: 0.9em; }
+pre { background: #f0f0f0; padding: 1em; border-radius: 6px; overflow-x: auto; font-size: 0.85em; }
+.meta { color: #666; font-size: 0.9em; }
+.input-line { display: inline-block; min-width: 6em; border-bottom: 1px solid #999; padding: 0 0.3em; }
+.skip { color: #c62828; font-weight: bold; }
+</style>
+</head>
+<body>
+<button class="print-btn" onclick="window.print()">🖨 PDF保存 / 印刷</button>
+
+<h1>Optimizer 廃止後 四半期健全性チェックリスト<br><span style="font-size:0.6em;color:#666;">SOQL 版（Org Check 不使用）</span></h1>
+
+<p class="meta">
+<strong>目的</strong>: Org Check（Salesforce Labs パッケージ）を<b>導入できない / 導入しない組織</b>向けに、Optimizer 廃止（Winter '26）後の健全性点検を <b>Setup 標準機能 + SOQL（sf CLI）</b>のみで完結させる手順書。<br>
+<strong>所要時間</strong>: 約 40 分（1周）／<strong>実施頻度</strong>: 四半期に 1 回<br>
+<strong>対応元評価</strong>: <a href="./persol_orgcheck_coverage.html">サンプル株式会社 健全性評価カバレッジ（Org Check 版）</a>
+</p>
+
+<div class="warning">
+<strong>⚠️ 本書は Optimizer の完全代替ではありません</strong><br>
+Optimizer / Org Check が検出する「Hardcoded URLs」「Flow LFS Violations」「Admin-like 自動判定」等の高度な静的解析は SOQL では実用的に再現できません（後述）。可能なら <b>Org Check（Salesforce Labs）の併用を第一選択</b>として再検討してください。本書は AppExchange を導入できない組織向けの<b>ベースライン点検</b>を目的とします。
+</div>
+
+<div class="warning">
+<strong>📌 実行前の前提</strong>
+<ul>
+<li><b>Apex テストカバレッジ</b>を取る場合、<code>ApexCodeCoverageAggregate</code> は最後のテスト実行から <b>24 時間で消える</b>ため、本書実行直前に <code>sf apex run test --wait 10 --target-org &lt;alias&gt;</code> を流しておくこと。さもなくば常に 0% 表示になる</li>
+<li><b>「365日未閲覧」検出</b>は <code>LastViewedDate</code> ベース。閲覧追跡が無効な org（Setup → ユーザインターフェース → 「最近閲覧したリスト」無効）では暴発する</li>
+<li><b>付録 B（大量データオブジェクト一括カウント）は本番 org での実行非推奨</b>。API 24h 上限を消費し、<code>count()</code> が QUERY_TIMEOUT を起こすため、Setup → 組織のディスク使用量で代替できる場合は不要</li>
+</ul>
+</div>
+
+<div class="summary">
+<strong>📋 SOQL 版の使いどころ</strong>
+<ul>
+<li>AppExchange パッケージの導入が <b>セキュリティポリシー</b>等で許可されない組織</li>
+<li>Trial Org / 権限制約下で Org Check の <code>flows</code> / <code>process-builders</code> recipe が <b>INSUFFICIENT_ACCESS</b> になる場合</li>
+<li>CI / 定期ジョブで <b>JSON 出力を機械処理</b>したい場合（Org Check は UI 主体）</li>
+<li>サブスク料金や運用負荷（パッケージ更新追従等）を避けたい場合</li>
+</ul>
+<strong>使い方</strong>
+<ol>
+<li>Section ① Setup 標準機能で容量・セキュリティ等を確認</li>
+<li>Section ② SOQL クエリを <b>sf CLI で順次実行</b>し、結果を記録欄に転記</li>
+<li>Section ③ Org Check 専用機能の代替策を確認（または有償ツール検討）</li>
+<li>Section ④ サマリ表で前回値と比較して対応事項を起票</li>
+</ol>
+</div>
+
+<div class="warning">
+<strong>⚠️ Org Check 版との差分（取得できない指標）</strong>
+<ul>
+<li><b>Hardcoded URLs 検出</b>: Apex/VF/WebLink の本文に対する誤検出フィルタ込み判定は SOQL では再現困難（developer.salesforce.com / OAuth エンドポイント / コメント等の除外ロジックを自前で書く必要がある）</li>
+<li><b>LFS Violations</b>: Flow 内の SOQL/DML がループ内にあるかの検出は Metadata retrieve + 解析が必要</li>
+<li><b>Admin-like 自動判定</b>: Org Check は ModifyAllData 等の組合せでフラグ立てするが、SOQL では PermissionSet ごとの個別確認が必要</li>
+<li><b>Apex Test Coverage</b>: ApexCodeCoverage SOQL は取れるが Org Check のサマリ表示が便利</li>
+</ul>
+これらは <b>SOQL では実用的に代替しんどい</b>。必要なら Org Check / 有償ツール（Salto / Elements.cloud / Sonar 等）の併用を検討。
+</div>
+
+<h2>0. 実施情報</h2>
+<table>
+<tr><th>実施日</th><td><span class="input-line">　　　　　　</span></td></tr>
+<tr><th>担当者</th><td><span class="input-line">　　　　　　</span></td></tr>
+<tr><th>対象 Org（Org ID / Alias）</th><td><span class="input-line">　　　　　　　　　　</span></td></tr>
+<tr><th>前回実施日</th><td><span class="input-line">　　　　　　</span></td></tr>
+<tr><th>sf CLI バージョン</th><td><code>sf --version</code> の結果: <span class="input-line">　　　　　　</span></td></tr>
+<tr><th>備考</th><td><span class="input-line">　　　　　　　　　　　　　　　　　　　　</span></td></tr>
+</table>
+
+<h3>事前準備</h3>
+<pre>
+# 接続確認
+sf org list
+sf org display --target-org &lt;alias&gt;
+
+# 結果保存用ディレクトリ（任意）
+mkdir -p ~/health-check/$(date +%Y%m%d)
+cd ~/health-check/$(date +%Y%m%d)
+</pre>
+
+<h2>① Setup 標準機能で確認（所要 約12分）</h2>
+
+<p class="meta">SOQL では取れない／取りづらい指標は Setup 標準機能で確認する。Org Check 版チェックリストと同じ画面パスを使用。</p>
+
+<h3>容量・ライセンス・ガバナ系</h3>
+<table>
+<tr><th class="check">☐</th><th>項目</th><th>設定画面パス（日本語）</th><th>記録欄</th><th>前回値</th></tr>
+<tr><td class="check">☐</td><td>主要ライセンス使用率<br><span style="font-size:0.85em;color:#666;">※ Salesforce（フル）/ Salesforce Platform 等、契約済の有償ライセンスのみ確認。「使用 0」「合計 0」「Trial 由来」は無視。80% 超で要注意。</span></td><td>設定 → 会社の設定 → 会社の情報 → ユーザライセンス</td><td>
+Salesforce: <span class="input-line">　　</span> / <span class="input-line">　　</span> = <span class="input-line">　　</span>%<br>
+Salesforce Platform: <span class="input-line">　　</span> / <span class="input-line">　　</span> = <span class="input-line">　　</span>%<br>
+その他(<span class="input-line">　　　</span>): <span class="input-line">　　</span> / <span class="input-line">　　</span> = <span class="input-line">　　</span>%
+</td><td><span class="input-line">　　</span>%</td></tr>
+<tr><td class="check">☐</td><td>データストレージ使用率</td><td>設定 → データ → 組織のディスク使用量 → ストレージの種別「データストレージ」</td><td>使用 <span class="input-line">　　</span> MB / 上限 <span class="input-line">　　</span> GB = <span class="input-line">　　</span>%</td><td><span class="input-line">　　</span>%</td></tr>
+<tr><td class="check">☐</td><td>ファイルストレージ使用率</td><td>設定 → データ → 組織のディスク使用量 → ストレージの種別「ファイルストレージ」</td><td>使用 <span class="input-line">　　</span> MB / 上限 <span class="input-line">　　</span> GB = <span class="input-line">　　</span>%</td><td><span class="input-line">　　</span>%</td></tr>
+<tr><td class="check">☐</td><td>Apex コード使用率<br><span style="font-size:0.85em;color:#666;">※ 上限はエディションで異なる（Enterprise: 3M / Unlimited: 6M / 一部 org: 10M）。表示メッセージから読み取る。</span></td><td>設定 → カスタムコード → Apex クラス（ページ上部の説明文）</td><td><span class="input-line">　　</span>% (<span class="input-line">　　　　　</span> / <span class="input-line">　　　　　</span> 文字)</td><td><span class="input-line">　　</span>%</td></tr>
+<tr><td class="check">☐</td><td>API 要求数（24時間以内）</td><td>設定 → 環境 → システムの概要 → API 使用状況「API 要求数」</td><td><span class="input-line">　　　　</span> / 最大 <span class="input-line">　　　　</span> = <span class="input-line">　　</span>%</td><td><span class="input-line">　　</span>%</td></tr>
+</table>
+
+<h3>セキュリティ</h3>
+<table>
+<tr><th class="check">☐</th><th>項目</th><th>設定画面パス（日本語）</th><th>記録欄</th><th>前回値</th></tr>
+<tr><td class="check">☐</td><td>状態チェックスコア（Health Check）</td><td>設定 → セキュリティ → 状態チェック</td><td>スコア <span class="input-line">　　</span>% / 高リスク <span class="input-line">　　</span>件</td><td><span class="input-line">　　</span>%</td></tr>
+<tr><td class="check">☐</td><td>多要素認証必須化状態</td><td>設定 → ID → ID 検証</td><td>MFA 必須: ☐ Yes / ☐ No</td><td>—</td></tr>
+<tr><td class="check">☐</td><td>リリース更新（対応待ち）</td><td>設定 → 環境 → リリース更新</td><td>対応待ち <span class="input-line">　　</span>件 / 期限切れ <span class="input-line">　　</span>件</td><td><span class="input-line">　　</span></td></tr>
+</table>
+
+<h3>Lightning 採用 / モバイル</h3>
+<table>
+<tr><th class="check">☐</th><th>項目</th><th>画面パス（日本語）</th><th>記録欄</th><th>前回値</th></tr>
+<tr><td class="check">☐</td><td>月次の有効ユーザー数（MAU）</td><td>アプリケーションランチャー → Lightning の利用状況 → 活動 → Lightning Experience → 主要なメトリクス</td><td><span class="input-line">　　</span> ユーザ（前月比 <span class="input-line">　　</span>%）</td><td><span class="input-line">　　</span></td></tr>
+<tr><td class="check">☐</td><td>Salesforce モバイル MAU</td><td>アプリケーションランチャー → Lightning の利用状況 → 活動 → Salesforce モバイル</td><td>月次 <span class="input-line">　　</span> ユーザ</td><td><span class="input-line">　　</span></td></tr>
+<tr><td class="check">☐</td><td>主要ページ EPT</td><td>アプリケーションランチャー → Lightning の利用状況 → 利用状況 → ページ</td><td>最遅: <span class="input-line">　　　　</span> EPT <span class="input-line">　　</span>秒</td><td><span class="input-line">　　</span>秒</td></tr>
+<tr><td class="check">☐</td><td>ブラウザーパフォーマンス（10秒超 %）</td><td>アプリケーションランチャー → Lightning の利用状況 → 利用状況 → ブラウザー → パフォーマンス（ブラウザー別）</td><td>10s+ 比率: <span class="input-line">　　</span>%</td><td><span class="input-line">　　</span>%</td></tr>
+</table>
+
+<h3>アプリケーションライフサイクル</h3>
+<table>
+<tr><th class="check">☐</th><th>項目</th><th>設定画面パス（日本語）</th><th>記録欄</th><th>前回値</th></tr>
+<tr><td class="check">☐</td><td>Sandbox 件数・最終更新</td><td>設定 → 環境 → Sandbox</td><td>Dev <span class="input-line">　</span> / DevPro <span class="input-line">　</span> / Partial <span class="input-line">　</span> / Full <span class="input-line">　</span></td><td><span class="input-line">　　</span></td></tr>
+<tr><td class="check">☐</td><td>変更セット失敗率</td><td>設定 → 環境 → 変更セット → 送信/受信変更セット</td><td>失敗 <span class="input-line">　　</span>件 / 直近30日デプロイ <span class="input-line">　　</span>件</td><td><span class="input-line">　　</span></td></tr>
+<tr><td class="check">☐</td><td>インストール済みパッケージ数</td><td>設定 → アプリケーション → パッケージ → インストール済みパッケージ</td><td><span class="input-line">　　</span> パッケージ</td><td><span class="input-line">　　</span></td></tr>
+</table>
+
+<h2>② SOQL で確認（所要 約20分）</h2>
+
+<p class="meta">以下のクエリを <code>sf data query</code> で順次実行する。Tooling API が必要なものは <code>--use-tooling-api</code> を付与。<br>結果は記録欄に件数を転記。閾値超過は④の対応事項に記入。</p>
+
+<h3>2-1. プログラム型（コード品質）</h3>
+<table>
+<tr><th class="check">☐</th><th>項目</th><th>SOQL クエリ</th><th>記録欄</th><th>閾値目安</th></tr>
+<tr><td class="check">☐</td><td>カスタム Apex Classes 件数</td><td><code>SELECT count() FROM ApexClass WHERE NamespacePrefix = null</code></td><td><span class="input-line">　　</span>件</td><td>—</td></tr>
+<tr><td class="check">☐</td><td>古い API バージョン Apex（&lt;50）</td><td><code>SELECT count() FROM ApexClass WHERE NamespacePrefix = null AND ApiVersion &lt; 50</code></td><td><span class="input-line">　　</span>件</td><td>0 が望ましい</td></tr>
+<tr><td class="check">☐</td><td>カスタム Apex Triggers 件数</td><td><code>SELECT count() FROM ApexTrigger WHERE NamespacePrefix = null</code></td><td><span class="input-line">　　</span>件</td><td>—</td></tr>
+<tr><td class="check">☐</td><td>無効な Apex Triggers</td><td><code>SELECT count() FROM ApexTrigger WHERE Status = 'Inactive' AND NamespacePrefix = null</code></td><td><span class="input-line">　　</span>件</td><td>0 が望ましい</td></tr>
+<tr><td class="check">☐</td><td>古い API バージョン Triggers（&lt;50）</td><td><code>SELECT count() FROM ApexTrigger WHERE NamespacePrefix = null AND ApiVersion &lt; 50</code></td><td><span class="input-line">　　</span>件</td><td>0 が望ましい</td></tr>
+<tr><td class="check">☐</td><td>カスタム VF Pages 件数</td><td><code>SELECT count() FROM ApexPage WHERE NamespacePrefix = null</code></td><td><span class="input-line">　　</span>件</td><td>—</td></tr>
+<tr><td class="check">☐</td><td>古い API バージョン VF（&lt;50）</td><td><code>SELECT count() FROM ApexPage WHERE NamespacePrefix = null AND ApiVersion &lt; 50</code></td><td><span class="input-line">　　</span>件</td><td>0 が望ましい</td></tr>
+<tr><td class="check">☐</td><td>Apex テストカバレッジ（org 全体）<br><small>※直近テスト実行から24h以内のみ有効</small></td><td>Tooling: <code>SELECT PercentCovered FROM ApexOrgWideCoverage</code></td><td><span class="input-line">　　</span>%</td><td>≥75%（必須）</td></tr>
+<tr><td class="check">☐</td><td>カバレッジ 0% の Apex Classes<br><small>※同上、事前に <code>sf apex run test</code> を実行</small></td><td>Tooling: <code>SELECT ApexClassOrTrigger.Name FROM ApexCodeCoverageAggregate WHERE NumLinesCovered = 0 AND NumLinesUncovered &gt; 0</code></td><td><span class="input-line">　　</span>件</td><td>少ないほど良</td></tr>
+</table>
+
+<h3>2-2. セキュリティ・ユーザ</h3>
+<table>
+<tr><th class="check">☐</th><th>項目</th><th>SOQL クエリ</th><th>記録欄</th><th>閾値目安</th></tr>
+<tr><td class="check">☐</td><td>有効内部ユーザ数（Salesforce ライセンス）</td><td><code>SELECT count() FROM User WHERE IsActive = true AND UserType = 'Standard' AND Profile.UserLicense.Name = 'Salesforce'</code></td><td><span class="input-line">　　</span>人</td><td>—</td></tr>
+<tr><td class="check">☐</td><td>30日非ログインの有効ユーザ</td><td><code>SELECT count() FROM User WHERE IsActive = true AND UserType = 'Standard' AND (LastLoginDate = null OR LastLoginDate &lt; LAST_N_DAYS:30)</code></td><td><span class="input-line">　　</span>人</td><td>少ないほど良</td></tr>
+<tr><td class="check">☐</td><td>System Administrator プロファイルのユーザ</td><td><code>SELECT count() FROM User WHERE IsActive = true AND Profile.Name IN ('System Administrator','システム管理者')</code></td><td><span class="input-line">　　</span>人</td><td>最小限</td></tr>
+<tr><td class="check">☐</td><td>カスタム Permission Sets 件数</td><td><code>SELECT count() FROM PermissionSet WHERE IsOwnedByProfile = false AND IsCustom = true</code></td><td><span class="input-line">　　</span>件</td><td>—</td></tr>
+<tr><td class="check">☐</td><td>未割当 Permission Sets</td><td><code>SELECT count() FROM PermissionSet WHERE IsOwnedByProfile = false AND Id NOT IN (SELECT PermissionSetId FROM PermissionSetAssignment)</code></td><td><span class="input-line">　　</span>件</td><td>整理対象</td></tr>
+<tr><td class="check">☐</td><td>10人以下利用 Permission Sets</td><td><code>SELECT PermissionSet.Name, count(AssigneeId) FROM PermissionSetAssignment WHERE Assignee.IsActive = true AND PermissionSet.IsOwnedByProfile = false GROUP BY PermissionSetId, PermissionSet.Name HAVING count(AssigneeId) BETWEEN 1 AND 10</code></td><td><span class="input-line">　　</span>件</td><td>—</td></tr>
+<tr><td class="check">☐</td><td>ModifyAllData 持ち PermissionSet</td><td><code>SELECT count() FROM PermissionSet WHERE PermissionsModifyAllData = true</code></td><td><span class="input-line">　　</span>件</td><td>最小限</td></tr>
+<tr><td class="check">☐</td><td>ViewAllData 持ち PermissionSet</td><td><code>SELECT count() FROM PermissionSet WHERE PermissionsViewAllData = true</code></td><td><span class="input-line">　　</span>件</td><td>最小限</td></tr>
+<tr><td class="check">☐</td><td>未割当ロール</td><td><code>SELECT count() FROM UserRole WHERE Id NOT IN (SELECT UserRoleId FROM User WHERE IsActive = true)</code></td><td><span class="input-line">　　</span>件</td><td>整理対象</td></tr>
+</table>
+
+<h3>2-3. データモデル / 自動化</h3>
+<table>
+<tr><th class="check">☐</th><th>項目</th><th>SOQL クエリ</th><th>記録欄</th><th>閾値目安</th></tr>
+<tr><td class="check">☐</td><td>Active Flow 件数（FlowDefinition 単位）</td><td>Tooling: <code>SELECT count() FROM FlowDefinition WHERE ActiveVersionId != null</code></td><td><span class="input-line">　　</span>件</td><td>—</td></tr>
+<tr><td class="check">☐</td><td>非アクティブ Flow 件数</td><td>Tooling: <code>SELECT count() FROM FlowDefinition WHERE ActiveVersionId = null</code></td><td><span class="input-line">　　</span>件</td><td>整理対象</td></tr>
+<tr><td class="check">☐</td><td>Active Process Builder 件数</td><td>Tooling: <code>SELECT count() FROM Flow WHERE Status = 'Active' AND ProcessType = 'Workflow'</code></td><td><span class="input-line">　　</span>件</td><td>Flow へ移行</td></tr>
+<tr><td class="check">☐</td><td>Active Workflow Rule 件数</td><td>Tooling: <code>SELECT count() FROM WorkflowRule WHERE Active = true</code></td><td><span class="input-line">　　</span>件</td><td>Flow へ移行</td></tr>
+<tr><td class="check">☐</td><td>Workflow Rule 総数（非アクティブ含む）</td><td>Tooling: <code>SELECT count() FROM WorkflowRule</code></td><td><span class="input-line">　　</span>件</td><td>—</td></tr>
+<tr><td class="check">☐</td><td>Active Validation Rule 件数</td><td>Tooling: <code>SELECT count() FROM ValidationRule WHERE Active = true</code></td><td><span class="input-line">　　</span>件</td><td>—</td></tr>
+<tr><td class="check">☐</td><td>カスタム項目総数（カスタム/カスタムメタ除く）</td><td>Tooling: <code>SELECT count() FROM CustomField WHERE NamespacePrefix = null</code></td><td><span class="input-line">　　</span>件</td><td>—</td></tr>
+<tr><td class="check">☐</td><td>取引先のカスタム項目数</td><td>Tooling: <code>SELECT count() FROM CustomField WHERE TableEnumOrId = 'Account' AND NamespacePrefix = null</code></td><td><span class="input-line">　　</span>/500</td><td>80% 超で要注意</td></tr>
+<tr><td class="check">☐</td><td>取引先責任者のカスタム項目数</td><td>Tooling: <code>SELECT count() FROM CustomField WHERE TableEnumOrId = 'Contact' AND NamespacePrefix = null</code></td><td><span class="input-line">　　</span>/500</td><td>80% 超で要注意</td></tr>
+<tr><td class="check">☐</td><td>商談のカスタム項目数</td><td>Tooling: <code>SELECT count() FROM CustomField WHERE TableEnumOrId = 'Opportunity' AND NamespacePrefix = null</code></td><td><span class="input-line">　　</span>/500</td><td>80% 超で要注意</td></tr>
+<tr><td class="check">☐</td><td>カスタムオブジェクト数</td><td>Tooling: <code>SELECT count() FROM CustomObject WHERE NamespacePrefix = null</code></td><td><span class="input-line">　　</span>件</td><td>—</td></tr>
+<tr><td class="check">☐</td><td>レポート総数</td><td><code>SELECT count() FROM Report</code></td><td><span class="input-line">　　</span>件</td><td>—</td></tr>
+<tr><td class="check">☐</td><td>365日未閲覧のレポート</td><td><code>SELECT count() FROM Report WHERE LastViewedDate &lt; LAST_N_DAYS:365 OR LastViewedDate = null</code></td><td><span class="input-line">　　</span>件</td><td>整理対象</td></tr>
+<tr><td class="check">☐</td><td>ダッシュボード総数</td><td><code>SELECT count() FROM Dashboard</code></td><td><span class="input-line">　　</span>件</td><td>—</td></tr>
+<tr><td class="check">☐</td><td>365日未閲覧のダッシュボード</td><td><code>SELECT count() FROM Dashboard WHERE LastViewedDate &lt; LAST_N_DAYS:365 OR LastViewedDate = null</code></td><td><span class="input-line">　　</span>件</td><td>整理対象</td></tr>
+</table>
+
+<h3>2-4. ライフサイクル / リリース</h3>
+<table>
+<tr><th class="check">☐</th><th>項目</th><th>SOQL クエリ</th><th>記録欄</th><th>閾値目安</th></tr>
+<tr><td class="check">☐</td><td>Sandbox 一覧<br><span style="font-size:0.85em;color:#666;">※ SandboxInfo に Name / LastRefreshDate 列はない。最終更新日は Setup → 環境 → Sandbox で確認。</span></td><td>Tooling: <code>SELECT SandboxName, LicenseType, HistoryDays FROM SandboxInfo</code></td><td>合計 <span class="input-line">　　</span>件（Dev:<span class="input-line">　</span>/DevPro:<span class="input-line">　</span>/Partial:<span class="input-line">　</span>/Full:<span class="input-line">　</span>）</td><td>—</td></tr>
+<tr><td class="check">☐</td><td>直近30日のデプロイ件数</td><td>Tooling: <code>SELECT count() FROM DeployRequest WHERE CreatedDate = LAST_N_DAYS:30</code></td><td><span class="input-line">　　</span>件</td><td>—</td></tr>
+<tr><td class="check">☐</td><td>直近30日のデプロイ失敗件数</td><td>Tooling: <code>SELECT count() FROM DeployRequest WHERE CreatedDate = LAST_N_DAYS:30 AND Status = 'Failed'</code></td><td><span class="input-line">　　</span>件</td><td>失敗率 &lt;10%</td></tr>
+<tr><td class="check">☐</td><td>インストール済みパッケージ数<br><span style="font-size:0.85em;color:#666;">※ <code>count()</code> は UNKNOWN_EXCEPTION で失敗するため明示項目で取得し件数は totalSize で確認。</span></td><td>Tooling: <code>SELECT Id FROM InstalledSubscriberPackage</code></td><td><span class="input-line">　　</span>件</td><td>—</td></tr>
+</table>
+
+<h2>③ SOQL カバー外の補完（所要 約5分）</h2>
+
+<table>
+<tr><th class="check">☐</th><th>項目</th><th>取得方法</th><th>記録欄 / 備考</th></tr>
+<tr><td class="check">☐</td><td>Lightning ページ EPT</td><td>主要画面の URL に <code>?eptVisible=1</code> 付加してブラウザ計測。または <code>SELECT PageName, AVG(EPT) FROM LightningUsageByPageMetrics WHERE Date = LAST_N_DAYS:7 GROUP BY PageName</code>（一部 org のみ）</td><td>最遅 <span class="input-line">　　　　</span>: <span class="input-line">　　</span>秒</td></tr>
+<tr><td class="check">☐</td><td>大量データオブジェクト（100万超）</td><td>下記スクリプトで全カスタムオブジェクトを一括 count（付録参照）</td><td>100万超 <span class="input-line">　　</span>件 / 1000万超 <span class="input-line">　　</span>件</td></tr>
+<tr><td class="check">☐</td><td>ファイル使用率内訳</td><td><code>SELECT count() FROM ContentDocument</code> ＋ <code>SELECT count() FROM Attachment</code></td><td>ContentDoc <span class="input-line">　　　</span>件 / Attachment <span class="input-line">　　　</span>件</td></tr>
+<tr><td class="check">☐</td><td><span class="skip">Hardcoded URLs 検出</span></td><td><span class="skip">SOQL では誤検出フィルタ込みの判定が再現困難。必要なら Org Check / Salto / Sonar 等の併用を検討</span></td><td>—</td></tr>
+<tr><td class="check">☐</td><td><span class="skip">Flow LFS Violations</span></td><td><span class="skip">Metadata retrieve + 解析が必要。Flow Analyzer（Salesforce Labs）または有償ツール推奨</span></td><td>—</td></tr>
+<tr><td class="check">☐</td><td><span class="skip">Admin-like ユーザ自動判定</span></td><td><span class="skip">2-2 の ModifyAllData / ViewAllData / SystemAdmin 数の組み合わせで個別評価</span></td><td>—</td></tr>
+</table>
+
+<h2>④ 集計と対応事項</h2>
+
+<h3>サマリ（前回値との比較）</h3>
+
+<p class="meta">下表の「取得元」列はチェックリストのどのセクションから値を転記するかを示す。①＝Setup 標準機能 / ②＝SOQL / ③＝補完。</p>
+
+<table>
+<tr><th>カテゴリ</th><th>主要指標</th><th>取得元（転記元）</th><th>今回</th><th>前回</th><th>変動</th><th>判定</th></tr>
+<tr><td>セキュリティ</td><td>Health Check スコア</td><td>① セキュリティ「状態チェックスコア」</td><td><span class="input-line">　　</span>%</td><td><span class="input-line">　　</span>%</td><td><span class="input-line">　　</span></td><td>☐ ✅ ☐ ⚠️ ☐ ❌</td></tr>
+<tr><td>セキュリティ</td><td>SystemAdmin プロファイルユーザ</td><td>② 2-2 セキュリティ・ユーザ「System Administrator プロファイルのユーザ」</td><td><span class="input-line">　　</span>人</td><td><span class="input-line">　　</span>人</td><td><span class="input-line">　　</span></td><td>☐ ✅ ☐ ⚠️ ☐ ❌</td></tr>
+<tr><td>容量</td><td>ファイルストレージ</td><td>① 容量・ライセンス系「ファイルストレージ使用率」</td><td><span class="input-line">　　</span>%</td><td><span class="input-line">　　</span>%</td><td><span class="input-line">　　</span></td><td>☐ ✅ ☐ ⚠️ ☐ ❌</td></tr>
+<tr><td>容量</td><td>データストレージ</td><td>① 容量・ライセンス系「データストレージ使用率」</td><td><span class="input-line">　　</span>%</td><td><span class="input-line">　　</span>%</td><td><span class="input-line">　　</span></td><td>☐ ✅ ☐ ⚠️ ☐ ❌</td></tr>
+<tr><td>コード</td><td>Apex テストカバレッジ</td><td>② 2-1 プログラム型「Apex テストカバレッジ（org 全体）」</td><td><span class="input-line">　　</span>%</td><td><span class="input-line">　　</span>%</td><td><span class="input-line">　　</span></td><td>☐ ✅ ☐ ⚠️ ☐ ❌</td></tr>
+<tr><td>コード</td><td>古い API（&lt;50） 合計</td><td>② 2-1 プログラム型「古い API バージョン」(Apex/Trigger/VF 合算)</td><td><span class="input-line">　　</span></td><td><span class="input-line">　　</span></td><td><span class="input-line">　　</span></td><td>☐ ✅ ☐ ⚠️ ☐ ❌</td></tr>
+<tr><td>自動化</td><td>非アクティブ Flow + Active WF</td><td>② 2-3 データモデル/自動化「非アクティブ Flow」+「Active Workflow Rule」</td><td><span class="input-line">　　</span></td><td><span class="input-line">　　</span></td><td><span class="input-line">　　</span></td><td>☐ ✅ ☐ ⚠️ ☐ ❌</td></tr>
+<tr><td>運用</td><td>変更セット失敗率</td><td>② 2-4 ライフサイクル「直近30日デプロイ失敗 ÷ 直近30日デプロイ」</td><td><span class="input-line">　　</span>%</td><td><span class="input-line">　　</span>%</td><td><span class="input-line">　　</span></td><td>☐ ✅ ☐ ⚠️ ☐ ❌</td></tr>
+</table>
+
+<p class="meta">判定基準: ✅ 改善・維持 / ⚠️ 軽微悪化（次回監視） / ❌ 要対応（チケット起票）</p>
+
+<h3>対応事項リスト</h3>
+<table>
+<tr><th>#</th><th>項目</th><th>担当</th><th>期限</th><th>状態</th></tr>
+<tr><td>1</td><td><span class="input-line">　　　　　　　　　　　　　　　　　　　　</span></td><td><span class="input-line">　　</span></td><td><span class="input-line">　　</span></td><td>☐ Open ☐ Close</td></tr>
+<tr><td>2</td><td><span class="input-line">　　　　　　　　　　　　　　　　　　　　</span></td><td><span class="input-line">　　</span></td><td><span class="input-line">　　</span></td><td>☐ Open ☐ Close</td></tr>
+<tr><td>3</td><td><span class="input-line">　　　　　　　　　　　　　　　　　　　　</span></td><td><span class="input-line">　　</span></td><td><span class="input-line">　　</span></td><td>☐ Open ☐ Close</td></tr>
+<tr><td>4</td><td><span class="input-line">　　　　　　　　　　　　　　　　　　　　</span></td><td><span class="input-line">　　</span></td><td><span class="input-line">　　</span></td><td>☐ Open ☐ Close</td></tr>
+<tr><td>5</td><td><span class="input-line">　　　　　　　　　　　　　　　　　　　　</span></td><td><span class="input-line">　　</span></td><td><span class="input-line">　　</span></td><td>☐ Open ☐ Close</td></tr>
+</table>
+
+<h2>付録 A: sf CLI 一括実行スクリプト</h2>
+
+<p class="meta">②の SOQL を一括で流して結果を CSV/JSON に保存するスクリプト。CI / 定期ジョブで回す場合に活用。</p>
+
+<pre>
+#!/bin/bash
+# health-check-sql.sh — Org Check 不使用版 健全性チェック一括実行
+# 使い方: ./health-check-sql.sh &lt;target-org-alias&gt;
+
+set -euo pipefail
+ALIAS="${1:-}"
+[ -z "$ALIAS" ] &amp;&amp; { echo "Usage: $0 &lt;alias&gt;"; exit 1; }
+OUT="health-check-$(date +%Y%m%d-%H%M%S)"
+mkdir -p "$OUT"
+
+run_q() {
+  local label="$1" tooling="$2" query="$3"
+  local flags="--target-org $ALIAS --result-format csv"
+  [ "$tooling" = "true" ] &amp;&amp; flags="$flags --use-tooling-api"
+  echo "▶ $label"
+  sf data query --query "$query" $flags &gt; "$OUT/$label.csv" 2&gt;&amp;1 || echo "  (失敗) $label"
+}
+
+# 2-1 プログラム型
+run_q "01_apex_classes_total"     false "SELECT count() FROM ApexClass WHERE NamespacePrefix = null"
+run_q "02_apex_classes_old_api"   false "SELECT count() FROM ApexClass WHERE NamespacePrefix = null AND ApiVersion &lt; 50"
+run_q "03_apex_triggers_total"    false "SELECT count() FROM ApexTrigger WHERE NamespacePrefix = null"
+run_q "04_apex_triggers_inactive" false "SELECT count() FROM ApexTrigger WHERE Status='Inactive' AND NamespacePrefix = null"
+run_q "05_vf_pages_total"         false "SELECT count() FROM ApexPage WHERE NamespacePrefix = null"
+run_q "06_apex_org_coverage"      true  "SELECT PercentCovered FROM ApexOrgWideCoverage"
+run_q "07_apex_zero_coverage"     true  "SELECT ApexClassOrTrigger.Name FROM ApexCodeCoverageAggregate WHERE NumLinesCovered = 0 AND NumLinesUncovered &gt; 0"
+
+# 2-2 セキュリティ・ユーザ
+run_q "10_users_active_internal"  false "SELECT count() FROM User WHERE IsActive=true AND UserType='Standard' AND Profile.UserLicense.Name='Salesforce'"
+run_q "11_users_inactive_30d"     false "SELECT count() FROM User WHERE IsActive=true AND UserType='Standard' AND (LastLoginDate=null OR LastLoginDate &lt; LAST_N_DAYS:30)"
+run_q "12_users_sysadmin"         false "SELECT count() FROM User WHERE IsActive=true AND Profile.Name IN ('System Administrator','システム管理者')"
+run_q "13_permsets_unassigned"    false "SELECT count() FROM PermissionSet WHERE IsOwnedByProfile=false AND Id NOT IN (SELECT PermissionSetId FROM PermissionSetAssignment)"
+run_q "14_permsets_modify_all"    false "SELECT count() FROM PermissionSet WHERE PermissionsModifyAllData=true"
+run_q "15_roles_unassigned"       false "SELECT count() FROM UserRole WHERE Id NOT IN (SELECT UserRoleId FROM User WHERE IsActive=true)"
+
+# 2-3 データモデル / 自動化
+run_q "20_flows_active"           true  "SELECT count() FROM FlowDefinition WHERE ActiveVersionId != null"
+run_q "21_flows_inactive"         true  "SELECT count() FROM FlowDefinition WHERE ActiveVersionId = null"
+run_q "22_process_builders"       true  "SELECT count() FROM Flow WHERE Status='Active' AND ProcessType='Workflow'"
+run_q "23_workflow_rules_active"  true  "SELECT count() FROM WorkflowRule WHERE Active=true"
+run_q "23b_workflow_rules_total"  true  "SELECT count() FROM WorkflowRule"
+run_q "24_validation_rules_active" true "SELECT count() FROM ValidationRule WHERE Active=true"
+run_q "25_account_custom_fields"  true  "SELECT count() FROM CustomField WHERE TableEnumOrId='Account' AND NamespacePrefix=null"
+run_q "26_contact_custom_fields"  true  "SELECT count() FROM CustomField WHERE TableEnumOrId='Contact' AND NamespacePrefix=null"
+run_q "27_opportunity_custom_fields" true "SELECT count() FROM CustomField WHERE TableEnumOrId='Opportunity' AND NamespacePrefix=null"
+run_q "28_custom_objects"         true  "SELECT count() FROM CustomObject WHERE NamespacePrefix=null"
+run_q "29_reports_unused_365d"    false "SELECT count() FROM Report WHERE LastViewedDate &lt; LAST_N_DAYS:365 OR LastViewedDate=null"
+run_q "30_dashboards_unused_365d" false "SELECT count() FROM Dashboard WHERE LastViewedDate &lt; LAST_N_DAYS:365 OR LastViewedDate=null"
+
+# 2-4 ライフサイクル
+run_q "40_sandbox_list"           true  "SELECT SandboxName, LicenseType, HistoryDays FROM SandboxInfo"
+run_q "41_deploy_30d"             true  "SELECT count() FROM DeployRequest WHERE CreatedDate=LAST_N_DAYS:30"
+run_q "42_deploy_30d_failed"      true  "SELECT count() FROM DeployRequest WHERE CreatedDate=LAST_N_DAYS:30 AND Status='Failed'"
+run_q "43_installed_packages"     true  "SELECT Id FROM InstalledSubscriberPackage"  # count() は失敗するため明示項目
+
+echo "✅ 完了: $OUT/ に CSV を保存"
+ls -la "$OUT"
+</pre>
+
+<h2>付録 B: 大量データオブジェクト一括カウント（参考実装・本番非推奨）</h2>
+
+<div class="warning">
+<strong>🚨 本番 org での実行は非推奨</strong>
+<ul>
+<li>標準オブジェクトだけで 500 個超を <code>count()</code> で順次叩くため、<b>24 時間 API 上限を大量消費</b>（数千コール／run）</li>
+<li><code>Event</code> / <code>Task</code> / <code>CaseHistory</code> / <code>LoginHistory</code> 等の数百万件オブジェクトで <b><code>QUERY_TIMEOUT</code>（120秒制限）</b>を起こす</li>
+<li><b>代替</b>: Setup → データ → <b>組織のディスク使用量</b> にレコード数とストレージ容量がオブジェクト別で標準提供されている。まずはこちらを参照すること</li>
+<li>どうしても本スクリプトを使う場合は、<b>Sandbox / Dev Org で動作確認</b>し、<code>objects.txt</code> を主要オブジェクトのみに手動で絞ってから実行する</li>
+</ul>
+</div>
+
+<pre>
+#!/bin/bash
+# large-data-scan.sh — ⚠ 本番非推奨。Sandbox / Dev Org 用の参考実装
+ALIAS="${1:-}"
+[ -z "$ALIAS" ] &amp;&amp; { echo "Usage: $0 &lt;alias&gt;"; exit 1; }
+
+# クエリ可能なオブジェクト一覧を取得
+sf sobject list --target-org "$ALIAS" --sobject all &gt; objects.txt
+# ⚠ 推奨: vi objects.txt で監視対象オブジェクトのみに絞り込んでから実行
+
+# 各オブジェクトを count
+&gt; results.csv
+echo "Object,Count" &gt; results.csv
+while read -r obj; do
+  cnt=$(sf data query --query "SELECT count() FROM $obj" --target-org "$ALIAS" --json 2&gt;/dev/null | jq -r '.result.totalSize // "ERROR"')
+  echo "$obj,$cnt" &gt;&gt; results.csv
+done &lt; objects.txt
+
+# 100万超を抽出
+echo "=== 100万超 ==="
+awk -F, '$2 &gt; 1000000 {print $1": "$2}' results.csv
+echo "=== 1000万超 ==="
+awk -F, '$2 &gt; 10000000 {print $1": "$2}' results.csv
+</pre>
+
+<h2>付録 C: Anonymous Apex によるリミット監視</h2>
+
+<p class="meta">Apex / Storage 系の組織制限は <code>OrgLimits</code> Apex から取得できる。SOQL より手軽に「使用率」を一括取得可能。</p>
+
+<pre>
+// limits-check.apex
+// 実行: sf apex run --file limits-check.apex --target-org &lt;alias&gt;
+Map&lt;String, System.OrgLimit&gt; limits = OrgLimits.getMap();
+List&lt;String&gt; warnings = new List&lt;String&gt;();
+for (String name : limits.keySet()) {
+    System.OrgLimit lim = limits.get(name);
+    Integer used = lim.getValue();
+    Integer max  = lim.getLimit();
+    if (max == 0) continue;
+    Decimal pct = (Decimal.valueOf(used) / max * 100).setScale(1);
+    System.debug(name + ': ' + used + '/' + max + ' = ' + pct + '%');
+    if (pct &gt;= 80) {
+        warnings.add(name + ' = ' + pct + '% (' + used + '/' + max + ')');
+    }
+}
+System.debug('===== 80% 超過 =====');
+for (String w : warnings) System.debug(w);
+</pre>
+
+<h2>関連ドキュメント</h2>
+<p class="meta">
+<a href="./persol_orgcheck_coverage.html">📄 評価カバレッジ（Org Check 版）</a> ／
+<a href="./persol_orgcheck_quarterly_checklist.html">📋 四半期チェックリスト（Org Check 版）</a> ／
+<a href="./salesforce_health_checklist_sqlonly.md">📄 本書 Markdown 版</a>
+</p>
+
+</body>
+</html>

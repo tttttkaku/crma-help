@@ -1,0 +1,493 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Salesforce: あなたの組織を保護する (Secure Your Org) 日本語ガイド</title><style>
+:root {
+  --bg:#f5f7fa; --fg:#16252e; --muted:#5a6d78;
+  --primary:#0176d3; --primary-dark:#014486;
+  --accent:#7f5ab6; --green:#2e844a; --red:#ba0517;
+  --card:#fff; --border:#cfd7df; --side-bg:#032d60; --side-fg:#e5f1fb;
+}
+* { box-sizing:border-box; }
+html,body { margin:0; padding:0; font-family:-apple-system,"Hiragino Sans","Hiragino Kaku Gothic ProN","Helvetica Neue",Arial,sans-serif;
+  color:var(--fg); background:var(--bg); line-height:1.7; font-size:15px; }
+
+/* Layout */
+.layout { display:grid; grid-template-columns: 320px 1fr; min-height:100vh; }
+.sidebar { background:var(--side-bg); color:var(--side-fg); position:sticky; top:0; height:100vh; overflow:hidden; }
+.sidebar-inner { height:100%; overflow-y:auto; padding:20px 14px 80px; }
+.sidebar a { color:var(--side-fg); text-decoration:none; }
+.sidebar a:hover { color:#fff; text-decoration:underline; }
+#filter { width:100%; padding:8px 10px; border-radius:6px; border:1px solid #4a6a8e; background:#0a1b3a;
+  color:#fff; margin-bottom:14px; font-size:13px; }
+.toc, .toc ol { list-style:none; padding-left:14px; margin:0; }
+.toc { padding-left:0; }
+.toc > li.ch { margin:14px 0 6px; }
+.toc > li.ch > a { font-size:14px; color:#fff; }
+.toc ol li { margin:3px 0; font-size:12.5px; }
+.toc .pgs { padding-left:14px; opacity:0.85; }
+.toc .pg { font-size:11.5px; line-height:1.45; margin:2px 0; }
+.toc-intro a { color:#ffd479; font-weight:700; }
+
+/* Main */
+.main { padding:32px 48px 80px; max-width:1100px; }
+h1.title { font-size:30px; margin:0 0 6px; color:var(--primary-dark); }
+.subtitle { color:var(--muted); margin:0 0 24px; }
+
+.chapter { margin:48px 0; padding-top:8px; border-top:3px solid var(--primary); scroll-margin-top:20px; }
+.chapter h2 { font-size:24px; color:var(--primary-dark); margin:8px 0 4px; }
+.chapter .ch-num { display:inline-block; background:var(--primary); color:#fff; padding:2px 10px; border-radius:4px;
+  font-size:12px; font-weight:700; letter-spacing:1px; margin-right:8px; vertical-align:middle; }
+.chapter .official { font-size:12px; color:var(--muted); }
+.section { margin:28px 0; padding:18px 22px; background:var(--card); border:1px solid var(--border);
+  border-radius:10px; scroll-margin-top:20px; }
+.section h3 { margin:0 0 10px; font-size:18px; color:var(--primary-dark); }
+.section h3 .sec-num { color:var(--accent); font-weight:600; margin-right:6px; }
+.section h3 .ext { font-size:12px; color:var(--primary); margin-left:8px; }
+.intro { background:#eef6fc; border-left:4px solid var(--primary); padding:14px 18px; border-radius:6px; margin:14px 0; }
+.diagram { width:100%; height:auto; max-width:760px; background:#fff; border:1px solid var(--border);
+  border-radius:8px; padding:8px; margin:14px 0; }
+.page-list { list-style:disc; padding-left:22px; margin:8px 0; }
+.page-list a { color:var(--primary); text-decoration:none; font-size:13.5px; }
+.page-list a:hover { text-decoration:underline; }
+.topic { margin:14px 0; padding:12px 16px; background:#fafcfe; border-left:3px solid var(--green); border-radius:4px; }
+.topic h4 { margin:0 0 6px; font-size:14.5px; color:var(--primary-dark); }
+.topic h4 a { color:var(--primary); text-decoration:none; }
+.topic h4 a:hover { text-decoration:underline; }
+.topic p { margin:4px 0; }
+code { background:#eef2f5; padding:1px 5px; border-radius:3px; font-family:"SF Mono",Menlo,Consolas,monospace; font-size:12.5px; }
+ul, ol { padding-left:24px; }
+
+.callout { background:#fff8e6; border-left:4px solid #f3a900; padding:12px 16px; border-radius:6px; margin:14px 0; }
+.callout b { color:#a06700; }
+
+/* Hide filtered items */
+.toc li.hidden { display:none; }
+
+/* Print */
+@media print {
+  .layout { display:block; }
+  .sidebar { display:none; }
+  .main { padding:0; }
+  .section, .chapter { page-break-inside:avoid; }
+  a { color:#000; text-decoration:underline; }
+  .diagram { max-width:100%; }
+}
+
+/* Mobile */
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { position:relative; height:auto; max-height:none; }
+  .sidebar-inner { max-height:300px; }
+  .main { padding:20px; }
+}
+</style></head><body><div class="layout"><nav class="sidebar"><div class="sidebar-inner"><input type="search" id="filter" placeholder="絞り込み (例: MFA, sharing)" autocomplete="off"><ol class="toc"><li class="toc-intro"><a href="#intro">★ はじめに / 全体像</a></li><li class="ch"><a href="#ch1"><b>第1章</b> Salesforce Security Basics</a><ol><li><a href="#ch1-1">1.1 Phishing and Malware</a></li><li><a href="#ch1-2">1.2 Security Health Check</a></li><li><a href="#ch1-3">1.3 Auditing</a></li><li><a href="#ch1-4">1.4 Salesforce Shield</a></li></ol></li><li class="ch"><a href="#ch2"><b>第2章</b> Authenticate Users</a><ol><li><a href="#ch2-1">2.1 Multi-Factor Authentication</a></li><li><a href="#ch2-2">2.2 Single Sign-On</a></li><li><a href="#ch2-3">2.3 Custom Login Flows</a></li><li><a href="#ch2-4">2.4 Connected Apps</a></li><li><a href="#ch2-5">2.5 Manage User Passwords</a></li><li><a href="#ch2-6">2.6 Device Activation</a></li><li><a href="#ch2-7">2.7 Session Security</a></li></ol></li><li class="ch"><a href="#ch3"><b>第3章</b> Give Users Access to Data</a><ol><li><a href="#ch3-1">3.1 Control Who Sees What</a></li><li><a href="#ch3-2">3.2 User Permissions</a><ol class="pgs"><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.permissions_about_users_access.htm&amp;type=5" target="_blank" rel="noopener">Permissions and Access Settings ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.permissions_revoking_access.htm&amp;type=5" target="_blank" rel="noopener">Revoke Permissions and Access ↗</a></li></ol></li><li><a href="#ch3-3">3.3 Object Permissions</a><ol class="pgs"><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.users_profiles_view_all_mod_all.htm&amp;type=5" target="_blank" rel="noopener">“View All” and “Modify All” Permissions Overview ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.users_sharing_vs_obj_level_perms.htm&amp;type=5" target="_blank" rel="noopener">Comparing Security Models ↗</a></li></ol></li><li><a href="#ch3-4">3.4 Custom Permissions</a><ol class="pgs"><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.custom_perms_create.htm&amp;type=5" target="_blank" rel="noopener">Create Custom Permissions ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.custom_perms_edit.htm&amp;type=5" target="_blank" rel="noopener">Edit Custom Permissions ↗</a></li></ol></li><li><a href="#ch3-5">3.5 Profiles</a><ol class="pgs"><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.users_profiles_using_enhanced_ui.htm&amp;type=5" target="_blank" rel="noopener">Configure Default Settings in Profiles ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.users_profiles_record_types.htm&amp;type=5" target="_blank" rel="noopener">Assign Record Types and Page Layouts in Profiles ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.admin_recordtype.htm&amp;type=5" target="_blank" rel="noopener">Assign Record Types to Profiles in the Original Profile User Interface ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.users_profiles_orig_page_layouts.htm&amp;type=5" target="_blank" rel="noopener">Assign Page Layouts in the Original Profile User Interface ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.users_profiles_epui_app_and_system.htm&amp;type=5" target="_blank" rel="noopener">App and System Settings in the Enhanced Profile User Interface ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.users_profiles_epui_search.htm&amp;type=5" target="_blank" rel="noopener">Search in the Enhanced Profile User Interface ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.login_hours.htm&amp;type=5" target="_blank" rel="noopener">View and Edit Login Hours in Profiles ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.login_ip_ranges.htm&amp;type=5" target="_blank" rel="noopener">Restrict Login IP Addresses in Profiles ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.users_inline_editing.htm&amp;type=5" target="_blank" rel="noopener">Edit Multiple Profiles with Profile List Views ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.users_profiles_cloning.htm&amp;type=5" target="_blank" rel="noopener">Create or Clone Profiles ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.users_profiles_assigned_users.htm&amp;type=5" target="_blank" rel="noopener">View a Profile&#x27;s Assigned Users ↗</a></li></ol></li><li><a href="#ch3-6">3.6 Permission Sets</a><ol class="pgs"><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.perm_sets_permissions_access.htm&amp;type=5" target="_blank" rel="noopener">Configure Permissions and Access in Permission Sets ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.perm_sets_objects_and_fields.htm&amp;type=5" target="_blank" rel="noopener">Enable Object Permissions in Permission Sets ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.perm_sets_app_perms.htm&amp;type=5" target="_blank" rel="noopener">Enable User Permissions in Permission Sets ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.perm_sets_custom_perms.htm&amp;type=5" target="_blank" rel="noopener">Enable Custom Permissions in Permission Sets ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.users_tab_visibility.htm&amp;type=5" target="_blank" rel="noopener">View and Edit Tab Settings in Permission Sets ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.perm_sets_about_app_and_system.htm&amp;type=5" target="_blank" rel="noopener">App and System Settings in Permission Sets ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.perm_sets_view.htm&amp;type=5" target="_blank" rel="noopener">Work with Permission Set Lists ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.perm_sets_manage_assignments.htm&amp;type=5" target="_blank" rel="noopener">Manage Permission Set Assignments ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.perm_sets_assigning.htm&amp;type=5" target="_blank" rel="noopener">Assign Permission Sets to a Single User ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.perm_sets_mass_assign.htm&amp;type=5" target="_blank" rel="noopener">Assign a Permission Set to Multiple Users ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.perm_sets_remove_assignments.htm&amp;type=5" target="_blank" rel="noopener">Remove User Assignments from a Permission Set ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.perm_sets_search.htm&amp;type=5" target="_blank" rel="noopener">Search Permission Sets ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.perm_sets_assigning_apps.htm&amp;type=5" target="_blank" rel="noopener">View and Edit Assigned Apps in Permission Sets ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.perm_sets_record_types_assign.htm&amp;type=5" target="_blank" rel="noopener">Assign Custom Record Types in Permission Sets ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.permissions_record_type_access.htm&amp;type=5" target="_blank" rel="noopener">How Is Record Type Access Specified? ↗</a></li></ol></li><li><a href="#ch3-7">3.7 Create a User Role</a></li></ol></li><li class="ch"><a href="#ch4"><b>第4章</b> Share Objects and Fields</a><ol><li><a href="#ch4-1">4.1 Field Permissions</a><ol class="pgs"><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.users_profiles_fls.htm&amp;type=5" target="_blank" rel="noopener">Set Field Permissions in Permission Sets and Profiles ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.users_fields_fls_permsets.htm&amp;type=5" target="_blank" rel="noopener">Set Field-Level Security for a Field on All Permission Sets ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.fields_about_encrypted_fields.htm&amp;type=5" target="_blank" rel="noopener">Classic Encryption for Custom Fields ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.adding_fields.htm&amp;type=5" target="_blank" rel="noopener">Create Custom Fields ↗</a></li></ol></li><li><a href="#ch4-2">4.2 Organization-Wide Sharing Defaults</a><ol class="pgs"><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.admin_sharing.htm&amp;type=5" target="_blank" rel="noopener">Set Your Internal Organization-Wide Sharing Defaults ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_owd_external.htm&amp;type=5" target="_blank" rel="noopener">External Organization-Wide Defaults Overview ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_owd_external_setting.htm&amp;type=5" target="_blank" rel="noopener">Set Your External Organization-Wide Sharing Defaults ↗</a></li></ol></li><li><a href="#ch4-3">4.3 Sharing Rules</a><ol class="pgs"><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_sharing_rule_types.htm&amp;type=5" target="_blank" rel="noopener">Sharing Rule Types ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_sharing_rules_owner.htm&amp;type=5" target="_blank" rel="noopener">Create Owner-Based Sharing Rules ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_sharing_rules_criteria.htm&amp;type=5" target="_blank" rel="noopener">Create Criteria-Based Sharing Rules ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_sharing_rules_guest.htm&amp;type=5" target="_blank" rel="noopener">Create Guest User Sharing Rules ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_sharing_data_set_categories.htm&amp;type=5" target="_blank" rel="noopener">Sharing Rule Categories ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_sharing_rules_edit.htm&amp;type=5" target="_blank" rel="noopener">Edit Sharing Rules ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_sharing_rule_considerations.htm&amp;type=5" target="_blank" rel="noopener">Sharing Rule Considerations ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_sharing_recalculating.htm&amp;type=5" target="_blank" rel="noopener">Recalculate Sharing Rules Manually ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_sharing_recalculating_parallel.htm&amp;type=5" target="_blank" rel="noopener">Automatic Recalculation of Org-Wide Defaults and Sharing Rules ↗</a></li></ol></li><li><a href="#ch4-4">4.4 User Sharing and Visibility</a><ol class="pgs"><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_sharing_users_concept.htm&amp;type=5" target="_blank" rel="noopener">User Sharing Considerations ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_sharing_owd_users.htm&amp;type=5" target="_blank" rel="noopener">Set the Org-Wide Sharing Defaults for User Records ↗</a></li></ol></li><li><a href="#ch4-5">4.5 Public and Personal Groups</a><ol class="pgs"><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.creating_and_editing_groups.htm&amp;type=5" target="_blank" rel="noopener">Create and Edit Public Groups ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.users_group_member_types.htm&amp;type=5" target="_blank" rel="noopener">Group Member Types ↗</a></li></ol></li><li><a href="#ch4-6">4.6 Manual Sharing</a><ol class="pgs"><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.granting_access_to_records_lex.htm&amp;type=5" target="_blank" rel="noopener">Grant Access to Records with Manual Sharing in Lightning Experience ↗</a></li></ol></li><li><a href="#ch4-7">4.7 Restriction Rules</a><ol class="pgs"><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_restriction_rule_create.htm&amp;type=5" target="_blank" rel="noopener">Create a Restriction Rule ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_restriction_rule_considerations.htm&amp;type=5" target="_blank" rel="noopener">Restriction Rule Considerations ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_restriction_rule_examples.htm&amp;type=5" target="_blank" rel="noopener">Restriction Rule Example Scenarios ↗</a></li></ol></li></ol></li><li class="ch"><a href="#ch5"><b>第5章</b> Audit and Monitor Your Organization’s Security</a><ol><li><a href="#ch5-1">5.1 Monitor Login History</a></li><li><a href="#ch5-2">5.2 Field History Tracking</a><ol class="pgs"><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.tracking_field_history_for_standard_objects.htm&amp;type=5" target="_blank" rel="noopener">Track Object Field History ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.field_audit_trail.htm&amp;type=5" target="_blank" rel="noopener">Field Audit Trail ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.field_audit_trail_query.htm&amp;type=5" target="_blank" rel="noopener">Query Batches of Archived Field History Data ↗</a></li></ol></li><li><a href="#ch5-3">5.3 Monitor Setup Changes with Setup Audit Trail</a></li></ol></li><li class="ch"><a href="#ch6"><b>第6章</b> Real-Time Event Monitoring</a><ol><li><a href="#ch6-1">6.1 Real-Time Event Monitoring Definitions</a></li><li><a href="#ch6-2">6.2 Considerations for Using Real-Time Event Monitoring</a></li><li><a href="#ch6-3">6.3 Enable Access to Real-Time Event Monitoring</a></li><li><a href="#ch6-4">6.4 Stream and Store Event Data</a><ol class="pgs"><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.event_monitoring_monitor_events_with_event_manager.htm&amp;type=5" target="_blank" rel="noopener">Manage Real-Time Event Monitoring Events ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_event_monitoring_streaming.htm&amp;type=5" target="_blank" rel="noopener">Event Data Streaming ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_event_monitoring_storage.htm&amp;type=5" target="_blank" rel="noopener">Event Data Storage ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_event_monitoring_batch_query.htm&amp;type=5" target="_blank" rel="noopener">Use Batch Apex Queries With Real-Time Event Monitoring ↗</a></li></ol></li><li><a href="#ch6-5">6.5 Create Logout Event Triggers</a></li><li><a href="#ch6-6">6.6 How Chunking Works with ReportEvent and ListViewEvent</a></li><li><a href="#ch6-7">6.7 Enhanced Transaction Security</a><ol class="pgs"><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_policy_list.htm&amp;type=5" target="_blank" rel="noopener">Types of Enhanced Transaction Security Policies ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_policy_types_api.htm&amp;type=5" target="_blank" rel="noopener">ApiEvent Policies ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_policy_types_apianomalyeventstore.htm&amp;type=5" target="_blank" rel="noopener">ApiAnomalyEventStore Policies ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_policy_types_bulkapiresulteventstore.htm&amp;type=5" target="_blank" rel="noopener">BulkApiResultEventStore Policies ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_policy_types_credentialstuff.htm&amp;type=5" target="_blank" rel="noopener">CredentialStuffingEventStore Policies ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_policy_types_fileevent.htm&amp;type=5" target="_blank" rel="noopener">FileEvent Policies ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_policy_types_listview.htm&amp;type=5" target="_blank" rel="noopener">ListViewEvent Policies ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_policy_types_login.htm&amp;type=5" target="_blank" rel="noopener">LoginEvent Policies ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_policy_types_permissionseteventstore.htm&amp;type=5" target="_blank" rel="noopener">PermissionSetEventStore Policies ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_policy_types_report.htm&amp;type=5" target="_blank" rel="noopener">ReportEvent Policies ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_policy_types_reportanomaly.htm&amp;type=5" target="_blank" rel="noopener">ReportAnomalyEventStore Policies ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_policy_types_sessionhijack.htm&amp;type=5" target="_blank" rel="noopener">SessionHijackingEventStore Policies ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_actions_notifs.htm&amp;type=5" target="_blank" rel="noopener">Enhanced Transaction Security Actions and Notifications ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_condition_builder.htm&amp;type=5" target="_blank" rel="noopener">Build a Transaction Security Policy with Condition Builder ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_cb_examples.htm&amp;type=5" target="_blank" rel="noopener">Condition Builder Examples ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_apex.htm&amp;type=5" target="_blank" rel="noopener">Create an Enhanced Transaction Security Policy That Uses Apex ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_policy_apex_examples.htm&amp;type=5" target="_blank" rel="noopener">Implementation Apex Examples ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_policy_apex_dml_example.htm&amp;type=5" target="_blank" rel="noopener">Asynchronous Apex Example ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_apex_testing.htm&amp;type=5" target="_blank" rel="noopener">Apex Testing ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_best_practices.htm&amp;type=5" target="_blank" rel="noopener">Best Practices for Writing and Maintaining Enhanced Transaction Security Policies ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_metering.htm&amp;type=5" target="_blank" rel="noopener">Enhanced Transaction Security Metering ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_exempt.htm&amp;type=5" target="_blank" rel="noopener">Exempt Users from Transaction Security Policies ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.enh_txn_sec_migration_troubleshoot.htm&amp;type=5" target="_blank" rel="noopener">Test and Troubleshoot Your New Enhanced Policy ↗</a></li></ol></li><li><a href="#ch6-8">6.8 Threat Detection</a><ol class="pgs"><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_session.htm&amp;type=5" target="_blank" rel="noopener">Session Hijacking ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_session_features.htm&amp;type=5" target="_blank" rel="noopener">Features of the Browser Fingerprint ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_session_review.htm&amp;type=5" target="_blank" rel="noopener">Investigate Session Hijacking ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_credstuff.htm&amp;type=5" target="_blank" rel="noopener">Credential Stuffing ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_credstuff_review.htm&amp;type=5" target="_blank" rel="noopener">Investigate Credential Stuffing ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_reportanomaly.htm&amp;type=5" target="_blank" rel="noopener">Report Anomaly ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_detection_steps.htm&amp;type=5" target="_blank" rel="noopener">Training and Inference Steps ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_detection_review.htm&amp;type=5" target="_blank" rel="noopener">Investigate Report Anomalies ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_detection_bestpractices.htm&amp;type=5" target="_blank" rel="noopener">Best Practices for Investigating Report Anomalies ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_detection_examples.htm&amp;type=5" target="_blank" rel="noopener">Report Anomaly Detection Examples ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_examples_notanomalous.htm&amp;type=5" target="_blank" rel="noopener">Detection Event Isn’t Anomalous ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_examples_maybeanomalous.htm&amp;type=5" target="_blank" rel="noopener">Detection Event Possibly Anomalous ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_examples_anomalous.htm&amp;type=5" target="_blank" rel="noopener">Detection Event Is Definitely Anomalous but Maybe Not Malicious ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_examples_malicious.htm&amp;type=5" target="_blank" rel="noopener">Detection Event Is Confirmed Malicious ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_apianomaly.htm&amp;type=5" target="_blank" rel="noopener">API Anomaly ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_detection_steps.htm&amp;type=5" target="_blank" rel="noopener">Training and Inference Steps ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_detection_investigate_api_anomaly.htm&amp;type=5" target="_blank" rel="noopener">Investigate API Request Anomalies ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_detection_api_bestpractices.htm&amp;type=5" target="_blank" rel="noopener">Best Practices for Investigating API Request Anomalies ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_detection_api_anomaly_examples.htm&amp;type=5" target="_blank" rel="noopener">API Request Anomaly Detection Examples ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_examples_api_notanomalous.htm&amp;type=5" target="_blank" rel="noopener">API Detection Event Isn’t Anomalous ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_examples_api_maybeanomalous.htm&amp;type=5" target="_blank" rel="noopener">API Detection Event Possibly Anomalous ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_examples_api_anomalous.htm&amp;type=5" target="_blank" rel="noopener">API Detection Event Is an Anomaly but Isn’t Clearly Malicious ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_examples_api_malicious.htm&amp;type=5" target="_blank" rel="noopener">API Detection Event Is Confirmed Malicious ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_detection_guest_user_anomaly.htm&amp;type=5" target="_blank" rel="noopener">Guest User Anomaly ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_detection_steps_guest_user_anomaly.htm&amp;type=5" target="_blank" rel="noopener">Investigate Guest User Anomalies ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_detection_investigate_guest_user_anomaly.htm&amp;type=5" target="_blank" rel="noopener">Best Practices for Investigating Guest User Anomalies ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_td_ui.htm&amp;type=5" target="_blank" rel="noopener">View Threat Detection Events and Provide Feedback ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_td_ui_enable_app.htm&amp;type=5" target="_blank" rel="noopener">Make the Threat Detection App Visible to Users ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_td_ui_view_and_feedback.htm&amp;type=5" target="_blank" rel="noopener">View Events and Provide Feedback ↗</a></li></ol></li><li><a href="#ch6-9">6.9 Event Log File Browser</a></li><li><a href="#ch6-10">6.10 Store and Query Log Data with Event Log Objects</a><ol class="pgs"><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_elo_analytics.htm&amp;type=5" target="_blank" rel="noopener">Analyze Log Data with Salesforce Direct ↗</a></li><li class="pg"><a href="https://help.salesforce.com/s/articleView?id=xcloud.elo_best_practices.htm&amp;type=5" target="_blank" rel="noopener">Best Practices and Considerations for Leveraging Event Log Object Data ↗</a></li></ol></li></ol></li><li class="ch"><a href="#ch7"><b>第7章</b> Security Guidelines for Apex and Visualforce Development</a></li><li class="ch"><a href="#ch8"><b>第8章</b> API End-of-Life Policy</a></li></ol></div></nav><main class="main"><h1 class="title">Salesforce: あなたの組織を保護する</h1><p class="subtitle">Secure Your Org — 日本語解説ガイド (公式 164 ページへの索引付き)</p><section id="intro" class="chapter" style="border-top:none;margin-top:0"><h2>★ はじめに / 全体像</h2><div class="intro">
+<p>本資料は Salesforce 公式ヘルプ
+<a href="https://help.salesforce.com/s/articleView?id=xcloud.security_secure_your_org.htm&type=5" target="_blank" rel="noopener">「Secure Your Org」配下 164 ページ</a>
+を 1 つの HTML にまとめ、主要概念に日本語解説と図解を追加した学習用インデックスです。
+詳細な手順は各リンク先 (公式) を参照してください。</p>
+<ul>
+<li><b>左サイドバー</b>: 全 164 ページの階層 TOC。検索ボックスで絞り込み可能。</li>
+<li><b>章解説</b>: 各章の冒頭に日本語の概念整理と図解 (SVG)。</li>
+<li><b>外部リンク</b>: 「↗」マークのリンクはすべて公式ヘルプ (新規タブ) を開きます。</li>
+</ul>
+</div>
+<svg viewBox="0 0 760 360" class="diagram" role="img" aria-label="Salesforceセキュリティ4層">
+  <defs>
+    <linearGradient id="g1" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#0176d3"/><stop offset="1" stop-color="#014486"/>
+    </linearGradient>
+  </defs>
+  <rect x="20" y="20" width="720" height="320" rx="14" fill="#f3f8fc" stroke="#cfd7df"/>
+  <text x="380" y="48" text-anchor="middle" font-size="18" font-weight="700" fill="#032d60">Salesforce セキュリティの 4 階層</text>
+
+  <g font-family="system-ui" font-size="13">
+    <!-- Layer 1 -->
+    <rect x="50" y="70" width="660" height="55" rx="8" fill="url(#g1)"/>
+    <text x="70" y="103" fill="#fff" font-weight="700">① 認証 Authenticate</text>
+    <text x="240" y="103" fill="#e5f1fb">MFA / SSO / セッション / 接続アプリ / ログインIP</text>
+
+    <!-- Layer 2 -->
+    <rect x="50" y="135" width="660" height="55" rx="8" fill="#1589ee"/>
+    <text x="70" y="168" fill="#fff" font-weight="700">② 認可 Permissions</text>
+    <text x="260" y="168" fill="#e5f1fb">プロファイル / 権限セット / ロール / カスタム権限</text>
+
+    <!-- Layer 3 -->
+    <rect x="50" y="200" width="660" height="55" rx="8" fill="#2e844a"/>
+    <text x="70" y="233" fill="#fff" font-weight="700">③ 共有 Sharing</text>
+    <text x="220" y="233" fill="#e5f1fb">OWD / ロール階層 / 共有ルール / 手動共有 / Apex 共有</text>
+
+    <!-- Layer 4 -->
+    <rect x="50" y="265" width="660" height="55" rx="8" fill="#7f5ab6"/>
+    <text x="70" y="298" fill="#fff" font-weight="700">④ 監査 Audit & Monitor</text>
+    <text x="270" y="298" fill="#e5f1fb">Health Check / 監査証跡 / 項目履歴 / Event Monitoring</text>
+  </g>
+</svg>
+</section><section class="chapter" id="ch1"><h2><span class="ch-num">第1章</span>Salesforce Security Basics</h2><div class="official"><a href="https://help.salesforce.com/s/articleView?id=xcloud.overview_security.htm&amp;type=5" target="_blank" rel="noopener">公式: https://help.salesforce.com/s/articleView?id=xcloud.overview_security.htm&amp;type=5 ↗</a></div><div class="intro">
+<p>Salesforce のセキュリティは「<b>Salesforce 側</b>」と「<b>顧客側</b>」の<b>共有責任モデル</b>で成り立ちます。
+Salesforce はインフラ・プラットフォーム・物理セキュリティ・暗号化基盤を提供し、
+顧客は<b>ユーザー認証・権限設計・共有設定・監査</b>といった「組織の中の使い方」を設計します。</p>
+
+<p>本ガイドの全体像は次の4層に整理できます:</p>
+<ol>
+  <li><b>認証 (Authenticate)</b> — 誰がログインできるか (MFA / SSO / セッション)</li>
+  <li><b>認可 (Give Access)</b> — ログインした人が何をしてよいか (プロファイル / 権限セット)</li>
+  <li><b>共有 (Share)</b> — どのレコードを見られるか (OWD / ロール階層 / 共有ルール)</li>
+  <li><b>監査 (Audit & Monitor)</b> — 何が起きたかを記録・検知する (ログ / Health Check / Real-Time EM)</li>
+</ol>
+</div>
+<svg viewBox="0 0 760 360" class="diagram" role="img" aria-label="Salesforceセキュリティ4層">
+  <defs>
+    <linearGradient id="g1" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#0176d3"/><stop offset="1" stop-color="#014486"/>
+    </linearGradient>
+  </defs>
+  <rect x="20" y="20" width="720" height="320" rx="14" fill="#f3f8fc" stroke="#cfd7df"/>
+  <text x="380" y="48" text-anchor="middle" font-size="18" font-weight="700" fill="#032d60">Salesforce セキュリティの 4 階層</text>
+
+  <g font-family="system-ui" font-size="13">
+    <!-- Layer 1 -->
+    <rect x="50" y="70" width="660" height="55" rx="8" fill="url(#g1)"/>
+    <text x="70" y="103" fill="#fff" font-weight="700">① 認証 Authenticate</text>
+    <text x="240" y="103" fill="#e5f1fb">MFA / SSO / セッション / 接続アプリ / ログインIP</text>
+
+    <!-- Layer 2 -->
+    <rect x="50" y="135" width="660" height="55" rx="8" fill="#1589ee"/>
+    <text x="70" y="168" fill="#fff" font-weight="700">② 認可 Permissions</text>
+    <text x="260" y="168" fill="#e5f1fb">プロファイル / 権限セット / ロール / カスタム権限</text>
+
+    <!-- Layer 3 -->
+    <rect x="50" y="200" width="660" height="55" rx="8" fill="#2e844a"/>
+    <text x="70" y="233" fill="#fff" font-weight="700">③ 共有 Sharing</text>
+    <text x="220" y="233" fill="#e5f1fb">OWD / ロール階層 / 共有ルール / 手動共有 / Apex 共有</text>
+
+    <!-- Layer 4 -->
+    <rect x="50" y="265" width="660" height="55" rx="8" fill="#7f5ab6"/>
+    <text x="70" y="298" fill="#fff" font-weight="700">④ 監査 Audit & Monitor</text>
+    <text x="270" y="298" fill="#e5f1fb">Health Check / 監査証跡 / 項目履歴 / Event Monitoring</text>
+  </g>
+</svg>
+<div class="section" id="ch1-1"><h3><span class="sec-num">1.1</span>Phishing and Malware <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.security_overview_trust.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3><p><b>フィッシングとマルウェア対策</b>: trust.salesforce.com で稼働状況を公開し、
+ユーザー側は不審なメール/ファイルを開かない、MFA を有効化する、ブラウザを最新に保つ等の基本対策が前提。
+Salesforce は顧客に対しパスワードや個人情報をメールで尋ねることはない。</p></div><div class="section" id="ch1-2"><h3><span class="sec-num">1.2</span>Security Health Check <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.security_health_check.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3><p><b>Security Health Check</b>: 設定 → セキュリティ → ヘルスチェックで開く。
+パスワード方針・セッション設定・証明書管理など 50 以上の設定項目を、Salesforce 推奨ベースラインと照合してスコア化する。
+カスタムベースラインで自社基準に合わせた評価も可能。<b>四半期ごとにスコアを確認</b>するのが基本運用。</p></div><div class="section" id="ch1-3"><h3><span class="sec-num">1.3</span>Auditing <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.security_overview_auditing.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3><p><b>監査</b>: 「誰がいつ何をしたか」を残す機能群。代表的なログ:
+<ul>
+<li><b>ログイン履歴</b> (過去 6 か月): 成功/失敗、IP、認証方式</li>
+<li><b>設定監査証跡</b> (過去 180 日 / Shield で 365 日): 管理者の設定変更</li>
+<li><b>項目履歴管理</b>: 個別レコード項目の変更追跡 (オブジェクトあたり最大 20 項目)</li>
+<li><b>Event Monitoring (Shield)</b>: API コール・レポート出力など 50+ イベント</li>
+</ul></p></div><div class="section" id="ch1-4"><h3><span class="sec-num">1.4</span>Salesforce Shield <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.salesforce_shield.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3><p><b>Salesforce Shield</b>: 高度セキュリティが必要な業界 (金融・医療等) 向けの追加製品。3 機能セット:
+<ol>
+<li><b>Platform Encryption</b>: 暗号化キーを顧客が管理しつつ、項目/添付/検索インデックスまで暗号化</li>
+<li><b>Event Monitoring</b>: 詳細イベントログ + Threat Detection (リアルタイム異常検知)</li>
+<li><b>Field Audit Trail</b>: 項目履歴を最大 10 年保持</li>
+</ol>
+標準機能の延長ではなく <b>有償アドオン</b>。コンプライアンス要件 (PCI/HIPAA/GDPR 等) で購入を検討する。</p></div></section><section class="chapter" id="ch2"><h2><span class="ch-num">第2章</span>Authenticate Users</h2><div class="official"><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_sharing_setup.htm&amp;type=5" target="_blank" rel="noopener">公式: https://help.salesforce.com/s/articleView?id=xcloud.security_sharing_setup.htm&amp;type=5 ↗</a></div><div class="intro">
+<p>認証は「<b>本人確認</b>」のレイヤー。Salesforce は ID/パスワードに加え、
+<b>MFA・SSO・OAuth・セッション制御</b>を組み合わせて多層防御を実現する。
+2022 年以降、Salesforce は<b>全顧客に MFA を契約上義務化</b>しており、未導入の組織は自動的に有効化される運用となっている。</p>
+</div>
+<svg viewBox="0 0 760 320" class="diagram" role="img" aria-label="MFAフロー">
+  <text x="380" y="28" text-anchor="middle" font-size="16" font-weight="700" fill="#032d60">MFA ログインフロー</text>
+  <g font-family="system-ui" font-size="12">
+    <!-- User -->
+    <circle cx="80" cy="170" r="36" fill="#e5f1fb" stroke="#0176d3" stroke-width="2"/>
+    <text x="80" y="174" text-anchor="middle" font-weight="700">ユーザー</text>
+    <!-- Step 1 ID/PW -->
+    <rect x="160" y="80" width="160" height="60" rx="8" fill="#fff" stroke="#0176d3"/>
+    <text x="240" y="105" text-anchor="middle" font-weight="700">① ID/パスワード</text>
+    <text x="240" y="125" text-anchor="middle" fill="#555">何を知っているか</text>
+    <!-- Step 2 second factor -->
+    <rect x="160" y="200" width="160" height="60" rx="8" fill="#fff" stroke="#2e844a"/>
+    <text x="240" y="225" text-anchor="middle" font-weight="700">② 第2要素</text>
+    <text x="240" y="245" text-anchor="middle" fill="#555">Authenticator / 物理キー</text>
+    <!-- Salesforce -->
+    <rect x="400" y="140" width="180" height="60" rx="8" fill="#0176d3"/>
+    <text x="490" y="167" text-anchor="middle" fill="#fff" font-weight="700">Salesforce 検証</text>
+    <text x="490" y="187" text-anchor="middle" fill="#cfe6f8">2つともOK?</text>
+    <!-- Grant -->
+    <rect x="620" y="80" width="120" height="60" rx="8" fill="#2e844a"/>
+    <text x="680" y="105" text-anchor="middle" fill="#fff" font-weight="700">許可</text>
+    <text x="680" y="125" text-anchor="middle" fill="#d6f0db">セッション発行</text>
+    <rect x="620" y="200" width="120" height="60" rx="8" fill="#ba0517"/>
+    <text x="680" y="225" text-anchor="middle" fill="#fff" font-weight="700">拒否</text>
+    <text x="680" y="245" text-anchor="middle" fill="#fbd5d2">再試行/ロック</text>
+    <!-- Arrows -->
+    <line x1="116" y1="155" x2="160" y2="110" stroke="#0176d3" stroke-width="2" marker-end="url(#arr)"/>
+    <line x1="116" y1="185" x2="160" y2="230" stroke="#2e844a" stroke-width="2" marker-end="url(#arr)"/>
+    <line x1="320" y1="110" x2="400" y2="160" stroke="#888" stroke-width="2"/>
+    <line x1="320" y1="230" x2="400" y2="180" stroke="#888" stroke-width="2"/>
+    <line x1="580" y1="160" x2="620" y2="110" stroke="#2e844a" stroke-width="2" marker-end="url(#arr)"/>
+    <line x1="580" y1="180" x2="620" y2="230" stroke="#ba0517" stroke-width="2" marker-end="url(#arr)"/>
+  </g>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#666"/>
+    </marker>
+  </defs>
+</svg>
+
+<svg viewBox="0 0 760 280" class="diagram" role="img" aria-label="SSOフロー">
+  <text x="380" y="28" text-anchor="middle" font-size="16" font-weight="700" fill="#032d60">SAML / OIDC によるシングルサインオン</text>
+  <g font-family="system-ui" font-size="12">
+    <rect x="40" y="100" width="120" height="80" rx="8" fill="#e5f1fb" stroke="#0176d3"/>
+    <text x="100" y="135" text-anchor="middle" font-weight="700">ユーザー</text>
+    <text x="100" y="155" text-anchor="middle" fill="#555">ブラウザ</text>
+
+    <rect x="220" y="100" width="160" height="80" rx="8" fill="#fff" stroke="#7f5ab6" stroke-width="2"/>
+    <text x="300" y="130" text-anchor="middle" font-weight="700">IdP</text>
+    <text x="300" y="150" text-anchor="middle" fill="#555">Azure AD / Okta /</text>
+    <text x="300" y="166" text-anchor="middle" fill="#555">Google / 自社 IdP</text>
+
+    <rect x="440" y="100" width="160" height="80" rx="8" fill="#fff" stroke="#0176d3" stroke-width="2"/>
+    <text x="520" y="130" text-anchor="middle" font-weight="700">Salesforce (SP)</text>
+    <text x="520" y="150" text-anchor="middle" fill="#555">SAML Assertion を</text>
+    <text x="520" y="166" text-anchor="middle" fill="#555">検証→ログイン</text>
+
+    <rect x="650" y="100" width="80" height="80" rx="8" fill="#2e844a"/>
+    <text x="690" y="145" text-anchor="middle" fill="#fff" font-weight="700">App</text>
+
+    <line x1="160" y1="140" x2="220" y2="140" stroke="#0176d3" stroke-width="2" marker-end="url(#arr2)"/>
+    <text x="180" y="130" font-size="11" fill="#0176d3">①認証要求</text>
+    <line x1="380" y1="140" x2="440" y2="140" stroke="#7f5ab6" stroke-width="2" marker-end="url(#arr2)"/>
+    <text x="385" y="130" font-size="11" fill="#7f5ab6">②Assertion</text>
+    <line x1="600" y1="140" x2="650" y2="140" stroke="#2e844a" stroke-width="2" marker-end="url(#arr2)"/>
+    <text x="605" y="130" font-size="11" fill="#2e844a">③利用許可</text>
+  </g>
+  <defs>
+    <marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#666"/>
+    </marker>
+  </defs>
+</svg>
+<div class="section" id="ch2-1"><h3><span class="sec-num">2.1</span>Multi-Factor Authentication <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.mfa_pointer.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3><p><b>多要素認証 (MFA)</b>: 「知っているもの (PW)」+「持っているもの (Authenticator/物理キー)」の2つを要求。
+推奨方式は <b>Salesforce Authenticator アプリ</b>、<b>TOTP アプリ</b>、<b>WebAuthn (FIDO2 物理キー)</b>。
+SMS や音声通話は<b>非推奨</b>。MFA は契約義務であり、未対応の組織には自動有効化が段階的に適用される。</p></div><div class="section" id="ch2-2"><h3><span class="sec-num">2.2</span>Single Sign-On <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.single_signon_pointer.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3><p><b>シングルサインオン (SSO)</b>: 外部 IdP (Azure AD / Okta / Google / 自社 ADFS) を信頼し、
+Salesforce ログイン画面で ID/PW を入力せずに通過する。プロトコルは <b>SAML 2.0</b> または <b>OpenID Connect</b>。
+SSO 経由でも MFA は IdP 側で実装されていれば「MFA 義務」を満たす。</p></div><div class="section" id="ch2-3"><h3><span class="sec-num">2.3</span>Custom Login Flows <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.custom_login_flows_pointer.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3><p><b>ログインフロー</b>: ログイン直後に Flow を差し込み、利用規約同意・追加質問・条件付き MFA 等を実行できる。
+プロファイルごとに割り当て可能。</p></div><div class="section" id="ch2-4"><h3><span class="sec-num">2.4</span>Connected Apps <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.connected_apps.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3><p><b>接続アプリ (Connected App)</b>: 外部アプリ (モバイルアプリ・iPaaS・社内ツール) が Salesforce API を呼ぶための入口。
+OAuth 2.0 で認可し、<b>スコープ・IP 制限・セッション期限・許可するプロファイル</b>を細かく制御できる。
+管理者は「使用済み接続アプリ」画面で利用状況を監視し、不要なアプリのアクセスを失効させる。</p></div><div class="section" id="ch2-5"><h3><span class="sec-num">2.5</span>Manage User Passwords <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.manage_user_passwords_pointer.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3><p><b>パスワード管理</b>: パスワード方針 (長さ・複雑度・有効期限・履歴) はプロファイル単位で設定。
+パスワードリセットメール、強制ロック解除、初回ログイン URL 発行などは管理者が個別に実行可能。
+SSO 環境では Salesforce 側のパスワードは「フォールバック用」となるが、流出経路となるため強度は維持する。</p></div><div class="section" id="ch2-6"><h3><span class="sec-num">2.6</span>Device Activation <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.device_activation_pointer.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3><p><b>デバイス有効化</b>: 未知のブラウザ/IP からログインがあった際に追加確認 (メールコード等) を要求する仕組み。
+信頼済みデバイスとして登録すれば次回以降スキップ。<b>MFA とは別レイヤー</b>の緩い保護であり、MFA 導入後も併用される。</p></div><div class="section" id="ch2-7"><h3><span class="sec-num">2.7</span>Session Security <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.session_settings_pointer.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3><p><b>セッションセキュリティ</b>: タイムアウト時間、IP ロック (セッションを発行 IP に固定)、
+HTTPS 強制、High Assurance セッション (重要操作だけ MFA 再要求) などを制御。
+Lightning Experience では既定で安全側の設定が適用される。</p></div></section><section class="chapter" id="ch3"><h2><span class="ch-num">第3章</span>Give Users Access to Data</h2><div class="official"><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_feature_setup.htm&amp;type=5" target="_blank" rel="noopener">公式: https://help.salesforce.com/s/articleView?id=xcloud.security_feature_setup.htm&amp;type=5 ↗</a></div><div class="intro">
+<p>認可は「ログインした人が<b>何をしてよいか</b>」を決めるレイヤー。Salesforce では伝統的に
+<b>プロファイル</b>と<b>権限セット</b>の2系統で表現される。
+近年は「プロファイルは最小限に、機能ごとの追加権限は権限セット (権限セットグループ)」が推奨設計。</p>
+</div>
+<svg viewBox="0 0 760 300" class="diagram" role="img" aria-label="権限の合成">
+  <text x="380" y="28" text-anchor="middle" font-size="16" font-weight="700" fill="#032d60">権限はユーザーごとに「合成」される (OR 結合)</text>
+  <g font-family="system-ui" font-size="12">
+    <circle cx="200" cy="160" r="90" fill="#0176d3" opacity="0.7"/>
+    <text x="200" y="155" text-anchor="middle" fill="#fff" font-weight="700">プロファイル</text>
+    <text x="200" y="172" text-anchor="middle" fill="#fff" font-size="11">基本セット (1ユーザー1個)</text>
+
+    <circle cx="380" cy="160" r="90" fill="#2e844a" opacity="0.7"/>
+    <text x="380" y="155" text-anchor="middle" fill="#fff" font-weight="700">権限セット</text>
+    <text x="380" y="172" text-anchor="middle" fill="#fff" font-size="11">追加機能 (複数割当可)</text>
+
+    <circle cx="560" cy="160" r="90" fill="#7f5ab6" opacity="0.7"/>
+    <text x="560" y="155" text-anchor="middle" fill="#fff" font-weight="700">権限セットグループ</text>
+    <text x="560" y="172" text-anchor="middle" fill="#fff" font-size="11">役割単位の束ね</text>
+
+    <text x="380" y="265" text-anchor="middle" font-size="13" fill="#032d60" font-weight="700">最終権限 = 上記すべての和集合 (一度付与されたら剥がしにくい点に注意)</text>
+  </g>
+</svg>
+<div class="section" id="ch3-1"><h3><span class="sec-num">3.1</span>Control Who Sees What <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.security_data_access.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3><p><b>Control Who Sees What</b>: Salesforce のアクセス制御は3軸で考える。
+<ol>
+<li><b>オブジェクトレベル</b>: 「Account を見られるか」 (プロファイル/権限セット)</li>
+<li><b>項目レベル</b>: 「Account の Revenue 項目を見られるか」 (Field-Level Security)</li>
+<li><b>レコードレベル</b>: 「この特定の Account レコードを見られるか」 (共有設定 — 第4章)</li>
+</ol>
+3つは AND で重なる: オブジェクト Read 不可なら、項目や共有を緩めても見えない。</p></div><div class="section" id="ch3-2"><h3><span class="sec-num">3.2</span>User Permissions <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.admin_userperms.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3><p><b>ユーザー権限</b>: 「Modify All Data」「View All Data」「API Enabled」など、
+組織全体に効く特殊権限。誤付与すると<b>共有設定をすべて貫通</b>するので、付与対象は最小に。</p><details><summary>このセクションの下位ページ一覧 (公式リンク)</summary><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.permissions_about_users_access.htm&amp;type=5" target="_blank" rel="noopener">Permissions and Access Settings ↗</a></li><ul class="page-list"><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.permissions_revoking_access.htm&amp;type=5" target="_blank" rel="noopener">Revoke Permissions and Access ↗</a></li></ul></details></div><div class="section" id="ch3-3"><h3><span class="sec-num">3.3</span>Object Permissions <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.users_profiles_object_perms.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3><p><b>オブジェクト権限 (CRUD)</b>: Create / Read / Edit / Delete の4種に加え、
+<b>View All</b> (共有設定を無視して全件閲覧) / <b>Modify All</b> (同じく編集) の特殊権限がある。
+レポート対象の管理者ロールには View All を、業務担当には付与しないのが基本。</p><details><summary>このセクションの下位ページ一覧 (公式リンク)</summary><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.users_profiles_view_all_mod_all.htm&amp;type=5" target="_blank" rel="noopener">“View All” and “Modify All” Permissions Overview ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.users_sharing_vs_obj_level_perms.htm&amp;type=5" target="_blank" rel="noopener">Comparing Security Models ↗</a></li></details></div><div class="section" id="ch3-4"><h3><span class="sec-num">3.4</span>Custom Permissions <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.custom_perms_overview.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3><p><b>カスタム権限</b>: 開発者が任意に作る「権限名」。Apex / Flow / 数式から
+<code>$Permission.MyCustomPerm</code> で参照でき、業務ロジックの分岐に使える。
+プロファイル/権限セットに紐付けて配布。</p><details><summary>このセクションの下位ページ一覧 (公式リンク)</summary><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.custom_perms_create.htm&amp;type=5" target="_blank" rel="noopener">Create Custom Permissions ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.custom_perms_edit.htm&amp;type=5" target="_blank" rel="noopener">Edit Custom Permissions ↗</a></li></details></div><div class="section" id="ch3-5"><h3><span class="sec-num">3.5</span>Profiles <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.admin_userprofiles.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3><p><b>プロファイル</b>: ユーザーの<b>必須の土台</b>。1ユーザーに1つ。
+オブジェクト/項目/Apex クラス/Visualforce/Tab/レコードタイプ/ページレイアウト/ログイン IP/ログイン時間など
+広範な設定を持つ。複製で増えやすく管理が膨らむため、<b>最小限の標準プロファイル+権限セット</b>戦略を取る。</p><details><summary>このセクションの下位ページ一覧 (公式リンク)</summary><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.users_profiles_using_enhanced_ui.htm&amp;type=5" target="_blank" rel="noopener">Configure Default Settings in Profiles ↗</a></li><ul class="page-list"><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.users_profiles_record_types.htm&amp;type=5" target="_blank" rel="noopener">Assign Record Types and Page Layouts in Profiles ↗</a></li><ul class="page-list"><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.admin_recordtype.htm&amp;type=5" target="_blank" rel="noopener">Assign Record Types to Profiles in the Original Profile User Interface ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.users_profiles_orig_page_layouts.htm&amp;type=5" target="_blank" rel="noopener">Assign Page Layouts in the Original Profile User Interface ↗</a></li></ul><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.users_profiles_epui_app_and_system.htm&amp;type=5" target="_blank" rel="noopener">App and System Settings in the Enhanced Profile User Interface ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.users_profiles_epui_search.htm&amp;type=5" target="_blank" rel="noopener">Search in the Enhanced Profile User Interface ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.login_hours.htm&amp;type=5" target="_blank" rel="noopener">View and Edit Login Hours in Profiles ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.login_ip_ranges.htm&amp;type=5" target="_blank" rel="noopener">Restrict Login IP Addresses in Profiles ↗</a></li></ul><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.users_inline_editing.htm&amp;type=5" target="_blank" rel="noopener">Edit Multiple Profiles with Profile List Views ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.users_profiles_cloning.htm&amp;type=5" target="_blank" rel="noopener">Create or Clone Profiles ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.users_profiles_assigned_users.htm&amp;type=5" target="_blank" rel="noopener">View a Profile&#x27;s Assigned Users ↗</a></li></details></div><div class="section" id="ch3-6"><h3><span class="sec-num">3.6</span>Permission Sets <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.perm_sets_overview.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3><p><b>権限セット</b>: プロファイルを上書きせず<b>追加</b>するための単位。複数同時割当可。
+「機能 X を使えるユーザー」を権限セットで束ねれば、プロファイルを増殖させずに済む。
+<b>権限セットグループ</b>でさらに役割単位 (営業マネージャ = 営業 + レポート参照 + チーム管理) に束ねる。</p><details><summary>このセクションの下位ページ一覧 (公式リンク)</summary><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.perm_sets_permissions_access.htm&amp;type=5" target="_blank" rel="noopener">Configure Permissions and Access in Permission Sets ↗</a></li><ul class="page-list"><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.perm_sets_objects_and_fields.htm&amp;type=5" target="_blank" rel="noopener">Enable Object Permissions in Permission Sets ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.perm_sets_app_perms.htm&amp;type=5" target="_blank" rel="noopener">Enable User Permissions in Permission Sets ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.perm_sets_custom_perms.htm&amp;type=5" target="_blank" rel="noopener">Enable Custom Permissions in Permission Sets ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.users_tab_visibility.htm&amp;type=5" target="_blank" rel="noopener">View and Edit Tab Settings in Permission Sets ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.perm_sets_about_app_and_system.htm&amp;type=5" target="_blank" rel="noopener">App and System Settings in Permission Sets ↗</a></li></ul><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.perm_sets_view.htm&amp;type=5" target="_blank" rel="noopener">Work with Permission Set Lists ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.perm_sets_manage_assignments.htm&amp;type=5" target="_blank" rel="noopener">Manage Permission Set Assignments ↗</a></li><ul class="page-list"><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.perm_sets_assigning.htm&amp;type=5" target="_blank" rel="noopener">Assign Permission Sets to a Single User ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.perm_sets_mass_assign.htm&amp;type=5" target="_blank" rel="noopener">Assign a Permission Set to Multiple Users ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.perm_sets_remove_assignments.htm&amp;type=5" target="_blank" rel="noopener">Remove User Assignments from a Permission Set ↗</a></li></ul><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.perm_sets_search.htm&amp;type=5" target="_blank" rel="noopener">Search Permission Sets ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.perm_sets_assigning_apps.htm&amp;type=5" target="_blank" rel="noopener">View and Edit Assigned Apps in Permission Sets ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.perm_sets_record_types_assign.htm&amp;type=5" target="_blank" rel="noopener">Assign Custom Record Types in Permission Sets ↗</a></li><ul class="page-list"><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.permissions_record_type_access.htm&amp;type=5" target="_blank" rel="noopener">How Is Record Type Access Specified? ↗</a></li></ul></details></div><div class="section" id="ch3-7"><h3><span class="sec-num">3.7</span>Create a User Role <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.admin_roles.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3></div></section><section class="chapter" id="ch4"><h2><span class="ch-num">第4章</span>Share Objects and Fields</h2><div class="official"><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_data_sharing.htm&amp;type=5" target="_blank" rel="noopener">公式: https://help.salesforce.com/s/articleView?id=xcloud.security_data_sharing.htm&amp;type=5 ↗</a></div><div class="intro">
+<p>共有 (Sharing) は Salesforce セキュリティで最も難解な領域。
+「<b>原則は閉じて、必要に応じて開ける</b>」が設計の鉄則。
+組織のデータを最も厳しい状態 (Private) からスタートし、ロール階層・共有ルール・手動共有で必要な人にだけ開放する。</p>
+</div>
+<svg viewBox="0 0 760 400" class="diagram" role="img" aria-label="共有モデル積み上げ">
+  <text x="380" y="28" text-anchor="middle" font-size="16" font-weight="700" fill="#032d60">レコード共有の積み上げ (下から上へ開放)</text>
+  <g font-family="system-ui" font-size="12">
+    <!-- OWD base -->
+    <rect x="100" y="320" width="560" height="50" rx="6" fill="#032d60"/>
+    <text x="380" y="350" text-anchor="middle" fill="#fff" font-weight="700">① OWD (組織の共有設定) — Private / Public Read / Public Read-Write の最も厳しい底</text>
+
+    <rect x="120" y="260" width="520" height="50" rx="6" fill="#0176d3"/>
+    <text x="380" y="290" text-anchor="middle" fill="#fff" font-weight="700">② ロール階層 — 上司は部下のレコードを自動継承</text>
+
+    <rect x="140" y="200" width="480" height="50" rx="6" fill="#1589ee"/>
+    <text x="380" y="230" text-anchor="middle" fill="#fff" font-weight="700">③ 共有ルール — 基準ベース / 所有者ベースで横展開</text>
+
+    <rect x="160" y="140" width="440" height="50" rx="6" fill="#2e844a"/>
+    <text x="380" y="170" text-anchor="middle" fill="#fff" font-weight="700">④ 手動共有 / チーム共有 — レコード単位の追加開放</text>
+
+    <rect x="180" y="80" width="400" height="50" rx="6" fill="#7f5ab6"/>
+    <text x="380" y="110" text-anchor="middle" fill="#fff" font-weight="700">⑤ Apex 共有 / プログラム的共有 — 任意条件で動的開放</text>
+
+    <text x="50" y="350" font-size="11" fill="#555">閉</text>
+    <text x="50" y="105" font-size="11" fill="#555">開</text>
+    <line x1="60" y1="100" x2="60" y2="345" stroke="#aaa" stroke-dasharray="3 3"/>
+  </g>
+</svg>
+
+<svg viewBox="0 0 760 320" class="diagram" role="img" aria-label="ロール階層">
+  <text x="380" y="28" text-anchor="middle" font-size="16" font-weight="700" fill="#032d60">ロール階層: 上位ロールは下位レコードを自動的に閲覧</text>
+  <g font-family="system-ui" font-size="12">
+    <rect x="320" y="60" width="140" height="40" rx="6" fill="#0176d3"/>
+    <text x="390" y="85" text-anchor="middle" fill="#fff" font-weight="700">CEO</text>
+
+    <rect x="160" y="140" width="140" height="40" rx="6" fill="#1589ee"/>
+    <text x="230" y="165" text-anchor="middle" fill="#fff" font-weight="700">営業部長 (東)</text>
+    <rect x="480" y="140" width="140" height="40" rx="6" fill="#1589ee"/>
+    <text x="550" y="165" text-anchor="middle" fill="#fff" font-weight="700">営業部長 (西)</text>
+
+    <rect x="60" y="230" width="120" height="40" rx="6" fill="#2e844a"/>
+    <text x="120" y="255" text-anchor="middle" fill="#fff" font-weight="700">担当 A</text>
+    <rect x="200" y="230" width="120" height="40" rx="6" fill="#2e844a"/>
+    <text x="260" y="255" text-anchor="middle" fill="#fff" font-weight="700">担当 B</text>
+    <rect x="440" y="230" width="120" height="40" rx="6" fill="#2e844a"/>
+    <text x="500" y="255" text-anchor="middle" fill="#fff" font-weight="700">担当 C</text>
+    <rect x="580" y="230" width="120" height="40" rx="6" fill="#2e844a"/>
+    <text x="640" y="255" text-anchor="middle" fill="#fff" font-weight="700">担当 D</text>
+
+    <line x1="390" y1="100" x2="230" y2="140" stroke="#888" stroke-width="2"/>
+    <line x1="390" y1="100" x2="550" y2="140" stroke="#888" stroke-width="2"/>
+    <line x1="230" y1="180" x2="120" y2="230" stroke="#888"/>
+    <line x1="230" y1="180" x2="260" y2="230" stroke="#888"/>
+    <line x1="550" y1="180" x2="500" y2="230" stroke="#888"/>
+    <line x1="550" y1="180" x2="640" y2="230" stroke="#888"/>
+
+    <text x="380" y="305" text-anchor="middle" font-size="11" fill="#555">CEO は全レコード閲覧。東部長は A/B のみ。西部長は C/D のみ。</text>
+  </g>
+</svg>
+<div class="section" id="ch4-1"><h3><span class="sec-num">4.1</span>Field Permissions <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.users_profiles_field_perms.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3><details><summary>このセクションの下位ページ一覧 (公式リンク)</summary><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.users_profiles_fls.htm&amp;type=5" target="_blank" rel="noopener">Set Field Permissions in Permission Sets and Profiles ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.users_fields_fls_permsets.htm&amp;type=5" target="_blank" rel="noopener">Set Field-Level Security for a Field on All Permission Sets ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.fields_about_encrypted_fields.htm&amp;type=5" target="_blank" rel="noopener">Classic Encryption for Custom Fields ↗</a></li><ul class="page-list"><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.adding_fields.htm&amp;type=5" target="_blank" rel="noopener">Create Custom Fields ↗</a></li></ul></details></div><div class="section" id="ch4-2"><h3><span class="sec-num">4.2</span>Organization-Wide Sharing Defaults <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.security_sharing_owd_about.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3><details><summary>このセクションの下位ページ一覧 (公式リンク)</summary><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.admin_sharing.htm&amp;type=5" target="_blank" rel="noopener">Set Your Internal Organization-Wide Sharing Defaults ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_owd_external.htm&amp;type=5" target="_blank" rel="noopener">External Organization-Wide Defaults Overview ↗</a></li><ul class="page-list"><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_owd_external_setting.htm&amp;type=5" target="_blank" rel="noopener">Set Your External Organization-Wide Sharing Defaults ↗</a></li></ul></details></div><div class="section" id="ch4-3"><h3><span class="sec-num">4.3</span>Sharing Rules <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.security_about_sharing_rules.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3><details><summary>このセクションの下位ページ一覧 (公式リンク)</summary><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_sharing_rule_types.htm&amp;type=5" target="_blank" rel="noopener">Sharing Rule Types ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_sharing_rules_owner.htm&amp;type=5" target="_blank" rel="noopener">Create Owner-Based Sharing Rules ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_sharing_rules_criteria.htm&amp;type=5" target="_blank" rel="noopener">Create Criteria-Based Sharing Rules ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_sharing_rules_guest.htm&amp;type=5" target="_blank" rel="noopener">Create Guest User Sharing Rules ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_sharing_data_set_categories.htm&amp;type=5" target="_blank" rel="noopener">Sharing Rule Categories ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_sharing_rules_edit.htm&amp;type=5" target="_blank" rel="noopener">Edit Sharing Rules ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_sharing_rule_considerations.htm&amp;type=5" target="_blank" rel="noopener">Sharing Rule Considerations ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_sharing_recalculating.htm&amp;type=5" target="_blank" rel="noopener">Recalculate Sharing Rules Manually ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_sharing_recalculating_parallel.htm&amp;type=5" target="_blank" rel="noopener">Automatic Recalculation of Org-Wide Defaults and Sharing Rules ↗</a></li></details></div><div class="section" id="ch4-4"><h3><span class="sec-num">4.4</span>User Sharing and Visibility <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.security_sharing_users.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3><details><summary>このセクションの下位ページ一覧 (公式リンク)</summary><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_sharing_users_concept.htm&amp;type=5" target="_blank" rel="noopener">User Sharing Considerations ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_sharing_owd_users.htm&amp;type=5" target="_blank" rel="noopener">Set the Org-Wide Sharing Defaults for User Records ↗</a></li></details></div><div class="section" id="ch4-5"><h3><span class="sec-num">4.5</span>Public and Personal Groups <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.user_groups.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3><details><summary>このセクションの下位ページ一覧 (公式リンク)</summary><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.creating_and_editing_groups.htm&amp;type=5" target="_blank" rel="noopener">Create and Edit Public Groups ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.users_group_member_types.htm&amp;type=5" target="_blank" rel="noopener">Group Member Types ↗</a></li></details></div><div class="section" id="ch4-6"><h3><span class="sec-num">4.6</span>Manual Sharing <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.granting_access_to_records.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3><details><summary>このセクションの下位ページ一覧 (公式リンク)</summary><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.granting_access_to_records_lex.htm&amp;type=5" target="_blank" rel="noopener">Grant Access to Records with Manual Sharing in Lightning Experience ↗</a></li></details></div><div class="section" id="ch4-7"><h3><span class="sec-num">4.7</span>Restriction Rules <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.security_restriction_rule.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3><details><summary>このセクションの下位ページ一覧 (公式リンク)</summary><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_restriction_rule_create.htm&amp;type=5" target="_blank" rel="noopener">Create a Restriction Rule ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_restriction_rule_considerations.htm&amp;type=5" target="_blank" rel="noopener">Restriction Rule Considerations ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_restriction_rule_examples.htm&amp;type=5" target="_blank" rel="noopener">Restriction Rule Example Scenarios ↗</a></li></details></div></section><section class="chapter" id="ch5"><h2><span class="ch-num">第5章</span>Audit and Monitor Your Organization’s Security</h2><div class="official"><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_monitoring.htm&amp;type=5" target="_blank" rel="noopener">公式: https://help.salesforce.com/s/articleView?id=xcloud.security_monitoring.htm&amp;type=5 ↗</a></div><div class="intro">
+<p>監査・モニタリングは「予防」ではなく「<b>事後追跡</b>」のレイヤー。
+インシデント発生時に「誰が・いつ・何を変えたか」を即座に答えられるよう、
+ログの保持期間と取得対象を事前に設計しておく。</p>
+</div>
+<svg viewBox="0 0 760 280" class="diagram" role="img" aria-label="監査ログ">
+  <text x="380" y="28" text-anchor="middle" font-size="16" font-weight="700" fill="#032d60">監査ログの種類と保持期間</text>
+  <g font-family="system-ui" font-size="12">
+    <rect x="40" y="70" width="160" height="160" rx="8" fill="#0176d3"/>
+    <text x="120" y="100" text-anchor="middle" fill="#fff" font-weight="700">ログイン履歴</text>
+    <text x="120" y="125" text-anchor="middle" fill="#cfe6f8">誰がいつどこから</text>
+    <text x="120" y="145" text-anchor="middle" fill="#cfe6f8">ログインしたか</text>
+    <text x="120" y="195" text-anchor="middle" fill="#fff" font-weight="700">6 か月</text>
+
+    <rect x="220" y="70" width="160" height="160" rx="8" fill="#1589ee"/>
+    <text x="300" y="100" text-anchor="middle" fill="#fff" font-weight="700">設定監査証跡</text>
+    <text x="300" y="125" text-anchor="middle" fill="#cfe6f8">管理者の設定変更</text>
+    <text x="300" y="145" text-anchor="middle" fill="#cfe6f8">(項目追加/権限変更等)</text>
+    <text x="300" y="195" text-anchor="middle" fill="#fff" font-weight="700">180 日 / Shield 365 日</text>
+
+    <rect x="400" y="70" width="160" height="160" rx="8" fill="#2e844a"/>
+    <text x="480" y="100" text-anchor="middle" fill="#fff" font-weight="700">項目履歴管理</text>
+    <text x="480" y="125" text-anchor="middle" fill="#d6f0db">レコード項目の</text>
+    <text x="480" y="145" text-anchor="middle" fill="#d6f0db">変更履歴 (最大20項目)</text>
+    <text x="480" y="195" text-anchor="middle" fill="#fff" font-weight="700">18 か月 / Shield 10 年</text>
+
+    <rect x="580" y="70" width="160" height="160" rx="8" fill="#7f5ab6"/>
+    <text x="660" y="100" text-anchor="middle" fill="#fff" font-weight="700">Event Monitoring</text>
+    <text x="660" y="125" text-anchor="middle" fill="#e5dafc">API/Report/Login 等</text>
+    <text x="660" y="145" text-anchor="middle" fill="#e5dafc">50+ イベント (Shield)</text>
+    <text x="660" y="195" text-anchor="middle" fill="#fff" font-weight="700">30 日 (ELF)</text>
+  </g>
+</svg>
+<div class="section" id="ch5-1"><h3><span class="sec-num">5.1</span>Monitor Login History <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.users_login_history.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3></div><div class="section" id="ch5-2"><h3><span class="sec-num">5.2</span>Field History Tracking <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.tracking_field_history.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3><p><b>項目履歴管理</b>: 1 オブジェクトにつき最大 20 項目を追跡。
+「Stage が誰によって Closed Won に変更されたか」を保存。
+標準保持は最大 18 か月、<b>Field Audit Trail (Shield)</b> で最大 10 年に延長可能。</p><details><summary>このセクションの下位ページ一覧 (公式リンク)</summary><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.tracking_field_history_for_standard_objects.htm&amp;type=5" target="_blank" rel="noopener">Track Object Field History ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.field_audit_trail.htm&amp;type=5" target="_blank" rel="noopener">Field Audit Trail ↗</a></li><ul class="page-list"><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.field_audit_trail_query.htm&amp;type=5" target="_blank" rel="noopener">Query Batches of Archived Field History Data ↗</a></li></ul></details></div><div class="section" id="ch5-3"><h3><span class="sec-num">5.3</span>Monitor Setup Changes with Setup Audit Trail <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.admin_monitorsetup.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3></div></section><section class="chapter" id="ch6"><h2><span class="ch-num">第6章</span>Real-Time Event Monitoring</h2><div class="official"><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_event_monitoring_overview.htm&amp;type=5" target="_blank" rel="noopener">公式: https://help.salesforce.com/s/articleView?id=xcloud.real_time_event_monitoring_overview.htm&amp;type=5 ↗</a></div><div class="intro">
+<p>Real-Time Event Monitoring は Salesforce Shield に含まれる<b>有償アドオン</b>。
+50 以上のイベント (ログイン、API、レポート出力、Apex 実行、ファイル DL 等) を<b>ほぼリアルタイム</b>で取得し、
+ストリーミング購読・SIEM 連携・<b>Transaction Security ポリシー</b>でリアルタイム遮断ができる。</p>
+</div>
+<svg viewBox="0 0 760 340" class="diagram" role="img" aria-label="Real-Time Event Monitoring">
+  <text x="380" y="28" text-anchor="middle" font-size="16" font-weight="700" fill="#032d60">Real-Time Event Monitoring の構成</text>
+  <g font-family="system-ui" font-size="12">
+    <rect x="40" y="80" width="160" height="180" rx="8" fill="#0176d3"/>
+    <text x="120" y="110" text-anchor="middle" fill="#fff" font-weight="700">イベント発生源</text>
+    <text x="120" y="140" text-anchor="middle" fill="#cfe6f8">ログイン</text>
+    <text x="120" y="160" text-anchor="middle" fill="#cfe6f8">API コール</text>
+    <text x="120" y="180" text-anchor="middle" fill="#cfe6f8">レポート出力</text>
+    <text x="120" y="200" text-anchor="middle" fill="#cfe6f8">Apex 実行</text>
+    <text x="120" y="220" text-anchor="middle" fill="#cfe6f8">ファイル DL 他</text>
+
+    <rect x="240" y="80" width="200" height="180" rx="8" fill="#1589ee"/>
+    <text x="340" y="110" text-anchor="middle" fill="#fff" font-weight="700">プラットフォーム</text>
+    <text x="340" y="140" text-anchor="middle" fill="#cfe6f8">Streaming イベント発火</text>
+    <text x="340" y="170" text-anchor="middle" fill="#cfe6f8">Big Object 保存 (任意)</text>
+    <text x="340" y="200" text-anchor="middle" fill="#cfe6f8">Threat Detection (ML)</text>
+    <text x="340" y="230" text-anchor="middle" fill="#cfe6f8">で異常検知</text>
+
+    <rect x="480" y="60" width="240" height="80" rx="8" fill="#2e844a"/>
+    <text x="600" y="90" text-anchor="middle" fill="#fff" font-weight="700">SIEM / Splunk</text>
+    <text x="600" y="115" text-anchor="middle" fill="#d6f0db">CometD 購読 or ELF DL</text>
+
+    <rect x="480" y="160" width="240" height="80" rx="8" fill="#7f5ab6"/>
+    <text x="600" y="190" text-anchor="middle" fill="#fff" font-weight="700">Transaction Security</text>
+    <text x="600" y="215" text-anchor="middle" fill="#e5dafc">ブロック / MFA 要求 / 通知</text>
+
+    <line x1="200" y1="170" x2="240" y2="170" stroke="#888" stroke-width="2" marker-end="url(#arr6)"/>
+    <line x1="440" y1="120" x2="480" y2="100" stroke="#888" stroke-width="2" marker-end="url(#arr6)"/>
+    <line x1="440" y1="220" x2="480" y2="200" stroke="#888" stroke-width="2" marker-end="url(#arr6)"/>
+  </g>
+  <defs>
+    <marker id="arr6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#666"/>
+    </marker>
+  </defs>
+</svg>
+<div class="section" id="ch6-1"><h3><span class="sec-num">6.1</span>Real-Time Event Monitoring Definitions <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_event_monitoring_definitions.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3></div><div class="section" id="ch6-2"><h3><span class="sec-num">6.2</span>Considerations for Using Real-Time Event Monitoring <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_event_monitoring_considerations.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3></div><div class="section" id="ch6-3"><h3><span class="sec-num">6.3</span>Enable Access to Real-Time Event Monitoring <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_event_monitoring_enable.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3></div><div class="section" id="ch6-4"><h3><span class="sec-num">6.4</span>Stream and Store Event Data <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_event_monitoring_details.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3><details><summary>このセクションの下位ページ一覧 (公式リンク)</summary><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.event_monitoring_monitor_events_with_event_manager.htm&amp;type=5" target="_blank" rel="noopener">Manage Real-Time Event Monitoring Events ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_event_monitoring_streaming.htm&amp;type=5" target="_blank" rel="noopener">Event Data Streaming ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_event_monitoring_storage.htm&amp;type=5" target="_blank" rel="noopener">Event Data Storage ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_event_monitoring_batch_query.htm&amp;type=5" target="_blank" rel="noopener">Use Batch Apex Queries With Real-Time Event Monitoring ↗</a></li></details></div><div class="section" id="ch6-5"><h3><span class="sec-num">6.5</span>Create Logout Event Triggers <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.security_auth_create_logout_event_trigger.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3></div><div class="section" id="ch6-6"><h3><span class="sec-num">6.6</span>How Chunking Works with ReportEvent and ListViewEvent <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_event_monitoring_chunking.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3></div><div class="section" id="ch6-7"><h3><span class="sec-num">6.7</span>Enhanced Transaction Security <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_policy_types.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3><details><summary>このセクションの下位ページ一覧 (公式リンク)</summary><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_policy_list.htm&amp;type=5" target="_blank" rel="noopener">Types of Enhanced Transaction Security Policies ↗</a></li><ul class="page-list"><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_policy_types_api.htm&amp;type=5" target="_blank" rel="noopener">ApiEvent Policies ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_policy_types_apianomalyeventstore.htm&amp;type=5" target="_blank" rel="noopener">ApiAnomalyEventStore Policies ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_policy_types_bulkapiresulteventstore.htm&amp;type=5" target="_blank" rel="noopener">BulkApiResultEventStore Policies ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_policy_types_credentialstuff.htm&amp;type=5" target="_blank" rel="noopener">CredentialStuffingEventStore Policies ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_policy_types_fileevent.htm&amp;type=5" target="_blank" rel="noopener">FileEvent Policies ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_policy_types_listview.htm&amp;type=5" target="_blank" rel="noopener">ListViewEvent Policies ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_policy_types_login.htm&amp;type=5" target="_blank" rel="noopener">LoginEvent Policies ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_policy_types_permissionseteventstore.htm&amp;type=5" target="_blank" rel="noopener">PermissionSetEventStore Policies ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_policy_types_report.htm&amp;type=5" target="_blank" rel="noopener">ReportEvent Policies ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_policy_types_reportanomaly.htm&amp;type=5" target="_blank" rel="noopener">ReportAnomalyEventStore Policies ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_policy_types_sessionhijack.htm&amp;type=5" target="_blank" rel="noopener">SessionHijackingEventStore Policies ↗</a></li></ul><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_actions_notifs.htm&amp;type=5" target="_blank" rel="noopener">Enhanced Transaction Security Actions and Notifications ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_condition_builder.htm&amp;type=5" target="_blank" rel="noopener">Build a Transaction Security Policy with Condition Builder ↗</a></li><ul class="page-list"><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_cb_examples.htm&amp;type=5" target="_blank" rel="noopener">Condition Builder Examples ↗</a></li></ul><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_apex.htm&amp;type=5" target="_blank" rel="noopener">Create an Enhanced Transaction Security Policy That Uses Apex ↗</a></li><ul class="page-list"><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_policy_apex_examples.htm&amp;type=5" target="_blank" rel="noopener">Implementation Apex Examples ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_policy_apex_dml_example.htm&amp;type=5" target="_blank" rel="noopener">Asynchronous Apex Example ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_apex_testing.htm&amp;type=5" target="_blank" rel="noopener">Apex Testing ↗</a></li></ul><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_best_practices.htm&amp;type=5" target="_blank" rel="noopener">Best Practices for Writing and Maintaining Enhanced Transaction Security Policies ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_metering.htm&amp;type=5" target="_blank" rel="noopener">Enhanced Transaction Security Metering ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.enhanced_transaction_security_exempt.htm&amp;type=5" target="_blank" rel="noopener">Exempt Users from Transaction Security Policies ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.enh_txn_sec_migration_troubleshoot.htm&amp;type=5" target="_blank" rel="noopener">Test and Troubleshoot Your New Enhanced Policy ↗</a></li></details></div><div class="section" id="ch6-8"><h3><span class="sec-num">6.8</span>Threat Detection <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_detection.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3><p><b>Threat Detection</b>: 4 種類の異常検知が同梱。
+<ul>
+<li><b>Session Hijacking</b> — IP/User Agent の急変</li>
+<li><b>Credential Stuffing</b> — 短時間に多数の異なる ID で失敗</li>
+<li><b>Report Anomaly</b> — 通常と異なる量/対象のレポート出力</li>
+<li><b>API Anomaly</b> — 通常と異なる量/パターンの API コール</li>
+</ul>
+検知結果は Threat Detection アプリで確認し、True/False のフィードバックで精度が向上する。</p><details><summary>このセクションの下位ページ一覧 (公式リンク)</summary><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_session.htm&amp;type=5" target="_blank" rel="noopener">Session Hijacking ↗</a></li><ul class="page-list"><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_session_features.htm&amp;type=5" target="_blank" rel="noopener">Features of the Browser Fingerprint ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_session_review.htm&amp;type=5" target="_blank" rel="noopener">Investigate Session Hijacking ↗</a></li></ul><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_credstuff.htm&amp;type=5" target="_blank" rel="noopener">Credential Stuffing ↗</a></li><ul class="page-list"><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_credstuff_review.htm&amp;type=5" target="_blank" rel="noopener">Investigate Credential Stuffing ↗</a></li></ul><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_reportanomaly.htm&amp;type=5" target="_blank" rel="noopener">Report Anomaly ↗</a></li><ul class="page-list"><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_detection_steps.htm&amp;type=5" target="_blank" rel="noopener">Training and Inference Steps ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_detection_review.htm&amp;type=5" target="_blank" rel="noopener">Investigate Report Anomalies ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_detection_bestpractices.htm&amp;type=5" target="_blank" rel="noopener">Best Practices for Investigating Report Anomalies ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_detection_examples.htm&amp;type=5" target="_blank" rel="noopener">Report Anomaly Detection Examples ↗</a></li><ul class="page-list"><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_examples_notanomalous.htm&amp;type=5" target="_blank" rel="noopener">Detection Event Isn’t Anomalous ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_examples_maybeanomalous.htm&amp;type=5" target="_blank" rel="noopener">Detection Event Possibly Anomalous ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_examples_anomalous.htm&amp;type=5" target="_blank" rel="noopener">Detection Event Is Definitely Anomalous but Maybe Not Malicious ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_examples_malicious.htm&amp;type=5" target="_blank" rel="noopener">Detection Event Is Confirmed Malicious ↗</a></li></ul></ul><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_apianomaly.htm&amp;type=5" target="_blank" rel="noopener">API Anomaly ↗</a></li><ul class="page-list"><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_detection_steps.htm&amp;type=5" target="_blank" rel="noopener">Training and Inference Steps ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_detection_investigate_api_anomaly.htm&amp;type=5" target="_blank" rel="noopener">Investigate API Request Anomalies ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_detection_api_bestpractices.htm&amp;type=5" target="_blank" rel="noopener">Best Practices for Investigating API Request Anomalies ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_detection_api_anomaly_examples.htm&amp;type=5" target="_blank" rel="noopener">API Request Anomaly Detection Examples ↗</a></li><ul class="page-list"><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_examples_api_notanomalous.htm&amp;type=5" target="_blank" rel="noopener">API Detection Event Isn’t Anomalous ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_examples_api_maybeanomalous.htm&amp;type=5" target="_blank" rel="noopener">API Detection Event Possibly Anomalous ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_examples_api_anomalous.htm&amp;type=5" target="_blank" rel="noopener">API Detection Event Is an Anomaly but Isn’t Clearly Malicious ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_examples_api_malicious.htm&amp;type=5" target="_blank" rel="noopener">API Detection Event Is Confirmed Malicious ↗</a></li></ul></ul><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_detection_guest_user_anomaly.htm&amp;type=5" target="_blank" rel="noopener">Guest User Anomaly ↗</a></li><ul class="page-list"><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_detection_steps_guest_user_anomaly.htm&amp;type=5" target="_blank" rel="noopener">Investigate Guest User Anomalies ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_threat_detection_investigate_guest_user_anomaly.htm&amp;type=5" target="_blank" rel="noopener">Best Practices for Investigating Guest User Anomalies ↗</a></li></ul><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_td_ui.htm&amp;type=5" target="_blank" rel="noopener">View Threat Detection Events and Provide Feedback ↗</a></li><ul class="page-list"><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_td_ui_enable_app.htm&amp;type=5" target="_blank" rel="noopener">Make the Threat Detection App Visible to Users ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_td_ui_view_and_feedback.htm&amp;type=5" target="_blank" rel="noopener">View Events and Provide Feedback ↗</a></li></ul></details></div><div class="section" id="ch6-9"><h3><span class="sec-num">6.9</span>Event Log File Browser <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_elf_browser.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3></div><div class="section" id="ch6-10"><h3><span class="sec-num">6.10</span>Store and Query Log Data with Event Log Objects <a class="ext" href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_event_log_objects.htm&amp;type=5" target="_blank" rel="noopener">公式 ↗</a></h3><details><summary>このセクションの下位ページ一覧 (公式リンク)</summary><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_elo_analytics.htm&amp;type=5" target="_blank" rel="noopener">Analyze Log Data with Salesforce Direct ↗</a></li><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.elo_best_practices.htm&amp;type=5" target="_blank" rel="noopener">Best Practices and Considerations for Leveraging Event Log Object Data ↗</a></li></details></div></section><section class="chapter" id="ch7"><h2><span class="ch-num">第7章</span>Security Guidelines for Apex and Visualforce Development</h2><div class="official"><a href="https://help.salesforce.com/s/articleView?id=xcloud.review_and_certification.htm&amp;type=5" target="_blank" rel="noopener">公式: https://help.salesforce.com/s/articleView?id=xcloud.review_and_certification.htm&amp;type=5 ↗</a></div><div class="intro">
+<p>Apex / Visualforce / LWC で開発するときに開発者が踏みやすい脆弱性パターンと対策。
+Salesforce のセキュリティレビュー (AppExchange 出品時) でも厳しくチェックされる項目。</p>
+</div><div class="section"><p><b>開発者が必ず守る基本</b>:
+<ol>
+<li><b>SOQL/SOSL インジェクション対策</b>: 動的 SOQL を組むときは <code>String.escapeSingleQuotes()</code> または bind 変数を使う。文字列連結は厳禁。</li>
+<li><b>XSS 対策</b>: Visualforce では <code>{!value}</code> でなく <code>HTMLENCODE/JSENCODE</code> 関数を経由。LWC は標準で自動エスケープされるが <code>lwc:dom="manual"</code> は要注意。</li>
+<li><b>CRUD/FLS 適用</b>: Apex は既定で共有・FLS を「無視」する。<code>with sharing</code> 宣言、<code>Schema.sObjectType.X.isAccessible()</code> 確認、または <code>WITH SECURITY_ENFORCED</code> / <code>Security.stripInaccessible()</code> を使う。</li>
+<li><b>機密情報のハードコード禁止</b>: API キー・パスワードは <b>Named Credential</b> / <b>Protected Custom Metadata</b> / <b>Protected Custom Setting</b> に格納。</li>
+<li><b>CSRF 対策</b>: Visualforce は <code>apex:form</code> でトークン自動付与。GET でのデータ変更は禁止。</li>
+<li><b>オープンリダイレクト対策</b>: <code>retURL</code> / <code>startURL</code> パラメータを Apex で取り出す場合、ホワイトリスト検証必須。</li>
+</ol>
+さらに本番反映前に <b>Checkmarx</b> や <b>Salesforce Code Analyzer (PMD)</b> で静的解析することが推奨される。</p></div></section><section class="chapter" id="ch8"><h2><span class="ch-num">第8章</span>API End-of-Life Policy</h2><div class="official"><a href="https://help.salesforce.com/s/articleView?id=xcloud.api_rest_eol.htm&amp;type=5" target="_blank" rel="noopener">公式: https://help.salesforce.com/s/articleView?id=xcloud.api_rest_eol.htm&amp;type=5 ↗</a></div><div class="intro">
+<p>古い API バージョンの段階的廃止ポリシー。
+リリースから 3 年経過すると <b>EOL (廃止)</b> 候補となり、その後段階的に無効化される。</p>
+</div><div class="section"><p><b>API End-of-Life ポリシー</b>: SOAP/REST/Bulk/Streaming API は約 3 年経過後に廃止対象となる。
+廃止対象バージョンを呼び出すと最初は警告ヘッダ、最終的に HTTP 410。
+影響を受けるかは <b>Event Monitoring の ApiTotalUsage イベント</b>または <b>Setup → API Usage Notifications</b> で確認。
+本番では常に最新の3バージョン以内を使う運用が安全。</p></div></section><footer style="margin-top:60px;color:#5a6d78;font-size:12px;border-top:1px solid #cfd7df;padding-top:16px">原典: Salesforce Help &mdash; <i>Secure Your Org</i>. 本文の詳細は各 ↗ リンクから公式ページを参照してください。<br>本資料は学習用に独自の日本語解説と SVG 図解を加えた索引であり、公式翻訳ではありません。</footer></main></div><script>
+(function(){
+  const f = document.getElementById('filter');
+  if (!f) return;
+  f.addEventListener('input', () => {
+    const q = f.value.trim().toLowerCase();
+    document.querySelectorAll('.sidebar a').forEach(a => {
+      const li = a.closest('li');
+      if (!li) return;
+      if (!q) { li.classList.remove('hidden'); return; }
+      const t = a.textContent.toLowerCase();
+      li.classList.toggle('hidden', !t.includes(q));
+    });
+    // Re-show parents of visible children
+    document.querySelectorAll('.sidebar ol').forEach(ol => {
+      const visibleChild = ol.querySelector(':scope > li:not(.hidden)');
+      const parentLi = ol.closest('li');
+      if (parentLi && visibleChild) parentLi.classList.remove('hidden');
+    });
+  });
+})();
+</script></body></html>

@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>コードではなくクリックによる Salesforce の拡張 — 日本語ガイド（再構成版）</title>
+<style>
+  :root {
+    --c-text: #1f2d5c;
+    --c-muted: #5b6b8a;
+    --c-bg: #fbfcff;
+    --c-card: #ffffff;
+    --c-border: #dde3f7;
+    --c-accent: #5867d4;
+    --c-accent-soft: #eef2ff;
+    --c-green: #1f8b4d;
+    --c-orange: #d68b1f;
+    --c-red: #c14256;
+    --shadow: 0 1px 2px rgba(20,30,80,.04), 0 4px 12px rgba(20,30,80,.06);
+  }
+  * { box-sizing: border-box; }
+  html, body { background: var(--c-bg); color: var(--c-text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif; line-height: 1.7; margin: 0; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 32px 24px 96px; }
+  .hero { background: linear-gradient(135deg, #4a5cd0 0%, #6c50b8 100%); color: #fff; border-radius: 18px; padding: 36px 36px 30px; margin-bottom: 28px; box-shadow: var(--shadow); }
+  .hero h1 { margin: 0 0 8px; font-size: 28px; letter-spacing: .02em; }
+  .hero p { margin: 4px 0; opacity: .92; font-size: 14px; }
+  .hero a { color: #fff; text-decoration: underline; }
+  h2 { font-size: 22px; margin: 48px 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--c-accent); color: var(--c-accent); }
+  h3 { font-size: 17px; margin: 28px 0 8px; color: var(--c-text); }
+  h4 { font-size: 14px; margin: 16px 0 6px; color: var(--c-muted); letter-spacing: .04em; }
+  p { margin: 8px 0; }
+  .lead { font-size: 15px; color: var(--c-muted); margin-bottom: 16px; }
+  .card { background: var(--c-card); border: 1px solid var(--c-border); border-radius: 12px; padding: 20px 22px; margin: 14px 0; box-shadow: var(--shadow); }
+  .card.tight { padding: 14px 16px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  @media (max-width: 720px) { .grid2, .grid3 { grid-template-columns: 1fr; } }
+  ul { padding-left: 22px; }
+  li { margin: 4px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 13px; }
+  th, td { border: 1px solid var(--c-border); padding: 8px 10px; text-align: left; vertical-align: top; }
+  th { background: var(--c-accent-soft); font-weight: 700; }
+  code { background: #f1f3fb; padding: 2px 6px; border-radius: 4px; font-size: 90%; }
+  .badge { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; margin-left: 6px; vertical-align: middle; }
+  .b-new { background: #e6f7ee; color: #0c5c30; }
+  .b-legacy { background: #fff7e6; color: #7a4a00; }
+  .b-deprecated { background: #fde6e9; color: #7a1d2e; }
+  .toc { background: var(--c-accent-soft); border: 1px solid var(--c-border); border-radius: 12px; padding: 18px 22px; margin: 20px 0 30px; }
+  .toc ol { padding-left: 22px; margin: 4px 0; }
+  .toc a { color: var(--c-accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .diagram { background: #fff; border: 1px solid var(--c-border); border-radius: 12px; padding: 8px; margin: 18px 0; box-shadow: var(--shadow); }
+  .diagram svg { display: block; width: 100%; height: auto; }
+  .src { font-size: 12px; color: var(--c-muted); }
+  .src a { color: var(--c-accent); }
+  .callout { background: #fff7e6; border-left: 4px solid var(--c-orange); padding: 10px 14px; border-radius: 6px; margin: 12px 0; font-size: 13px; }
+  .callout.green { background: #e6f7ee; border-left-color: var(--c-green); }
+  .callout.red { background: #fde6e9; border-left-color: var(--c-red); }
+  .topic-list dt { font-weight: 700; margin-top: 12px; color: var(--c-text); }
+  .topic-list dt a { color: var(--c-accent); text-decoration: none; }
+  .topic-list dt a:hover { text-decoration: underline; }
+  .topic-list dd { margin: 4px 0 6px 20px; color: var(--c-muted); font-size: 13px; }
+  .footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--c-border); font-size: 12px; color: var(--c-muted); }
+  .anchor { display: block; position: relative; top: -20px; visibility: hidden; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>コードではなくクリックによる Salesforce の拡張</h1>
+  <p>機械翻訳の Salesforce ヘルプを 日本語で読みやすく再構成 ／ 主要 100+ ページの構造 ＋ 重要概念を 13 図で図解</p>
+  <p>原文（Salesforce 公式ヘルプ）: <a href="https://help.salesforce.com/s/articleView?id=platform.extend_click_intro.htm&language=ja&type=5" target="_blank" rel="noopener">platform.extend_click_intro.htm</a></p>
+  <p style="margin-top:14px;font-size:13px;opacity:.85;">
+    本書は、ユーザー（Salesforce 管理者・コンサル）が「カスタマイズの全体像と判断軸」を素早く掴むために、Salesforce 公式ヘルプの構造を保ちつつ重要な概念に絵を添えた "案内図" です。各見出しから公式ページへ直接ジャンプできます。
+  </p>
+</header>
+
+<section class="card">
+  <h2 style="margin-top:0;border:none;color:var(--c-text);font-size:20px;">はじめに：Salesforce を "拡張" するとは</h2>
+  <p>Salesforce では、初期セットアップを終えた後も <strong>1 行のコードも書かずに</strong>機能を拡張できます。マウス操作とポイント＆クリックツールで、次のすべてが可能です。</p>
+  <div class="grid3">
+    <div>
+      <h4>データの拡張</h4>
+      <ul><li>カスタムオブジェクト・項目</li><li>数式・選択リスト</li><li>機密データ分類</li></ul>
+    </div>
+    <div>
+      <h4>画面・体験の拡張</h4>
+      <ul><li>ページレイアウト／動的フォーム</li><li>Lightning ページ・アプリ</li><li>カスタムタブ・アクション</li></ul>
+    </div>
+    <div>
+      <h4>業務範囲の拡張</h4>
+      <ul><li>カスタム通知・Slack</li><li>外部サービス／API カタログ</li><li>カスタムドメイン</li></ul>
+    </div>
+  </div>
+</section>
+
+<nav class="toc">
+  <h3 style="margin-top:0;">目次</h3>
+  <ol>
+    <li><a href="#sec1">[設定] ホームページ</a></li>
+    <li><a href="#sec2">Salesforce 組織のカスタマイズ</a></li>
+    <li><a href="#sec3">独自の方法でのデータの設定</a></li>
+    <li><a href="#sec4">独自の Salesforce アプリケーションの構築</a></li>
+    <li><a href="#sec5">Lightning アプリケーションビルダー</a></li>
+    <li><a href="#sec6">通知ビルダーを使用した通知の管理</a></li>
+    <li><a href="#sec7">カスタムドメイン</a></li>
+    <li><a href="#sec8">組織の範囲の拡張</a></li>
+    <li><a href="#sec9">独自の Web サイトの構築（参考）</a></li>
+    <li><a href="#sec10">DX インスペクター（参考）</a></li>
+  </ol>
+</nav>
+
+<section>
+<span class="anchor" id="sec1"></span>
+<h2>1. [設定] ホームページ</h2>
+<p class="lead">組織のカスタマイズ、設定ツール検索、アプリ作成と管理の出発点。Lightning Experience では右上の歯車アイコン → [設定] で開きます。</p>
+<p class="src">原文: <a href="https://help.salesforce.com/s/articleView?id=platform.setup_home_page.htm&language=ja&type=5" target="_blank" rel="noopener">platform.setup_home_page.htm</a></p>
+
+<div class="card">
+<h3>主要な構成要素</h3>
+<dl class="topic-list">
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.admin_system_overview_messages.htm&language=ja&type=5" target="_blank" rel="noopener">システムの概要メッセージ</a></dt>
+  <dd>API コール数・データストレージ・ユーザー数など、組織の制限に近づいたときに [設定] ホームに警告を表示する設定。</dd>
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.customize_recent_items.htm&language=ja&type=5" target="_blank" rel="noopener">[最近参照したデータ] リストのカスタマイズ</a></dt>
+  <dd>ホーム画面に表示する最近開いたメタデータ（カスタムオブジェクト・項目・フローなど）の種類を選ぶ。</dd>
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.recently_viewed_metadata.htm&language=ja&type=5" target="_blank" rel="noopener">[最近使ったデータ] リスト（ベータ）</a></dt>
+  <dd>関連する子オブジェクト・項目もまとめて表示する強化版。</dd>
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.quick_access_menu.htm&language=ja&type=5" target="_blank" rel="noopener">クイックアクセスメニュー</a></dt>
+  <dd>カスタマイズによく使う機能へのショートカット（Lightning Experience では一部のみ）。</dd>
+</dl>
+</div>
+</section>
+
+<section>
+<span class="anchor" id="sec2"></span>
+<h2>2. Salesforce 組織のカスタマイズ</h2>
+<p class="lead">標準オブジェクト・タブ・項目のラベル名・ページレイアウト・項目レベルセキュリティ・コンパクトレイアウト・カスタムタブ・レコードタイプ・カスタムヘルプを「画面で見えるもの」全般としてまとめるセクション。</p>
+<p class="src">原文: <a href="https://help.salesforce.com/s/articleView?id=platform.customize_overview.htm&language=ja&type=5" target="_blank" rel="noopener">platform.customize_overview.htm</a></p>
+
+<h3>2.1 ページレイアウト と 項目レベルセキュリティ</h3>
+<div class="card">
+<p><strong>ページレイアウト</strong> は「画面のどこに何の項目を並べるか」を決める従来仕組み。<strong>項目レベルセキュリティ (FLS)</strong> は「プロファイル毎に項目を見せる／編集させる」をオンオフします。両者は別物で、画面に出ても FLS で隠せば見えません。</p>
+<dl class="topic-list">
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.customize_layoutoverview.htm&language=ja&type=5" target="_blank" rel="noopener">項目へのユーザーアクセスの制御方法</a></dt>
+  <dd>項目アクセスは「ページレイアウト」「項目レベルセキュリティ」「権限セット」の3層で決まる。設計時はこの3点をセットで検討。</dd>
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.managing_page_layouts_and_field-level_security.htm&language=ja&type=5" target="_blank" rel="noopener">ページレイアウトおよび項目レベルセキュリティの設定</a></dt>
+  <dd>レコードタイプ × プロファイル の組合せ毎にどのレイアウトを使うかを割当てる。</dd>
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.customize_layout.htm&language=ja&type=5" target="_blank" rel="noopener">ページレイアウト</a> <span class="badge b-legacy">Classic 主体</span></dt>
+  <dd>Salesforce Classic 由来。Lightning でも残っているが、新規は次の動的フォームへ。</dd>
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.compact_layout_overview.htm&language=ja&type=5" target="_blank" rel="noopener">コンパクトレイアウト</a></dt>
+  <dd>レコード上部のハイライトパネル / モバイルカードに表示する厳選項目（4〜10件程度）。</dd>
+</dl>
+
+<h4>★ ページレイアウト vs 動的フォーム</h4>
+<div class="diagram"><object type="image/svg+xml" data="diagrams/01_pagelayout_vs_dynamicforms.svg">ページレイアウトと動的フォームの比較図</object></div>
+</div>
+
+<h3>2.2 カスタムタブ</h3>
+<div class="card">
+<p><a href="https://help.salesforce.com/s/articleView?id=platform.custom_tab_overview.htm&language=ja&type=5" target="_blank" rel="noopener">カスタムタブ</a> はナビゲーションバーに項目を追加する仕組み。種類は「カスタムオブジェクトタブ」「Web タブ（外部 URL）」「Visualforce タブ」「Lightning コンポーネントタブ」など。アプリへの組込みは Lightning App Builder で行います。</p>
+</div>
+
+<h3>2.3 レコードタイプ</h3>
+<div class="card">
+<p><a href="https://help.salesforce.com/s/articleView?id=platform.customize_recordtype.htm&language=ja&type=5" target="_blank" rel="noopener">レコードタイプ</a> は、同じオブジェクトを業務シナリオ別に出し分ける仕組み。1つの「商談」テーブルでも、新規ビジネスとアップセルでは選択リスト・レイアウト・営業プロセスを別にしたい—そのために使います。</p>
+<div class="diagram"><object type="image/svg+xml" data="diagrams/02_record_type.svg">レコードタイプの仕組み図</object></div>
+<div class="callout">レコードタイプ ＝ <strong>ページレイアウト × 選択リスト値 × ビジネスプロセス</strong> の組合せを切り替えるラベル。新規作成時にユーザーに選ばせる、または条件で自動割当できる。</div>
+</div>
+
+<h3>2.4 そのほかのカスタマイズ</h3>
+<div class="card">
+<dl class="topic-list">
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.customize_rename.htm&language=ja&type=5" target="_blank" rel="noopener">オブジェクト・タブ・項目の表示ラベル名称変更</a></dt>
+  <dd>標準オブジェクトの「取引先」を「顧客」「会員」などに改名できる。多言語対応も可能。</dd>
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.customhelp_about.htm&language=ja&type=5" target="_blank" rel="noopener">カスタムヘルプコンテンツ</a></dt>
+  <dd>標準項目のヘルプ吹き出しを自社用ガイドに置換、または独自オブジェクト用にオンラインヘルプを掲示。</dd>
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.workbench_overview.htm&language=ja&type=5" target="_blank" rel="noopener">翻訳の管理</a></dt>
+  <dd>多言語ラベル・選択リスト値の翻訳作業を [翻訳ワークベンチ] で行う。</dd>
+</dl>
+</div>
+</section>
+
+<section>
+<span class="anchor" id="sec3"></span>
+<h2>3. 独自の方法でのデータの設定</h2>
+<p class="lead">「データモデル」をビジネスに合わせて作り込むセクション。カスタムオブジェクト・項目・数式・カスタム設定・スキーマビルダー・機密データ分類が含まれる。</p>
+<p class="src">原文: <a href="https://help.salesforce.com/s/articleView?id=platform.extend_click_custom_data.htm&language=ja&type=5" target="_blank" rel="noopener">platform.extend_click_custom_data.htm</a></p>
+
+<h3>3.1 スキーマビルダー</h3>
+<div class="card">
+<p><a href="https://help.salesforce.com/s/articleView?id=platform.schema_builder.htm&language=ja&type=5" target="_blank" rel="noopener">スキーマビルダー</a> はオブジェクトとリレーション（参照／主従）を ER 図として可視化＆編集するツール。データモデル設計時の最重要画面。</p>
+<div class="diagram"><object type="image/svg+xml" data="diagrams/09_schema_builder.svg">スキーマビルダーの図</object></div>
+<dl class="topic-list">
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.schema_builder_create_objects.htm&language=ja&type=5" target="_blank" rel="noopener">スキーマビルダーでオブジェクトを作成</a></dt>
+  <dd>図面上で右クリック → オブジェクト追加。属性は通常画面と同じ。</dd>
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.schema_builder_create_fields.htm&language=ja&type=5" target="_blank" rel="noopener">スキーマビルダーで項目を作成</a></dt>
+  <dd>サイドバーから項目をドラッグでオブジェクトに追加。型選択 → 必須/外部ID 等。</dd>
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.schema_builder_considerations.htm&language=ja&type=5" target="_blank" rel="noopener">スキーマビルダーに関する考慮事項</a></dt>
+  <dd>大規模組織では表示が重くなる、レイアウト・権限の編集は不可、などの制約。</dd>
+</dl>
+</div>
+
+<h3>3.2 項目のカスタマイズ — 型の全体像</h3>
+<div class="card">
+<p><a href="https://help.salesforce.com/s/articleView?id=platform.customize_fields.htm&language=ja&type=5" target="_blank" rel="noopener">項目のカスタマイズ</a> では、標準/カスタム項目を追加・編集します。型の選択がデータモデル品質を左右します。</p>
+<div class="diagram"><object type="image/svg+xml" data="diagrams/11_field_types.svg">カスタム項目の主な型</object></div>
+</div>
+
+<h3>3.3 数式項目</h3>
+<div class="card">
+<p><a href="https://help.salesforce.com/s/articleView?id=platform.customize_formuladef.htm&language=ja&type=5" target="_blank" rel="noopener">数式を使用した項目値の計算</a>。数式項目は「他の項目の値から都度計算する読取専用項目」。保存はされず、参照される度に再計算されます。</p>
+<div class="diagram"><object type="image/svg+xml" data="diagrams/05_formula_field.svg">数式項目の図</object></div>
+<div class="callout">数式に使える関数は <code>IF / CASE / TEXT / DATE / DATEVALUE / VLOOKUP / ISCHANGED / ISBLANK</code> など多数。AND/OR/NOT のブール演算と、親レコードの項目参照 <code>Account.Name</code> も可。</div>
+<p>関連: <a href="https://help.salesforce.com/s/articleView?id=platform.valid_merge_fields.htm&language=ja&type=5" target="_blank" rel="noopener">レコードからのメール生成（差し込み項目）</a> — メールテンプレート内に <code>{!Contact.LastName}</code> のように埋め込んで動的化。</p>
+</div>
+
+<h3>3.4 カスタム設定</h3>
+<div class="card">
+<p><a href="https://help.salesforce.com/s/articleView?id=platform.cs_about.htm&language=ja&type=5" target="_blank" rel="noopener">カスタム設定</a> は、Apex / フロー / 数式から高速参照できる軽量データセット。アプリ設定値・ホワイトリスト・組織別パラメータの格納先として使われる。<strong>リスト型</strong>（全ユーザー共通）と<strong>階層型</strong>（プロファイル/ユーザー別オーバライド）の2種類。</p>
+<div class="callout green">カスタムオブジェクトより読み込みコストが軽く、SOQL クエリ数に算入されない。アプリ動作の設定値置場として優秀。</div>
+</div>
+
+<h3>3.5 機密データの分類</h3>
+<div class="card">
+<p><a href="https://help.salesforce.com/s/articleView?id=platform.data_classification_intro.htm&language=ja&type=5" target="_blank" rel="noopener">機密データの分類</a> — 各項目に「PII」「機密性レベル」「コンプライアンス分類」のラベルをメタデータとして付与。GDPR / 個情法 / PCI DSS 対応の出発点となる仕組み。</p>
+<div class="diagram"><object type="image/svg+xml" data="diagrams/12_data_classification.svg">機密データ分類の図</object></div>
+</div>
+
+<h3>3.6 顧客のデータプライバシー設定の保存</h3>
+<div class="card">
+<p><a href="https://help.salesforce.com/s/articleView?id=platform.individuals_store_data_privacy.htm&language=ja&type=5" target="_blank" rel="noopener">個人 (Individual) オブジェクト</a> を有効化し、取引先責任者 / リードに紐付けて「ニュースレター不可」「データ削除依頼済」などの同意管理を記録します。GDPR 対応で典型。</p>
+</div>
+</section>
+
+<section>
+<span class="anchor" id="sec4"></span>
+<h2>4. 独自の Salesforce アプリケーションの構築</h2>
+<p class="lead">「アプリ」は項目のコレクションではなく、複数のタブ・ページ・ブランディング・ユーティリティバーを束ねた業務単位のコンテナ。Classic と Lightning の 2 種類。</p>
+<p class="src">原文: <a href="https://help.salesforce.com/s/articleView?id=platform.apps_overview.htm&language=ja&type=5" target="_blank" rel="noopener">platform.apps_overview.htm</a></p>
+
+<h3>4.1 Lightning アプリケーション</h3>
+<div class="card">
+<p><a href="https://help.salesforce.com/s/articleView?id=platform.apps_overview_lightning.htm&language=ja&type=5" target="_blank" rel="noopener">Lightning アプリケーション</a> は App Launcher（9点メニュー）から起動する1単位。営業/サービス/分析など業務ごとに分けて、ナビ項目とユーティリティバーをカスタマイズします。</p>
+<div class="diagram"><object type="image/svg+xml" data="diagrams/03_lightning_app_structure.svg">Lightning アプリケーション構造図</object></div>
+<dl class="topic-list">
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.apps_lightning_tips.htm&language=ja&type=5" target="_blank" rel="noopener">Lightning Experience でのアプリケーション作成のヒント</a></dt>
+  <dd>命名規則・ブランディング・アイコンサイズなど作る前に押さえるべき点。</dd>
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.apps_lightning_create.htm&language=ja&type=5" target="_blank" rel="noopener">Lightning アプリケーションの作成</a></dt>
+  <dd>ウィザード形式（アプリ詳細 → オプション → ユーティリティ → ナビ項目 → ユーザー割当）。</dd>
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.apps_lightning_customize.htm&language=ja&type=5" target="_blank" rel="noopener">Lightning アプリケーションビルダーを使用したカスタマイズ</a></dt>
+  <dd>作成後のページ構成は Lightning App Builder で行う。</dd>
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.apps_lightning_utilities.htm&language=ja&type=5" target="_blank" rel="noopener">ユーティリティバーの追加</a></dt>
+  <dd>画面下に常駐するパネル。電話 (Open CTI)・メモ・カスタム LWC を配置可。</dd>
+</dl>
+</div>
+
+<h3>4.2 Salesforce Classic のカスタムアプリケーション</h3>
+<div class="card">
+<dl class="topic-list">
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.apps_classic_create.htm&language=ja&type=5" target="_blank" rel="noopener">Classic カスタムアプリケーションの作成</a> <span class="badge b-legacy">Classic 専用</span></dt>
+  <dd>Lightning Experience が標準の今、新規構築では原則 Lightning を採用。Classic は既存環境保守のみ。</dd>
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.apps_classic_subtab_overview.htm&language=ja&type=5" target="_blank" rel="noopener">Classic のサブタブアプリケーション</a> <span class="badge b-legacy">Classic 専用</span></dt>
+  <dd>1つのタブの中に複数サブタブを持たせる構造。Lightning ではコンソールアプリで代替。</dd>
+</dl>
+</div>
+</section>
+
+<section>
+<span class="anchor" id="sec5"></span>
+<h2>5. Lightning アプリケーションビルダー</h2>
+<p class="lead">ノーコードで Lightning ページ（ホーム / アプリ / レコード / 埋め込み）を作る中核ツール。動的フォーム・動的アクション・動的関連リスト・動的インタラクションといった「動的」機能群がここに集約されている。</p>
+<p class="src">原文: <a href="https://help.salesforce.com/s/articleView?id=platform.lightning_app_builder_overview.htm&language=ja&type=5" target="_blank" rel="noopener">platform.lightning_app_builder_overview.htm</a></p>
+
+<h3>5.1 Lightning ページの種類とレコードページ</h3>
+<div class="card">
+<p><a href="https://help.salesforce.com/s/articleView?id=platform.lightning_page_overview.htm&language=ja&type=5" target="_blank" rel="noopener">Lightning ページ</a> は「ホーム」「アプリ」「レコード」「メール下書き」「埋込み」など複数の種類があり、種類ごとに使えるテンプレートが異なる。最も使用頻度の高い「レコードページ」の構造と割当ロジックを図示します。</p>
+<div class="diagram"><object type="image/svg+xml" data="diagrams/10_lightning_record_page.svg">Lightning レコードページの構造図</object></div>
+<dl class="topic-list">
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.lightning_app_builder_customize_lex_pages.htm&language=ja&type=5" target="_blank" rel="noopener">Lightning Experience レコードページの作成および設定</a></dt>
+  <dd>テンプレ選択 → コンポーネント配置 → 保存＆有効化。</dd>
+</dl>
+</div>
+
+<h3>5.2 動的フォーム</h3>
+<div class="card">
+<p><a href="https://help.salesforce.com/s/articleView?id=platform.dynamic_forms_overview.htm&language=ja&type=5" target="_blank" rel="noopener">動的フォーム</a> はページレイアウトの後継。項目を1つずつページに配置でき、条件式で表示/非表示・必須・読取専用を切り替えられる。</p>
+<div class="diagram"><object type="image/svg+xml" data="diagrams/01_pagelayout_vs_dynamicforms.svg">動的フォーム比較図</object></div>
+<div class="callout">動的フォームに切替えてもページレイアウト定義は残る（モバイル/旧 RT で参照される）。完全に置き換える運用は段階移行が安全。</div>
+</div>
+
+<h3>5.3 動的強調表示パネル・動的アクション・動的関連リスト</h3>
+<div class="card">
+<dl class="topic-list">
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.dynamic_highlights_panel.htm&language=ja&type=5" target="_blank" rel="noopener">動的強調表示パネル</a></dt>
+  <dd>ハイライトパネルの項目を「VIP取引先のときだけ表示」のように条件で切替え可能。</dd>
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.lightning_app_builder_create_dynamic_action.htm&language=ja&type=5" target="_blank" rel="noopener">動的アクションの作成</a></dt>
+  <dd>レコード上部のアクションボタン群を条件式で出し分け。たとえば「フェーズが提案中のときだけ "見積発行" ボタン」。</dd>
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.lightning_app_builder_create_dynamic_related_list.htm&language=ja&type=5" target="_blank" rel="noopener">動的関連リストの作成</a></dt>
+  <dd>関連リストを条件絞り込み（例: 完了済タスクのみ）。タイトル・表示列も個別設定可。</dd>
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.conditional_formatting_overview.htm&language=ja&type=5" target="_blank" rel="noopener">条件付き項目の書式設定</a></dt>
+  <dd>Spring '24 以降。数値の閾値超過で背景色変更などを画面上から設定。</dd>
+</dl>
+</div>
+
+<h3>5.4 動的インタラクション</h3>
+<div class="card">
+<p><a href="https://help.salesforce.com/s/articleView?id=platform.dynamic_interactions_overview.htm&language=ja&type=5" target="_blank" rel="noopener">動的インタラクション</a> は、同じ Lightning ページ内で「あるコンポーネントの操作 → 別コンポーネントが反応」をクリックで設定する仕組み。</p>
+<div class="diagram"><object type="image/svg+xml" data="diagrams/13_dynamic_interactions.svg">動的インタラクションの図</object></div>
+</div>
+</section>
+
+<section>
+<span class="anchor" id="sec6"></span>
+<h2>6. 通知ビルダーを使用した通知の管理</h2>
+<p class="lead">「通知タイプ」をクリックで定義し、フロー/Apex から呼び出すと、デスクトップ・モバイル・Slack へ同時配信できる仕組み。</p>
+<p class="src">原文: <a href="https://help.salesforce.com/s/articleView?id=platform.notif_builder.htm&language=ja&type=5" target="_blank" rel="noopener">platform.notif_builder.htm</a></p>
+
+<div class="diagram"><object type="image/svg+xml" data="diagrams/06_notification_routes.svg">通知ビルダーの配信経路図</object></div>
+
+<div class="card">
+<dl class="topic-list">
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.notif_builder_custom.htm&language=ja&type=5" target="_blank" rel="noopener">カスタムデスクトップまたはモバイル通知の作成と送信</a></dt>
+  <dd>[設定] → 通知ビルダー → カスタム通知タイプを作成 → フロー「カスタム通知を送信」アクションで呼出。受信者・タイトル・本文・遷移先 ID を渡す。</dd>
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.notif_builder_custom_slack.htm&language=ja&type=5" target="_blank" rel="noopener">カスタム Slack 通知</a></dt>
+  <dd>Slack 連携の事前設定後、通知タイプで Slack チャネルを選択可能になる。承認/失注などビジネスクリティカルなイベントを Slack に流す用途。</dd>
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.notif_builder_delivery_settings.htm&language=ja&type=5" target="_blank" rel="noopener">通知の配信設定の管理</a></dt>
+  <dd>各通知タイプ×チャネルのデフォルトON/OFFと、ユーザー側で上書き可否を制御。</dd>
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.notif_builder_considerations.htm&language=ja&type=5" target="_blank" rel="noopener">通知に関する考慮事項</a></dt>
+  <dd>1日の送信上限、モバイル登録要件、Apex からの呼出制限（DML/同期）など。</dd>
+</dl>
+<div class="callout red">通知ビルダーで作れるのはデスクトップ/モバイル/Slack 通知のみ。メール通知は別機能（メールアラート・Email Studio）。</div>
+</div>
+</section>
+
+<section>
+<span class="anchor" id="sec7"></span>
+<h2>7. カスタムドメイン</h2>
+<p class="lead">「www.example.com」など自社所有ドメインで Experience Cloud サイト・Salesforce サイトを提供する仕組み。ブランディング統一とSEO・SSL証明書を一元管理する目的。</p>
+<p class="src">原文: <a href="https://help.salesforce.com/s/articleView?id=platform.domain_mgmt.htm&language=ja&type=5" target="_blank" rel="noopener">platform.domain_mgmt.htm</a></p>
+
+<div class="diagram"><object type="image/svg+xml" data="diagrams/04_custom_domain.svg">カスタムドメイン3方式の図</object></div>
+
+<h3>7.1 提供方式の選択</h3>
+<div class="card">
+<dl class="topic-list">
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.domain_mgmt_overview.htm&language=ja&type=5" target="_blank" rel="noopener">Salesforce のカスタムドメイン</a></dt>
+  <dd>概念と前提。My Domain（組織別 URL）と混同しがちだが別物。カスタムドメインは「外向けサイトに自社ドメインを当てる」機能。</dd>
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.domain_mgmt_determine_configuration.htm&language=ja&type=5" target="_blank" rel="noopener">カスタムドメインの提供方法の決定</a></dt>
+  <dd>3方式（Salesforce HTTPS / Salesforce CDN / サードパーティ）の選択ガイド。WAF・キャッシュ要件・運用負荷で判断。</dd>
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.domain_mgmt_prereqs.htm&language=ja&type=5" target="_blank" rel="noopener">カスタムドメインの前提条件</a></dt>
+  <dd>DNS の管理権限・証明書・CNAME 設定・MyDomain 有効化済みであることなど。</dd>
+</dl>
+</div>
+
+<h3>7.2 セットアップ・運用</h3>
+<div class="card">
+<dl class="topic-list">
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.domain_mgmt_sandbox_custom_domains.htm&language=ja&type=5" target="_blank" rel="noopener">Sandbox でのカスタムドメインのテスト</a></dt>
+  <dd>本番に出す前に Sandbox でドメイン挙動を確認するベストプラクティス。</dd>
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.domain_mgmt_cert.htm&language=ja&type=5" target="_blank" rel="noopener">HTTPS 証明書を使用したカスタムドメイン</a> <span class="badge b-new">方式A</span></dt>
+  <dd>Salesforce サーバーが証明書を保持して HTTPS 終端。最もシンプル。</dd>
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.domain_mgmt_salesforce_cdn.htm&language=ja&type=5" target="_blank" rel="noopener">Salesforce CDN を使用した Experience Cloud サイトの提供</a> <span class="badge b-new">方式B</span></dt>
+  <dd>Experience Cloud 向け推奨。CDN によるキャッシュで高速化。</dd>
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.domain_mgmt_external_host.htm&language=ja&type=5" target="_blank" rel="noopener">サードパーティサービス／CDN を使用したカスタムドメインの提供</a> <span class="badge b-legacy">方式C</span></dt>
+  <dd>Akamai / Cloudflare / AWS CloudFront 等を前段に置く構成。WAF・複雑なヘッダ要件がある場合。</dd>
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.domain_mgmt_dom_detail.htm&language=ja&type=5" target="_blank" rel="noopener">カスタムドメイン管理</a></dt>
+  <dd>追加・編集・削除・URL リダイレクト・証明書更新の手順。</dd>
+</dl>
+</div>
+</section>
+
+<section>
+<span class="anchor" id="sec8"></span>
+<h2>8. 組織の範囲の拡張</h2>
+<p class="lead">Salesforce 組織外のデータ・サービス・外部システムとの接続全般。アクション/ボタン/リンク、API カタログ、外部サービス、Salesforce Connect、プラットフォームイベントなどが含まれる。</p>
+<p class="src">原文: <a href="https://help.salesforce.com/s/articleView?id=platform.extend_click_reach.htm&language=ja&type=5" target="_blank" rel="noopener">platform.extend_click_reach.htm</a></p>
+
+<h3>8.1 アクション・ボタン・リンク</h3>
+<div class="card">
+<p><a href="https://help.salesforce.com/s/articleView?id=platform.working_with_buttons_links_actions.htm&language=ja&type=5" target="_blank" rel="noopener">アクション、ボタン、およびリンクの提供</a> — 「画面から何かを実行する」3つの仕組み。新規構築では <strong>クイックアクション + フロー</strong> の組合せが第一選択。</p>
+<div class="diagram"><object type="image/svg+xml" data="diagrams/08_buttons_links_actions.svg">アクション/ボタン/リンクの使い分け</object></div>
+</div>
+
+<h3>8.2 外部サービス</h3>
+<div class="card">
+<p><a href="https://help.salesforce.com/s/articleView?id=platform.external_services.htm&language=ja&type=5" target="_blank" rel="noopener">外部サービス</a> — OpenAPI 仕様 1ファイルから「フローで呼べる Apex 不要のアクション」を自動生成する仕組み。社外 REST API との連携をクリックだけで実現。</p>
+<div class="diagram"><object type="image/svg+xml" data="diagrams/07_external_services.svg">外部サービスの仕組み</object></div>
+</div>
+
+<h3>8.3 API カタログと MuleSoft</h3>
+<div class="card">
+<dl class="topic-list">
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.api_catalog.htm&language=ja&type=5" target="_blank" rel="noopener">Salesforce の API カタログ</a> <span class="badge b-new">新</span></dt>
+  <dd>組織内の API と MCP（Model Context Protocol）サーバーを一元カタログ化。Agentforce / 自動化からの発見性が向上。</dd>
+  <dt><a href="https://help.salesforce.com/s/articleView?id=platform.mulesoft_manage_your_anypoint_platform_connection.htm&language=ja&type=5" target="_blank" rel="noopener">MuleSoft Anypoint Platform 接続の管理</a></dt>
+  <dd>MuleSoft テナントを Salesforce と紐付けてクロスプラットフォーム機能を有効化。</dd>
+</dl>
+</div>
+
+<h3>8.4 外部データへのアクセス（Salesforce Connect / Files Connect）</h3>
+<div class="card">
+<p>Salesforce Connect は、SAP / SQL Server / Oracle / OData ソースなどに保管されたデータを <strong>外部オブジェクト</strong>として Salesforce 内に "投影" する機能。コピーせず参照のみ。Files Connect は SharePoint・Google Drive のファイルを統合的に検索/参照する機能。</p>
+<div class="callout">「外部サービス」と「Salesforce Connect」は混同されがち。<strong>外部サービス = 呼び出すだけ</strong>（操作系API）、<strong>Salesforce Connect = データを SObject として参照</strong>（マスタデータの仮想化）と覚える。</div>
+</div>
+
+<h3>8.5 ビジネスプロセスとリアルタイムイベント</h3>
+<div class="card">
+<dl class="topic-list">
+  <dt>プラットフォームイベント</dt>
+  <dd>Salesforce が「イベントバス」を持ち、発行者と購読者を疎結合で繋ぐ Pub/Sub。Apex/フロー/外部システムが双方向で利用可。</dd>
+  <dt>Event Studio</dt>
+  <dd>Salesforce イベントバスの公開・購読を可視化・追跡。</dd>
+  <dt>Salesforce と Heroku 間のデータ同期</dt>
+  <dd>Heroku Connect で Salesforce と Heroku Postgres を双方向に同期。</dd>
+  <dt>Lightning Out 2.0</dt>
+  <dd>カスタム LWC を Salesforce 以外の Web に埋め込んで配信。</dd>
+</dl>
+</div>
+</section>
+
+<section>
+<span class="anchor" id="sec9"></span>
+<h2>9. 独自の Web サイトの構築（参考）</h2>
+<p class="lead">Site.com と Salesforce サイトは Web サイト作成の従来システム。現在の新規構築では <strong>Experience Cloud</strong>（旧 Community Cloud）が推奨。</p>
+<div class="card">
+<p>このセクションは互換性維持のためにヘルプに残されているもの。新規プロジェクトでは Experience Builder を使い、必要に応じてセクション7のカスタムドメインと組合せる流れが標準です。</p>
+</div>
+</section>
+
+<section>
+<span class="anchor" id="sec10"></span>
+<h2>10. DX インスペクター（参考）</h2>
+<p class="lead">Sandbox・スクラッチ組織・Developer Edition でメタデータとデータ変更を追跡・可視化する管理ツール。Salesforce DX の開発ワークフローを補助。</p>
+<div class="card">
+<p>各ビルダー（Lightning App Builder / Flow Builder 等）の上部に表示され、変更履歴・差分・依存関係をその場で確認できる。本番組織では利用不可。</p>
+</div>
+</section>
+
+<section>
+<h2>付録：図解インデックス</h2>
+<div class="card">
+<ul>
+  <li><a href="diagrams/01_pagelayout_vs_dynamicforms.svg" target="_blank">図1: ページレイアウト vs 動的フォーム</a></li>
+  <li><a href="diagrams/02_record_type.svg" target="_blank">図2: レコードタイプの仕組み</a></li>
+  <li><a href="diagrams/03_lightning_app_structure.svg" target="_blank">図3: Lightning アプリケーションの構造</a></li>
+  <li><a href="diagrams/04_custom_domain.svg" target="_blank">図4: カスタムドメインの3つの提供方式</a></li>
+  <li><a href="diagrams/05_formula_field.svg" target="_blank">図5: 数式項目とは</a></li>
+  <li><a href="diagrams/06_notification_routes.svg" target="_blank">図6: 通知ビルダーの配信経路</a></li>
+  <li><a href="diagrams/07_external_services.svg" target="_blank">図7: 外部サービスの仕組み</a></li>
+  <li><a href="diagrams/08_buttons_links_actions.svg" target="_blank">図8: アクション・ボタン・リンクの使い分け</a></li>
+  <li><a href="diagrams/09_schema_builder.svg" target="_blank">図9: スキーマビルダー</a></li>
+  <li><a href="diagrams/10_lightning_record_page.svg" target="_blank">図10: Lightning レコードページの構成と割り当て</a></li>
+  <li><a href="diagrams/11_field_types.svg" target="_blank">図11: カスタム項目の主な型</a></li>
+  <li><a href="diagrams/12_data_classification.svg" target="_blank">図12: 機密データ分類</a></li>
+  <li><a href="diagrams/13_dynamic_interactions.svg" target="_blank">図13: 動的インタラクション</a></li>
+</ul>
+</div>
+</section>
+
+<footer class="footer">
+  <p>出典: <a href="https://help.salesforce.com/s/articleView?id=platform.extend_click_intro.htm&language=ja&type=5" target="_blank" rel="noopener">Salesforce ヘルプ「コードではなくてクリックによる Salesforce の拡張」</a> ©Salesforce.com Inc.</p>
+  <p>本書は Salesforce 公式ドキュメントを基にした再構成・要約ガイドです。実装時は必ず各ページの原文（リリースに応じた最新版）をご確認ください。</p>
+  <p>作成日: 2026-06-22 / 図解: 13 点 / 対象範囲: extend_click_intro.htm 配下の主要 100+ ページ構造</p>
+</footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Salesforce セキュリティ状態チェック — まとめヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2>目次</h2>
+    <ol>
+    <li><a href="#security_health_check">1. セキュリティ状態チェック</a></li>
+    <li><a href="#security_health_check_score">2. [状態チェック] のスコアの計算方法</a></li>
+    <li><a href="#security_health_check_notifications">3. セキュリティ状態チェックスコア通知の設定</a></li>
+    <li><a href="#security_custom_baseline_create">4. 状態チェックのカスタムベースラインの作成</a></li>
+    <li><a href="#security_custom_baseline_file_requirements">5. カスタムベースラインファイルの要件</a></li>
+    </ol>
+    <h2 style="margin-top: 28px;">出典</h2>
+    <ul style="list-style: none; padding: 0; font-size: 12px;">
+    <li><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_health_check.htm&amp;type=5&amp;language=ja" target="_blank" rel="noopener">セキュリティ状態チェック</a></li>
+    <li><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_health_check_score.htm&amp;type=5&amp;language=ja" target="_blank" rel="noopener">[状態チェック] のスコアの計算方法</a></li>
+    <li><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_health_check_notifications.htm&amp;type=5&amp;language=ja" target="_blank" rel="noopener">セキュリティ状態チェックスコア通知の設定</a></li>
+    <li><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_custom_baseline_create.htm&amp;type=5&amp;language=ja" target="_blank" rel="noopener">状態チェックのカスタムベースラインの作成</a></li>
+    <li><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_custom_baseline_file_requirements.htm&amp;type=5&amp;language=ja" target="_blank" rel="noopener">カスタムベースラインファイルの要件</a></li>
+    </ul>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>Salesforce セキュリティ状態チェック</h1>
+      <div class="meta"><code>help.salesforce.com</code> のヘルプ記事をまとめたもの · 生成日 2026-06-19 17:04</div>
+    </header>
+<section class="article" id="security_health_check">
+<h1 class="slds-text-heading_large">セキュリティ状態チェック</h1>
+  <p>システム管理者として、[状態チェック] を使用してセキュリティ設定の潜在的な脆弱性をすべて 1 つのページから特定して修正できます。概要スコアには、Salesforce ベースライン標準などのセキュリティベースラインを組織がどの程度満たしているかが表示されます。最大 5 つのカスタムベースラインをアップロードして、Salesforce ベースライン標準の代わりに使用できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic と Lightning Experience の両方</td>
+
+          </tr>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</td>
+
+          </tr>
+        </tbody></table>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d47120e70" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d47120e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">状態チェックを表示またはカスタムベースラインをエクスポートする</td>
+
+            <td headers="d47120e70" style="vertical-align:top;" class="slds-cell-wrap"><p>「状態チェックの表示」</p><p>または</p><p>「セキュリティセンターの表示」</p><p style="margin-bottom:0;">または</p><p style="margin-bottom:0;">「セキュリティセンターの管理」</p></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d47120e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">カスタムベースラインをインポートする</td>
+
+            <td headers="d47120e70" style="vertical-align:top;" class="slds-cell-wrap"><p>「状態チェックの管理」</p><p>または</p><p>「セキュリティセンターの表示」</p><p style="margin-bottom:0;">または</p><p style="margin-bottom:0;">「セキュリティセンターの管理」</p></td>
+
+          </tr>
+        </tbody></table>
+    <p>[設定] から、[クイック検索] ボックスに<kbd>「状態チェック」</kbd>と入力し、<strong class="uicontrol">[状態チェック]</strong> を選択します。</p>
+    <div style="text-align:center;">
+      <img alt="スコアと高リスク設定が表示されている [状態チェック] ページ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/security/images/health_check/health_check_full.png">
+    </div>
+    <p>ベースラインドロップダウン (1) で、[Salesforce ベースライン標準] またはカスタムベースラインを選択します。ベースラインは、[高リスクのセキュリティ設定]、[中リスクのセキュリティ設定]、[低リスクのセキュリティ設定]、[情報のセキュリティ設定] の推奨値で構成されます (2)。ベースラインよりも制限が緩い設定に変更すると、状態チェックのスコア (3) とグレード (4) が低下します。</p>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 現在の状態チェックスコアに影響する可能性のある新しいシグナルが導入されることがあります。ベースライン設定を確認して新しいシグナルを追加し、非準拠設定を解決してスコアを高めます。</div></div></div>
+
+    <p>設定は基準値 (5) との比較情報と共に表示されます。リスクに対処するには、設定を編集 (6) するか、[リスクを修正] (7) を使用して、[状態チェック] ページを離れることなく、選択したベースラインの推奨値に設定をすばやく変更します。ベースラインコントロールメニュー (8) を使用して、カスタムベースラインのインポート、エクスポート、編集、削除ができます。</p>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> 
+      <p>パスワードの最小長を 8 (デフォルト値) から 5 に変更し、[パスワードポリシー] の他の設定を制限の緩い値に変更したとします。これらの変更により、推測や他の過激な攻撃に対してユーザーのパスワードが脆弱な状態になります。その結果、全体的なスコアが低下し、設定がリスクとして表示されます。</p>
+    </div></div></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの修正の制限事項</h2><p>一部の設定は [リスクを修正] ボタンでは変更できません。調整する設定が [リスクを修正] 画面に表示されない場合、[状態チェック] ページの [編集] リンクを使用して手動で変更します。セキュリティセンターアプリケーションの [状態チェック] 詳細ページでは、複数の状態チェックスコアと設定を 1 か所で集計できるため、時間を節約できます。詳細は、<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.security_center.htm&amp;language=ja&amp;type=5">「セキュリティセンターを使用したセキュリティ目標の管理」</a>を参照してください。</p></div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#security_health_check_score">[状態チェック] のスコアの計算方法</a></strong><br>状態チェックのスコアは、セキュリティ設定が Salesforce ベースライン標準または選択したカスタムベースラインをどの程度満たしているかを測定する独自の数式を使用して計算されます。設定が基準を満たすか超える場合はスコアが上昇し、設定にリスクがある場合はスコアが低下します。</li><li class="slds-p-bottom_small"><strong><a href="#security_health_check_notifications">セキュリティ状態チェックスコア通知の設定</a></strong><br>状態チェックスコアが減少した場合に毎週通知を受信するユーザーを設定します。これらのアラートにより、システム管理者は手動で監視することなく、最新情報を把握できます。</li><li class="slds-p-bottom_small"><strong><a href="#security_custom_baseline_create">状態チェックのカスタムベースラインの作成</a></strong><br>最大 5 つのカスタムベースラインをインポートすると、セキュリティ設定を Salesforce 推奨の標準ではなく、独自の標準と比較できます。たとえば、金融サービス業であれば、FINRA 標準を使用してカスタムセキュリティベースラインを作成できます。</li><li class="slds-p-bottom_small"><strong><a href="#security_custom_baseline_file_requirements">カスタムベースラインファイルの要件</a></strong><br>状態チェックのカスタムベースラインを正常にインポートするために、ファイルと設定が要件を満たしていることを確認します。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="状態チェックのスコアは、セキュリティ設定が Salesforce ベースライン標準または選択したカスタムベースラインをどの程度満たしているかを測定する独自の数式を使用して計算されます。設定が基準を満たすか超える場合はスコアが上昇し、設定にリスクがある場合はスコアが低下します。" href="#security_health_check_score">[状態チェック] のスコアの計算方法</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.security_center_health_check_data.htm&amp;language=ja&amp;type=5">セキュリティセンターでの状態チェックデータの表示と監視</a></li><li><a title="設定変更履歴では、自分自身と他のシステム管理者が行った最近の設定変更を追跡します。監査履歴は、複数のシステム管理者がいる場合に特に役立ちます。" href="https://help.salesforce.com/s/articleView?id=xcloud.admin_monitorsetup.htm&amp;language=ja&amp;type=5">設定変更履歴を使用した設定変更の監視</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="security_health_check_score">
+<h1 class="slds-text-heading_large">[状態チェック] のスコアの計算方法</h1>
+  <p>状態チェックのスコアは、セキュリティ設定が Salesforce ベースライン標準または選択したカスタムベースラインをどの程度満たしているかを測定する独自の数式を使用して計算されます。設定が基準を満たすか超える場合はスコアが上昇し、設定にリスクがある場合はスコアが低下します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic および Lightning Experience の両方</td>
+
+          </tr>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</td>
+
+          </tr>
+        </tbody></table>
+    <div><p>高リスク、中リスク、低リスク、情報の 4 つのリスクカテゴリがあります。リスクカテゴリは状態チェックのスコアに影響を及ぼします。高リスク設定は最も多く反映され、低リスク設定は最も少なく反映され、中リスク設定はその中間に反映されます。情報カテゴリ内の設定は状態チェックのスコアには考慮されません。</p><p>すべての設定が基準を満たすか超える場合は、合計スコアが 100% になります。設定を更新すると、緑色のバーが右側に移動します。</p><div style="text-align:center;">
+        <img alt="79% のスコアと [リスクを修正] ボタンが表示されている [状態チェック] ページ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/security/images/health_check/health_check_score.png">
+      </div><p>グレードはスコアに基づいています。</p><ul>
+        <li>90 % 以上 = 非常に良い </li>
+
+        <li>80 ～ 89% = かなり良い </li>
+
+        <li>70 ～ 79% = 良い </li>
+
+        <li>55 ～ 69% = 悪い </li>
+
+        <li>54% 以下 = 非常に低い </li>
+
+      </ul>
+<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 状態チェックのスコアに関する重要な考慮事項を次に示します。</div></div></div>
+<ul>
+        <li>スコアは [状態チェック] ページに表示されますが、API で参照することはできません。</li>
+
+        <li>Salesforce によってスコアの計算で使用されるオプションが追加または削除された場合、スコアが変更される可能性があります。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">
+        スコアに基づく推奨アクション
+      </h2><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:32.51173708920187%"><col style="width:67.48826291079813%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d126909e127" style="vertical-align:top;" class="slds-cell-wrap" scope="col">合計スコア</th>
+              <th id="d126909e130" style="vertical-align:top;" class="slds-cell-wrap" scope="col">推奨アクション</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d126909e127" style="vertical-align:top;" class="slds-cell-wrap" data-label="合計スコア">0% ～ 33%</td>
+
+              <td headers="d126909e130" style="vertical-align:top;" class="slds-cell-wrap" data-label="推奨アクション">すぐに高リスクに対処する。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e127" style="vertical-align:top;" class="slds-cell-wrap" data-label="合計スコア">34% ～ 66%</td>
+
+              <td headers="d126909e130" style="vertical-align:top;" class="slds-cell-wrap" data-label="推奨アクション">短期的に高リスクに対処し、長期的に中リスクに対処する。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e127" style="vertical-align:top;" class="slds-cell-wrap" data-label="合計スコア">67% ～ 100%</td>
+
+              <td headers="d126909e130" style="vertical-align:top;" class="slds-cell-wrap" data-label="推奨アクション">[状態チェック] を定期的に確認し、リスクに対処する。</td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 新しい Salesforce 組織には、100% 未満の初期スコアが設定されています。[状態チェック] を使用して、パスワードポリシーやその他の設定グループの高いリスクを解消して、スコアを速やかに改善します。</div></div></div>
+</div>
+    <div><p>次の表に、Salesforce ベースライン標準設定、リスクレベル、およびデフォルトの Salesforce ベースライン標準の値を示します。カスタムベースラインを使用している場合、この情報は異なります。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">高リスクのセキュリティ設定</h2><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:44.36557231588287%"><col style="width:18.544809228039043%"><col style="width:18.544809228039043%"><col style="width:18.544809228039043%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d126909e198" style="vertical-align:top;" class="slds-cell-wrap" scope="col">設定</th>
+              <th id="d126909e201" style="vertical-align:top;" class="slds-cell-wrap" scope="col">準拠値</th>
+              <th id="d126909e204" style="vertical-align:top;" class="slds-cell-wrap" scope="col">警告値</th>
+              <th id="d126909e207" style="vertical-align:top;" class="slds-cell-wrap" scope="col">重大値</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d126909e198" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">セッションを最初に使用したドメインにセッションをロックする</td>
+
+              <td headers="d126909e201" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">チェックボックスがオン</td>
+
+              <td headers="d126909e204" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">なし</td>
+
+              <td headers="d126909e207" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">チェックボックスがオフ</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e198" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">SMS によるデバイスの有効化の有効化</td>
+
+              <td headers="d126909e201" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">チェックボックスがオン</td>
+
+              <td headers="d126909e204" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">なし</td>
+
+              <td headers="d126909e207" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">チェックボックスがオフ</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e198" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">設定ページのクリックジャック保護を有効化</td>
+
+              <td headers="d126909e201" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">チェックボックスがオン</td>
+
+              <td headers="d126909e204" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">なし</td>
+
+              <td headers="d126909e207" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">チェックボックスがオフ</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e198" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">設定以外の Salesforce ページのクリックジャック保護を有効化</td>
+
+              <td headers="d126909e201" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">チェックボックスがオン</td>
+
+              <td headers="d126909e204" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">なし</td>
+
+              <td headers="d126909e207" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">チェックボックスがオフ</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e198" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">標準ヘッダーがある Visualforce ページのクリックジャック保護を有効化</td>
+
+              <td headers="d126909e201" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">チェックボックスがオン</td>
+
+              <td headers="d126909e204" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">なし</td>
+
+              <td headers="d126909e207" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">チェックボックスがオフ</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e198" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">ヘッダーが無効化された Visualforce ページのクリックジャック保護を有効化</td>
+
+              <td headers="d126909e201" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">チェックボックスがオン</td>
+
+              <td headers="d126909e204" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">なし</td>
+
+              <td headers="d126909e207" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">チェックボックスがオフ</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e198" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">設定ページ以外の GET 要求の CSRF 保護を有効化</td>
+
+              <td headers="d126909e201" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">チェックボックスがオン</td>
+
+              <td headers="d126909e204" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">なし</td>
+
+              <td headers="d126909e207" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">チェックボックスがオフ</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e198" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">設定ページ以外の POST 要求の CSRF 保護を有効化</td>
+
+              <td headers="d126909e201" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">チェックボックスがオン</td>
+
+              <td headers="d126909e204" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">なし</td>
+
+              <td headers="d126909e207" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">チェックボックスがオフ</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e198" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">HttpOnly 属性が必要</td>
+
+              <td headers="d126909e201" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">チェックボックスがオン</td>
+
+              <td headers="d126909e204" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">チェックボックスがオフ</td>
+
+              <td headers="d126909e207" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">なし</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e198" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">ハイブリッド動作を行う、セキュリティリスクファイルの種類の数</td>
+
+              <td headers="d126909e201" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">ハイブリッド動作が有効になっているセキュリティリスクファイルの種類がない</td>
+
+              <td headers="d126909e204" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">1 つ以上のセキュリティリスクファイルの種類でハイブリッド動作が有効になっている</td>
+
+              <td headers="d126909e207" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">なし</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e198" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">ログイン失敗によりロックするまでの回数</td>
+
+              <td headers="d126909e201" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">3</td>
+
+              <td headers="d126909e204" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">5,10</td>
+
+              <td headers="d126909e207" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">制限なし</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e198" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">期限切れの証明書の数</td>
+
+              <td headers="d126909e201" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">期限切れの証明書がない</td>
+
+              <td headers="d126909e204" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">1 つ以上の証明書の期限が切れている</td>
+
+              <td headers="d126909e207" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">なし</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e198" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">デフォルトの外部アクセス権が [公開] に設定されているオブジェクトの数</td>
+
+              <td headers="d126909e201" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">デフォルトの外部アクセス権が公開に設定されているオブジェクトが存在しない</td>
+
+              <td headers="d126909e204" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">デフォルトの外部アクセス権が [公開] に設定されているオブジェクトが少なくとも 1 つ存在する</td>
+
+              <td headers="d126909e207" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">なし</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">中リスクのセキュリティ設定</h2><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:44.36557231588287%"><col style="width:18.544809228039043%"><col style="width:18.544809228039043%"><col style="width:18.544809228039043%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d126909e438" style="vertical-align:top;" class="slds-cell-wrap" scope="col">設定</th>
+              <th id="d126909e441" style="vertical-align:top;" class="slds-cell-wrap" scope="col">準拠値</th>
+              <th id="d126909e444" style="vertical-align:top;" class="slds-cell-wrap" scope="col">警告値</th>
+              <th id="d126909e447" style="vertical-align:top;" class="slds-cell-wrap" scope="col">重大値</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d126909e438" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">パスワードの有効期限は 1 日以上にする必要があります</td>
+
+              <td headers="d126909e441" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">チェックボックスがオン</td>
+
+              <td headers="d126909e444" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">チェックボックスがオフ</td>
+
+              <td headers="d126909e447" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">なし</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e438" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">ユーザーとしてログインしてから再ログインを強制する</td>
+
+              <td headers="d126909e441" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">チェックボックスがオン</td>
+
+              <td headers="d126909e444" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">なし</td>
+
+              <td headers="d126909e447" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">チェックボックスがオフ</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e438" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">すべての要求でログイン IP アドレスの制限を適用</td>
+
+              <td headers="d126909e441" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">チェックボックスがオン</td>
+
+              <td headers="d126909e444" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">チェックボックスがオフ</td>
+
+              <td headers="d126909e447" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">なし</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e438" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">コンテンツセキュリティポリシーによるメールテンプレートの保護の有効化</td>
+
+              <td headers="d126909e441" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">チェックボックスがオン</td>
+
+              <td headers="d126909e444" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">なし</td>
+
+              <td headers="d126909e447" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">チェックボックスがオフ</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e438" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">コンテンツ盗聴保護を有効化</td>
+
+              <td headers="d126909e441" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">チェックボックスがオン</td>
+
+              <td headers="d126909e444" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">なし</td>
+
+              <td headers="d126909e447" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">チェックボックスがオフ</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e438" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">管理者は任意のユーザーでログインできます</td>
+
+              <td headers="d126909e441" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">チェックボックスがオフ</td>
+
+              <td headers="d126909e444" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">チェックボックスがオン</td>
+
+              <td headers="d126909e447" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">なし</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e438" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">過去のパスワードの利用制限回数</td>
+
+              <td headers="d126909e441" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">3 回前のパスワードまで使用不可 </td>
+
+              <td headers="d126909e444" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">1 または 2 回前のパスワードまで使用不可</td>
+
+              <td headers="d126909e447" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">制限なし</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e438" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">最小パスワード長</td>
+
+              <td headers="d126909e441" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">8</td>
+
+              <td headers="d126909e444" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">6 または 7</td>
+
+              <td headers="d126909e447" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">5 以下</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e438" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">パスワードの有効期間</td>
+
+              <td headers="d126909e441" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">90 日以下</td>
+
+              <td headers="d126909e444" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">180 日</td>
+
+              <td headers="d126909e447" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">1 年または無期限</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e438" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">パスワード文字列の制限</td>
+
+              <td headers="d126909e441" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">英字、数字、および特殊文字またはそれ以外の要素を組み合わせて使用する必要がある</td>
+
+              <td headers="d126909e444" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">英・数字両方含める</td>
+
+              <td headers="d126909e447" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">制限なし</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">低リスクのセキュリティ設定</h2><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:44.36557231588287%"><col style="width:18.544809228039043%"><col style="width:18.544809228039043%"><col style="width:18.544809228039043%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d126909e631" style="vertical-align:top;" class="slds-cell-wrap" scope="col">設定</th>
+              <th id="d126909e634" style="vertical-align:top;" class="slds-cell-wrap" scope="col">準拠値</th>
+              <th id="d126909e637" style="vertical-align:top;" class="slds-cell-wrap" scope="col">警告値</th>
+              <th id="d126909e640" style="vertical-align:top;" class="slds-cell-wrap" scope="col">重大値</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d126909e631" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">パスワードのリセットの秘密の回答を非表示にする</td>
+
+              <td headers="d126909e634" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">チェックボックスがオン</td>
+
+              <td headers="d126909e637" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">チェックボックスがオフ</td>
+
+              <td headers="d126909e640" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">なし</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e631" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">セッションタイムアウト時に強制的にログアウト</td>
+
+              <td headers="d126909e634" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">チェックボックスがオン</td>
+
+              <td headers="d126909e637" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">チェックボックスがオフ</td>
+
+              <td headers="d126909e640" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">なし</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e631" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">多要素認証 (MFA) の登録時に ID 検証が必要</td>
+
+              <td headers="d126909e634" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">チェックボックスがオン</td>
+
+              <td headers="d126909e637" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">なし</td>
+
+              <td headers="d126909e640" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">チェックボックスがオフ</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e631" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">メールアドレスの変更に ID 検証が必要</td>
+
+              <td headers="d126909e634" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">チェックボックスがオン</td>
+
+              <td headers="d126909e637" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">なし</td>
+
+              <td headers="d126909e640" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">チェックボックスがオフ</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e631" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">リモートサイト</td>
+
+              <td headers="d126909e634" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">[プロトコルセキュリティの無効化] オプションがオンになっているリモートサイトがない</td>
+
+              <td headers="d126909e637" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">少なくとも 1 つのリモートサイトが <strong class="uicontrol">[プロトコルセキュリティの無効化]</strong> オプションをオンにして作成されている。</td>
+
+              <td headers="d126909e640" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">なし</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e631" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">パスワード質問の制限</td>
+
+              <td headers="d126909e634" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">パスワードを含めることはできない</td>
+
+              <td headers="d126909e637" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">なし</td>
+
+              <td headers="d126909e640" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">なし</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e631" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">タイムアウト値</td>
+
+              <td headers="d126909e634" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">2 時間以下</td>
+
+              <td headers="d126909e637" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">4、8、または 12 時間</td>
+
+              <td headers="d126909e640" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">チェックボックスがオフ</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e631" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">ロックアウトの有効期間</td>
+
+              <td headers="d126909e634" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">30 分以上</td>
+
+              <td headers="d126909e637" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">30 分未満</td>
+
+              <td headers="d126909e640" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">なし</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">情報のセキュリティ設定</h2><p>情報のセキュリティ設定は状態チェックのスコアに影響しませんが、確認する価値があります。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:44.36557231588287%"><col style="width:18.544809228039043%"><col style="width:18.544809228039043%"><col style="width:18.544809228039043%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d126909e800" style="vertical-align:top;" class="slds-cell-wrap" scope="col">設定</th>
+              <th id="d126909e803" style="vertical-align:top;" class="slds-cell-wrap" scope="col">準拠値</th>
+              <th id="d126909e806" style="vertical-align:top;" class="slds-cell-wrap" scope="col">警告値</th>
+              <th id="d126909e809" style="vertical-align:top;" class="slds-cell-wrap" scope="col">重大値</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d126909e800" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">信頼されていない外部 URL へのリダイレクトを警告なしで許可</td>
+
+              <td headers="d126909e803" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">設定が無効になっている</td>
+
+              <td headers="d126909e806" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">なし</td>
+
+              <td headers="d126909e809" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">設定が有効になっている</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e800" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">証明書の期限が切れるまでの日数</td>
+
+              <td headers="d126909e803" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">証明書が作成されていないか、すべての証明書の期限が切れるまで 180 日未満である。</td>
+
+              <td headers="d126909e806" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">少なくとも 1 つの証明書の期限が切れるまで 15 日以上 180 日未満である。</td>
+
+              <td headers="d126909e809" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">少なくとも 1 つの証明書の期限が切れるまで 15 日未満である。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e800" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">鍵サイズ</td>
+
+              <td headers="d126909e803" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">すべての証明書の鍵サイズが 4096 である。</td>
+
+              <td headers="d126909e806" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">少なくとも 1 つの証明書の鍵サイズが 3072 または 2048 である。</td>
+
+              <td headers="d126909e809" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">なし</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e800" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">ゲストユーザープロファイルに編集アクセス権のあるオブジェクトの数</td>
+
+              <td headers="d126909e803" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">0 ～ 4</td>
+
+              <td headers="d126909e806" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">5 ～ 9</td>
+
+              <td headers="d126909e809" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">10 以上</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e800" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">ゲストユーザープロファイルに参照アクセス権のあるオブジェクトの数</td>
+
+              <td headers="d126909e803" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">0 ～ 4</td>
+
+              <td headers="d126909e806" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">5 ～ 9</td>
+
+              <td headers="d126909e809" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">10 以上</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126909e800" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">参照項目にレコード名を表示するための権限が必要</td>
+
+              <td headers="d126909e803" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">設定が有効になっている</td>
+
+              <td headers="d126909e806" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">なし</td>
+
+              <td headers="d126909e809" style="vertical-align:top;" class="slds-cell-wrap" data-label="重大値">設定が無効になっている</td>
+
+            </tr>
+          </tbody></table></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="システム管理者として、[状態チェック] を使用してセキュリティ設定の潜在的な脆弱性をすべて 1 つのページから特定して修正できます。概要スコアには、Salesforce ベースライン標準などのセキュリティベースラインを組織がどの程度満たしているかが表示されます。最大 5 つのカスタムベースラインをアップロードして、Salesforce ベースライン標準の代わりに使用できます。" href="#security_health_check">セキュリティ状態チェック</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="security_health_check_notifications">
+<h1 class="slds-text-heading_large">セキュリティ状態チェックスコア通知の設定</h1>
+  <p>状態チェックスコアが減少した場合に毎週通知を受信するユーザーを設定します。これらのアラートにより、システム管理者は手動で監視することなく、最新情報を把握できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 2026 年 4 月 15 日以降、本番組織のシステム管理者に対して通知がデフォルトで有効になります。オプトアウトするには、[設定] の [セキュリティ状態チェック] 設定で通知を手動で無効にします。</div></div></div>
+
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col style="width:100%"></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</td>
+
+          </tr>
+        </tbody></table>
+    <table summary="必要なユーザー権限" class="slds-table slds-table_bordered slds-m-bottom_small"><caption>必要なユーザー権限</caption><colgroup><col style="width:50%"><col style="width:50%"></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">状態チェックを表示またはカスタムベースラインをエクスポートする</td>
+
+            <td style="vertical-align:top;" class="slds-cell-wrap">「状態チェックの表示」</td>
+
+          </tr>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">カスタムベースラインをインポートする</td>
+
+            <td style="vertical-align:top;" class="slds-cell-wrap">「状態チェックの管理」</td>
+
+          </tr>
+        </tbody></table>
+    <p>すべてのシステム管理者を含めたり、個々のユーザーやメールアドレスを追加したりできます。</p>
+    <ol>
+      <li>[設定] から、[クイック検索] ボックスに「<strong>状態チェック」</strong>と入力し、[<strong>状態チェック]</strong> を選択します。</li>
+
+      <li>[<strong>Notify all System Admins</strong> (すべてのシステム管理者に通知)] 切り替えをオンにして、システム管理者プロファイルを持つすべてのユーザーに通知を送信します。</li>
+
+      <li>または、<strong>[受信者</strong>] 参照フィールドを使用して、個々のユーザまたは外部電子メール アドレスを追加します。</li>
+
+      <li>ユーザーを検索して選択するか、外部受信者の完全なメールアドレスを入力します。</li>
+
+      <li>受信者を追加すると、項目の下にテーブルが表示され、通知を受信するすべてのユーザーとメールがリストされます。</li>
+
+      <li><strong>[保存]</strong> をクリックします。</li>
+
+    </ol>
+    <p>保存すると、通知設定が有効になります。セキュリティ状態チェックスコアが変更されるたびに、設定された受信者に通知が送信されます。</p>
+    <div style="text-align:center;">
+      <img alt="通知は状態チェックの [設定] から簡単に管理できます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/security/images/health_check/health_check_notifications.png">
+    </div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="security_custom_baseline_create">
+<h1 class="slds-text-heading_large">状態チェックのカスタムベースラインの作成</h1>
+  
+  <p>最大 5 つのカスタムベースラインをインポートすると、セキュリティ設定を Salesforce 推奨の標準ではなく、独自の標準と比較できます。たとえば、金融サービス業であれば、FINRA 標準を使用してカスタムセキュリティベースラインを作成できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d117760e68" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d117760e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">カスタムベースラインを表示する</td>
+
+              <td headers="d117760e68" style="vertical-align:top;" class="slds-cell-wrap"><p>「状態チェックの表示」</p><p>または</p><p>「セキュリティセンターの表示」</p><p style="margin-bottom:0;">または</p><p style="margin-bottom:0;">「セキュリティセンターの管理」</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d117760e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">カスタムベースラインを作成する</td>
+
+              <td headers="d117760e68" style="vertical-align:top;" class="slds-cell-wrap"><p>「状態チェックの管理」</p><p>または</p><p>「セキュリティセンターの表示」</p><p style="margin-bottom:0;">または</p><p style="margin-bottom:0;">「セキュリティセンターの管理」</p></td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>カスタムベースラインを作成するには、Salesforce ベースライン標準を基本にします。</p><div style="text-align:left;">
+        <img alt="[ベースラインコントロール] メニューの画像" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/security/images/health_check/cb_create_baseline_control_menu.png" style="width:600px;">
+      </div></div>
+    <ol><li>
+        <span>Salesforce ベースライン標準ファイルをエクスポートするには、[ベースラインコントロール] メニューから <strong class="uicontrol">[ベースラインをエクスポート]</strong> を選択します。</span>
+      </li><li>
+        <span>XML ファイルをテキストエディターで編集し、変更を保存します。</span>
+        <ol>
+          <li>
+            <span>リスクカテゴリを調整してスコアリングを調整します。リスクカテゴリは、状態チェックのスコアに影響を及ぼします。より高いリスクカテゴリ内の設定の方が重要として加重されます。設定を情報カテゴリに移動すると、その設定は状態チェックのスコアの計算から除外されます。</span>
+          </li>
+
+          <li>
+            <span>設定値を変更するには、「カスタムベースラインファイルの要件」に従ってください。一部の値は変更できません。また一部の設定には制限された値のオプションがあります。リスクカテゴリ、設定名、引用符の追加または削除は行わないでください。追加または削除を行うと、インポートが失敗します。セキュリティ設定によっては、低い値が低リスクを表す場合もあれば、高リスクを表す場合もあります。たとえば、最小パスワード長は、値が低いほどリスクが高くなります。一方、ログイン失敗によりロックするまでの回数は、値が低いほど安全です。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>ファイルをインポートするには、[ベースラインコントロール] メニューから <strong class="uicontrol">[ベースラインをインポート]</strong> を選択します。</span>
+        <ol>
+          <li>
+            <span>カスタムベースラインに名前を付けます。スペースと一部の特殊文字を使用できます。名前を「SFDC recommended」または「Salesforce Baseline Standard」にすると、ファイルはインポートできません。</span>
+          </li>
+
+          <li>
+            <span>カスタムベースラインには一意の API 参照名を付けてください。文字および数字を使用できますが、名前の先頭は文字にする必要があります。スペースや特殊文字を含めることはできません。</span>
+          </li>
+
+          <li>
+            <span>必要に応じて、カスタムベースラインをセキュリティ状態チェックのデフォルトベースラインに設定します。</span>
+          </li>
+
+        </ol>
+        <div>
+          <p>ベースラインファイル内に予期しない情報がある場合や、新しいカスタムベースラインアップロードですべての状態チェック設定が指定されていない場合、インポートが失敗します。インポートに失敗した場合は、問題の解決に役立つメッセージが表示されます。トラブルシューティングについては、Salesforce ヘルプの「カスタムベースラインのファイル要件」を参照してください。ベースライン名、API 参照名、デフォルトベースラインを、[ベースラインコントロール] メニューの [編集] 機能を使用して変更できます。</p>
+        </div>
+      </li><li>
+        <span>ファイルがアップロードされたことを確認するには、ベースラインドロップダウンをクリックしてベースラインを選択します。カスタムベースラインをデフォルトとして設定した場合は、インポート後に表示されます。</span>
+        <div>
+          <div style="text-align:left;">
+            <img alt="カスタムベースラインドロップダウンツールの画像" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/security/images/health_check/cb_baseline_dropdown.png" style="width:400px;">
+          </div>
+        </div>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="状態チェックのカスタムベースラインを正常にインポートするために、ファイルと設定が要件を満たしていることを確認します。" href="#security_custom_baseline_file_requirements">カスタムベースラインファイルの要件</a></li><li><a title="状態チェックのスコアは、セキュリティ設定が Salesforce ベースライン標準または選択したカスタムベースラインをどの程度満たしているかを測定する独自の数式を使用して計算されます。設定が基準を満たすか超える場合はスコアが上昇し、設定にリスクがある場合はスコアが低下します。" href="#security_health_check_score">[状態チェック] のスコアの計算方法</a></li><li><a title="システム管理者として、[状態チェック] を使用してセキュリティ設定の潜在的な脆弱性をすべて 1 つのページから特定して修正できます。概要スコアには、Salesforce ベースライン標準などのセキュリティベースラインを組織がどの程度満たしているかが表示されます。最大 5 つのカスタムベースラインをアップロードして、Salesforce ベースライン標準の代わりに使用できます。" href="#security_health_check">セキュリティ状態チェック</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="security_custom_baseline_file_requirements">
+<h1 class="slds-text-heading_large">カスタムベースラインファイルの要件</h1>
+  <p>状態チェックのカスタムベースラインを正常にインポートするために、ファイルと設定が要件を満たしていることを確認します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</td>
+
+          </tr>
+        </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">XML ファイル</h2><p>英語の文字が使用されている有効な XML ファイルを使用します。ファイルを 20 KB より大きくすることはできません。各値は引用符で囲んでください。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">カスタムベースラインセキュリティ設定の項目と値</h2><p>状態チェックの設定をファイルで追加または削除することはできませんが、リスクと値を変更できます。</p><p>高リスク、中リスク、低リスク、情報の 4 つのリスクカテゴリがあります。リスクカテゴリは状態チェックのスコアに影響を及ぼします。高リスク設定は最も多く反映され、低リスク設定は最も少なく反映され、中リスク設定はその中間に反映されます。設定を任意のリスクカテゴリに移動できます。情報カテゴリの設定は状態チェックのスコアには考慮されないため、不要な設定は削除する代わりにこのカテゴリに移動します。</p><p>各セキュリティ設定は、[準拠]、[警告]、または [重大] として [状態チェック] に表示されます。これらの状況は、セキュリティを高めるための指針になります。インポートファイルの各状況に値を割り当てます。</p><p>Boolean、数値範囲、Enum の 3 つの設定種別があります。各設定に割り当てることができる値は、設定種別によって異なります。</p><p>Boolean セキュリティ設定</p><p>Boolean 設定には、compliant と noncompliant の 2 つの属性があります。compliant の値は、セキュリティ設定のチェックボックスに対応します。Boolean 値の <code>“true”</code> はチェックボックスのオンを示し、<code>“false”</code> はオフを示します。非準拠の属性には、<code>warning</code> 値と <code>critical</code> 値のいずれかを指定できます。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> 状態チェックで Boolean の compliant 値は変更できませんが、noncompliant 値は変更できます。</div></div></div>
+<table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:56.41748942172073%"><col style="width:43.58251057827927%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d23547e112" style="vertical-align:top;" class="slds-cell-wrap" scope="col">設定</th>
+              <th id="d23547e115" style="vertical-align:top;" class="slds-cell-wrap" scope="col">使用可能な値</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d23547e112" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">LoginAccessPolicies.adminLoginAsAnyUser</td>
+
+              <td headers="d23547e115" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な値"><ul>
+                  <li>"false"—compliant</li>
+
+                  <li>"warning" または "critical" — noncompliant</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e112" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">PasswordPolicies.minOneDayPasswordLifetime</td>
+
+              <td headers="d23547e115" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な値"><ul>
+                  <li>"true" — compliant</li>
+
+                  <li>"warning" または "critical" — noncompliant</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e112" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">PasswordPolicies.obscureSecretAnswer</td>
+
+              <td headers="d23547e115" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な値"><ul>
+                  <li>"true" — compliant</li>
+
+                  <li>"warning" または "critical" — noncompliant</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e112" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">SessionSettings.clickjackNonSetup</td>
+
+              <td headers="d23547e115" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な値"><ul>
+                  <li>"true" — compliant</li>
+
+                  <li>"warning" または "critical" — noncompliant</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e112" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">SessionSettings.clickjackSetup</td>
+
+              <td headers="d23547e115" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な値"><ul>
+                  <li>"true" — compliant</li>
+
+                  <li>"warning" または "critical" — noncompliant</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e112" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">SessionSettings.clickjackVisualForceHeaders</td>
+
+              <td headers="d23547e115" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な値"><ul>
+                  <li>"true" — compliant</li>
+
+                  <li>"warning" または "critical" — noncompliant</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e112" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">SessionSettings.clickjackVisualForceNoHeaders</td>
+
+              <td headers="d23547e115" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な値"><ul>
+                  <li>"true" — compliant</li>
+
+                  <li>"warning" または "critical" — noncompliant</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e112" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">SessionSettings.contentSniffingProtection</td>
+
+              <td headers="d23547e115" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な値"><ul>
+                  <li>"true" — compliant</li>
+
+                  <li>"warning" または "critical" — noncompliant</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e112" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">SessionSettings.cspOnEmail</td>
+
+              <td headers="d23547e115" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な値"><ul>
+                  <li>"true" — compliant</li>
+
+                  <li>"warning" または "critical" — noncompliant</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e112" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">SessionSettings.csrfGet</td>
+
+              <td headers="d23547e115" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な値"><ul>
+                  <li>"true" — compliant</li>
+
+                  <li>"warning" または "critical" — noncompliant</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e112" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">SessionSettings.csrfPost</td>
+
+              <td headers="d23547e115" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な値"><ul>
+                  <li>"true" — compliant</li>
+
+                  <li>"warning" または "critical" — noncompliant</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e112" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">SessionSettings.enableSmsIdentity</td>
+
+              <td headers="d23547e115" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な値"><ul>
+                  <li>"true" — compliant</li>
+
+                  <li>"warning" または "critical" — noncompliant</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e112" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">SessionSettings.enforceLoginIp</td>
+
+              <td headers="d23547e115" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な値"><ul>
+                  <li>"true" — compliant</li>
+
+                  <li>"warning" または "critical" — noncompliant</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e112" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">SessionSettings.forceLogoutOnTimeout</td>
+
+              <td headers="d23547e115" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な値"><ul>
+                  <li>"true" — compliant</li>
+
+                  <li>"warning" または "critical" — noncompliant</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e112" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">SessionSettings.forceRelogin</td>
+
+              <td headers="d23547e115" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な値"><ul>
+                  <li>"true" — compliant</li>
+
+                  <li>"warning" または "critical" — noncompliant</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e112" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">SessionSettings.icOn2faRegistration</td>
+
+              <td headers="d23547e115" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な値"><ul>
+                  <li>"true" — compliant</li>
+
+                  <li>"warning" または "critical" — noncompliant</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e112" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">SessionSettings.icOnEmailChange</td>
+
+              <td headers="d23547e115" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な値"><ul>
+                  <li>"true" — compliant</li>
+
+                  <li>"warning" または "critical" — noncompliant</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e112" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">SessionSettings.lockSessionsToDomain</td>
+
+              <td headers="d23547e115" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な値"><ul>
+                  <li>"true" — compliant</li>
+
+                  <li>"warning" または "critical" — noncompliant</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e112" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">SessionSettings.redirectionAllowUntrusted</td>
+
+              <td headers="d23547e115" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な値"><ul>
+                  <li>"false"—compliant</li>
+
+                  <li>"warning" または "critical" — noncompliant</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e112" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">SessionSettings.requireHttpOnly</td>
+
+              <td headers="d23547e115" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な値"><ul>
+                  <li>"true" — compliant</li>
+
+                  <li>"warning" または "critical" — noncompliant</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e112" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">SessionSettings.xssProtection</td>
+
+              <td headers="d23547e115" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な値"><ul>
+                  <li>"true" — compliant</li>
+
+                  <li>"warning" または "critical" — noncompliant</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e112" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">UserPIISettings.enforceNameVisibility</td>
+
+              <td headers="d23547e115" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な値"><ul>
+                  <li>"enabled" — compliant</li>
+
+                  <li>"disabled" — noncompliant</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table><p>数値範囲の値は、小数点第 1 位まで表記される正の整数です。数値範囲設定では、準拠値と警告値のみを指定します。重大値は、設定の他の値に基づいて指定されます。各設定には固有の入力規則があるため、有効な値のみを入力してください。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:44.44444444444444%"><col style="width:22.22222222222222%"><col style="width:33.33333333333333%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d23547e541" style="vertical-align:top;" class="slds-cell-wrap" scope="col">設定</th>
+              <th id="d23547e544" style="vertical-align:top;" class="slds-cell-wrap" scope="col">準拠値</th>
+              <th id="d23547e547" style="vertical-align:top;" class="slds-cell-wrap" scope="col">警告値</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d23547e541" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">CertificateAndKeyManagement.certExpiration</td>
+
+              <td headers="d23547e544" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">日数 ("0.0" から "180.0" までの任意の整数)</td>
+
+              <td headers="d23547e547" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">準拠値より小さい "0.0" から "180.0" までの任意の整数。警告値より小さいすべての値は「重大」として表示されます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e541" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">CertificateAndKeyManagement.expiredCert</td>
+
+              <td headers="d23547e544" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">"0.0" 以上の任意の整数</td>
+
+              <td headers="d23547e547" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">準拠値より大きい任意の整数。警告値より大きいすべての値は「重大」として表示されます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e541" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">CertificateAndKeyManagement.keySize</td>
+
+              <td headers="d23547e544" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">「4096.0」、「3072.0」、または「2048.0」</td>
+
+              <td headers="d23547e547" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">「4096.0」、「3072.0」、または「2048.0」。 2048 または 3072 の鍵サイズを許可しない場合は、準拠値「4096.0」と警告値「3072.0」から「4096.0」までの任意の数値を入力します。 2048 の鍵サイズのみを許可しない場合は、準拠値「4096.0」と警告値「2048.0」から「3072.0」までの任意の数値を入力します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e541" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">FileUploadAndDownloadSecurity.hybridSecurityRiskFileTypes</td>
+
+              <td headers="d23547e544" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">"0.0" 以上の任意の整数</td>
+
+              <td headers="d23547e547" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">準拠値より大きい任意の整数。警告値より大きいすべての値は「重大」として表示されます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e541" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">GuestUserAccess.guestEditAccess</td>
+
+              <td headers="d23547e544" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">"0.0" から "4.0" までの任意の整数</td>
+
+              <td headers="d23547e547" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">"5.0" から "9.0" までの任意の整数。“10.0” 以上の値は「重大」として表示されます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e541" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">GuestUserAccess.guestReadAccess</td>
+
+              <td headers="d23547e544" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">"0.0" から "4.0" までの任意の整数</td>
+
+              <td headers="d23547e547" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">"5.0" から "9.0" までの任意の整数。“10.0” 以上の値は「重大」として表示されます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e541" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">PasswordPolicies.history</td>
+
+              <td headers="d23547e544" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">"0.0" から "24.0" までの任意の整数</td>
+
+              <td headers="d23547e547" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">準拠値より小さい "0.0" から "24.0" までの任意の整数。警告値より小さいすべての値は「重大」として表示されます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e541" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">PasswordPolicies.minPasswordLength</td>
+
+              <td headers="d23547e544" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">"5.0" から "50.0" までの任意の整数</td>
+
+              <td headers="d23547e547" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">準拠値より小さい "5.0" から "50.0" までの任意の整数。警告値より小さいすべての値は「重大」として表示されます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e541" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">RemoteSiteSettings.remoteSiteSettings</td>
+
+              <td headers="d23547e544" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">許可されるリモートサイト設定の最大数 ("0.0" より大きい任意の整数)</td>
+
+              <td headers="d23547e547" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">準拠値より大きい任意の整数。警告値より大きいすべての値は「重大」として表示されます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e541" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">SharingSettings.orgWideDefaults</td>
+
+              <td headers="d23547e544" style="vertical-align:top;" class="slds-cell-wrap" data-label="準拠値">"0.0" から "1.0" までの任意の整数</td>
+
+              <td headers="d23547e547" style="vertical-align:top;" class="slds-cell-wrap" data-label="警告値">準拠値より大きい "0.0" から "1.0" までの任意の整数。</td>
+
+            </tr>
+          </tbody></table><p>Enum 値では、提供される文字列テキストから選択できます。すべての有効な値を使用し、それらの値の状況が準拠、警告、重大のいずれであるかを決定します。Enum 値では、大文字と小文字が区別されます。複数の Enum 名を 1 つの状況に割り当てるには、カンマで区切ります。たとえば、compliant="FifteenMinutes,ThirtyMinutes,SixtyMinutes,TwoHours" とします。</p><p>状況を空のままにするには、すべての値を使用します。たとえば、これらの値を準拠と重大で分け、警告は空のまま (<code>warning=“”</code>) にします。準拠状況は空のままにしないでください。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> 各設定ですべての有効な値を使用します。値がない場合、そのファイルはインポートされません。</div></div></div>
+<table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:56.41748942172073%"><col style="width:43.58251057827927%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d23547e703" style="vertical-align:top;" class="slds-cell-wrap" scope="col">設定</th>
+              <th id="d23547e706" style="vertical-align:top;" class="slds-cell-wrap" scope="col">使用可能な値</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d23547e703" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">PasswordPolicies.complexity</td>
+
+              <td headers="d23547e706" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な値"><ul>
+                  <li>“UpperLowerCaseNumericSpecialCharacters”</li>
+
+                  <li>“UpperLowerCaseNumeric”</li>
+
+                  <li>“SpecialCharacters”</li>
+
+                  <li>“AlphaNumeric”</li>
+
+                  <li>"NoRestriction" (最も高いリスク)</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e703" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">PasswordPolicies.expiration</td>
+
+              <td headers="d23547e706" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な値"><ul>
+                  <li>“ThirtyDays”</li>
+
+                  <li>“SixtyDays”</li>
+
+                  <li>“NinetyDays”</li>
+
+                  <li>“SixMonths”</li>
+
+                  <li>“OneYear”</li>
+
+                  <li>"Never" (最も高いリスク)</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e703" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">PasswordPolicies.lockoutInterval</td>
+
+              <td headers="d23547e706" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な値"><ul>
+                  <li>"Forever" (システム管理者によるリセットが必要)</li>
+
+                  <li>“SixtyMinutes”</li>
+
+                  <li>“ThirtyMinutes”</li>
+
+                  <li>"FifteenMinutes" (最も高いリスク)</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e703" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">PasswordPolicies.maxLoginAttempts</td>
+
+              <td headers="d23547e706" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な値"><ul>
+                  <li>“ThreeAttempts”</li>
+
+                  <li>“FiveAttempts”</li>
+
+                  <li>“TenAttempts”</li>
+
+                  <li>"NoLimit" (最も高いリスク)</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e703" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">PasswordPolicies.questionRestriction</td>
+
+              <td headers="d23547e706" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な値"><ul>
+                  <li>“DoesNotContainPassword”</li>
+
+                  <li>"None" (最も高いリスク)</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d23547e703" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">SessionSettings.timeout</td>
+
+              <td headers="d23547e706" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な値"><ul>
+                  <li>“FifteenMinutes”</li>
+
+                  <li>"ThirtyMinutes"</li>
+
+                  <li>"SixtyMinutes"</li>
+
+                  <li>“TwoHours”</li>
+
+                  <li>“FourHours”</li>
+
+                  <li>“EightHours”</li>
+
+                  <li>“TwelveHours”</li>
+
+                  <li>"TwentyFourHours" (最も高いリスク)</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> <div style="text-align:left;">
+        <img alt="カスタムベースライン XML ファイルの画像" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/security/images/health_check/cb_baseline_xml_example.png" style="width:800px;">
+      </div></div></div></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="最大 5 つのカスタムベースラインをインポートすると、セキュリティ設定を Salesforce 推奨の標準ではなく、独自の標準と比較できます。たとえば、金融サービス業であれば、FINRA 標準を使用してカスタムセキュリティベースラインを作成できます。" href="#security_custom_baseline_create">状態チェックのカスタムベースラインの作成</a></li></ul></div>
+</div></div></content>
+</section>
+    <div class="source-list">
+      <strong>元記事</strong>
+      <ul>
+    <li><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_health_check.htm&amp;type=5&amp;language=ja" target="_blank" rel="noopener">セキュリティ状態チェック</a></li>
+    <li><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_health_check_score.htm&amp;type=5&amp;language=ja" target="_blank" rel="noopener">[状態チェック] のスコアの計算方法</a></li>
+    <li><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_health_check_notifications.htm&amp;type=5&amp;language=ja" target="_blank" rel="noopener">セキュリティ状態チェックスコア通知の設定</a></li>
+    <li><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_custom_baseline_create.htm&amp;type=5&amp;language=ja" target="_blank" rel="noopener">状態チェックのカスタムベースラインの作成</a></li>
+    <li><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_custom_baseline_file_requirements.htm&amp;type=5&amp;language=ja" target="_blank" rel="noopener">カスタムベースラインファイルの要件</a></li>
+      </ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>

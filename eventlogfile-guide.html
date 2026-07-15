@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EventLogFile 早わかりガイド</title>
+<style>
+  :root{
+    --blue:#0176d3; --blue-d:#032d60; --bg:#f3f6f9; --card:#fff;
+    --ink:#181818; --sub:#5c6b7a; --line:#dbe4ec; --warn:#fef1e0; --warn-b:#ba8b00;
+    --ok:#eef7ee; --ok-b:#2e844a; --code-bg:#0b2239; --code-ink:#e6edf3;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
+    color:var(--ink);background:var(--bg);line-height:1.75;font-size:15px}
+  header{background:linear-gradient(120deg,var(--blue-d),var(--blue));color:#fff;padding:34px 24px}
+  header h1{margin:0 0 6px;font-size:26px}
+  header p{margin:0;opacity:.9;font-size:14px}
+  main{max-width:960px;margin:0 auto;padding:24px}
+  section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px 26px;margin:18px 0;
+    box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  h2{color:var(--blue-d);border-left:5px solid var(--blue);padding-left:12px;margin:4px 0 16px;font-size:20px}
+  h3{color:var(--blue-d);font-size:16px;margin:22px 0 8px}
+  p{margin:8px 0}
+  .lead{font-size:15px;color:var(--sub)}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:13.5px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:#eaf2f9;color:var(--blue-d)}
+  tr:nth-child(even) td{background:#fafcfe}
+  code{background:#eef2f6;padding:1px 6px;border-radius:4px;font-family:"SFMono-Regular",Consolas,monospace;font-size:13px}
+  pre{background:var(--code-bg);color:var(--code-ink);padding:16px;border-radius:8px;overflow-x:auto;font-size:13px;line-height:1.6}
+  pre code{background:none;color:inherit;padding:0}
+  .box{border-radius:8px;padding:12px 16px;margin:14px 0;font-size:14px}
+  .warn{background:var(--warn);border-left:4px solid var(--warn-b)}
+  .ok{background:var(--ok);border-left:4px solid var(--ok-b)}
+  .tip{background:#eaf4fb;border-left:4px solid var(--blue)}
+  .pill{display:inline-block;background:var(--blue);color:#fff;border-radius:999px;padding:2px 10px;font-size:12px;margin-right:6px}
+  .tag{display:inline-block;background:#eef2f6;border:1px solid var(--line);border-radius:6px;padding:2px 8px;font-size:12px;margin:2px}
+  .toc{columns:2;font-size:14px}
+  .toc a{color:var(--blue);text-decoration:none}
+  .toc a:hover{text-decoration:underline}
+  .muted{color:var(--sub);font-size:13px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:680px){.grid,.toc{grid-template-columns:1fr;columns:1}}
+  footer{text-align:center;color:var(--sub);font-size:12px;padding:24px}
+</style>
+</head>
+<body>
+<header>
+  <h1>EventLogFile 早わかりガイド</h1>
+  <p>Salesforce の「誰が・いつ・何をしたか」を記録するイベントモニタリングログの読み方 / ベンダー作業を追うコツ</p>
+</header>
+<main>
+
+<section id="top">
+  <h2>0. このページの目的</h2>
+  <p class="lead"><strong>EventLogFile（イベントログファイル）</strong>は、組織の中で起きた操作を <strong>1時間ごと / 1日ごとの CSV ファイル</strong> にまとめてくれるオブジェクトです。ログイン・レポート出力・API 呼び出し・ページ表示などが記録され、「誰がいつ何をしたか」を後から追えます。</p>
+  <div class="box tip">
+    <strong>ひとことで：</strong> 設定変更履歴（監査証跡）とは別物で、こちらは<strong>「日々の操作の生ログ」</strong>。<em>外部ベンダーが API で大量データを抜いた / 深夜に大量ログインした</em> といった調査に使います。<br>
+    <span class="muted">※ 利用には <strong>Event Monitoring（Shield または Event Monitoring アドオン）</strong> のライセンスが必要です。</span>
+  </div>
+  <div class="toc">
+    <a href="#what">1. EventLogFile とは</a><br>
+    <a href="#struct">2. ログの構造（ここが肝）</a><br>
+    <a href="#fields">3. 主なフィールド一覧</a><br>
+    <a href="#types">4. 代表的なイベント種別</a><br>
+    <a href="#read">5. ログを見るときのポイント</a><br>
+    <a href="#vendor">6. ベンダー作業で出るログの例</a><br>
+    <a href="#query">7. 取得手順（SOQL / CLI）</a><br>
+    <a href="#gotcha">8. つまずきポイント / 制限</a>
+  </div>
+  <p class="muted">出典: Salesforce Object Reference「EventLogFile」/「Supported Event Types」。本ページは要点を日本語で整理した非公式まとめです。</p>
+</section>
+
+<section id="what">
+  <h2>1. EventLogFile とは</h2>
+  <p>EventLogFile は「1本のログファイル」を表すレコードです。1レコード ＝ <strong>「あるイベント種別（例: Login）× ある日 × ある集計間隔」の CSV ファイル1つ</strong>、と考えると分かりやすいです。</p>
+  <ul>
+    <li><strong>読み取り専用。</strong> API/レポートから照会するだけで、作成・編集はできません。</li>
+    <li>1レコードの中に、その日の同種イベントが<strong>何百〜何万行</strong>まとめて入っています（＝ CSV 本体）。</li>
+    <li>Salesforce が<strong>自動生成</strong>します。ログイン画面で操作した瞬間に出るのではなく、少し遅れてファイル化されます（後述）。</li>
+  </ul>
+  <div class="box tip">
+    <strong>2段階で使う：</strong> ① まず <code>EventLogFile</code> を SOQL で検索して「どんなログファイルがあるか」の一覧を取る → ② 目的のレコードの <code>LogFile</code> フィールド（CSV 本体）をダウンロードして中身を見る。この2ステップが基本です。
+  </div>
+</section>
+
+<section id="struct">
+  <h2>2. ログの構造（ここが肝）</h2>
+  <p>EventLogFile の分かりにくさは、ほぼ全部「構造」に集約されます。ここだけ押さえれば読めます。</p>
+  <h3>タイミング（いつログができるか）</h3>
+  <table>
+    <tr><th>種類</th><th>Interval 値</th><th>生成タイミング</th><th>用途</th></tr>
+    <tr><td>1日ログ</td><td><code>Daily</code></td><td>イベント発生の<strong>翌日</strong>にその日ぶんをまとめて生成</td><td>通常の日次監査。デフォルト</td></tr>
+    <tr><td>1時間ログ</td><td><code>Hourly</code></td><td>おおむね<strong>数時間以内</strong>に1時間ぶんを生成（準リアルタイム）</td><td>インシデント調査・当日中に見たい時</td></tr>
+  </table>
+  <div class="box warn">
+    <strong>要注意：</strong> リアルタイムではありません。「今さっきの操作」はまだログに出ていないのが普通です。特に <code>Daily</code> は<strong>翌日</strong>になるまで出ません。「ログが無い＝操作が無い」ではないので注意。
+  </div>
+  <div class="box tip">
+    <strong>頻度と保持は別物：</strong> Daily / Hourly は<strong>「どのくらいの間隔でファイル化するか」</strong>という生成頻度の話です。<strong>「何日残るか」（保持期間）は別軸</strong>で、Edition・ライセンスに依存します（無償ぶんは約1日、有償の Event Monitoring は最大1年）。詳細は §8。
+  </div>
+
+  <h3>1レコードを分解すると</h3>
+  <p>1つの EventLogFile レコードは、下の要素で「どの CSV か」が決まります。</p>
+  <ul>
+    <li><code>EventType</code> … 何のログか（Login / API / Report …）</li>
+    <li><code>LogDate</code> … 何日ぶんか</li>
+    <li><code>Interval</code> … Daily か Hourly か</li>
+    <li><code>Sequence</code> … 同じ日・同じ種別で複数ファイルに分かれた時の連番</li>
+    <li><code>LogFile</code> … <strong>CSV 本体</strong>（これをダウンロードして中身を読む）</li>
+  </ul>
+
+  <h3>CSV の中身の見方</h3>
+  <p>CSV には共通の先頭列があり、ここを見れば「誰が・いつ・どこから」が分かります。</p>
+  <table>
+    <tr><th>列名</th><th>意味</th><th>調査での使いどころ</th></tr>
+    <tr><td><code>EVENT_TYPE</code></td><td>イベント種別</td><td>ファイル種別と一致</td></tr>
+    <tr><td><code>TIMESTAMP</code> / <code>TIMESTAMP_DERIVED</code></td><td>発生時刻（UTC）</td><td><strong>時刻は UTC</strong>。日本時間は +9時間して読む</td></tr>
+    <tr><td><code>USER_ID</code> / <code>USER_ID_DERIVED</code></td><td>実行ユーザーの18桁ID</td><td>「誰が」を特定する主キー</td></tr>
+    <tr><td><code>CLIENT_IP</code></td><td>接続元IPアドレス</td><td>社外/海外IP、見慣れないIPの検知</td></tr>
+    <tr><td><code>SESSION_KEY</code> / <code>LOGIN_KEY</code></td><td>セッション/ログインの識別子</td><td>一連の操作を1本につなげて追跡</td></tr>
+    <tr><td><code>REQUEST_ID</code></td><td>リクエスト識別子</td><td>種別をまたいで同じ操作を突き合わせ</td></tr>
+    <tr><td><code>RUN_TIME</code> / <code>CPU_TIME</code></td><td>処理時間(ms)</td><td>重い処理・パフォーマンス調査</td></tr>
+  </table>
+  <div class="box tip"><strong>コツ：</strong> どの列が入っているかは <code>LogFileFieldNames</code>（列名一覧）と <code>LogFileFieldTypes</code>（型一覧）フィールドで事前に確認できます。EventType ごとに列は違います。</div>
+</section>
+
+<section id="fields">
+  <h2>3. 主なフィールド一覧（EventLogFile レコード側）</h2>
+  <table>
+    <tr><th>フィールド</th><th>型</th><th>説明</th></tr>
+    <tr><td><code>EventType</code></td><td>Picklist</td><td>イベント種別。SOQL の絞り込みで最頻出</td></tr>
+    <tr><td><code>LogDate</code></td><td>DateTime</td><td>ログ対象日（その日の 00:00 GMT）</td></tr>
+    <tr><td><code>Interval</code></td><td>Picklist</td><td><code>Daily</code> / <code>Hourly</code></td></tr>
+    <tr><td><code>Sequence</code></td><td>Number</td><td>同一日・同一種別が複数に分割された時の連番</td></tr>
+    <tr><td><code>LogFile</code></td><td>base64 (textarea)</td><td><strong>CSV 本体。</strong> REST の <code>/sobjects/EventLogFile/{Id}/LogFile</code> でダウンロード</td></tr>
+    <tr><td><code>LogFileLength</code></td><td>Double</td><td>CSV のサイズ（バイト）。大きさの目安に</td></tr>
+    <tr><td><code>LogFileFieldNames</code></td><td>textarea</td><td>CSV の列名（カンマ区切り）</td></tr>
+    <tr><td><code>LogFileFieldTypes</code></td><td>textarea</td><td>各列のデータ型</td></tr>
+    <tr><td><code>LogFileContentType</code></td><td>string</td><td>ほぼ <code>text/csv</code></td></tr>
+    <tr><td><code>ApiVersion</code></td><td>Double</td><td>ログを生成した API バージョン</td></tr>
+    <tr><td><code>CreatedDate</code></td><td>DateTime</td><td>ファイルが生成された日時（＝取得可能になった時刻）</td></tr>
+  </table>
+</section>
+
+<section id="types">
+  <h2>4. 代表的なイベント種別（EventType）</h2>
+  <p>種別は数十あります。調査でよく使う代表を用途別に。</p>
+  <h3>アクセス・認証系（不正アクセス調査の主役）</h3>
+  <span class="tag">Login</span><span class="tag">Logout</span><span class="tag">LoginAs（代理ログイン）</span><span class="tag">URI（ページ表示）</span>
+  <h3>データ持ち出し系（情報漏えい調査の主役）</h3>
+  <span class="tag">API（SOAPなど）</span><span class="tag">RestApi</span><span class="tag">BulkApi</span><span class="tag">ReportExport（レポート出力）</span><span class="tag">Report</span><span class="tag">ContentTransfer / ContentDistribution（ファイルDL）</span>
+  <h3>処理・開発系（ベンダー実装の挙動確認）</h3>
+  <span class="tag">ApexExecution</span><span class="tag">ApexSoap</span><span class="tag">ApexRestApi</span><span class="tag">ApexCallout（外部連携）</span><span class="tag">ApexTrigger</span><span class="tag">AsyncReportRun</span><span class="tag">VisualforceRequest</span><span class="tag">Flow</span>
+  <h3>その他よく見るもの</h3>
+  <span class="tag">Dashboard</span><span class="tag">Search</span><span class="tag">QueuedExecution</span><span class="tag">MetadataApiOperation（メタデータ配備）</span><span class="tag">PackageInstall</span>
+  <div class="box tip">最新の完全な一覧は公式の「Supported Event Types for EventLogFile」を参照。バージョンで増減します。</div>
+</section>
+
+<section id="read">
+  <h2>5. ログを見るときのポイント（実務チェックリスト）</h2>
+  <ol>
+    <li><strong>時刻は必ず UTC。</strong> <code>TIMESTAMP</code> は協定世界時。日本の出来事と突き合わせる時は <strong>+9時間</strong>。「深夜3時のアクセス」が実は日本の正午だった、という読み違いに注意。</li>
+    <li><strong>「誰が」は USER_ID で。</strong> 名前ではなく18桁ID。別途 User をクエリして氏名に変換すると読みやすい。</li>
+    <li><strong>「どこから」は CLIENT_IP。</strong> 普段と違うIP・海外IP・データセンターIPは要チェック。ベンダーは固定IPのことが多いので、そのIP一覧を先に控えておくと判別が速い。</li>
+    <li><strong>一連の操作は SESSION_KEY / LOGIN_KEY で束ねる。</strong> 「ログイン→レポート出力→ログアウト」を1本の線として追える。</li>
+    <li><strong>量の異常を見る。</strong> ReportExport / BulkApi の急増、普段0が突然数千行、は持ち出しのサイン。<code>LogFileLength</code> の急な増加も目印。</li>
+    <li><strong>ログの欠損＝安全ではない。</strong> Daily は翌日まで出ない／保持期間を過ぎると消える。「無いこと」を無罪の証拠にしない。</li>
+    <li><strong>種別をまたぐ時は REQUEST_ID。</strong> 同じ操作が API と Apex 両方に記録されることがあり、REQUEST_ID で名寄せできる。</li>
+  </ol>
+</section>
+
+<section id="vendor">
+  <h2>6. ベンダー作業で出てくるログの例</h2>
+  <p class="lead">外部ベンダーが開発・保守作業をすると、典型的に下記のようなログが並びます。「これは何の作業か」を読めるようにしておくのがこのセクションの狙いです。</p>
+
+  <h3>① 開発ツール（VS Code / sfdx CLI）で接続して作業</h3>
+  <pre><code>EVENT_TYPE  TIMESTAMP(UTC)        USER_ID            CLIENT_IP       (概要)
+Login       2026-07-11T23:40:12Z  0055i0000&hellip;VendorA  203.0.113.10    APIログイン(OAuth)
+API         2026-07-11T23:41:02Z  0055i0000&hellip;VendorA  203.0.113.10    Metadata取得(retrieve)
+MetadataApiOperation 2026-07-11T23:55:20Z 0055i0000&hellip;VendorA 203.0.113.10  deploy 実行
+ApexExecution 2026-07-12T00:03:11Z 0055i0000&hellip;VendorA 203.0.113.10   テスト実行</code></pre>
+  <p class="muted">→ <strong>OAuth/API 経由のログイン</strong>＋<strong>MetadataApiOperation</strong>が並んだら「ベンダーがコードを配備した」合図。deploy の直後に <code>ApexTrigger</code>/<code>Flow</code> が動き出したら実装が有効化されたということ。</p>
+
+  <h3>② Bulk / API で大量データを投入・抽出</h3>
+  <pre><code>BulkApi   2026-07-12T01:10:00Z  0055i0000&hellip;VendorA  203.0.113.10   job投入(insert 5万件)
+BulkApi   2026-07-12T01:12:30Z  0055i0000&hellip;VendorA  203.0.113.10   batch処理
+RestApi   2026-07-12T01:20:00Z  0055i0000&hellip;VendorA  203.0.113.10   query(件数確認)</code></pre>
+  <p class="muted">→ データ移行/一括更新の典型。<strong>件数と時間帯</strong>を控えておくと「予定外の抽出」との区別がつく。ROWS_PROCESSED 列で処理件数が見える。</p>
+
+  <h3>③ 管理者に代理ログインして画面操作（LoginAs）</h3>
+  <pre><code>LoginAs   2026-07-12T02:00:00Z  管理者ID → 対象ユーザーID           ベンダーが代理ログイン
+URI       2026-07-12T02:01:15Z  対象ユーザーID  203.0.113.10          設定画面を表示
+URI       2026-07-12T02:03:40Z  対象ユーザーID  203.0.113.10          レコード確認</code></pre>
+  <p class="muted">→ <code>LoginAs</code> が出たら「誰かが別ユーザーになりすまして操作」。正規のサポート作業か、要確認の対象か切り分ける。DELEGATED_USER 列で「元の人／なりすまし先」が分かる。</p>
+
+  <h3>④ 外部システム連携（ApexCallout）を仕込んだ</h3>
+  <pre><code>ApexCallout 2026-07-12T03:00:00Z  自動プロセス/連携ユーザー  &mdash;   外部APIへ送信(URL, ステータス)</code></pre>
+  <p class="muted">→ 送信先URL・HTTPステータス・応答時間が記録される。連携先が意図通りか、エラー(4xx/5xx)が出ていないかを確認。</p>
+
+  <div class="box ok"><strong>調査の型：</strong> ①ベンダーの<strong>接続元IP</strong>と<strong>ユーザーID</strong>を先に確定 → ②その条件で Login / MetadataApiOperation / BulkApi を時系列に並べる → ③「作業予定表」と突き合わせる。この3手で「予定通りの作業か／想定外か」がほぼ判別できます。</div>
+</section>
+
+<section id="query">
+  <h2>7. 取得手順（SOQL / CLI）</h2>
+  <h3>① まず一覧を取る（SOQL）</h3>
+  <pre><code>SELECT Id, EventType, LogDate, Interval, Sequence, LogFileLength
+FROM EventLogFile
+WHERE EventType = 'Login' AND LogDate = LAST_N_DAYS:7
+ORDER BY LogDate DESC</code></pre>
+
+  <h3>② CSV 本体をダウンロード（Salesforce CLI）</h3>
+  <pre><code># 一覧を取得
+sf data query --query "SELECT Id, EventType, LogDate FROM EventLogFile WHERE EventType='API' AND LogDate=LAST_N_DAYS:1" --target-org trueagent
+
+# LogFile(CSV本体) を REST で取得して保存
+sf api request rest "/services/data/v60.0/sobjects/EventLogFile/&lt;取得したId&gt;/LogFile" \
+  --target-org trueagent &gt; login_log.csv</code></pre>
+  <div class="box tip"><strong>GUI 派なら：</strong> AppExchange の無料アプリ「<strong>Event Log File Browser</strong>」や、Setup &gt; Event Monitoring Analytics を使うと、クエリを書かずにダウンロード/可視化できます。</div>
+</section>
+
+<section id="gotcha">
+  <h2>8. つまずきポイント / 制限</h2>
+  <table>
+    <tr><th>ハマりどころ</th><th>実態</th></tr>
+    <tr><td>ライセンス</td><td>Event Monitoring / Shield が必要。無いと EventType の多くが生成されない</td></tr>
+    <tr><td>リアルタイムでない</td><td>Daily=翌日、Hourly=数時間遅れ。今の操作はまだ出ない</td></tr>
+    <tr><td>保持期間</td><td><strong>生成頻度（Daily/Hourly）と保持期間は別軸。</strong> 保持は Edition・ライセンス依存で、無償ぶんは <strong>約1日</strong>、有償 Event Monitoring は <strong>最大1年</strong>。長期保存は外部エクスポートが前提</td></tr>
+    <tr><td>時刻がUTC</td><td>日本時間へ +9h 変換を忘れると読み違える</td></tr>
+    <tr><td>列がEventTypeごとに違う</td><td>共通列以外は種別依存。<code>LogFileFieldNames</code> で毎回確認</td></tr>
+    <tr><td>LogFileはbase64/大容量</td><td>数十MBになることも。SOQLで LogFile を直接SELECTせず、REST でファイル取得する</td></tr>
+    <tr><td>設定変更は別物</td><td>「誰が項目を消したか」等の設定変更は Setup Audit Trail 側。EventLogFile には出ない</td></tr>
+  </table>
+  <div class="box warn"><strong>まとめの一言：</strong> EventLogFile は「操作の生ログ」。<strong>UTC・翌日反映・保持はライセンス依存（放置すると消える）・種別ごとに列が違う</strong> の4点だけ先に頭に入れておけば、あとは <code>EventType</code> で絞って CSV を開くだけです。</div>
+  <p><a href="#top">▲ ページ先頭へ</a></p>
+</section>
+
+</main>
+</body>
+</html>
