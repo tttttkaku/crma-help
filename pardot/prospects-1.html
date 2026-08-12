@@ -1,0 +1,2351 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>プロスペクト・訪問者・データ管理（1/2） | Account Engagement (Pardot) ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（38）</h2>
+    <ol>
+      <li><a href="#mcae_automatically_remove_unconverted_visitor_records">未変換のビジターレコードの自動削除</a></li>
+      <li><a href="#mcae_delete_visitor_records_to_restore_paused_prospects">ビジターレコードを削除した一時停止中のプロスペクトの復元</a></li>
+      <li><a href="#mcae_find_duplicate_prospects">重複する見込み客の検索</a></li>
+      <li><a href="#mcae_paused_prospect_causes">過剰なプロスペクトアクティビティを回避する方法</a></li>
+      <li><a href="#mcae_prospects_high_activity_parent">トラッキングされた過剰なアクティビティがあるプロスペクトの管理</a></li>
+      <li><a href="#pardot_active_propect">アクティブプロスペクト</a></li>
+      <li><a href="#pardot_assign_prospect_from_record">プロスペクトレコードからのプロスペクトの割り当て</a></li>
+      <li><a href="#pardot_assign_prospects_during_import">インポート中のプロスペクトの割り当て</a></li>
+      <li><a href="#pardot_assign_visitors">ビジターとプロスペクトの関連付け</a></li>
+      <li><a href="#pardot_automating_prospect_assignments">プロスペクト割り当ての自動化</a></li>
+      <li><a href="#pardot_converting_visitors_to_prospects">プロスペクトへのビジターの変換</a></li>
+      <li><a href="#pardot_custom_object_automate">カスタムオブジェクトの自動化</a></li>
+      <li><a href="#pardot_custom_object_create">Account Engagement でのカスタムオブジェクトの作成</a></li>
+      <li><a href="#pardot_custom_object_parent">Salesforce とのカスタムオブジェクトの同期</a></li>
+      <li><a href="#pardot_custom_objects_considerations">カスタムオブジェクトの同期に関する考慮事項</a></li>
+      <li><a href="#pardot_database_hygiene">データベースの状態を良好に保つ方法のヒント</a></li>
+      <li><a href="#pardot_default_account_field_mapping">デフォルトの取引先オブジェクト項目のマッピング</a></li>
+      <li><a href="#pardot_default_prospect_field_mapping">デフォルトのプロスペクト項目のマッピング</a></li>
+      <li><a href="#pardot_delete_prospects_on_list">複数のプロスペクトの削除</a></li>
+      <li><a href="#pardot_delete_single_prospect">プロスペクトの削除</a></li>
+      <li><a href="#pardot_deleting_prospects">プロスペクトの削除または復元</a></li>
+      <li><a href="#pardot_export_prospects">プロスペクトのエクスポート</a></li>
+      <li><a href="#pardot_field_types">プロスペクト項目のデータ型</a></li>
+      <li><a href="#pardot_fields_create_custom_field">カスタムプロスペクト項目の作成</a></li>
+      <li><a href="#pardot_fields_default_character_limits">デフォルトのプロスペクト項目の文字数制限</a></li>
+      <li><a href="#pardot_fields_edit_fields_on_a_form">フォーム項目の編集</a></li>
+      <li><a href="#pardot_fields_edit_globally">グローバル項目設定の編集</a></li>
+      <li><a href="#pardot_fields_use_predefined_values">カスタム項目の事前定義された値の使用</a></li>
+      <li><a href="#pardot_guidelines_deleting_prospects">プロスペクトの削除に関するガイドライン</a></li>
+      <li><a href="#pardot_guidelines_for_prospect_import_field_validation">プロスペクトのインポート項目の検証に関するガイドライン</a></li>
+      <li><a href="#pardot_how_source_field_populated">プロスペクトのソース項目の入力方法</a></li>
+      <li><a href="#pardot_last_activity_field">プロスペクトの最近のアクティビティの追跡</a></li>
+      <li><a href="#pardot_list_email_report">リストメールレポート</a></li>
+      <li><a href="#pardot_list_email_report_metrics">リストメールレポートの総計値</a></li>
+      <li><a href="#pardot_list_hygiene_and_spam_filters">リストの良好な状態とスパムフィルター</a></li>
+      <li><a href="#pardot_manual_opt_in_synced_prospect">手動でのプロスペクトのオプトイン状況の変更</a></li>
+      <li><a href="#pardot_manually_opting_in_prospects">プロスペクトのメール可能性の管理</a></li>
+      <li><a href="#pardot_merge_prospect">プロスペクトのマージ</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>プロスペクト・訪問者・データ管理（1/2）</h1>
+      <div class="meta">Account Engagement (Pardot) ヘルプ · 38 記事 · 生成 2026-08-12</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="data_cloud.html">&larr; Data Cloud 連携</a><a href="prospects-2.html">プロスペクト・訪問者・データ管理（2/2） &rarr;</a></div>
+<section class="article" id="mcae_automatically_remove_unconverted_visitor_records">
+<h1 class="slds-text-heading_large">未変換のビジターレコードの自動削除</h1>
+  <p>システム帯域幅を解放することで、ビジネスユニット全体のパフォーマンスを改善し、古い未変換のビジターレコードを自動的に削除してプライバシーに関する規制を遵守します。古い未変換のビジターは完全に削除されます。削除した記録は復元できません。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span>すべての Account Engagement エディション</span></td>
+
+            </tr>
+          </tbody></table><p>未変換のビジターレコードを完全に削除する前に、レポートに関する次の点に注意してください。</p><ul>
+        <li>設定によっては、古い未変換のビジターを自動的に削除すると B2BMA レポートに影響が生じます。pdVisitor を使用しているレポートが影響を受ける可能性があります。Pipeline (パイプライン) ダッシュボードでは、コンバージョン率が高く表示されたり、ビジター数が減少したりします。</li>
+
+        <li>B2BMA レポートを使用している場合は、B2BMA のデータ保持率に合わせて削除までの日数を 3 年に設定することをお勧めします。</li>
+
+        <li>古い未変換のビジターを削除すると、コンバージョン率が高く表示され、ユニーククリック数が少なくなります。</li>
+
+      </ul>
+</div>
+    <ol><li>
+        <span>ビジネスユニットの設定を開きます。</span>
+        <ul>
+          <li>Account Engagement で、<span style="vertical-align:text-bottom;display:inline-block;"><img alt="歯車アイコン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-mktg-pardot-262-0-0-production-jajp/ff9bd55b-c854-4f3c-8dc5-1cfbcc01fd95/pardot/images/pardot_settings_icon.png" style="margin-bottom:0;"></span> をクリックし、<strong class="uicontrol">[設定]</strong> を選択します。</li>
+
+          <li>Lightning アプリケーションで、<strong class="uicontrol">[Account Engagement 設定]</strong> を選択します。</li>
+
+        </ul>
+
+      </li><li>
+        <span>[<strong class="uicontrol">編集]</strong> をクリックし、[訪問者重要度期間(<strong class="uicontrol">Visitor Importance Time Frame</strong>)] を選択して、訪問者レコードが自動的に削除される日付範囲を選択します。</span>
+      </li><li>
+        <span>[見込み客に変換されなかった Visitor Importance Time Frame lapses after the <strong class="uicontrol">Automatically delete all visitor</strong> records (訪問者の重要性期間経過後にすべての訪問者レコードを自動的に削除する)] を有効にします。</span>
+        <ul>
+          <li>2023 年 10 月 16 日以降に作成されたビジネスユニットの場合、この設定は自動で有効になり、削除までの日数は 365 日に設定されます。この期間は 6 か月から 3 年の間で調整できます。</li>
+
+          <li>この設定は、Sandbox およびデモビジネスユニットではデフォルトの日付が 365 日に設定され、自動的に有効になります。</li>
+
+        </ul>
+
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="mcae_delete_visitor_records_to_restore_paused_prospects">
+<h1 class="slds-text-heading_large">ビジターレコードを削除した一時停止中のプロスペクトの復元</h1>
+  <p>テストに使用されるプロスペクトを含め、プロスペクトのアクティビティレベルが Account Engagement のパフォーマンスに影響を与えるほど高い場合、プロスペクトは一時停止されます。ビジターレコードを完全に削除することでプロスペクトを復元できます。一時停止されたプロスペクトは、ビジターレコードが 1,000 未満になると復元されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span>すべての Account Engagement エディション</span></td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d50808e55" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d50808e55" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロスペクトのビジターレコードを永久に削除する</td>
+
+              <td headers="d50808e55" style="vertical-align:top;" class="slds-cell-wrap">管理者ロール</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>プロスペクトのビジターレコードを削除するときは、次のガイドラインに注意してください。</p><ul>
+        <li>ビジターレコードを削除できるのは、プロスペクトが一時停止されている場合のみです。</li>
+
+        <li>削除したビジターレコードは復元できません。</li>
+
+        <li>プロスペクトのビジターレコードを削除しても、今後そのプロスペクトが一時停止されないという保証はありません。プロスペクトがボットに類似するアクティビティを示した場合、再び一時停止されます。プロスペクトが継続的に一時停止される場合は、プロスペクトレコードを完全に削除することをお勧めします。</li>
+
+      </ul>
+</div>
+  
+  <div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="ボットと思われるアクティビティが原因でプロスペクトが一時停止すると、プロスペクトテーブルでその名前の横にアイコンが表示され、プロスペクトレコードにエラーが表示されます。一時停止したプロスペクトは、ダイナミックリストを含めオートメーションの対象にはなりません。" href="https://help.salesforce.com/s/articleView?id=mktg.pardot_paused_prospects.htm&amp;language=ja&amp;type=5">アクティビティトラッキングが一時停止したプロスペクト</a></li><li><a title="メールアドレスが分かっているビジターのことをプロスペクトと呼びます。Account Engagementでは、メール アドレスを割り当てることができるときに訪問者を追跡して見込み客に変換します。これは通常、フォーム送信を介して行われます。" href="https://help.salesforce.com/s/articleView?id=mktg.pardot_converting_visitors_to_prospects.htm&amp;language=ja&amp;type=5">プロスペクトへのビジターの変換</a></li></ul></div>
+<div id="manually_delete_visitor_records" aria-labelledby="ariaid-title2" class="nested1"><a name="manually_delete_visitor_records" href="https://help.salesforce.com/s?language=ja"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">過剰な訪問者レコードの手動削除</h2>
+    
+      <ol><li>
+          <span>一時停止されたプロスペクトレコードまたは [ビジター] タブで、<strong class="uicontrol">[ツール]</strong> をクリックし、<strong class="uicontrol">[ビジターレコードを削除]</strong> を選択します。</span>
+        </li><li>
+          <span>削除が永続的であることを確認し、<strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+        </li><li>
+          <span>推奨日以前に作成されたビジターレコードを削除するか、日付を選択して <strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+          <div>[プロスペクトの状況] 項目、[削除されるビジターレコード] 項目、[削除されていないビジターレコード] 項目は、選択した日付に基づいて動的に調整されます。一時停止されたプロスペクトは、ビジターレコードが 1,000 未満になると復元されます。</div>
+        </li><li>
+          <span>削除を確認して <strong class="uicontrol">[削除]</strong> をクリックします。</span>
+        </li><li>
+          <span>削除プロセスが開始したら <strong class="uicontrol">[完了]</strong> をクリックします。</span>
+        </li></ol>
+
+      <div id="manually_delete_visitor_records__postreq_hxd_1ty_hcc"><a name="manually_delete_visitor_records__postreq_hxd_1ty_hcc" href="https://help.salesforce.com/s?language=ja"></a><p>ビジターの削除を確認するメールを確認し、一時停止中のプロスペクトを復元するのに十分な数のビジターレコードが削除されていることを確認します。</p></div>
+    
+  </div>
+
+  <div id="automatically_delete_visitor_records" aria-labelledby="ariaid-title3" class="nested1"><a name="automatically_delete_visitor_records" href="https://help.salesforce.com/s?language=ja"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">過剰な訪問者レコードの自動削除</h2>
+    
+      <ol><li>
+        <span>ビジネスユニットの設定を開きます。</span>
+        <ul>
+          <li>Account Engagement で、<span style="vertical-align:text-bottom;display:inline-block;"><img alt="歯車アイコン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-mktg-pardot-262-0-0-production-jajp/ff9bd55b-c854-4f3c-8dc5-1cfbcc01fd95/pardot/images/pardot_settings_icon.png" style="margin-bottom:0;"></span> をクリックし、<strong class="uicontrol">[設定]</strong> を選択します。</li>
+
+          <li>Lightning アプリケーションで、<strong class="uicontrol">[Account Engagement 設定]</strong> を選択します。</li>
+
+        </ul>
+
+      </li><li>
+          <span>[<strong class="uicontrol">編集]</strong> をクリックし、[訪問者重要度期間(<strong class="uicontrol">Visitor Importance Time Frame</strong>)] を選択して、訪問者レコードが自動的に削除される日付範囲を選択します。</span>
+        </li><li>
+          <span><strong class="uicontrol">有効化訪問者重要度期間経過後、ボットのような活動を表示している、または一時停止している見込み客のすべての訪問者レコードを自動的に削除します。</strong></span>
+          <div>[Visitor Importance Time Frame (訪問者の重要性期間)] では、古い<a target="_blank" href="https://help.salesforce.com/s/articleView?id=mktg.mcae_automatically_remove_unconverted_visitor_records.htm&amp;language=ja&amp;type=5">未変換の訪問者</a>を削除するタイミングも決まります。</div>
+        </li></ol>
+
+    
+  </div>
+
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="mcae_find_duplicate_prospects">
+<h1 class="slds-text-heading_large">重複する見込み客の検索</h1>
+  <p>Optimizerで重複する見込み客レコードをマージすることで、<span>Account Engagement</span>ビジネス ユニットのデータをクリーンかつ正確に保ちます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: 同じメールアドレスを持つ複数の見込み客を許可するすべての <span>Account Engagement</span> エディション</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d19982e59" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d19982e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">重複する見込み客レコードを検索する</td>
+
+              <td headers="d19982e59" style="vertical-align:top;" class="slds-cell-wrap"><span>Account Engagement Administratorロール</span>またはカスタム<span>Account Engagement</span>ロール。「View Optimizer(オプティマイザーを表示)」、「Prospect(見込み客)」&gt;「View prospects not assigned to self(自分に割り当てられていない見込み客を表示)」のユーザー権限があります。</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>Optimizer を開きます。</span>
+        <ol>
+          <li>
+            <span>[<span>Account Engagement</span>] で、[<strong class="uicontrol">Admin</strong>]、[<strong class="uicontrol">Optimizer]</strong> の順に選択します。</span>
+          </li>
+
+          <li>
+            <span>Lightning アプリケーションで、<strong class="uicontrol">[Account Engagement 設定]</strong>、<strong class="uicontrol">[Optimizer]</strong> の順に選択します。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>[Maintenance Resources (メンテナンスリソース)] で、[<strong class="uicontrol">Review Duplicate Prospects</strong> (重複する見込み客を確認)] をクリックします。</span>
+      </li><li>
+        <span>アクションメニューを使用して、ビジネスユニットまたはごみ箱で見込み客を確認します。[Duplicate Prospects (見込み客の重複)] ページで、見込み客のメールアドレスの横にある [<span style="vertical-align:text-bottom;display:inline-block;"><img alt="歯車アイコン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-mktg-pardot-262-0-0-production-jajp/ff9bd55b-c854-4f3c-8dc5-1cfbcc01fd95/pardot/images/pardot_settings_icon.png" style="margin-bottom:0;"></span>] をクリックし、[<strong class="uicontrol">Review Prospects (見込み客</strong>を確認)] または [<strong class="uicontrol">Review Prospects In Recycle Bin</strong> (ごみ箱に見込み客を確認)] を選択します。</span>
+      </li><li>
+        <span>同じメールアドレスを持つ複数の見込み客がある場合、テーブルアクションを使用してそれらを選択してマージします。</span>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="データベースではプロスペクトが重複してしまうことがあります。最大 3 件のプロスペクトを同時にマージして、1 件をプライマリとして選択できます。マージされると、マージされた見込み客の活動が集計され、Account Engagementがプライマリ見込み客のスコアを再計算します。プライマリ以外のプロスペクトは完全に削除されるため、ごみ箱には入りません。" href="https://help.salesforce.com/s/articleView?id=mktg.pardot_merge_prospect.htm&amp;language=ja&amp;type=5">プロスペクトのマージ</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="mcae_paused_prospect_causes">
+<h1 class="slds-text-heading_large">過剰なプロスペクトアクティビティを回避する方法</h1>
+  <p>プロスペクトにアクティビティトラッキングを一時停止するのに十分なアクティビティが蓄積されているときは、多くの場合、実際のプロスペクトではなくボットの結果です。ただし、問題の原因がボットのアクティビティではない場合もあります。トラッキングの一時停止が発生している場合は、今後の問題を防ぐために次のシナリオを検討してください。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span>すべての Account Engagement エディション</span></td>
+
+          </tr>
+        </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">古いプロスペクトの管理</h2><p>データベースに長期間存在するプロスペクトでは、トラッキングされたアクティビティが大量に蓄積される可能性があります。<span>Account Engagement</span>は、セールス パイプラインにオポチュニティを組み込むマーケティング自動化を目的としています。長期的な関係維持のために設計されたものではありません。新規商談を提示し続ける長期プロスペクトがいる場合は、古いレコードをアーカイブして削除します。次に、それらの新規プロスペクトレコードを作成し、それを現在のマーケティングニーズに使用します。複数のビジネスユニットを使用する場合は、関連ビジネスユニットごとに個別のプロスペクトレコードを作成することを検討してください。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">CRM としての Account Engagement の使用</h2><p>進行中の案件について話し合ったり、既存の顧客との関係を維持したりするために<span>Account Engagementを</span>使用しないでください。Salesforce はカスタマーリレーションマネージャー (CRM) であり、リードを顧客に変換し、カスタマーリレーションを管理するのに役立つすべてのツールを備えています。<span>Account Engagement</span> で 1 対 1 の拡張コミュニケーションを維持すると、古い見込み客に過剰な量の活動が蓄積されます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">トラッキングコードの不適切な配置</h2><p><span>Account Engagement</span> 追跡コードは、マーケティング活動にとって重要で、活動の追跡が重要な Web ページに配置することをお勧めします。より一般的なページ (ホームページなど) にトラッキングコードを配置すると、大量の一般的なプロスペクトアクティビティが発生します。過剰なプロスペクトアクティビティが見られる場合は、トラッキングコードの配置を確認し、戦略的な調整を行うことを検討してください。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">内部プロスペクト</h2><p>従業員または同僚のプロスペクトレコードを作成する場合は、テスト目的でのみ使用し、完了したらプロスペクトをアーカイブします。内部プロスペクトがメールを受信し、そのメールを外部リストに転送した場合、そのメールのすべてのアクティビティは 1 人のプロスペクトに関連付けられます。通常、会社または組織の従業員は、<span>Account Engagement</span> のユーザーである必要があります。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">プロスペクトのテスト</h2><p>必要に応じてテストプロスペクトを作成し、メール、オートメーション、その他の設定をテストできます。ただし、経時的にアクティビティが蓄積されるテストプロスペクトのレコードをビジネスユニットで管理しないでください。作業内容をテストしたら、プロスペクトをアーカイブして削除します。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="mcae_prospects_high_activity_parent">
+<h1 class="slds-text-heading_large">トラッキングされた過剰なアクティビティがあるプロスペクトの管理</h1>
+  <p>見込み客の活動レベルがビジネス ユニットのパフォーマンスに影響するほど高い場合、<span>Account Engagement</span>は見込み客の活動追跡を一時停止します。多くの場合、このレベルのアクティビティはボットの結果です。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=mktg.pardot_paused_prospects.htm&amp;language=ja&amp;type=5">アクティビティトラッキングが一時停止したプロスペクト</a></strong><br>ボットと思われるアクティビティが原因でプロスペクトが一時停止すると、プロスペクトテーブルでその名前の横にアイコンが表示され、プロスペクトレコードにエラーが表示されます。一時停止したプロスペクトは、ダイナミックリストを含めオートメーションの対象にはなりません。</li><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=mktg.mcae_paused_prospect_causes.htm&amp;language=ja&amp;type=5">過剰なプロスペクトアクティビティを回避する方法</a></strong><br>プロスペクトにアクティビティトラッキングを一時停止するのに十分なアクティビティが蓄積されているときは、多くの場合、実際のプロスペクトではなくボットの結果です。ただし、問題の原因がボットのアクティビティではない場合もあります。トラッキングの一時停止が発生している場合は、今後の問題を防ぐために次のシナリオを検討してください。</li><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=mktg.mcae_delete_visitor_records_to_restore_paused_prospects.htm&amp;language=ja&amp;type=5">ビジターレコードを削除した一時停止中のプロスペクトの復元</a></strong><br>テストに使用されるプロスペクトを含め、プロスペクトのアクティビティレベルが Account Engagement のパフォーマンスに影響を与えるほど高い場合、プロスペクトは一時停止されます。ビジターレコードを完全に削除することでプロスペクトを復元できます。一時停止されたプロスペクトは、ビジターレコードが 1,000 未満になると復元されます。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="pardot_active_propect">
+<h1 class="slds-text-heading_large">アクティブプロスペクト</h1>
+  <p>アクティブプロスペクトとは、フォームを登録する、ページを訪問する、リンクをクリックするというようなアクティビティを行った人のことです。アクティブプロスペクトには、名前の横に緑色の人物アイコンが表示されます。一度もアクティブになったことがないプロスペクトには、赤色のアイコンが表示されます。</p>
+
+    <p>一部のアクティビティは受動的であり、プロスペクトの関心を知るための適切な指標となりません。次のアクティビティでは、プロスペクトはアクティブになりません。</p>
+    <ul>
+      <li>メールの送信</li>
+
+      <li>メールの開封</li>
+
+      <li>メールのバウンス</li>
+
+      <li>商談</li>
+
+    </ul>
+
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="pardot_assign_prospect_from_record">
+<h1 class="slds-text-heading_large">プロスペクトレコードからのプロスペクトの割り当て</h1>
+  <p>プロスペクトのレコードからプロスペクトを割り当てたり、再割り当てしたりすることができます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d101700e37" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d101700e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">自分に割り当てられていないプロスペクトを編集する</td>
+
+              <td headers="d101700e37" style="vertical-align:top;" class="slds-cell-wrap">
+                <span>Account Engagement の管理者、マーケティング、営業マネージャーのロール</span>
+              </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d101700e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">自分に割り当てられたプロスペクトを編集する</td>
+
+              <td headers="d101700e37" style="vertical-align:top;" class="slds-cell-wrap">
+                <span>Account Engagement の営業ロール以上</span>
+              </td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-mktg-pardot-262-0-0-production-jajp/ff9bd55b-c854-4f3c-8dc5-1cfbcc01fd95/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> プロスペクトが Salesforce とすでに同期している場合、プロスペクトレコードは Salesforce でレコード所有者に戻ります。Salesforce でレコードを再割り当てしてください。</div></div></div>
+</div>
+    <ol><li>
+        <span>プロスペクトレコードに移動します。</span>
+      </li><li>
+        <span>プロスペクトレコードを編集します。</span>
+      </li><li>
+        <span>[任命先] ドロップダウンから割り当てアクションを選択します。</span>
+      </li><li>
+        <span>ユーザー、グループ、キューのいずれかを選択します。</span>
+      </li><li>
+        <span>プロスペクトを保存します。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="pardot_assign_prospects_during_import">
+<h1 class="slds-text-heading_large">インポート中のプロスペクトの割り当て</h1>
+  <p>インポート中にプロスペクトの割り当てまたは再割り当てを実行できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d39489e37" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d39489e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロスペクトをインポートする</td>
+
+              <td headers="d39489e37" style="vertical-align:top;" class="slds-cell-wrap">
+                <span>Account Engagement の管理者ロールまたはマーケティングロール</span>
+              </td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>インポート .csv ファイルで、割り当てられたユーザの列を追加し、ユーザの電子メール アドレスを入力します。<div><img alt="割り当て済みユーザーの列を追加したスプレッドシート" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-mktg-pardot-262-0-0-production-jajp/ff9bd55b-c854-4f3c-8dc5-1cfbcc01fd95/pardot/images/pardot_assigned_user_import.png"></div></span>
+      </li><li>
+        <span>インポート中に、割り当て済みユーザーの列を <strong class="uicontrol">[ユーザーに割り当て]</strong> 項目にマッピングします。</span>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="新しいプロスペクトの CSV ファイルのインポートや、既存のプロスペクトの一括更新ができます。" href="https://help.salesforce.com/s/articleView?id=mktg.pardot_prospect_imports.htm&amp;language=ja&amp;type=5">プロスペクトのインポート</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="pardot_assign_visitors">
+<h1 class="slds-text-heading_large">ビジターとプロスペクトの関連付け</h1>
+  <p>多くのプロスペクトは変換時にビジターのアクティビティに関連付けられますが、ビジターをプロスペクトに手動で関連付けることもできます。この機能が便利なのは、ビジターレポートに会社が登録されている、潜在的なプロスペクトと連絡するときです。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d107305e37" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d107305e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">ビジターを作成するまたはビジターをプロスペクトに関連付ける</td>
+
+              <td headers="d107305e37" style="vertical-align:top;" class="slds-cell-wrap">
+                <span>Account Engagement の管理者ロールまたはマーケティングロール</span>
+              </td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-mktg-pardot-262-0-0-production-jajp/ff9bd55b-c854-4f3c-8dc5-1cfbcc01fd95/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 訪問者を手動で関連付けると、見込み客に入力したメールアドレスが<span>Account Engagement</span>フォームに事前入力されます。</div></div></div>
+</div>
+    <ol><li>
+        <span><span class="menucascade"><strong class="uicontrol">Prospects</strong> | <strong class="uicontrol">Visitors</strong></span>に移動し、関連付ける訪問者を見つけます。</span>
+      </li><li>
+        <span>ビジターの横の <strong class="uicontrol">[作成 / 関連付け]</strong> をクリックします。</span>
+      </li><li>
+        <span>プロスペクトレコードのメールアドレスを入力します。同じメールアドレスを持つ複数の見込み客がある場合、<span>Account Engagement</span> は、その見込み客に [最終活動日] 項目の最新の値を関連付けます。</span>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="メールアドレスが分かっているビジターのことをプロスペクトと呼びます。Account Engagementでは、メール アドレスを割り当てることができるときに訪問者を追跡して見込み客に変換します。これは通常、フォーム送信を介して行われます。" href="https://help.salesforce.com/s/articleView?id=mktg.pardot_converting_visitors_to_prospects.htm&amp;language=ja&amp;type=5">プロスペクトへのビジターの変換</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="pardot_automating_prospect_assignments">
+<h1 class="slds-text-heading_large">プロスペクト割り当ての自動化</h1>
+  <p><span>Account Engagementで</span>は、見込み客の情報とアクションに基づいて見込み客の割り当てを自動化するツールが提供されます。</p>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">オートメーションルール</h2><p>オートメーションルールでは、プロスペクトが複合的な基準に基づいて割り当てられます。このルールでは、ルールの基準と照合した時点で未割り当てのプロスペクトのみが割り当てられます。</p></div>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-mktg-pardot-262-0-0-production-jajp/ff9bd55b-c854-4f3c-8dc5-1cfbcc01fd95/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> あるプロスペクトは、スコアが 100 以上、役職名に VP または Vice という文字が含まれ、居住地がジョージア州、テネシー州、アラバマ州のいずれかであるとします。照合基準に基づいて、このプロスペクトは米国南東部の営業担当者に割り当てられます。</div></div></div>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-mktg-pardot-262-0-0-production-jajp/ff9bd55b-c854-4f3c-8dc5-1cfbcc01fd95/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> あるプロスペクトは、スコアが 100 以上、グレードが B 以上、3 つのホワイトペーパーのうち 1 つをダウンロード済みであるとします。基準との照合に基づいて、このプロスペクトは社内営業グループに割り当てられます。</div></div></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">完了アクション</h2><p>完了アクションでは、フォームの正常な登録、特定のページの表示、ファイルのダウンロード、カスタムリダイレクトのクリックに基づいて、プロスペクトが割り当てられます。すでに所有者が割り当てられているプロスペクトは再割り当てされません。</p><p>基準の組み合わせ (たとえばフォームの登録およびカスタムリダイレクトのクリックの組み合わせ) に基づいて割り当てるには、オートメーションルールを使用します。</p></div>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-mktg-pardot-262-0-0-production-jajp/ff9bd55b-c854-4f3c-8dc5-1cfbcc01fd95/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> プロスペクトが無料トライアルの申し込みフォームを登録しました。この関心の表れに基づき、プロスペクトはただちに営業グループに割り当てられます。</div></div></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Engagement プログラムのアクション</h2><p>Engagement プログラムのアクションでは、プロスペクトはプログラムにどのように反応したのかに基づいて割り当てられます。</p></div>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-mktg-pardot-262-0-0-production-jajp/ff9bd55b-c854-4f3c-8dc5-1cfbcc01fd95/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> 
+      <p>30 日のナーチャリングプログラムを実施しているプロスペクトが、トライアルの申し込みリンクをクリックしたとします。ユーザーに割り当てる手順を実行して、このプロスペクトを営業担当者に割り当てます。</p>
+    </div></div></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Engagement プログラムでは、アクションステップにより、メールの送信や項目値の変更など、何らかのアクションをプロスペクトに実行できます。" href="https://help.salesforce.com/s/articleView?id=mktg.pardot_engagement_program_actions.htm&amp;language=ja&amp;type=5">Engagement プログラムのアクション</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="pardot_converting_visitors_to_prospects">
+<h1 class="slds-text-heading_large">プロスペクトへのビジターの変換</h1>
+  <p>メールアドレスが分かっているビジターのことをプロスペクトと呼びます。<span>Account Engagement</span>では、メール アドレスを割り当てることができるときに訪問者を追跡して見込み客に変換します。これは通常、フォーム送信を介して行われます。</p>
+
+    <p>プロスペクトレコードが作成される一般的な方法を次に示します。</p>
+    <ul>
+      <li>訪問者が Web ページの iframe に<span>ある Account Engagement</span> フォームを送信した</li>
+
+      <li>訪問者が、<span>Account Engagement</span> フォームハンドラーに接続されているサイトのフォームを送信する</li>
+
+      <li>ビジターがランディングページでフォームを登録する</li>
+
+      <li>ユーザーが手動でビジターをプロスペクトに関連付ける</li>
+
+    </ul>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="テストに使用されるプロスペクトを含め、プロスペクトのアクティビティレベルが Account Engagement のパフォーマンスに影響を与えるほど高い場合、プロスペクトは一時停止されます。ビジターレコードを完全に削除することでプロスペクトを復元できます。一時停止されたプロスペクトは、ビジターレコードが 1,000 未満になると復元されます。" href="https://help.salesforce.com/s/articleView?id=mktg.mcae_delete_visitor_records_to_restore_paused_prospects.htm&amp;language=ja&amp;type=5">ビジターレコードを削除した一時停止中のプロスペクトの復元</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="pardot_custom_object_automate">
+<h1 class="slds-text-heading_large">カスタムオブジェクトの自動化</h1>
+  <p><span>Account Engagement</span> の他のオブジェクトと同様に、自動化ルールでカスタムオブジェクトを使用できます。オートメーションはプロスペクトのマッチングを行うため、カスタムオブジェクトのオートメーションルールは、カスタムオブジェクトに関連するプロスペクトのマッチングを実行します。カスタムオブジェクトをオートメーションルールグループの条件として使用することはできません。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d106615e39" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d106615e39" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">オートメーションルールを作成する</td>
+
+              <td headers="d106615e39" style="vertical-align:top;" class="slds-cell-wrap">
+                <span>Account Engagement の管理者ロールまたはマーケティングロール</span>
+              </td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>[オートメーションルール] ページを開きます。</span>
+        <ul>
+          <li>Account Engagementで、[<span class="menucascade"><strong class="uicontrol">Marketing</strong> | <strong class="uicontrol">Automation</strong> | <strong class="uicontrol">Automation Rules]</strong></span>を選択します。</li>
+
+          <li>Lightning アプリケーションで [オートメーション] タブを開き、<strong class="uicontrol">[オートメーションルール]</strong> を選択します。</li>
+
+        </ul>
+
+      </li><li>
+        <span>[一致項目] ドロップダウンから <strong class="uicontrol">[プロスペクトのカスタムオブジェクト]</strong> を選択します。</span>
+      </li><li>
+        <span>プロスペクトとカスタムオブジェクトのマッチングを行う条件を定義します。</span>
+        <div>
+          <ul>
+            <li><strong class="uicontrol">[関連]</strong> は、選択した関連項目によって、選択したカスタムオブジェクトのいずれかのインスタンスに関連するすべてのプロスペクトをマッチングさせます。</li>
+
+            <li><strong class="uicontrol">[関連していない]</strong> は、選択した関連項目によって、選択したカスタムオブジェクトのいずれかのインスタンスに関連しないすべてのプロスペクトをマッチングさせます。</li>
+
+            <li><strong class="uicontrol">[プロパティと関連している]</strong> は、定義したプロパティを持つすべての関連プロスペクトをマッチングさせます。</li>
+
+          </ul>
+
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-mktg-pardot-262-0-0-production-jajp/ff9bd55b-c854-4f3c-8dc5-1cfbcc01fd95/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Salesforce 内のリード、取引先責任者、取引先と直接関連のあるカスタムオブジェクトのみを選択できます。</div></div></div>
+
+        </div>
+      </li><li>
+        <span>必要に応じて、ルールやアクションを追加します。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="pardot_custom_object_create">
+<h1 class="slds-text-heading_large">Account Engagement でのカスタムオブジェクトの作成</h1>
+  <p><span>Account Engagement</span> でカスタムオブジェクトを作成し、Salesforce カスタムオブジェクトと同期できます。カスタムオブジェクトを作成する前に、そのカスタムオブジェクトが Salesforce に存在している必要があります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d18133e39" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d18133e39" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限"><span>Account Engagement</span> でカスタムオブジェクトを作成する</td>
+
+              <td headers="d18133e39" style="vertical-align:top;" class="slds-cell-wrap">
+                <span>Account Engagement の管理者ロール</span>
+              </td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>[カスタムオブジェクト] ページを開きます。</span>
+        <ul>
+          <li><span>Account Engagement</span> Lightning アプリケーションで、[<strong class="uicontrol">Account Engagement Settings]</strong>、[<strong class="uicontrol">Object and Field Configuration</strong>]、[<strong class="uicontrol">Custom Objects]</strong> の順に選択します。</li>
+
+          <li>Classic では、<strong class="uicontrol">[管理]</strong>、<strong class="uicontrol">[カスタムオブジェクト]</strong> の順に選択します。</li>
+
+        </ul>
+
+      </li><li>
+        <span>CRM オブジェクトを選択します。</span>
+      </li><li>
+        <span>必要に応じて、表示名、複数形の表示名、表示項目を編集します。</span>
+      </li><li>
+        <span>完了したら、<strong class="uicontrol">[Create custom object]</strong> をクリックします。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="pardot_custom_object_parent">
+<h1 class="slds-text-heading_large">Salesforce とのカスタムオブジェクトの同期</h1>
+  <p>見込み客 ID を使用して、見込み客レコードに関連するカスタム Salesforce オブジェクトでオートメーションを実行できます。 カスタム Salesforce オブジェクトを見込み客 ID に関連付けるには、オブジェクトを取引先責任者、リード、または取引先レコードにリンクします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span>Account Engagement <strong>Advanced</strong> Edition</span>、<span>有料オプションで使用可能なエディション: Account Engagement <strong>Plus</strong> Edition</span></td>
+
+          </tr>
+        </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=mktg.pardot_custom_objects_considerations.htm&amp;language=ja&amp;type=5">カスタムオブジェクトの同期に関する考慮事項</a></strong><br>Salesforceと<span>Account Engagement</span>の間でカスタムオブジェクトを同期するときは、次の考慮事項に留意してください。</li><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=mktg.pardot_custom_object_create.htm&amp;language=ja&amp;type=5">Account Engagement でのカスタムオブジェクトの作成</a></strong><br><span>Account Engagement</span> でカスタムオブジェクトを作成し、Salesforce カスタムオブジェクトと同期できます。カスタムオブジェクトを作成する前に、そのカスタムオブジェクトが Salesforce に存在している必要があります。</li><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=mktg.pardot_custom_object_automate.htm&amp;language=ja&amp;type=5">カスタムオブジェクトの自動化</a></strong><br><span>Account Engagement</span> の他のオブジェクトと同様に、自動化ルールでカスタムオブジェクトを使用できます。オートメーションはプロスペクトのマッチングを行うため、カスタムオブジェクトのオートメーションルールは、カスタムオブジェクトに関連するプロスペクトのマッチングを実行します。カスタムオブジェクトをオートメーションルールグループの条件として使用することはできません。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="pardot_custom_objects_considerations">
+<h1 class="slds-text-heading_large">カスタムオブジェクトの同期に関する考慮事項</h1>
+  <p>Salesforceと<span>Account Engagement</span>の間でカスタムオブジェクトを同期するときは、次の考慮事項に留意してください。</p>
+
+    <ul>
+      <li><span>Account Engagement</span> でオブジェクトを作成または同期する前に、まず Salesforce で同等のオブジェクトを作成します。</li>
+
+      <li>Salesforce カスタムオブジェクトを同期するには、そのカスタムオブジェクトがクエリ可能である必要があります。照会できないオブジェクトは、<span>Account Engagement</span> の [CRM オブジェクト] ドロップダウンに表示されません。</li>
+
+      <li>カスタムオブジェクトは<span>Account Engagement</span>では参照のみです。</li>
+
+      <li>カスタムオブジェクトで変数タグは使用できません。</li>
+
+      <li>カスタムオブジェクトは、バックグラウンドで 10 分ごとに同期されます。</li>
+
+      <li>新しいカスタムオブジェクトレコードは、カスタムオブジェクトが作成され、マッピングされた後に自動で同期されます。カスタムオブジェクトレコードを更新した場合も、自動で同期されます。Salesforce コネクタが作成される前に Salesforce で作成されたカスタムオブジェクトは手動で同期する必要があります。</li>
+
+      <li>デフォルトでは、カスタムユーザーロールでカスタムオブジェクトへのアクセス権は付与されません。カスタムロールごとにカスタムオブジェクト権限を手動で付与します。</li>
+
+      <li>800,000 件を超えるレコードがあるカスタムオブジェクトと統合する場合は、事前にアカウントエグゼクティブまたはカスタマーサクセスマネージャーにお問い合わせください。</li>
+
+      <li>Salesforceマクロは同期できず、<span>Account Engagement</span>の[CRMオブジェクト]ドロップダウンに表示されません。これらのオブジェクトには、Macro、MacroHistory、MacroInstruction、MacroInstructionChangeEvent、MacroShare、MacroUsage、MacroUsageShare が含まれます。</li>
+
+    </ul>
+
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="pardot_database_hygiene">
+<h1 class="slds-text-heading_large">データベースの状態を良好に保つ方法のヒント</h1>
+  <p>良好な状態のプロスペクトデータベースには、拡大を続けるエンゲージしたプロスペクトのリストが含まれます。定期的な状態確認を実行するためのリマインダーを設定して、送信レピュテーションを保護し、マーケティング支出に対する収益率を増加します。データベースがクリーンであれば、もっとも見込みの高いプロスペクトの育成に集中できます。</p>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">アクティビティのないプロスペクトの再エンゲージ</h2><p>データベース内にアクティビティのないプロスペクトが多数存在する場合は、Engagement プログラムを設定して再エンゲージさせることを検討してください。ダイナミックリストを使用して、アクティビティのないプロスペクトを対象とし、訴求力のあるメールを作成して、マーケティングアセットを操作することをプロスペクトに促します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">古いプロスペクトの削除</h2><p>アクティビティのないプロスペクトを削除します。削除されたプロスペクトはごみ箱に入り、データベース制限に含まれません。見込み客が再び有効になると、<span>Account Engagement</span>はデータを保持したまま見込み客を復元します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">プロスペクトへの再オプトインの依頼</h2><p>データベースを良好な状態に保つ別の方法は、承諾パスです。承諾パスを使用して、メールを再びオプトインすることをプロスペクトに依頼します。同意した場合、そのプロスペクトにはエンゲージメントがあり、価値あるリードということになります。プロスペクトが再びオプトインしない場合は、メールアドレスをデータベースから削除してください。</p><p>承諾パスを使用することで、データベース内のプロスペクトの数は減少するかもしれませんが、エンゲージする可能性が最も高いプロスペクトが残されます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">リストクリーンアップサービスの使用</h2><p>メール可能なデータベースが古いプロスペクトのメールアドレスで満たされている場合は、リストクリーンアップおよび検証サービスを使用することを検討してください。一般的にこれらのサービスではリストのメールアドレスが調べられて、どのメールアドレスが有効であるのか示されます。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="リストを適切に管理し、エンゲージメントがないプロスペクトにメールを送信しないようにして、到達性を高く保ってください。エンゲージメントがないプロスペクトがマーケティングメールを受信しないようにするには、ダイナミックリストを使用します。" href="https://help.salesforce.com/s/articleView?id=mktg.pardot_email_sunset_unengaged_prospects.htm&amp;language=ja&amp;type=5">エンゲージメントがないプロスペクトの特定と除外</a></li><li><a title="プロスペクトを削除すると、レコードはごみ箱に移動します。ごみ箱からプロスペクトを復元したり、レコードを完全に削除したりできます。プロスペクトを削除しても、Salesforce 内で同期されているレコードは削除されません。" href="https://help.salesforce.com/s/articleView?id=mktg.pardot_deleting_prospects.htm&amp;language=ja&amp;type=5">プロスペクトの削除または復元</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="pardot_default_account_field_mapping">
+<h1 class="slds-text-heading_large">デフォルトの取引先オブジェクト項目のマッピング</h1>
+  <p>システム間の同期を容易にするために、<span>Account Engagement</span> で Salesforce コネクタを検証するときに特定の取引先オブジェクト項目の対応付けが作成されます。デフォルトでは、Salesforce がプライマリシステムです。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span>すべての Account Engagement エディション</span></td>
+
+          </tr>
+        </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">
+        項目のマッピング
+      </h2><p>このテーブルの項目は、プロスペクトアカウントと Salesforce 取引先オブジェクトで使用可能な項目を表します。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d100294e64" style="vertical-align:top;" class="slds-cell-wrap" scope="col"><span>Account Engagement</span> 項目</th>
+              <th id="d100294e69" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Salesforce 項目</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d100294e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement 項目">割り当てられたユーザー</td>
+
+              <td headers="d100294e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce 項目">取引先所有者 (この項目を再マッピングまたは編集することはできません)</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d100294e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement 項目">年間売上</td>
+
+              <td headers="d100294e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce 項目">年間売上</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d100294e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement 項目">請求先住所 1</td>
+
+              <td headers="d100294e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce 項目">町名・番地(請求先)</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d100294e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement 項目">請求先住所 2</td>
+
+              <td headers="d100294e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce 項目">--</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d100294e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement 項目">請求先市区郡</td>
+
+              <td headers="d100294e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce 項目">請求先市区郡</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d100294e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement 項目">請求先国</td>
+
+              <td headers="d100294e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce 項目">請求先国</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d100294e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement 項目">請求先都道府県</td>
+
+              <td headers="d100294e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce 項目">請求先都道府県</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d100294e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement 項目">請求先郵便番号</td>
+
+              <td headers="d100294e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce 項目">郵便番号(請求先)</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d100294e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement 項目">説明</td>
+
+              <td headers="d100294e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce 項目">説明</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d100294e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement 項目">Fax</td>
+
+              <td headers="d100294e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce 項目">Fax</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d100294e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement 項目">業種</td>
+
+              <td headers="d100294e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce 項目">業種</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d100294e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement 項目">名前</td>
+
+              <td headers="d100294e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce 項目">名前</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d100294e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement 項目">番号</td>
+
+              <td headers="d100294e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce 項目">取引先番号</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d100294e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement 項目">従業員数</td>
+
+              <td headers="d100294e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce 項目">従業員数</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d100294e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement 項目">会社形態</td>
+
+              <td headers="d100294e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce 項目">会社形態</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d100294e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement 項目">電話</td>
+
+              <td headers="d100294e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce 項目">電話</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d100294e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement 項目">評価</td>
+
+              <td headers="d100294e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce 項目">評価</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d100294e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement 項目">納入先住所 1</td>
+
+              <td headers="d100294e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce 項目">町名・番地(納入先)</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d100294e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement 項目">納入先住所 2</td>
+
+              <td headers="d100294e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce 項目">--</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d100294e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement 項目">納入先市区郡</td>
+
+              <td headers="d100294e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce 項目">納入先市区郡</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d100294e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement 項目">ShippingCountry (国 (納入先))</td>
+
+              <td headers="d100294e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce 項目">国(納入先)</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d100294e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement 項目">納入先都道府県</td>
+
+              <td headers="d100294e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce 項目">納入先都道府県</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d100294e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement 項目">ShippingZip (納入先郵便番号)</td>
+
+              <td headers="d100294e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce 項目">郵便番号(納入先)</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d100294e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement 項目">SIC コード</td>
+
+              <td headers="d100294e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce 項目">SIC コード</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d100294e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement 項目">サイト</td>
+
+              <td headers="d100294e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce 項目">サイト</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d100294e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement 項目">株式コード</td>
+
+              <td headers="d100294e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce 項目">株式コード</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d100294e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement 項目">種別</td>
+
+              <td headers="d100294e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce 項目">種別</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d100294e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement 項目">Web サイト</td>
+
+              <td headers="d100294e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce 項目">Web サイト</td>
+
+            </tr>
+          </tbody></table></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="pardot_default_prospect_field_mapping">
+<h1 class="slds-text-heading_large">デフォルトのプロスペクト項目のマッピング</h1>
+  <p>システム間の同期を促進するため、Account Engagement で Salesforce コネクタを検証するときに特定のプロスペクト項目がリードまたは取引先責任者レコードにマッピングされます。ほとんどの場合、Salesforce がプライマリシステムです。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span>すべての Account Engagement エディション</span></td>
+
+          </tr>
+        </tbody></table>
+    <div><p>
+      <span>Pardot の名称が Marketing Cloud Account Engagement に変更されました。あらゆる場所の名称を一括変換できればよいのですがそうもいかないため、変更が完了するまでは以前の名称を目にすることがあるかもしれません (アプリケーション自体も含む)。</span>
+    </p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">
+        項目のマッピングと詳細
+      </h2><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Account Engagement のプロスペクト項目</th>
+              <th id="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Salesforce リード/取引先責任者項目</th>
+              <th id="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" scope="col">詳細</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">名</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">名</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">&nbsp;</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">姓</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">姓</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">&nbsp;</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">メール</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">メール</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">1 つのメールアドレスに対して複数のプロスペクトを有効化しているアカウント (AMPSEA) の場合、編集が可能です。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">会社</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目"><p>リード: 会社</p><p style="margin-bottom:0;">取引先責任者: 取引先名</p></td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">この項目を再マッピングする場合、新しくマッピングされた Salesforce 項目値のみが同期されます。取引先責任者が Salesforce 取引先と関連付けられている場合、[会社] 項目は Account Engagement では参照のみとなります。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">キャンペーン</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">Account Engagement キャンペーン</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">これは独自の項目であり、参照のみの Salesforce 項目にマッピングします。この項目では Account Engagement が情報源であり、再マッピングして Salesforce のその他の項目と同期することはできません。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">スコア</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">Account Engagement スコア</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">これは独自の項目であり、参照のみの Salesforce 項目にマッピングします。この項目では Account Engagement が情報源であり、再マッピングして Salesforce のその他の項目と同期することはできません。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">グレード</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">Account Engagement グレード</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">これは独自の項目であり、参照のみの Salesforce 項目にマッピングします。この項目では Account Engagement が情報源であり、再マッピングして Salesforce のその他の項目と同期することはできません。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">割り当てられたユーザー</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目"><p>リード: リード所有者</p><p style="margin-bottom:0;">取引先責任者: 取引先責任者所有者</p></td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">この項目を編集して Account Engagement を情報源にすることはできません。また、この項目を Salesforce 内の別の項目に再マッピングすることはできません。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">メモ</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">Account Engagement に関するメモ</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">これは独自の項目であり、参照のみの Salesforce 項目にマッピングします。この項目では Account Engagement が情報源であり、再マッピングして Salesforce のその他の項目と同期することはできません。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">最近のインタラクション</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">--</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">この項目を編集して Account Engagement を情報源にすることはできません。また、この項目を Salesforce 内の別の項目に再マッピングすることはできません。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">最初の活動 </td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">Account Engagement First Activity (Account Engagement の最初の活動)</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">これは独自の項目であり、参照のみの Salesforce 項目にマッピングします。この項目では Account Engagement が情報源であり、再マッピングして Salesforce のその他の項目と同期することはできません。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">最新アクティビティ</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">Account Engagement Last Activity (Account Engagement の最後の活動)</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">これは独自の項目であり、参照のみの Salesforce 項目にマッピングします。この項目では Account Engagement が情報源であり、再マッピングして Salesforce のその他の項目と同期することはできません。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">Web サイト</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">Web サイト</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">&nbsp;</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">役職</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">役職</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">&nbsp;</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">部署</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目"><p>リード: なし</p><p style="margin-bottom:0;">取引先責任者: 部署</p></td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">&nbsp;</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">国</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目"><p>リード: 国</p><p style="margin-bottom:0;">取引先責任者: 国(郵送先)</p></td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">&nbsp;</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">住所 1</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目"><p>リード: 町名・番地</p><p style="margin-bottom:0;">取引先責任者: 町名・番地 (郵送先)</p></td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細"><p>[住所 1] または [住所 2] のいずれかを設定して Salesforce を上書きする場合、両方の Account Engagement 項目値が結合された形式で Salesforce にプッシュされます。</p><p style="margin-bottom:0;">Salesforce が情報元としてして設定 (デフォルト) されている場合、[住所 2] が空のとき [町名・番地]/[町名・番地 (郵送先)] の値が [住所 1] に追加されます。</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">住所 2</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目"><p>リード: 町名・番地</p><p style="margin-bottom:0;">取引先責任者: 町名・番地 (郵送先)</p></td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細"><p>[住所 1] または [住所 2] のいずれかを設定して Salesforce を上書きする場合、両方の Account Engagement 項目値が結合された形式で Salesforce にプッシュされます。</p><p style="margin-bottom:0;">Salesforce が情報元としてして設定 (デフォルト) されている場合、[住所 2] が空のとき [町名・番地]/[町名・番地 (郵送先)] の値が [住所 1] に追加されます。</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">市区郡</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目"><p>リード: 市区郡</p><p style="margin-bottom:0;">取引先責任者: 市区郡(郵送先)</p></td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">&nbsp;</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">都道府県</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目"><p>リード: 都道府県</p><p style="margin-bottom:0;">取引先責任者: 都道府県(郵送先)</p></td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">&nbsp;</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">テリトリー</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">--</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">&nbsp;</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">郵便番号</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目"><p>リード: 郵便番号</p><p style="margin-bottom:0;">取引先責任者: 郵便番号(郵送先)</p></td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">&nbsp;</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">電話</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">電話</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">&nbsp;</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">Fax</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">Fax</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">&nbsp;</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">ソース</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">リードソース</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">&nbsp;</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">年間売上</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目"><p>リード: 年間売上</p><p style="margin-bottom:0;">取引先責任者: なし</p></td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">整数にする必要があり、リードの項目のみと同期します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">従業員数</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">従業員数</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">整数にする必要があります。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">業種</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目"><p>リード: 業種</p><p style="margin-bottom:0;">取引先責任者: なし</p></td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">&nbsp;</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">メール送信除外</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">--</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">&nbsp;</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">Account Engagement ハードバウンス</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">Account Engagement ハードバウンス</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">Account Engagement が情報源になります。このリード項目を取引先責任者項目にマッピングして、取引先責任者レコードでデータを取り込めるようにする必要があります。バウンスの原因が無効なメールアドレスの場合、有効なメールアドレスを追加することで [Account Engagement ハードバウンス] 項目をクリアできます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">メールバウンス理由</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">Bounce_Reason</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">この項目では Salesforce の不達管理が必要となります。この項目はページレイアウトに追加できませんが、Salesforce のレポートで利用可能です。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">メールバウンス日付</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">Bounce_Date</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">この項目では Salesforce の不達管理が必要となります。この項目はページレイアウトに追加できませんが、Salesforce のレポートで利用可能です。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">電話送信除外</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">--</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">&nbsp;</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">操業年数</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">--</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">&nbsp;</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">コメント</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">Account Engagement のコメント</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">これは独自の項目であり、参照のみの Salesforce 項目にマッピングします。この項目では Account Engagement が情報源であり、再マッピングして Salesforce のその他の項目と同期することはできません。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">敬称</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">敬称</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">&nbsp;</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">オプトアウト済み</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">メール送信除外</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">この項目は別の項目にマッピングできます。オプトアウトされたデータを同期するには、この項目の情報源を選択する必要があります。Salesforce、Account Engagement または最後に更新された項目値を情報源として選択できます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">作成日時</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">Account Engagement 作成日</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">これは独自の項目であり、参照のみの Salesforce 項目にマッピングします。この項目では Account Engagement が情報源であり、再マッピングして Salesforce のその他の項目と同期することはできません。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">プロスペクト参照元</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">Account Engagement First Referrer (Account Engagement の最初の紹介者)</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">これは独自の項目であり、参照のみの Salesforce 項目にマッピングします。この項目では Account Engagement が情報源であり、再マッピングして Salesforce のその他の項目と同期することはできません。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">プロスペクト参照元クエリ</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">Account Engagement First Referrer Query (Account Engagement の最初の紹介者クエリ)</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">これは独自の項目であり、参照のみの Salesforce 項目にマッピングします。この項目では Account Engagement が情報源であり、再マッピングして Salesforce のその他の項目と同期することはできません。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">プロスペクト参照元タイプ</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">Account Engagement First Referrer Type (Account Engagement の最初の紹介者種別)</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">これは独自の項目であり、参照のみの Salesforce 項目にマッピングします。この項目では Account Engagement が情報源であり、再マッピングして Salesforce のその他の項目と同期することはできません。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">Google Analytics キャンペーン</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">Google Analytics キャンペーン</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">この項目は Account Engagement パッケージに含まれていました。ただし、Account Engagement で Google Analytics コネクタが検証済みの場合に限り、プロスペクトレコードに表示されます。これは独自の項目であり、参照のみの Salesforce 項目にマッピングします。この項目では Account Engagement が情報源であり、再マッピングして Salesforce のその他の項目と同期することはできません。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">Google Analytics メディア</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">Google Analytics メディア</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">この項目は Account Engagement パッケージに含まれていました。ただし、Account Engagement で Google Analytics コネクタが検証済みの場合に限り、プロスペクトレコードに表示されます。これは独自の項目であり、参照のみの Salesforce 項目にマッピングします。この項目では Account Engagement が情報源であり、再マッピングして Salesforce のその他の項目と同期することはできません。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">Google Analytics ソース</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">Google Analytics ソース</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">この項目は Account Engagement パッケージに含まれていました。ただし、Account Engagement で Google Analytics コネクタが検証済みの場合に限り、プロスペクトレコードに表示されます。これは独自の項目であり、参照のみの Salesforce 項目にマッピングします。この項目では Account Engagement が情報源であり、再マッピングして Salesforce のその他の項目と同期することはできません。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">Google Analytics コンテンツ</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">Google Analytics コンテンツ</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">この項目は Account Engagement パッケージに含まれていました。ただし、Account Engagement で Google Analytics コネクタが検証済みの場合に限り、プロスペクトレコードに表示されます。これは独自の項目であり、参照のみの Salesforce 項目にマッピングします。この項目では Account Engagement が情報源であり、再マッピングして Salesforce のその他の項目と同期することはできません。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">Google Analytics の期間</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">Google Analytics の期間</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">この項目は Account Engagement パッケージに含まれていました。ただし、Account Engagement で Google Analytics コネクタが検証済みの場合に限り、プロスペクトレコードに表示されます。これは独自の項目であり、参照のみの Salesforce 項目にマッピングします。この項目では Account Engagement が情報源であり、再マッピングして Salesforce のその他の項目と同期することはできません。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">項目なし。Account Engagement データから同期</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">Account Engagement Conversion Date (Account Engagement 取引開始日)</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">再マッピングできません。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">項目なし。Account Engagement データから同期</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">Account Engagement 変換オブジェクト</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">再マッピングできません。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">項目なし。Account Engagement データから同期</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">Account Engagement Conversion オブジェクト名</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">再マッピングできません。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">項目なし。Account Engagement カスタム項目を作成して同期</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目"><p>リード: 状況</p><p style="margin-bottom:0;">取引先責任者: なし</p></td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">&nbsp;</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">項目なし。Account Engagement カスタム項目を作成して同期</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">携帯電話</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">&nbsp;</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d54005e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="Account Engagement のプロスペクト項目">項目なし。Account Engagement カスタム項目を作成して同期</td>
+
+              <td headers="d54005e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="Salesforce リード/取引先責任者項目">レコードタイプ ID</td>
+
+              <td headers="d54005e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">&nbsp;</td>
+
+            </tr>
+          </tbody></table></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="ほとんどの見込み客項目は、Account Engagement 値と Salesforce 値のどちらを主とするかを制御するように設定できます。" href="https://help.salesforce.com/s/articleView?id=mktg.pardot_sync_behavior_works.htm&amp;language=ja&amp;type=5">同期動作の仕組み</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="pardot_delete_prospects_on_list">
+<h1 class="slds-text-heading_large">複数のプロスペクトの削除</h1>
+  <p>リストを使用することで、誤ってインポートしたプロスペクト、ハードバウンスが発生したプロスペクト、エンゲージメントがないプロスペクト、重複したプロスペクトを一括削除できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d86052e37" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d86052e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">リストを作成および表示する</td>
+
+              <td headers="d86052e37" style="vertical-align:top;" class="slds-cell-wrap">
+                <span>Account Engagement の管理者ロールまたはマーケティングロール</span>
+              </td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>削除するプロスペクトのみが含まれるリストに移動します。</span>
+      </li><li>
+        <span>名前列の横にあるボックスを選択します (1)。</span>
+      </li><li>
+        <span>リストのプロスペクトをすべて選択するには、<strong class="uicontrol">[このテーブルの [x] エントリをすべて選択]</strong> リンクをクリックします (2)。</span>
+      </li><li>
+        <span>テーブルの後のドロップダウンから、[削除(<strong class="uicontrol">Delete)]</strong> を選択し、[移動(<strong class="uicontrol">Go)]</strong> をクリックします (3)。<div><img alt="リストのプロスペクト" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-mktg-pardot-262-0-0-production-jajp/ff9bd55b-c854-4f3c-8dc5-1cfbcc01fd95/pardot/images/pardot_delete_prospect_list.png"></div></span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="pardot_delete_single_prospect">
+<h1 class="slds-text-heading_large">プロスペクトの削除</h1>
+  <p>重複したプロスペクト、テストプロスペクト、スパムプロスペクトをプロスペクトのレコードから削除できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d40066e37" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d40066e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロスペクトを削除する</td>
+
+              <td headers="d40066e37" style="vertical-align:top;" class="slds-cell-wrap">
+                <span>Account Engagement の管理者、マーケティング、営業マネージャーのロール</span>
+              </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d40066e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">割り当てられたプロスペクトを削除する</td>
+
+              <td headers="d40066e37" style="vertical-align:top;" class="slds-cell-wrap">
+                <span>Account Engagement の営業ロール以上</span>
+              </td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>削除するプロスペクトレコードに移動します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[削除]</strong> をクリックします。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="pardot_deleting_prospects">
+<h1 class="slds-text-heading_large">プロスペクトの削除または復元</h1>
+  <p>プロスペクトを削除すると、レコードはごみ箱に移動します。ごみ箱からプロスペクトを復元したり、レコードを完全に削除したりできます。プロスペクトを削除しても、Salesforce 内で同期されているレコードは削除されません。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span>すべての Account Engagement エディション</span></td>
+
+          </tr>
+        </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=mktg.pardot_guidelines_deleting_prospects.htm&amp;language=ja&amp;type=5">プロスペクトの削除に関するガイドライン</a></strong><br><span>Account Engagement</span> から見込み客を削除すると、レポートやその他の影響がある可能性があります。</li><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=mktg.pardot_delete_single_prospect.htm&amp;language=ja&amp;type=5">プロスペクトの削除</a></strong><br>重複したプロスペクト、テストプロスペクト、スパムプロスペクトをプロスペクトのレコードから削除できます。</li><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=mktg.pardot_delete_prospects_on_list.htm&amp;language=ja&amp;type=5">複数のプロスペクトの削除</a></strong><br>リストを使用することで、誤ってインポートしたプロスペクト、ハードバウンスが発生したプロスペクト、エンゲージメントがないプロスペクト、重複したプロスペクトを一括削除できます。</li><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=mktg.pardot_admin_prospects_permanently_delete.htm&amp;language=ja&amp;type=5">プロスペクトの永久削除</a></strong><br><span>Account Engagement</span> から見込み客を完全に削除するには、ごみ箱に移動します。</li><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=mktg.pardot_what_removes_prospect_from_recycle_bin.htm&amp;language=ja&amp;type=5">ごみ箱からのプロスペクトの復元</a></strong><br>プロスペクトを削除すると、レコードはごみ箱に移動します。ごみ箱では、プロスペクトを永久的に削除するか復元することができます。自分またはシステムが開始する特定のアクティビティによっても、プロスペクトを復元できます。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="pardot_export_prospects">
+<h1 class="slds-text-heading_large">プロスペクトのエクスポート</h1>
+  <p>プロスペクトを CSV 形式でエクスポートして、一括更新を実行したり、同期エラーを修正したり、プロスペクトデータを外部レポートに使用したりします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d86317e37" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d86317e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロスペクトをエクスポートする</td>
+
+              <td headers="d86317e37" style="vertical-align:top;" class="slds-cell-wrap">
+                <span>Account Engagement の管理者、マーケティング、営業マネージャーのロール</span>
+              </td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>
+          <span>[プロスペクト] ページを開きます。</span>
+        </span>
+      </li><li>
+        <span><strong class="uicontrol">[ツール]</strong> をクリックし、<strong class="uicontrol">[CSV ファイルとしてエクスポート]</strong> を選択します。</span>
+      </li><li>
+        <span>エクスポートに名前を付けます。</span>
+      </li><li>
+        <span>エクスポートのタイプを選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[エクスポート]</strong> をクリックします。</span>
+      </li></ol>
+
+    <div><p>エクスポートが 100 行よりも少ない場合は、すぐに使用可能になります。大きなデータセットのエクスポートファイルをダウンロードするには、<span><strong class="uicontrol">[管理]</strong> (Lightning アプリケーションでは <strong class="uicontrol">[Account Engagement 設定]</strong>) に移動して、<strong class="uicontrol">[エクスポート]</strong></span> を選択します。</p><p>特殊文字で開始される項目には、先頭にスラッシュ文字 (/) が追加されます。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="pardot_field_types">
+<h1 class="slds-text-heading_large">プロスペクト項目のデータ型</h1>
+  <p> データ型では、項目で取得するデータの種類を定義します。<span>Account Engagement</span> では、いくつかのデータ型を使用できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span>すべての Account Engagement エディション</span></td>
+
+          </tr>
+        </tbody></table>
+    <div><p>ここに記載されている文字数制限はカスタム項目に適用されます。デフォルト項目の制限は異なります。文字数制限は固定されており、変更できません。文字数制限を超える値をインポートすると、その値は切り捨てられます。</p></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d105127e64" style="vertical-align:top;" class="slds-cell-wrap" scope="col">種別</th>
+              <th id="d105127e67" style="vertical-align:top;" class="slds-cell-wrap" scope="col">形式と機能</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d105127e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="種別">テキスト</td>
+
+              <td headers="d105127e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="形式と機能">簡潔なデータポイント用の 1 行の自由形式のテキスト入力。制限はカスタム項目で 65,535 バイトです。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d105127e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="種別">数値</td>
+
+              <td headers="d105127e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="形式と機能">数値。ルールおよび動的リストの増分アクションおよび条件に使用されます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d105127e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="種別">日付</td>
+
+              <td headers="d105127e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="形式と機能">日付値。ルールとダイナミックリストの時刻に基づいた条件に使用します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d105127e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="種別">ラジオボタン</td>
+
+              <td headers="d105127e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="形式と機能">カスタマイズしたラジオボタン。プロスペクトは、複数ある選択肢のうち 1 つを選択できます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d105127e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="種別">チェックボックス</td>
+
+              <td headers="d105127e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="形式と機能">カスタムチェックボックス。プロスペクトは、複数ある選択肢からいくつかを選択できます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d105127e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="種別">ドロップダウン</td>
+
+              <td headers="d105127e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="形式と機能">カスタムドロップダウンメニュー。プロスペクトは、複数ある選択肢のうち 1 つを選択できます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d105127e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="種別">テキストエリア</td>
+
+              <td headers="d105127e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="形式と機能">詳細情報を表示する複数行自由形式のテキストボックス。制限はカスタム項目で 65,535 バイトです。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d105127e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="種別">複数選択</td>
+
+              <td headers="d105127e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="形式と機能">カスタムリスト。プロスペクトは、複数ある選択肢からいくつかを選択できます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d105127e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="種別">非表示</td>
+
+              <td headers="d105127e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="形式と機能">非表示項目。データの取得に使用されますが、フォームには表示されません。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d105127e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="種別">CRM ユーザー</td>
+
+              <td headers="d105127e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="形式と機能">Salesforce ユーザーに接続して送信元アドレスとして機能します。フォームやフォームハンドラーでは、この項目のデータ型を使用できません。</td>
+
+            </tr>
+          </tbody></table></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="デフォルトのプロスペクト項目では、バイト単位で測定される文字数制限が使用されます。大部分の単純な文字はそれぞれ 1 バイトですが、複雑な絵文字では文字ごとにより多くのバイトが使用されます。そのため、文字数と使用されるバイト数は一致しない場合もありますが、ガイドラインとして役立ちます。" href="https://help.salesforce.com/s/articleView?id=mktg.pardot_fields_default_character_limits.htm&amp;language=ja&amp;type=5">デフォルトのプロスペクト項目の文字数制限</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="pardot_fields_create_custom_field">
+<h1 class="slds-text-heading_large">カスタムプロスペクト項目の作成</h1>
+  <p><span>Account Engagement</span>のデフォルト項目で必要な見込み客データが取得されない場合は、独自のカスタム項目を作成します。カスタム項目と CRM をマッピングして同期できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span>すべての Account Engagement エディション</span></td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d8410e57" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d8410e57" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">カスタム項目を作成する</td>
+
+              <td headers="d8410e57" style="vertical-align:top;" class="slds-cell-wrap">
+                <span>Account Engagement の管理者ロール</span>
+              </td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>[プロスペクト項目] ページを開きます。</span>
+        <ul>
+          <li>Account Engagement で、[<span class="menucascade"><strong class="uicontrol">Admin</strong> | <strong class="uicontrol">Configure Fields</strong> | <strong class="uicontrol">] [Prospect Fields</strong></span>] を選択します。</li>
+
+          <li>Lightning アプリケーションで、[<span class="menucascade"><strong class="uicontrol">Account Engagement Settings</strong> | <strong class="uicontrol">Object and Field Configuration</strong> | <strong class="uicontrol">Prospect Fields</strong></span>] を選択します。</li>
+
+        </ul>
+
+      </li><li>
+        <span><strong class="uicontrol">[+ カスタム項目を追加]</strong> をクリックします。</span>
+      </li><li>
+        <span>項目に名前を付けます。名前は識別目的で内部的に使用され、プロスペクトに表示されません。</span>
+      </li><li>
+        <span>カスタム項目 ID は編集しないでください。 この ID は見込み客には表示されません。</span>
+      </li><li>
+        <span>項目設定を定義します。</span>
+      </li><li>
+        <span>完了したら、<strong class="uicontrol">[カスタム項目を作成]</strong> をクリックして保存します。</span>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="カスタム項目の値のラベルを変更し、プロスペクトが選択する値に基づいてプロファイルの割り当てとリストへのプロスペクトの追加を行います。" href="https://help.salesforce.com/s/articleView?id=mktg.pardot_fields_use_predefined_values.htm&amp;language=ja&amp;type=5">カスタム項目の事前定義された値の使用</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="pardot_fields_default_character_limits">
+<h1 class="slds-text-heading_large">デフォルトのプロスペクト項目の文字数制限</h1>
+  <p>デフォルトのプロスペクト項目では、バイト単位で測定される文字数制限が使用されます。大部分の単純な文字はそれぞれ 1 バイトですが、複雑な絵文字では文字ごとにより多くのバイトが使用されます。そのため、文字数と使用されるバイト数は一致しない場合もありますが、ガイドラインとして役立ちます。</p>
+
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d30157e37" style="vertical-align:top;" class="slds-cell-wrap" scope="col">項目</th>
+              <th id="d30157e40" style="vertical-align:top;" class="slds-cell-wrap" scope="col">バイト制限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d30157e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">salutation</td>
+
+              <td headers="d30157e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="バイト制限">32</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d30157e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">first_name</td>
+
+              <td headers="d30157e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="バイト制限">40</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d30157e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">last_name</td>
+
+              <td headers="d30157e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="バイト制限">80</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d30157e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">email</td>
+
+              <td headers="d30157e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="バイト制限">255</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d30157e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">company</td>
+
+              <td headers="d30157e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="バイト制限">255</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d30157e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">website</td>
+
+              <td headers="d30157e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="バイト制限">255</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d30157e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">job_title</td>
+
+              <td headers="d30157e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="バイト制限">128</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d30157e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">department</td>
+
+              <td headers="d30157e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="バイト制限">100</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d30157e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">country</td>
+
+              <td headers="d30157e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="バイト制限">80</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d30157e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">city</td>
+
+              <td headers="d30157e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="バイト制限">40</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d30157e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">state</td>
+
+              <td headers="d30157e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="バイト制限">80</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d30157e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">zip</td>
+
+              <td headers="d30157e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="バイト制限">32</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d30157e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">phone</td>
+
+              <td headers="d30157e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="バイト制限">40</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d30157e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">territory</td>
+
+              <td headers="d30157e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="バイト制限">255</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d30157e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">fax</td>
+
+              <td headers="d30157e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="バイト制限">32</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d30157e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">source</td>
+
+              <td headers="d30157e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="バイト制限">100</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d30157e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">annual_revenue</td>
+
+              <td headers="d30157e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="バイト制限">32</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d30157e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">employees</td>
+
+              <td headers="d30157e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="バイト制限">32</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d30157e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">industry</td>
+
+              <td headers="d30157e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="バイト制限">100</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d30157e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">years_in_business</td>
+
+              <td headers="d30157e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="バイト制限">32</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d30157e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">notes</td>
+
+              <td headers="d30157e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="バイト制限">65535</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d30157e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">comments</td>
+
+              <td headers="d30157e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="バイト制限">65535</td>
+
+            </tr>
+          </tbody></table></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="pardot_fields_edit_fields_on_a_form">
+<h1 class="slds-text-heading_large">フォーム項目の編集</h1>
+  <p>個々のフォームで見込み客の項目を調整します。たとえば、期間限定のキャンペーンのためにフォームの項目の表示ラベルをカスタマイズしたり、特定の用途に合わせてドロップダウンの値を変更したりします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span>すべての Account Engagement エディション</span></td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d94164e55" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d94164e55" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">フォームの項目を編集する</td>
+
+              <td headers="d94164e55" style="vertical-align:top;" class="slds-cell-wrap">
+                <span>Account Engagement の管理者ロールまたはマーケティングロール</span>
+              </td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>編集用にフォームを開きます。</span>
+      </li><li>
+        <span>フォームにアクセスします。</span>
+        <table class="slds-table slds-table_bordered slds-m-bottom_small"><thead class="slds-text-title_caps">
+            <tr><th id="d94164e91-option" style="vertical-align:bottom;text-align:left;">
+
+            </th><th id="d94164e91-desc" style="vertical-align:bottom;text-align:left;">
+          </th></tr></thead><tbody><tr class="">
+            <th id="d94164e102" headers="d94164e91-option" style="vertical-align:top;">パルドー</th>
+
+            <td headers="d94164e91-desc d94164e102" style="vertical-align:top;"><strong class="uicontrol">[マーケティング</strong>] | [<strong class="uicontrol">フォーム]</strong> に移動して、編集するフォームを選択します。</td>
+
+          </tr><tr class="">
+            <th id="d94164e116" headers="d94164e91-option" style="vertical-align:top;">Lightning アプリケーション</th>
+
+            <td headers="d94164e91-desc d94164e116" style="vertical-align:top;">[<strong class="uicontrol">コンテンツ</strong>] | [<strong class="uicontrol">フォーム]</strong> を選択し、編集するフォームを選択します。</td>
+
+          </tr></tbody></table>
+      </li><li>
+        <span> 編集する項目の横にある鉛筆アイコンをクリックします。</span>
+      </li><li>
+        <span>変更を行います。</span>
+        <div>フォームフィールド設定についての詳細は、「<a title="フォームの項目を編集するときは、複数の設定オプションを使用できます。" href="https://help.salesforce.com/s/articleView?id=mktg.pardot_forms_field_options.htm&amp;language=ja&amp;type=5">フォームフィールドオプション</a>」を参照してください。</div>
+      </li><li>
+        <span>変更を保存します。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="pardot_fields_edit_globally">
+<h1 class="slds-text-heading_large">グローバル項目設定の編集</h1>
+  <p><span>Account Engagement</span> 管理者は、項目のデフォルト設定を編集できます。たとえば、項目の種別をラジオボタンからチェックボックスに変更して、すべての新規フォームのデフォルトとして設定できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span>すべての Account Engagement エディション</span></td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d15650e57" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d15650e57" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロスペクト項目を設定する</td>
+
+              <td headers="d15650e57" style="vertical-align:top;" class="slds-cell-wrap">
+                <span>Account Engagement の管理者ロール</span>
+              </td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-mktg-pardot-262-0-0-production-jajp/ff9bd55b-c854-4f3c-8dc5-1cfbcc01fd95/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 項目のグローバル設定を変更しても、既存のフォームの項目は更新されません。新しい設定を有効にするには、フォームの項目を編集してデフォルトデータを読み込みます。</div></div></div>
+</div>
+    <ol><li>
+        <span><span class="menucascade"><strong class="uicontrol">[Admin</strong> | <strong class="uicontrol">Configure Fields</strong> | <strong class="uicontrol">Prospect Fields</strong></span>]に移動します。</span>
+      </li><li>
+        <span>項目を特定して編集用に開きます。</span>
+      </li><li>
+        <span>項目設定を編集し、変更を保存します。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="pardot_fields_use_predefined_values">
+<h1 class="slds-text-heading_large">カスタム項目の事前定義された値の使用</h1>
+  <p>カスタム項目の値のラベルを変更し、プロスペクトが選択する値に基づいてプロファイルの割り当てとリストへのプロスペクトの追加を行います。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d27343e37" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d27343e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">カスタム項目を作成、編集する</td>
+
+              <td headers="d27343e37" style="vertical-align:top;" class="slds-cell-wrap">
+                <span>Account Engagement の管理者ロール</span>
+              </td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>カスタム項目の編集時に <strong class="uicontrol">[事前定義された値を使用 (チェックボックス、ラジオボタン、ドロップダウン、複数選択)]</strong> を選択します。</span>
+      </li><li>
+        <span>(省略可能) <strong class="uicontrol">[事前入力]</strong> ドロップダウンから値を選択します。</span>
+      </li><li>
+        <span>[値] セクションで、項目の値を追加および削除します。項目をさらにカスタマイズするには、詳細なオプションを使用します。</span>
+        <ol>
+          <li>
+            <span>値のラベルを変更するには、A アイコンを使用します。プロスペクトにはこのラベルが表示されますが、プロスペクトのレコードには元の値が記録されます。</span>
+          </li>
+
+          <li>
+            <span>プロスペクトが項目値を選択するときにプロファイルをプロスペクトに適用するには、グリッドアイコンを使用します。</span>
+          </li>
+
+          <li>
+            <span>プロスペクトが項目値を選択するときにプロスペクトをリストに追加するには、リストアイコンを使用します。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>完了したら、項目を保存します。</span>
+      </li></ol>
+
+    <div><p>カスタム項目の事前定義された値をフォームで使用する場合は、フォーム内で項目を編集し、<strong class="uicontrol">[デフォルトデータを読み込み]</strong> をクリックします。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="pardot_guidelines_deleting_prospects">
+<h1 class="slds-text-heading_large">プロスペクトの削除に関するガイドライン</h1>
+  <p><span>Account Engagement</span> から見込み客を削除すると、レポートやその他の影響がある可能性があります。</p>
+
+    <ul>
+      <li>削除されたプロスペクトはごみ箱に移動します。プロスペクトはいつでも復元できます。</li>
+
+      <li>プロスペクトをごみ箱から永久に削除できます。</li>
+
+      <li>削除された見込み客は、<span>Account Engagement</span>レポートに表示されません。プロスペクトを復元すると、レポートに再表示されます。プロスペクトを削除しても、レポートの元の数値は影響されません。たとえば、メールレポートの HTML メールの開封数が 10 件の場合、そのプロスペクトを 5 件削除しても、HTML メールの開封数は 10 件のままです。</li>
+
+      <li>削除されたプロスペクトのページアクションはトリガーされません。プロスペクトがごみ箱に入れられた後は、フォーム登録のみがトラッキングされます。</li>
+
+      <li>削除したプロスペクトのレコードが CRM にある場合、そのレコードを CRM で更新および同期しても、プロスペクトは復元されません。</li>
+
+      <li>ごみ箱の中のプロスペクトは、メール送信可能なプロスペクトの制限に含まれません。</li>
+
+    </ul>
+
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="pardot_guidelines_for_prospect_import_field_validation">
+<h1 class="slds-text-heading_large">プロスペクトのインポート項目の検証に関するガイドライン</h1>
+  <p>プロスペクトのインポート項目の検証を操作するときは、次のガイドラインを念頭に置いてください。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span>すべての Account Engagement エディション</span></td>
+
+          </tr>
+        </tbody></table>
+    <ul>
+      <li>プロスペクトの項目値を検証できない場合、プロスペクトはインポートされません。</li>
+
+      <li>インポート中にエラーが発生すると、エラーが発生しない場合よりも、インポート完了までの時間が長くなります。</li>
+
+      <li>インポートエラーは、インポートエラー .csv にリストされます。インポート確認メールには、このファイルへのリンクが記載されています。</li>
+
+      <li>インポートエラーレポートからプロスペクトを再インポートするときは、エラーの種類の列とエラーの説明の列をマッピングしないでください。</li>
+
+      <li>検証では大文字と小文字が区別されませんが、値が保存されるときは、大文字と小文字の区別が事前定義された値と一致した状態になります。</li>
+
+    </ul>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="pardot_how_source_field_populated">
+<h1 class="slds-text-heading_large">プロスペクトのソース項目の入力方法</h1>
+  <p>プロスペクトのソース項目の値は、参照元 URL によって決まります。参照元 URL は、トラッキングコードが含まれるページを初めて訪問したビジターが、その直前に訪問していたページです。<span>Account Engagement</span> は、参照 URL が存在する場合にソースデータを取り込み、特定のベンダーの想定される Web サイトと照合します。</p>
+
+    <p>たとえばプロスペクトの参照元 URL が「www.linkedin.com/profile/SarahPersons」で、UTM パラメーターが存在しない場合、プロスペクトのソース項目は「LinkedIn」です。</p>
+    <p><span>Account Engagement</span>は、ソースの種別(自然検索、広告、有料検索、空)と、見込み客がマーケティング資産と最初に接触するベンダーを調べます。次に、この 2 つの要素 (ベンダーと種別) を組み合わせて、ソース項目の値にします。ソースの種別が空である場合は、ベンダーがソース項目に入力されます。</p>
+    <p>たとえば、ベンダーである Google は、Google Paid Search (みなさんの Google 広告)、Google 広告 (コンテンツネットワーク広告)、そして Google Natural Search という 3 種類をすべて提供できます。</p>
+    <p>ソース項目に表示される可能性があるベンダーは他にもあります。</p>
+    <ul>
+      <li>Google</li>
+
+      <li>Yahoo!</li>
+
+      <li>MSN</li>
+
+      <li>Bing</li>
+
+      <li>Twitter</li>
+
+      <li>LinkedIn</li>
+
+      <li>Facebook</li>
+
+      <li>PRweb</li>
+
+      <li>Business.com</li>
+
+      <li>Wikipedia</li>
+
+      <li>Quora</li>
+
+      <li>Marketwire</li>
+
+      <li>MarketWatch</li>
+
+      <li>TechCrunch</li>
+
+      <li>StumbleUpon</li>
+
+      <li>Baidu</li>
+
+      <li>Craigslist</li>
+
+      <li>Ask.com</li>
+
+      <li>Reddit</li>
+
+      <li>Indeed.com</li>
+
+      <li>Feedburner</li>
+
+      <li>Monster</li>
+
+      <li>Scribd</li>
+
+      <li>Eventbrite</li>
+
+      <li>Google Plus</li>
+
+    </ul>
+
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="pardot_last_activity_field">
+<h1 class="slds-text-heading_large">プロスペクトの最近のアクティビティの追跡</h1>
+  <p>[最新アクティビティ] 項目には、プロスペクトがマーケティングアセットを最後に操作した日時が表示されます。この項目は、プロスペクトがリンクのクリックやフォームの送信など、何らかのアクションを実行すると更新されます。ほとんどのプロスペクトのアクティビティによって [最新アクティビティ] 項目が更新されますが、例外もあります。アクティビティが<span>Account Engagement</span>ユーザーによって開始された場合(メールの送信など)、このフィールドは更新されません。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span>すべての Account Engagement エディション</span></td>
+
+          </tr>
+        </tbody></table>
+    <p>以下のアクティビティは、[最新アクティビティ] 項目のタイムスタンプを更新しません。</p>
+    <ul>
+      <li>メールの開封</li>
+
+      <li>メールの送信</li>
+
+      <li>メールのバウンス</li>
+
+      <li>商談の作成、不成立、成立</li>
+
+      <li>オートメーションルールのアクション</li>
+
+      <li>Engagement Studio プログラムへの取り込み</li>
+
+      <li>プロスペクトのインポート</li>
+
+    </ul>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="これらのプロスペクト アクティビティは、Engagement History Custom Lightningコンポーネントに表示されます。コンポーネントには、アーカイブされたプロスペクトのアクティビティは表示されません。" href="https://help.salesforce.com/s/articleView?id=mktg.pardot_engagement_history_glossary.htm&amp;language=ja&amp;type=5">エンゲージメント履歴カスタム Lightning コンポーネントアクティビティの用語集</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="pardot_list_email_report">
+<h1 class="slds-text-heading_large">リストメールレポート</h1>
+  <p>リストメールレポートには、送信したメールに関する最重要データが詳細に表示されます。その内容は、送信メール数、ユニーククリック数、ユニーククリックレート、総クリック数、総クリックレートです。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span>すべての Account Engagement エディション</span></td>
+
+          </tr>
+        </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">[レポート] タブ</h2><ul>
+        <li>[レポート] タブには、送信したメールに関する、基本的な情報と総計値が表示されます。</li>
+
+        <li>メールの詳細と総計値の基本テーブルには、除外したアクティビティは表示されません。このテーブルでは、並べ替え、フィルター、フィルター解除はできません。<span>Account Engagement</span> Classic で絞り込まれた活動設定は、この表には影響しません。</li>
+
+        <li>開封率円グラフでは、送信したリストメールの開封率、バウンス率、未開封率の内訳を視覚的に把握できます。</li>
+
+        <li>クリック数レポートでは、メールのリンク、およびプロスペクトが各リンクをクリックしたときの状況が詳しく表示されます。クリック数レポートでは、削除されたプロスペクトが除外されないため、この表の数値は、メールレポート全体の数値より大きくなることがあります。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">[インタラクション] タブ</h2><p>エンゲージメントおよびアクティビティレポート (追加料金を要する高度なメール分析パッケージで利用可能) には、どのように受信者がメールにエンゲージしているのかを示すデータが表示されます。収集されたデータは総計され、メールの総開封数に占める割合として表示されるので、簡単に比較できます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">[メールクライアント] タブ</h2><p>このレポート (高度なメール分析パッケージで利用可能) では、送信したメールを開封するのにプロスペクトが使用するメールクライアントを把握し、トラッキングします。</p></div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=mktg.pardot_reporting_clickthrough_rate_parent.htm&amp;language=ja&amp;type=5">クリックスルーレートレポート</a></strong><br>クリックスルーレートレポートではリンク統計が視覚的に示されます。プロスペクトのクリックに関するヒートマップがメールデザインの上部に表示され、最良のパフォーマンスを示しているコンテンツをすぐに知ることができます。このレポートはテキストのみのメールでは使用できません。</li><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=mktg.pardot_engagement_and_activity_report_metrics.htm&amp;language=ja&amp;type=5">エンゲージメントおよびアクティビティレポートの総計値</a></strong><br>エンゲージメントおよびアクティビティレポートには、どのように受信者がメールにエンゲージしているのかが表示されます。収集されたデータは総計され、メールの総開封数に占める割合が表示されます。</li><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=mktg.pardot_view_list_email_report.htm&amp;language=ja&amp;type=5">リストメールレポートの表示</a></strong><br>開封率やバウンス数など、メール送信に関する重要データを分析するには、リストメールレポートを使用します。</li><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=mktg.pardot_list_email_report_metrics.htm&amp;language=ja&amp;type=5">リストメールレポートの総計値</a></strong><br>リストメールレポートには、送信メール数、ユニーククリック数、ユニーククリックレート、総クリック数、総クリックレートなど、送信したメールに関する重要データが詳細に表示されます。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="pardot_list_email_report_metrics">
+<h1 class="slds-text-heading_large">リストメールレポートの総計値</h1>
+  <p>リストメールレポートには、送信メール数、ユニーククリック数、ユニーククリックレート、総クリック数、総クリックレートなど、送信したメールに関する重要データが詳細に表示されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span>すべての Account Engagement エディション</span></td>
+
+          </tr>
+        </tbody></table>
+    <div><p>特定のレポートページ (開封数やクリックスルー数など) では、絞り込んだアクティビティを [ツール] メニューからオンにできます。絞り込んだアクティビティをオンまたはオフにすると、すべてのレポートページに反映されます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">
+        総計値の定義
+      </h2><dl>
+        
+          <dt style="font-weight:bold;padding-top:.25rem;">送信総数</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">送信されたメールの合計数。</dd>
+        
+        
+          <dt style="font-weight:bold;padding-top:.25rem;">キュー登録総数</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">送信待ちとなっているメール数。このメールは作成されましたが、まだ処理されていません。新規メールが作成されてキューに登録されると、この数は増加する可能性があります。</dd>
+        
+        
+          <dt style="font-weight:bold;padding-top:.25rem;">ソフトバウンス</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">受信者のメールサーバーによって確認されたが、送信者に戻されたメール。受信者のメールボックスがいっぱいであるか、メールサーバーが一時的に使用不可になっていると発生します。ソフトバウンスメッセージは、時間を置くと配信可能になることがあります。ソフトバウンスが 5 回になると、プロスペクトはメールからオプトアウトされます。</dd>
+        
+        
+          <dt style="font-weight:bold;padding-top:.25rem;">ハードバウンス</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">アドレスが無効なために、差出人に何度も戻されるメール。ハードバウンスは、ドメイン名が存在しないか、受信者が不明であると発生します。</dd>
+        
+        
+          <dt style="font-weight:bold;padding-top:.25rem;">配信到達総数</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">メールの総送信数からハードバウンス数とソフトバウンス数を引いた数。このデータには、受信者のスパムフォルダーに配信されたメールが含まれます。</dd>
+        
+        
+          <dt style="font-weight:bold;padding-top:.25rem;">Total Failed (失敗総数)</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">送信に失敗したメールの合計数。番号をクリックすると、理由の詳細が表示されます。</dd>
+        
+        
+          <dt style="font-weight:bold;padding-top:.25rem;">配信到達率</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">バウンス数 (ソフトおよびハード) に対する配信されたメール数の割合。このデータには、受信者のスパムフォルダーに配信されたメールが含まれます。</dd>
+        
+        
+          <dt style="font-weight:bold;padding-top:.25rem;">HTML 開封数</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">プロスペクトのメールクライアントが HTML 版のメールに含まれる画像を読み込んだ合計数。画像をダウンロードしない HTML メールまたはテキストメールのリンクをプロスペクトがクリックした場合も、開封が記録されます。クリックされたということは、メッセージが表示されたということを意味します。デフォルトでは画像が表示されないメールクライアントもあります (Outlook、Apple Mail、Thunderbird)。画像が読み込まれるたびに開封が計数されます。</dd>
+        
+        
+          <dt style="font-weight:bold;padding-top:.25rem;">ユニーク HTML 開封数</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">HTML 版のメールに含まれる画像を読み込んだプロスペクトの数。ユニーク開封数カテゴリでは、プロスペクトが画像を 2 回以上読み込んだ場合も、各受信者が計数されるのは 1 回のみです。</dd>
+        
+        
+          <dt style="font-weight:bold;padding-top:.25rem;">HTML 開封率</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">メールの総配信数 (送信数－バウンス数) に占める、ユニーク HTML 開封数の割合。</dd>
+        
+        
+          <dt style="font-weight:bold;padding-top:.25rem;">総クリック数</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">メール内のすべてのリンクの総クリック回数。1 回 1 回のリンククリックが個別に計数されます。たとえば、プロスペクトが同じメッセージに含まれる 2 つの異なるリンクをクリックした場合、2 クリックとみなされます。プロスペクトが同じリンクを 2 回クリックした場合も、2 クリックとみなされます。登録解除リンクとメールプリファレンスセンターリンクをクリックした場合は、総クリック数に反映されません。</dd>
+        
+        
+          <dt style="font-weight:bold;padding-top:.25rem;">総 CTR (クリックスルーレート)</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">配信されたメール (送信数－バウンス数) に含まれるリンクをクリックしたビジターの割合。総 CTR では、同じリンクが複数回クリックされた場合も計数されます。</dd>
+        
+        
+          <dt style="font-weight:bold;padding-top:.25rem;">ユニーククリック数</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">メール内のリンクをクリックしたプロスペクトの数。各受信者は 1 回しか計数されないため、同じメッセージ内で複数回クリックしても、1 回としか計数されません。登録解除リンクとメールプリファレンスセンターリンクをクリックした場合は、ユニーククリック数に反映されません。</dd>
+        
+        
+          <dt style="font-weight:bold;padding-top:.25rem;">ユニーク CTR (クリックスルーレート)</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">メール内のリンクをクリックしたビジターの割合。</dd>
+        
+        
+          <dt style="font-weight:bold;padding-top:.25rem;">クリック/開封率</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">ユニーククリック数を HTML ユニーク開封数で割った数。</dd>
+        
+        
+          <dt style="font-weight:bold;padding-top:.25rem;">総オプトアウト数</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">メールプリファレンスセンターで、登録解除やすべてのメールコミュニケーションからのオプトアウトのためのリンクをクリックしたプロスペクトの合計数。このプロスペクトは、その後のメール送信から除外されます。</dd>
+        
+        
+          <dt style="font-weight:bold;padding-top:.25rem;">オプトアウト率</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">メールの総送信数に占める、オプトアウトしたユーザーの割合。</dd>
+        
+        
+          <dt style="font-weight:bold;padding-top:.25rem;">スパムの報告の合計数</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">メールをスパムとして報告したプロスペクトの合計数。</dd>
+        
+        
+          <dt style="font-weight:bold;padding-top:.25rem;">スパムの報告率</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">メールの総送信数に占める、スパムの報告の割合。</dd>
+        
+        
+          <dt style="font-weight:bold;padding-top:.25rem;">受信者リスト上のプロスペクト</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">メールのすべての受信者リストのプロスペクトの合計数。AMPSEA 以外のビジネスユニットの場合、このデータには、リストメール送信時にごみ箱に含まれていたプロスペクトが含まれます。この総計値は、テストリストまたは A/B テストメールの送信では使用できません。</dd>
+        
+        
+          <dt style="font-weight:bold;padding-top:.25rem;">除外されたプロスペクト</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">メールの受信から除外されたプロスペクトの合計数。この総計値は、テストリストまたは A/B テストメールの送信では使用できません。</dd>
+        
+        
+          <dt style="font-weight:bold;padding-top:.25rem;">メール不可のプロスペクト</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">メール不可で、除外されていないプロスペクトの合計数。AMPSEA 以外のビジネスユニットの場合、このデータには、リストメール送信時にごみ箱に含まれていたプロスペクトが含まれます。この総計値は、テストリストまたは A/B テストメールの送信では使用できません。</dd>
+        
+        
+          <dt style="font-weight:bold;padding-top:.25rem;">重複プロスペクト</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">受信者リストの重複メールアドレスの合計数。各メールアドレスで受信するメールが 1 つのみになるように、重複するアドレスが送信から削除されます。この総計値は、テストリストまたは A/B テストメールの送信では使用できません。</dd>
+        
+      </dl>
+</div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="pardot_list_hygiene_and_spam_filters">
+<h1 class="slds-text-heading_large">リストの良好な状態とスパムフィルター</h1>
+  <p>リストを良好な状態に保つことが、スパムフィルターを通過する上で重要です。メールを無視するような、エンゲージメントがないプロスペクトや無効なプロスペクトにメールを送信すると、あなたがスパムを送信していると、フィルターによって仮定されてしまいます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span>すべての Account Engagement エディション</span></td>
+
+          </tr>
+        </tbody></table>
+    <p>ほんのわずかな手間で、メールリストをクリーンかつ最新に保つことができます。</p>
+    <ul>
+      <li>エンゲージメントがないプロスペクト用のサンセットポリシーを用意します。プロスペクトにメールをいくつか送信してエンゲージメントがない場合は、そのプロスペクトをメーリングリストから削除します。</li>
+
+      <li>承諾パスを実行し、古いリストを更新します。承諾パスにより、エンゲージメントの高いプロスペクトを特定して、リストを 100% オプトインに保つことができます。</li>
+
+      <li>古いリストにはメールを送信しないでください。このようなリストのプロスペクトはあなたのことを覚えておらず、メッセージをスパムとしてマークする可能性が高くなります。スパムトラップ、つまりスパム送信者を捕らえてブロックリストに登録する目的で ISP が使用する、おとりのメールアドレスにメールを送信してしまうことにもなりかねません。</li>
+
+    </ul>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="pardot_manual_opt_in_synced_prospect">
+<h1 class="slds-text-heading_large">手動でのプロスペクトのオプトイン状況の変更</h1>
+  <p>プロスペクトからマーケティングメールの受信のオプトインやオプトアウトを要求された場合は、その要求を手動で実行することができます。見込み客がSalesforceと同期すると、<span>Account Engagement</span>は最後に更新されたレコードからオプトイン状況を記録します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d22245e40" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d22245e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロスペクトをオプトインする</td>
+
+              <td headers="d22245e40" style="vertical-align:top;" class="slds-cell-wrap">「[オプトアウト済み] 項目を更新」権限が付与された <span>Account Engagement 管理者ロール</span>またはカスタムロール</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-mktg-pardot-262-0-0-production-jajp/ff9bd55b-c854-4f3c-8dc5-1cfbcc01fd95/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> 
+        <p>見込み客をオプト インするときは、<a target="_blank" href="https://www.salesforce.com/en-us/wp-content/uploads/sites/4/documents/legal/Agreements/product-specific-terms/mc-account-engagement_permission-based-marketing-policy.pdf"><span>Account Engagement</span>権限ベースのマーケティング ポリシー</a>と、該当するマーケティングおよびプライバシー保護法に従ってください。</p>
+      </div></div></div>
+</div>
+    <ol><li>
+        <span>プロスペクト、リード、または取引先責任者レコードを開きます。</span>
+      </li><li>
+        <span>項目を更新します。</span>
+        <ul>
+          <li>リードまたは取引先責任者レコードで、<strong class="uicontrol">[メール送信除外]</strong> をオフにします。</li>
+
+          <li>プロスペクトレコードで、<strong class="uicontrol">[メール可能性項目]</strong> をクリックし、<strong class="uicontrol">[オプトアウト済み]</strong> ドロップダウンメニューをクリックします。プロスペクトをオプトインするには <strong class="uicontrol">[False]</strong> を選択します。プロスペクトをオプトアウトするには <strong class="uicontrol">[True]</strong> を選択します。</li>
+
+        </ul>
+
+      </li><li>
+        <span>変更を保存します。</span>
+      </li></ol>
+
+    <div><p>プロスペクトをオプトインまたはオプトアウトすると、そのプロスペクトのメール可能性状況がプロスペクトレコードで更新されます。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="pardot_manually_opting_in_prospects">
+<h1 class="slds-text-heading_large">プロスペクトのメール可能性の管理</h1>
+  <p><span>Account Engagement</span> では、見込み客の見込み客レコードで見込み客の郵送可能状況を表示および編集できます。プロスペクトからオプトインやオプトアウトを要求された場合は、その要求を手動で実行する必要があります。また、[メール送信除外] 項目を使用して、マーケティングメールの送信対象からプロスペクトを除外することもできます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span>すべての Account Engagement エディション</span></td>
+
+          </tr>
+        </tbody></table>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-mktg-pardot-262-0-0-production-jajp/ff9bd55b-c854-4f3c-8dc5-1cfbcc01fd95/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> オプトインを明示的に要求していない登録解除された見込み客をオプトインすると、<span>Account Engagement</span><a target="_blank" href="https://www.salesforce.com/en-us/wp-content/uploads/sites/4/documents/legal/Agreements/product-specific-terms/mc-account-engagement_permission-based-marketing-policy.pdf">権限ベースのマーケティングポリシー</a>に違反します。</div></div></div>
+
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=mktg.pardot_prospect_mailability.htm&amp;language=ja&amp;type=5">プロスペクトのメール可能性状況</a></strong><br>見込み客が<span>Account Engagement</span>から受信できるEメールに関するインサイトを提供するために、すべての見込み客レコードにメール送信可能性セクションが含まれています。プロスペクトのメール可能性は、オプトイン状況や以前のメールバウンスなど、いくつかの要素によって決まります。</li><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=mktg.pardot_manual_opt_in_synced_prospect.htm&amp;language=ja&amp;type=5">手動でのプロスペクトのオプトイン状況の変更</a></strong><br>プロスペクトからマーケティングメールの受信のオプトインやオプトアウトを要求された場合は、その要求を手動で実行することができます。見込み客がSalesforceと同期すると、<span>Account Engagement</span>は最後に更新されたレコードからオプトイン状況を記録します。</li><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=mktg.pardot_email_bounce_reset.htm&amp;language=ja&amp;type=5">プロスペクトレコードのバウンス数のリセット</a></strong><br>受信側のメールサーバがメッセージを配信できない場合、メッセージは <span>Account Engagement</span> に返されます。バウンスされた理由に応じて、戻されたメールはハードバウンスまたはソフトバウンスとして記録されます。あるプロスペクトでハードバウンスが 1 回またはソフトバウンスが 5 回発生すると、そのプロスペクトのメール可能性状況が [到達不能] になります。バウンスの問題を解決すると、プロスペクトのレコードでバウンス数をリセットできます。</li><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=mktg.pardot_prospect_suppression.htm&amp;language=ja&amp;type=5">メール送信対象からのプロスペクトの除外</a></strong><br>見込み客に頻繁にメールを送信したり、関係のないコンテンツを送信したりしないようにするには、<span>Account Engagement</span>で使用できる抑制ツールのいずれかを使用します。スタティックまたはダイナミック除外リストを使用して多くのプロスペクトを一度に除外するか、またはプロスペクトレコードを編集して個別に除外できます。</li><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=mktg.pardot_prospect_resubscribe_parent.htm&amp;language=ja&amp;type=5">プロスペクトによる Account Engagement メールへの再登録のサポート</a></strong><br>フォームに自動化されたプロスペクト再登録画面を設定し、登録解除したプロスペクトがマーケティングメールの受信を再びオプトインできるようにします。プロスペクト再登録を有効にしてメールテンプレートを選択すると、登録解除したプロスペクトがフォームを入力するときに再登録メールを受信するかどうかが尋ねられます。<span>Account Engagement</span> 管理者はデフォルトの再登録メッセージングをグローバルにカスタマイズでき、マーケティングユーザーは個々のフォームでメッセージングを制御できます。プロスペクト再登録は、フォームハンドラーでは使用できません。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="http://www.pardot.com/legal/permission-based-marketing-policy/">承諾に基づくマーケティングポリシー</a></li><li><a title="ほとんどの見込み客項目は、Account Engagement 値と Salesforce 値のどちらを主とするかを制御するように設定できます。" href="https://help.salesforce.com/s/articleView?id=mktg.pardot_sync_behavior_works.htm&amp;language=ja&amp;type=5">同期動作の仕組み</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="pardot_merge_prospect">
+<h1 class="slds-text-heading_large">プロスペクトのマージ</h1>
+  <p>データベースではプロスペクトが重複してしまうことがあります。最大 3 件のプロスペクトを同時にマージして、1 件をプライマリとして選択できます。マージされると、マージされた見込み客の活動が集計され、<span>Account Engagement</span>がプライマリ見込み客のスコアを再計算します。プライマリ以外のプロスペクトは完全に削除されるため、ごみ箱には入りません。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span>すべての Account Engagement エディション</span></td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d26413e58" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d26413e58" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">自分に割り当てられていないプロスペクトをマージする</td>
+
+              <td headers="d26413e58" style="vertical-align:top;" class="slds-cell-wrap">
+                <span>Account Engagement の管理者、マーケティング、営業マネージャーのロール</span>
+              </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d26413e58" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">自分に割り当てられているプロスペクトをマージする</td>
+
+              <td headers="d26413e58" style="vertical-align:top;" class="slds-cell-wrap">
+                <span>Account Engagement の営業ロール以上</span>
+              </td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>
+          <span>[プロスペクト] ページを開きます。</span>
+        </span>
+      </li><li>
+        <span>マージするプロスペクトを選択します (1)。</span>
+      </li><li>
+        <span>ドロップダウンから、[<strong class="uicontrol">マージ]</strong> (2) を選択し、[<strong class="uicontrol">Go]</strong> (3) をクリックします。 <div><img alt="プロスペクトの画面とドロップダウン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-mktg-pardot-262-0-0-production-jajp/ff9bd55b-c854-4f3c-8dc5-1cfbcc01fd95/pardot/images/pardot_merge_prospects_in_list.png"></div></span>
+      </li><li>
+        <span>メール項目を選択してプライマリプロスペクトを選択します。</span>
+      </li><li>
+        <span>プライマリプロスペクトの項目値を選択します。</span>
+      </li><li>
+        <span>プロスペクトをマージします。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="data_cloud.html">&larr; Data Cloud 連携</a><a href="prospects-2.html">プロスペクト・訪問者・データ管理（2/2） &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=mktg.bundle_pardot_parent.htm&type=5&language=ja">help.salesforce.com — Account Engagement (Pardot)（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>
