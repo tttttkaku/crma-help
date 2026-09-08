@@ -1,0 +1,2615 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>データ変換・準備・クレンジング・バッチ/ストリーミング（2/2） | Data 360 ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（41）</h2>
+    <ol>
+      <li><a href="#c360_a_batch_transform_join_leftjoin">左結合</a></li>
+      <li><a href="#c360_a_batch_transform_join_lookup">参照関係</a></li>
+      <li><a href="#c360_a_batch_transform_join_operations">結合操作</a></li>
+      <li><a href="#c360_a_batch_transform_join_outerjoin">完全外部結合</a></li>
+      <li><a href="#c360_a_batch_transform_join_rightjoin">右結合</a></li>
+      <li><a href="#c360_a_batch_transform_keyboard">キーボードショートカット</a></li>
+      <li><a href="#c360_a_batch_transform_limitations">一括処理データ変換の制限事項</a></li>
+      <li><a href="#c360_a_batch_transform_multidefinition_merge">複数定義変換を使用したレコードのマージ</a></li>
+      <li><a href="#c360_a_batch_transform_multivalue_functions">数式の複数値関数</a></li>
+      <li><a href="#c360_a_batch_transform_now">現在</a></li>
+      <li><a href="#c360_a_batch_transform_numeric">数式の数値演算子と数値関数</a></li>
+      <li><a href="#c360_a_batch_transform_preview_results">一括処理データ変換の結果のプレビュー</a></li>
+      <li><a href="#c360_a_batch_transform_run">一括処理データ変換の実行</a></li>
+      <li><a href="#c360_a_batch_transform_run_types">一括処理データ変換実行種別</a></li>
+      <li><a href="#c360_a_batch_transform_schedule">一括処理データ変換のスケジュール</a></li>
+      <li><a href="#c360_a_batch_transform_split">分割変換: 列値の分割</a></li>
+      <li><a href="#c360_a_batch_transform_status">一括処理データ変換状況の確認</a></li>
+      <li><a href="#c360_a_batch_transform_string">数式の文字列関数</a></li>
+      <li><a href="#c360_a_batch_transform_string_keywords">数式での予約キーワード</a></li>
+      <li><a href="#c360_a_batch_transform_string_notation">文字列数式の表記</a></li>
+      <li><a href="#c360_a_batch_transform_transform_node">変換ノード: 出力に読み込む前のデータの変換</a></li>
+      <li><a href="#c360_a_batch_transform_transformation_dimensiontodate">[テキストから日付] 変換: 列の型の変換</a></li>
+      <li><a href="#c360_a_batch_transform_transformation_dimensiontomeasure">[テキストから数値] 変換: 列の型の変換</a></li>
+      <li><a href="#c360_a_batch_transform_transformation_measuretodimension">[数値からテキスト] 変換: 列の型の変換</a></li>
+      <li><a href="#c360_a_batch_transform_update">[更新] ノード: 列値のスワップ</a></li>
+      <li><a href="#c360_a_batch_transform_window">数式のウィンドウ関数</a></li>
+      <li><a href="#c360_a_cleansing_data">データの整理とデータプレップ</a></li>
+      <li><a href="#c360_a_copy_field_enrichment_deploy_sandbox">Data 360 Sandbox からのコピー項目強化の構築とリリース</a></li>
+      <li><a href="#c360_a_copy_field_enrichment_matching">コピー項目強化の一致</a></li>
+      <li><a href="#c360_a_create_a_copy_field_enrichment">コピー項目強化の作成</a></li>
+      <li><a href="#c360_a_create_a_related_list_enrichment">関連リストの強化の作成</a></li>
+      <li><a href="#c360_a_currency_for_batch_transform">一括処理データ変換の通貨の設定</a></li>
+      <li><a href="#c360_a_delete_a_copy_field_enrichment">コピー項目強化の削除</a></li>
+      <li><a href="#c360_a_delete_a_related_list_enrichment">関連リストの強化の削除</a></li>
+      <li><a href="#c360_a_enrichment_troubleshooting">強化のトラブルシューティング</a></li>
+      <li><a href="#c360_a_llm_parsing_preprocessing">LLM ベースの解析と前処理</a></li>
+      <li><a href="#c360_a_packaging_data_cloud_enrichments">Data 360 強化のパッケージ化</a></li>
+      <li><a href="#c360_a_parsing_preprocessing_content">コンテンツの解析と前処理</a></li>
+      <li><a href="#c360_a_prepare_and_model_data">データの準備とモデル化</a></li>
+      <li><a href="#c360_a_prepare_home_org_for_dcone">Data Cloud ホーム組織から Data Cloud One コンパニオン組織への変換</a></li>
+      <li><a href="#c360_a_segmentation_b2b_hierarchical_aggregation">セグメント検索条件での階層集計</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>データ変換・準備・クレンジング・バッチ/ストリーミング（2/2）</h1>
+      <div class="meta">Data 360（旧 Data Cloud）ヘルプ · 41 記事 · 生成 2026-08-12</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="transform_prep-1.html">&larr; データ変換・準備・クレンジング・バッチ/ストリーミング（1/2）</a><a href="identity-1.html">ID解決・プロファイル統合・照合（1/2） &rarr;</a></div>
+<section class="article" id="c360_a_batch_transform_join_leftjoin">
+<h1 class="slds-text-heading_large">左結合</h1>
+  
+  <p>参照関係のように、左結合では左の入力データソースオブジェクトのすべての行と右オブジェクトの一致行のみが含まれます。参照関係とは異なり、複数行が一致している場合、すべての一致行が出力データに含まれます。</p>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> 
+      <p>会社のマーケティングチームは、Salesforce に保存されている商談の外部データソースのデモグラフィックデータを取得します。より対象を絞ったキャンペーンを作成するために、チームは教育レベルのデモグラフィックで現在の商談をセグメント化しています。左結合を使用して、デモグラフィックデータを商談データに追加しましょう。</p>
+      <div><p>この一括処理データ変換で不一致行と重複キーをどのように処理するのかを説明するために、それらを両方の入力データ ソースに含めました。</p><div><img alt="新しいデータセットには、両方のデータストリームの列が含まれています。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/resources-global/analytics/images/bi_integrate_recipeTransformations_leftJoin_dataStreams.png"></div></div>
+      <div><p>一致キーに基づいて左結合を実行すると、一括処理データ変換で次の出力データが生成されます。</p><div><img alt="新しいデータセットには、両方のデータストリームの列が含まれています。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/resources-global/analytics/images/bi_integrate_recipeTransformations_leftJoin_results.png"></div></div>
+      <p>左側のすべての行 (一致のない行や複数の一致のある行を含む) が出力に含まれています。<code>Opp_ID</code> 1 は右側の 2 件 ([High School (高等学校)] と [Secondary School (中等学校)]) と一致しているため、出力には各教育レベルの個別のレコードが含まれます。また、<code>Opp_ID</code> 4 には一致がないため、そのレコードの <code>Opp_id</code> 項目と <code>Education
+     Level</code> 項目は null になります。</p>
+    </div></div></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_batch_transform_join_lookup">
+<h1 class="slds-text-heading_large">参照関係</h1>
+  
+  <p>ルックアップでは、左の入力データソースオブジェクトのすべての行と、ルックアップソースである右オブジェクトの一致する行のみが返されます。結果の粒度が変わらないように、参照関係の出力データには左オブジェクトの行ごとに 1 行が含まれます。</p>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> 
+      <p>会社のマーケティングチームは、Salesforce に保存されている商談の外部データソースのデモグラフィックデータを取得します。より対象を絞ったキャンペーンを作成するために、チームは顧客のデモグラフィックで現在の商談をセグメント化するダッシュボードを作成します。参照関係を使用して、デモグラフィックを各商談レコードに追加しましょう。</p>
+      <div><p>次の 2 つの入力データソースについて考えてみます。左オブジェクトには、商談レコードが含まれます。右には、デモグラフィックデータが含まれます。両方のオブジェクトに不一致行と重複キーが含まれています。</p><div><img alt="左の Data Cloud オブジェクトには、商談 ID、顧客名、商談金額が表示されています。右オブジェクトには、商談 ID と教育レベルが表示されています。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/resources-global/analytics/images/bi_integrate_recipeTransformations_lookup_dataStreams.png"></div></div>
+      <div><p>複数の一致が見つかったときに 1 つの一致を返すために、参照関係では一致キーに基づいて次の結果が生成されます。</p><div><img alt="出力データには、両方のオブジェクトの列が含まれます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/resources-global/analytics/images/bi_integrate_recipeTransformations_lookup_results.png"></div></div>
+      <p>左側のすべての行 (一致のない行を含む) が結果に含まれています。右側には <code>Cust_ID</code> 1 の一致が 2 件ありますが、参照関係では最初に一致したレコードのみが返されます。また、<code>Cust_ID</code> 4 には一致がないため、そのレコードの <code>Cust_id</code> 項目と <code>Education Level</code> 項目は null になり、<code>Average Income</code> 項目は 0 になります。不一致のディメンションは null に設定されます。不一致の基準は 0 に設定されます。</p>
+    </div></div></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_batch_transform_join_operations">
+<h1 class="slds-text-heading_large">結合操作</h1>
+  <p>一括処理データ変換では、次の結合操作がサポートされています。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="#c360_a_batch_transform_join_lookup">参照関係</a></strong><br>ルックアップでは、左の入力データソースオブジェクトのすべての行と、ルックアップソースである右オブジェクトの一致する行のみが返されます。結果の粒度が変わらないように、参照関係の出力データには左オブジェクトの行ごとに 1 行が含まれます。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_batch_transform_join_leftjoin">左結合</a></strong><br>参照関係のように、左結合では左の入力データソースオブジェクトのすべての行と右オブジェクトの一致行のみが含まれます。参照関係とは異なり、複数行が一致している場合、すべての一致行が出力データに含まれます。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_batch_transform_join_rightjoin">右結合</a></strong><br>右結合では、右のすべての行と左の入力データソースオブジェクトの一致行のみが含まれます。複数行が一致している場合、すべての一致行がデータ出力に含まれます。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_batch_transform_join_outerjoin">完全外部結合</a></strong><br>完全外部結合では、一致があるかどうかに関係なく左と右の入力データソースオブジェクトのすべての行が含まれます。複数行が一致している場合、すべての一致行が出力データに含まれます。</li><li class="slds-p-bottom_small"><strong><a href="transform_prep-1.html#c360_a_batch_transform_join_innerjoin">内部結合</a></strong><br>内部結合では、左と右の入力データソースオブジェクトの一致行のみが含まれます。複数行が一致している場合、すべての一致行が出力データに含まれます。</li><li class="slds-p-bottom_small"><strong><a href="transform_prep-1.html#c360_a_batch_transform_join_crossjoin">クロス結合</a></strong><br>クロス結合では、関連のないレコードを組み合わせて、左と右の入力データソースオブジェクトのすべての行を含めます。キーを使用して一致を検索する他の結合とは異なり、クロス結合では、1 つのデータソースのすべての行を別のデータソースのすべての行と組み合わせます。</li><li class="slds-p-bottom_small"><strong><a href="getstarted-1.html#c360_a_batch_transform_join_considerations">結合を使用する場合の考慮事項</a></strong><br>参照関係とは異なり、結合では複数行が一致している場合、一致ごとに個別のレコードが出力データに作成されます。結合を使用する前に、重複行の影響を理解していることを確認してください。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_batch_transform_join_outerjoin">
+<h1 class="slds-text-heading_large">完全外部結合</h1>
+  
+  <p>完全外部結合では、一致があるかどうかに関係なく左と右の入力データソースオブジェクトのすべての行が含まれます。複数行が一致している場合、すべての一致行が出力データに含まれます。</p>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_example.png" style="margin-bottom:0;"></span></div><div id="c360_a_batch_transform_join_outerjoin__fullOuterJoin_example" style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><a name="c360_a_batch_transform_join_outerjoin__fullOuterJoin_example"></a><span class="slds-text-title_caps">例</span> 
+      <p>会社のマーケティングチームは、Salesforce に保存されている商談の Redshift のデモグラフィックデータを取得します。より対象を絞ったキャンペーンを作成するために、チームは教育レベルのデモグラフィックで現在の商談をセグメント化しています。完全外部結合を使用して、商談とデモグラフィックデータを結合しましょう。</p>
+      <p>一括処理データ変換の出力データにデータを提供する次の 2 つの入力データソースについて考えます。完全外部結合で不一致行と重複キーをどのように処理するのかを説明するために、それらが両方の入力データソースオブジェクトに含まれています。</p>
+      <div><div><img alt="左データストリームには、商談 ID、顧客名、商談金額が表示されています。右データストリームには、商談 ID と教育レベルが表示されています。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/resources-global/analytics/images/bi_integrate_recipeTransformations_fullOuterJoin_dataStreams.png"></div></div>
+      <div><p>一致キーに基づいて完全外部結合を実行すると、データ変換で次の出力が生成されます。</p><div><img alt="新しいデータセットには、両方のデータストリームの列が含まれています。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/resources-global/analytics/images/bi_integrate_recipeTransformations_fullOuterJoin_results.png"></div></div>
+      <p>一致があるかどうかに関係なく、すべての行が出力に含まれています。複数の一致のため、<code>Opp_ID</code> 2 ([Amy] と [Bob]) のレコードが 2 つ、さらに <code>Opp_id 1</code> ([High School (高等学校)] と [Secondary School (中等学校)]) のレコードが 2 つ表示されています。一致はありませんが、<code>Opp_ID</code> 4 と <code>Opp_id</code> 5 も含まれています。</p>
+      <p>左側の不一致レコードを含めることで、出力データを完成させるには David の教育レベルを見つける必要があることがわかります。右側の不一致レコードを含めることで、PhD を持つ顧客がいないことがわかります。</p>
+    </div></div></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_batch_transform_join_rightjoin">
+<h1 class="slds-text-heading_large">右結合</h1>
+  
+  <p>右結合では、右のすべての行と左の入力データソースオブジェクトの一致行のみが含まれます。複数行が一致している場合、すべての一致行がデータ出力に含まれます。</p>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> 
+      <p>会社のマーケティングチームは、Salesforce に保存されている商談の外部データソースのデモグラフィックデータを取得します。より対象を絞ったキャンペーンを作成するために、チームは教育レベルのデモグラフィックで現在の商談をセグメント化しています。右結合を使用して、商談データをデモグラフィックに追加しましょう。</p>
+      <div><p>この一括処理データ変換で不一致行と重複キーをどのように処理するのかを説明するために、それらが両方の入力データソースに含まれています。</p><div><img alt="左データストリームには、商談 ID、顧客名、商談金額が表示されています。右データストリームには、商談 ID と教育レベルが表示されています。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/resources-global/analytics/images/bi_integrate_recipeTransformations_rightJoin_dataStreams.png"></div></div>
+      <div><p>一致キーに基づいて右結合を実行すると、データ変換で次の出力データが生成されます。</p><div><img alt="新しいデータセットには、両方のデータストリームの列が含まれています。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/resources-global/analytics/images/bi_integrate_recipeTransformations_rightJoin_results.png"></div></div>
+      <p>右側のすべての行 (一致のない行や複数の一致のある行を含む) が出力に含まれています。<code>Opp_id</code> 2 は左側の 2 件 ([Amy] と [Bob]) と一致しているため、対象にはそれぞれの個別のレコードが含まれます。また、<code>Opp_id</code> 5 には一致がないため、そのレコードの <code>Opp_ID</code> 項目と <code>Customer Name</code> 項目は null になります。</p>
+      <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-error"><img alt="警告" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_warning.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">警告</span> 次のスクリーンショットの <code>Opp_id</code> 1 のように重複レコードに基準が含まれている場合、レコードの集計時に基準が二重に計数されないようにします。重複レコードを回避するには、結合ではなく参照関係を使用します。<div><img alt="新しいデータセットに Alice の重複レコードが含まれているため、彼女の年間収益が二重に計上される可能性があります。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/resources-global/analytics/images/bi_integrate_recipeTransformations_rightJoin_warning.png"></div></div></div></div>
+
+    </div></div></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_batch_transform_keyboard">
+<h1 class="slds-text-heading_large">キーボードショートカット</h1>
+  <p>キーボードから基本アクションを実行します。</p>
+
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d210421e35" style="vertical-align:top;" class="slds-cell-wrap" scope="col">グローバルショートカット</th>
+            <th id="d210421e38" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d210421e35" style="vertical-align:top;" class="slds-cell-wrap" data-label="グローバルショートカット"><p>Ctrl+F (Windows)</p><p style="margin-bottom:0;">Cmd+F (macOS)</p></td>
+
+            <td headers="d210421e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">検索バーに移動します。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d210421e35" style="vertical-align:top;" class="slds-cell-wrap" data-label="グローバルショートカット"><p>Ctrl+/ (Windows)</p><p style="margin-bottom:0;">Cmd+/ (macOS)</p></td>
+
+            <td headers="d210421e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">キーボードショートカットを開いたり閉じたりします。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d210421e35" style="vertical-align:top;" class="slds-cell-wrap" data-label="グローバルショートカット"><p>Ctrl+O (Windows)</p><p style="margin-bottom:0;">Cmd+O (macOS)</p></td>
+
+            <td headers="d210421e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">入力データを追加します。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d210421e35" style="vertical-align:top;" class="slds-cell-wrap" data-label="グローバルショートカット"><p>Ctrl+Z (Windows)</p><p style="margin-bottom:0;">Cmd+Z (macOS)</p></td>
+
+            <td headers="d210421e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">最後のアクションを元に戻します。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d210421e35" style="vertical-align:top;" class="slds-cell-wrap" data-label="グローバルショートカット"><p>Ctrl+Y (Windows)</p><p style="margin-bottom:0;">Cmd+Y (macOS)</p></td>
+
+            <td headers="d210421e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">最後に元に戻されたアクションをやり直します。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d210421e35" style="vertical-align:top;" class="slds-cell-wrap" data-label="グローバルショートカット"><p>Ctrl+D (Windows)</p><p style="margin-bottom:0;">Cmd+D (macOS)</p></td>
+
+            <td headers="d210421e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">プレビューのオンとオフを切り替えます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d210421e35" style="vertical-align:top;" class="slds-cell-wrap" data-label="グローバルショートカット"><p>Ctrl+S (Windows)</p><p style="margin-bottom:0;">Cmd+S (macOS)</p></td>
+
+            <td headers="d210421e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">保存します。</td>
+
+          </tr>
+        </tbody></table>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d210421e166" style="vertical-align:top;" class="slds-cell-wrap" scope="col">キャンバスのキーボードショートカット</th>
+            <th id="d210421e169" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d210421e166" style="vertical-align:top;" class="slds-cell-wrap" data-label="キャンバスのキーボードショートカット">矢印キー →</td>
+
+            <td headers="d210421e169" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">次の発信ノードに移動します。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d210421e166" style="vertical-align:top;" class="slds-cell-wrap" data-label="キャンバスのキーボードショートカット">矢印キー ←</td>
+
+            <td headers="d210421e169" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">最も近い受信ノードに移動します。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d210421e166" style="vertical-align:top;" class="slds-cell-wrap" data-label="キャンバスのキーボードショートカット">矢印キー ↓</td>
+
+            <td headers="d210421e169" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">下にある最近のノードに移動します。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d210421e166" style="vertical-align:top;" class="slds-cell-wrap" data-label="キャンバスのキーボードショートカット">矢印キー ↑</td>
+
+            <td headers="d210421e169" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">上にある最近のノードに移動します。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d210421e166" style="vertical-align:top;" class="slds-cell-wrap" data-label="キャンバスのキーボードショートカット">Shift+B</td>
+
+            <td headers="d210421e169" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ノードの [分岐を追加] メニューを開きます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d210421e166" style="vertical-align:top;" class="slds-cell-wrap" data-label="キャンバスのキーボードショートカット">Tab </td>
+
+            <td headers="d210421e169" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">次のグループの接続されたノードに移動します。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d210421e166" style="vertical-align:top;" class="slds-cell-wrap" data-label="キャンバスのキーボードショートカット">Shift+C</td>
+
+            <td headers="d210421e169" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">次の発信リンクに移動します。</td>
+
+          </tr>
+        </tbody></table>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_batch_transform_limitations">
+<h1 class="slds-text-heading_large">一括処理データ変換の制限事項</h1>
+  <p>一括処理データ変換には次の制限があります。</p>
+
+    <ul>
+      <li>1 つの一括変換には、最大 5 つの変換定義を結合できます。</li>
+
+      <li>入力ノードと出力ノードの両方で同じデータオブジェクトを使用することはできません。</li>
+
+      <li>同じオブジェクトに複数の変換を書き込むことはできません。ただし、同じ変換内の定義は同じオブジェクトに書き込むことができます。</li>
+
+    </ul>
+
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_batch_transform_multidefinition_merge">
+<h1 class="slds-text-heading_large">複数定義変換を使用したレコードのマージ</h1>
+  <p>変換定義では、一括処理データ変換時にデータに適用される操作の順序を指定します。定義は、データフローキャンバスにノードとして表示されます。複数の定義を組み合わせて、1 つの統合出力を生成できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d197593e66" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限セット</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d197593e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限セット">一括処理データ変換を作成する</td>
+
+            <td headers="d197593e66" style="vertical-align:top;" class="slds-cell-wrap"><p>権限セット</p><ul>
+              <li>Data Cloud アーキテクト</li>
+
+            </ul>
+</td>
+
+          </tr>
+        </tbody></table>
+    <p>変換には少なくとも 1 つの定義が必要ですが、最大 5 つの定義をサポートできます。出力オブジェクトに書き込む場合、更新/挿入 (または「マージ」) モードでは新規および更新されたレコードのみが処理されます。この機能により、リソースの使用量が最適化され、不要な再処理が制限されます。更新/挿入モードは通常、複数定義変換で使用されます。</p>
+    <p>複数定義変換を使用する場合は、次の制限事項を考慮してください。</p>
+    <ul>
+      <li>1 つの変換に複数の変換定義がある場合、一度に実行をスケジュールできるのは 1 つの定義のみですが、フローで任意の定義の実行をトリガーできます。</li>
+
+      <li>1 つの変換内の定義で同じ出力オブジェクトに書き込むことができます。異なる変換を同じ出力オブジェクトに書き込むことはできません。たとえば、複数の定義が同じ変換に属している場合、1 つの定義で同じ出力オブジェクトに書き込むことができます。</li>
+
+    </ul>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> マルチ定義と更新/挿入モードを使用して特定の定義を分離し、変換の出力のエラーを修正できます。この場合、更新/挿入モードで同じ出力オブジェクトに書き込む変換定義が修正されます。</div></div></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_batch_transform_multivalue_functions">
+<h1 class="slds-text-heading_large">数式の複数値関数</h1>
+  <p>複数値データは、数式での使用に制限されています。CRM Analytics でのレポートなど、Data 360 の一括処理データ変換の下流プロセスで複数値データを操作するには、複数値データを文字列に変換します。</p>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 変換の数式ステップでは、配列を直接出力できません。そのため、「sequence」などの配列を生成する関数は、「explode」や「array_join」などの配列を処理して配列以外の結果を返す関数と組み合わせる必要があります。</div></div></div>
+
+  
+<div id="c360_a_batch_transform_array_join" lang="ja-jp" aria-labelledby="ariaid-title2" class="nested1"><a name="c360_a_batch_transform_array_join"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">
+    <code>array_join</code>
+  </h2>
+  <p>複数値データを、指定された区切り文字で区切られた要素を含む文字列に変換します。<var>nullReplacement</var> に文字列が指定されていない場合、null は無視されます。</p>
+
+    <div><h3 class="slds-text-heading_small slds-p-top_small">
+        構文
+      </h3><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>array_join(<var>mvField</var>,<var>delimiter</var>,<var>nullReplacement(optional)</var>)</code></pre></div>
+    <div><h3 class="slds-text-heading_small slds-p-top_small">パラメーター</h3><ul>
+        <li><var>mvField</var> — 文字列に変換される複数値テキスト列。</li>
+
+        <li><var>delimiter</var> — (必須) 文字列内の要素を区切る値。これは項目またはテキスト文字列です。</li>
+
+        <li><var>nullReplacement</var> — (省略可能) Null を置換する値。これは項目またはテキスト文字列です。</li>
+
+      </ul>
+</div>
+    <div><h3 class="slds-text-heading_small slds-p-top_small">戻り値</h3><p>指定された区切り文字で区切られた複数値データが含まれる文字列。</p></div>
+  
+</div>
+<div id="c360_a_batch_transform_explode" lang="ja-jp" aria-labelledby="ariaid-title3" class="nested1"><a name="c360_a_batch_transform_explode"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">
+    <code>explode</code>
+  </h2>
+  <p>配列を、各要素が行である新しい列に変換します。</p>
+
+    <div><h3 class="slds-text-heading_small slds-p-top_small">
+        構文
+      </h3><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>explode(<var>array</var>)</code></pre></div>
+    <div><h3 class="slds-text-heading_small slds-p-top_small">パラメーター</h3><ul>
+        <li><var>array</var> — フィールドまたは数式。</li>
+
+      </ul>
+</div>
+    <div><h3 class="slds-text-heading_small slds-p-top_small">例</h3><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>explode(sequence(dateField1, dateField2, interval 6 months))</code></pre></div>
+    <div><h3 class="slds-text-heading_small slds-p-top_small">Returns</h3><p>配列の要素ごとに 1 行を返します。出力には、配列の各要素の値を持つ新しい項目が含まれます。</p></div>
+  
+</div>
+<div id="c360_a_batch_transform_sort_array" lang="ja-jp" aria-labelledby="ariaid-title4" class="nested1"><a name="c360_a_batch_transform_sort_array"></a>
+ <h2 class="slds-text-heading_medium slds-p-top_small">
+  <code>sort_array</code>
+ </h2>
+ <p>配列要素の自然順序に従って、入力配列を昇順または降順に並び替えます。null 要素は、昇順で返された配列の先頭または降順で返された配列の最後に配置されます。</p>
+
+  <div id="c360_a_batch_transform_sort_array__section_rwn_1bg_w2c"><a name="c360_a_batch_transform_sort_array__section_rwn_1bg_w2c"></a><h3 class="slds-text-heading_small slds-p-top_small">
+    構文
+   </h3><pre id="c360_a_batch_transform_sort_array__codeblock_swn_1bg_w2c" class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><a name="c360_a_batch_transform_sort_array__codeblock_swn_1bg_w2c"></a><code>sort_array(<var>array</var>,<var>ascendingOder</var>)</code></pre></div>
+  <div id="c360_a_batch_transform_sort_array__section_twn_1bg_w2c"><a name="c360_a_batch_transform_sort_array__section_twn_1bg_w2c"></a><h3 class="slds-text-heading_small slds-p-top_small">パラメーター</h3><a name="c360_a_batch_transform_sort_array__ul_uwn_1bg_w2c"></a><ul id="c360_a_batch_transform_sort_array__ul_uwn_1bg_w2c">
+    <li><var>array</var> — (必須) は並び替える配列です。</li>
+
+    <li><var>ascendingOrder</var> — (必須) 要素を文字列として昇順に並び替えます。</li>
+
+   </ul>
+</div>
+  <div id="c360_a_batch_transform_sort_array__section_vwn_1bg_w2c"><a name="c360_a_batch_transform_sort_array__section_vwn_1bg_w2c"></a><h3 class="slds-text-heading_small slds-p-top_small">Returns</h3><p>同じ配列への参照が並び替えられました。</p></div>
+ 
+</div>
+</div>
+
+
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_batch_transform_now">
+<h1 class="slds-text-heading_large">現在</h1>
+  
+  <p>指定された形式の現在日時を表示する列を作成します。この変換は、他の列を操作することなく動作します。</p>
+
+    <ol><li>
+        <span>一括処理データ変換の変換ノードの変換ツールバーで [数式] ボタン (<span style="vertical-align:text-bottom;display:inline-block;"><img alt="[数式] ボタン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/resources-global/analytics/images/bi_integrate_recipe_transformation_formula.png" style="margin-bottom:0;"></span>) を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[現在]</strong> を選択します。</span>
+      </li><li>
+        <span>日付形式を選択します。 <div style="text-align:left;"><img alt="[現在] を選択すると、[現在] メニューが表示されます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/resources-global/analytics/images/bi_integrate_now.png" style="width:300px;"></div></span>
+      </li><li>
+        <span>必要に応じて、[列の表示ラベル] 項目で、現在データを保存する列の表示ラベルを変更します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[適用]</strong> をクリックして、変換ノードに変換を追加します。新しい [現在] 列が表示されている [プレビュー] タブ。 <div style="text-align:left;"><img alt="[プレビュー] に新しい [現在] 列が表示されます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/resources-global/analytics/images/bi_integrate_recipe_now_column.png" style="width:750px;"></div></span>
+      </li><li>
+        <span>キャンバス領域を表示するには、[折りたたむ] ボタン (<span style="vertical-align:text-bottom;display:inline-block;"><img alt="[折りたたむ] ボタン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/resources-global/analytics/images/bi_button_collapse.png" style="margin-bottom:0;"></span>) をクリックします。</span>
+      </li></ol>
+
+    <div><p>[現在] オプションでは、UTC タイムゾーンに基づく、一括処理データ変換が最後に実行された日時が使用されます。</p></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_batch_transform_numeric">
+<h1 class="slds-text-heading_large">数式の数値演算子と数値関数</h1>
+  <p>数値関数を使用して、基準から値を計算します。たとえば、数値を丸めたり、切り捨てたり、数値の絶対値を決定したりできます。数値関数の引数は、数値または基準項目にすることができます。</p>
+
+    <div><p>数式を入力する場合、式では項目の API 参照名 (表示ラベルではない) を使用します。パラメーターセクションは括弧で囲まれます。たとえば、次の式を入力することができます。</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>round(Total_Amount/Unit_Price, 2)</code></pre></div>
+    <p>次の算術演算子を使用できます。</p>
+  <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:22.5%"><col style="width:77.5%"></colgroup><thead class="slds-text-title_caps">
+     <tr class="">
+      <th id="d113383e43" style="vertical-align:top;" class="slds-cell-wrap" scope="col"><span id="c360_a_batch_transform_numeric__Operator"><a name="c360_a_batch_transform_numeric__Operator"></a>演算子</span></th>
+      <th id="d113383e47" style="vertical-align:top;" class="slds-cell-wrap" scope="col"><span id="c360_a_batch_transform_numeric__Description"><a name="c360_a_batch_transform_numeric__Description"></a>説明</span></th>
+     </tr>
+    </thead><tbody>
+     <tr class="">
+      <td headers="d113383e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="演算子">+</td>
+
+      <td headers="d113383e47" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">2 つの値の合計を計算します。</td>
+
+     </tr>
+     <tr class="">
+      <td headers="d113383e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="演算子">-</td>
+
+      <td headers="d113383e47" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">2 つの値の差を計算します。</td>
+
+     </tr>
+     <tr class="">
+      <td headers="d113383e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="演算子">*</td>
+
+      <td headers="d113383e47" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">2 つの値を乗算します。</td>
+
+     </tr>
+     <tr class="">
+      <td headers="d113383e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="演算子">/</td>
+
+      <td headers="d113383e47" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">最初の値を 2 つ目の値で除算します。</td>
+
+     </tr>
+     <tr class="">
+      <td headers="d113383e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="演算子">()</td>
+
+      <td headers="d113383e47" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">括弧内の式を最初に評価することを示します。その他の式は、標準の演算子の優先順位で計算されます。</td>
+
+     </tr>
+    </tbody></table>
+    <p>式では次の数値関数を使用することもできます。</p>
+  <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:22.98850574712644%"><col style="width:32.41379310344827%"><col style="width:44.59770114942529%"></colgroup><thead class="slds-text-title_caps">
+     <tr class="">
+      <th id="d113383e120" style="vertical-align:top;" class="slds-cell-wrap" scope="col">数値関数</th>
+      <th id="d113383e123" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+      <th id="d113383e126" style="vertical-align:top;" class="slds-cell-wrap" scope="col">構文</th>
+     </tr>
+    </thead><tbody>
+     <tr class="">
+      <td headers="d113383e120" style="vertical-align:top;" class="slds-cell-wrap" data-label="数値関数"><code>abs</code></td>
+
+      <td headers="d113383e123" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">数値の絶対値を計算します。数値の絶対値とは、正または負の記号のない数値のことです。</td>
+
+      <td headers="d113383e126" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p><code>abs(<var>field</var>)</code></p><p><var>field</var>: 絶対値を求める数値または基準項目。</p><p style="margin-bottom:0;">例: <code>abs(Amount)</code></p></td>
+
+     </tr>
+     <tr class="">
+      <td headers="d113383e120" style="vertical-align:top;" class="slds-cell-wrap" data-label="数値関数"><code>ceil</code></td>
+
+      <td headers="d113383e123" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">数値を、もっとも近い整数に切り上げます。</td>
+
+      <td headers="d113383e126" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p><code>ceil(<var>field</var>)</code></p><p style="margin-bottom:0;"><var>field</var>: 最も近い整数に切り上げる数値または基準項目。</p></td>
+
+     </tr>
+     <tr class="">
+      <td headers="d113383e120" style="vertical-align:top;" class="slds-cell-wrap" data-label="数値関数"><code>exp</code></td>
+
+      <td headers="d113383e123" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">e を指定した指数まで掛け合わせた値を返します。</td>
+
+      <td headers="d113383e126" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p><code>exp(<var>field</var>)</code></p><p style="margin-bottom:0;"><var>field</var>: e を累乗する回数 (指数) を示す数値または基準項目。</p></td>
+
+     </tr>
+     <tr class="">
+      <td headers="d113383e120" style="vertical-align:top;" class="slds-cell-wrap" data-label="数値関数"><code>floor</code></td>
+
+      <td headers="d113383e123" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">もっとも近い整数に切り捨てられた数値を返します。</td>
+
+      <td headers="d113383e126" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p><code>floor(<var>field</var>)</code></p><p style="margin-bottom:0;"><var>field</var>: 最も近い整数に切り捨てる数値または基準項目。</p></td>
+
+     </tr>
+     <tr class="">
+      <td headers="d113383e120" style="vertical-align:top;" class="slds-cell-wrap" data-label="数値関数"><code>format_number</code></td>
+
+      <td headers="d113383e123" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">指定した小数点以下の桁数に丸めたり、#,###,###.## などの特定の形式を適用したりして、数値を書式設定します。</td>
+
+      <td headers="d113383e126" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p><code>format_number(<var>expr</var>,<var>format</var>)</code></p><p><var>expr</var>: 形式を変更する数値または基準項目。</p><p><var>format</var>: 項目の数値に適用する新しい形式。このパラメーターは、「#,###,###.##」や、「12,332.1235」のような実際の数値の形式で指定できます。このパラメーターは省略可能です。形式を指定しない場合、項目は整数に切り捨てられます。</p><p style="margin-bottom:0;">例: <code>format_number(12332.123456,
+         '###,###,###,###,###,###.###')</code> が <code>12,332.123</code> を返す</p></td>
+
+     </tr>
+     <tr class="">
+      <td headers="d113383e120" style="vertical-align:top;" class="slds-cell-wrap" data-label="数値関数"><code>log</code></td>
+
+      <td headers="d113383e123" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">指定した基数の数値の対数を返します。</td>
+
+      <td headers="d113383e126" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p><code>log(<var>value</var>,<var>field</var>)</code></p><p><var>value</var>: 対数の基数として使用する数値または基準項目。</p><p style="margin-bottom:0;"><var>field</var>: 対数を求める数値または基準項目。</p></td>
+
+     </tr>
+     <tr class="">
+      <td headers="d113383e120" style="vertical-align:top;" class="slds-cell-wrap" data-label="数値関数"><code>power</code></td>
+
+      <td headers="d113383e123" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">数値を指定の回数累乗します。<var>value</var></td>
+
+      <td headers="d113383e126" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p><code>power(<var>field</var>,
+         <var>value</var>)</code></p><p><var>field</var>: 指定した指数で累乗する数値または基準項目。</p><p style="margin-bottom:0;"><var>value</var>: 指定した数値を累乗する回数 (指数) を示す数値または基準項目。</p></td>
+
+     </tr>
+     <tr class="">
+      <td headers="d113383e120" style="vertical-align:top;" class="slds-cell-wrap" data-label="数値関数"><code>round</code></td>
+
+      <td headers="d113383e123" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">指定した数値にもっとも近い数値を返します。新しい数値は、指定した桁数で制限します。</td>
+
+      <td headers="d113383e126" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p><code>round(<var>field</var>,<var>numberOfDigits</var>)</code></p><p><var>field</var>: 丸める数値または基準項目。</p><p style="margin-bottom:0;"><var>numberOfDigits</var>: 指定した数値を丸める桁数を示す数値または基準項目。</p></td>
+
+     </tr>
+     <tr class="">
+      <td headers="d113383e120" style="vertical-align:top;" class="slds-cell-wrap" data-label="数値関数"><code>sqrt</code></td>
+
+      <td headers="d113383e123" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">指定された数値の正の平方根を返します。</td>
+
+      <td headers="d113383e126" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p><code>sqrt(<var>field</var>)</code></p><p style="margin-bottom:0;"><var>field</var>: 平方根を求める数値または基準項目。</p></td>
+
+     </tr>
+     <tr class="">
+      <td headers="d113383e120" style="vertical-align:top;" class="slds-cell-wrap" data-label="数値関数"><code>truncNumber</code></td>
+
+      <td headers="d113383e123" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">指定した小数値の数を数値から切り捨てるか、整数に変換します。</td>
+
+      <td headers="d113383e126" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p><code>truncNumber(<var>field</var>,<var>scale</var>)</code></p><p><var>field</var>: 切り捨てる数値または基準項目。</p><p><var>scale</var>: 小数点の右側の桁数。このパラメーターは必須です。小数値を指定しない場合は、<code>0</code> を使用します。</p><p style="margin-bottom:0;">例: <code>scale(13.111, 1)</code> が <code>13.1</code> を返す</p></td>
+
+     </tr>
+    </tbody></table>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_batch_transform_preview_results">
+<h1 class="slds-text-heading_large">一括処理データ変換の結果のプレビュー</h1>
+  
+  <p>一括処理データ変換に追加した各ノードと変換の結果を確認し、誤りを早期に見つけます。各ユーザーは 1 時間あたり最大 4,000 件のプレビューを開始できます。プレビューには、最新の使用可能なデータのサンプル (最大 5,000 行) が表示されます。</p>
+
+    <div><p dir="ltr">DLO 変換をプレビューすると、選択したデータスペースのデータスペース検索条件がデータプレビューに適用されます。ただし、実際に変換を実行すると、この検索条件は適用されず、DLO 内のすべてのデータが処理されます。</p><p>DMO には常にデータスペースが関連付けられており、データプレビューの表示時と変換の実行時にデータスペース検索条件が一貫して適用されます。</p></div>
+    <ol><li>
+        <span>一括処理データ変換でキャンバス内のノードを選択すると、その結果が表示されます。</span>
+        <div>
+          <p>検索条件ノードを追加すると、プレビューでは現在のサンプル行が絞り込まれます。たとえば、一括処理データ変換で 20,000 行が処理されるとします。集計ノードのプレビューには、5,000 サンプル行が表示されています。集計ノードの後に検索条件ノードを追加すると、同じサンプル行の 4,000 件のみが表示される場合があります。検索条件ノードのプレビューでは、5,000 行の更新済みサンプルは取得されません。</p>
+        </div>
+      </li><li>
+        <span>必要に応じて、ノードを編集して正しい結果が生成されるようにします。</span>
+      </li><li>
+        <span>変換ノードで、変換ステップを選択します。</span>
+        <div>必要に応じて、変換を編集して正しい結果が生成されるようにします。ノードのデータプレビューがすぐに完了しない場合は、進行状況ホイールでそのビルド状況を一目で確認できます。ホイールの上にマウスポインターを置くと、ビルド率が表示されます。</div>
+      </li><li>
+        <span>ノードまたは変換の影響を受ける列に焦点を絞るには、プレビューで列を非表示にします。</span>
+        <div>
+          <p>プレビューで列を非表示にすると、データ変換から列は削除されませんが、結果をプレビューするときのパフォーマンスを向上させることができます。デフォルトでは、入力ノードの各ソースオブジェクトの最初の 100 列がプレビューに表示されます。プレビューを必要としない列を非表示にするには、列を選択してから、変換ツールバーの [非表示] ボタンをクリックします。</p>
+        </div>
+        <ol>
+          <li>
+            <span>[プレビュー] タブで列を選択します。</span>
+          </li>
+
+          <li>
+            <span>[非表示] ボタン <span style="vertical-align:text-bottom;display:inline-block;"><img alt="[非表示] ボタン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/hideIcon.png" style="width:16px;margin-bottom:0;"></span> をクリックします。</span>
+          </li>
+
+          <li>
+            <span>プレビューのパフォーマンスを向上させるには、変換ツールバーの <strong class="uicontrol">[Hide Unused (使用されていない列をプレビューから非表示)]</strong> をクリックします。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>データプレビューが遅延している場合、データプレビューを無効にします。進行状況を確認したいときはいつでもオンに戻すことができます。</span>
+      </li><li>
+        <span>列のみを表示してデータを非表示にするには、<strong class="uicontrol">[列]</strong> タブをクリックします。</span>
+      </li><li>
+        <span>データ変換を保存します。</span>
+      </li></ol>
+
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_batch_transform_run">
+<h1 class="slds-text-heading_large">一括処理データ変換の実行</h1>
+  
+  <p>一括処理データ変換を初めて実行すると、データが作成されます。再度実行すると、最新のデータで更新されます。</p>
+
+    <ol><li>
+        <span><strong class="uicontrol">[データ変換]</strong> タブをクリックします。[データ変換] タブが表示されない場合は、<strong class="uicontrol">[その他]</strong> タブをクリックし、<strong class="uicontrol">[データ変換]</strong> を選択します。</span>
+      </li><li>
+        <span>[最近参照したデータ] 画面で、実行する一括処理データ変換名の右にある三角形をクリックし、[<strong class="uicontrol">今すぐ実行</strong>] を選択します。<div style="text-align:left;"><img alt="[今すぐ実行] 選択リストオプションが強調表示された [最近参照したデータ] 画面" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_batch_transform_run.png"></div></span>
+      </li></ol>
+
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#c360_a_batch_transform_schedule">一括処理データ変換のスケジュール</a></strong><br>最新のデータを特定の時間までに確実に使用できるようにするか、ジョブを営業時間外に実行するように一括処理データ変換をスケジュールします。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_batch_transform_run_types">一括処理データ変換実行種別</a></strong><br>一括処理データ変換は、増分モードまたはフルモードで実行されます。増分実行中、変換は追加、更新、削除された入力データにのみ適用されます。これらの変更は、データストリームを介して、または増分実行される別の一括処理データ変換の対象によって行われます。フル実行では、新規および既存のデータが処理されます。実行種別を設定することはできません。一括処理データ変換では、特定の条件に基づいて実行種別を選択します。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_batch_transform_run_types">
+<h1 class="slds-text-heading_large">一括処理データ変換実行種別</h1>
+  <p>一括処理データ変換は、増分モードまたはフルモードで実行されます。増分実行中、変換は追加、更新、削除された入力データにのみ適用されます。これらの変更は、データストリームを介して、または増分実行される別の一括処理データ変換の対象によって行われます。フル実行では、新規および既存のデータが処理されます。実行種別を設定することはできません。一括処理データ変換では、特定の条件に基づいて実行種別を選択します。</p>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div id="c360_a_batch_transform_run_types__note_wjw_d5k_hgc" style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><a name="c360_a_batch_transform_run_types__note_wjw_d5k_hgc"></a><span class="slds-text-title_caps">メモ</span>  ソースデータまたは変換が前回の実行から変更されていない場合、変換の実行はスキップされます。</div></div></div>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">増分実行</h2><p>増分実行には次の条件が必要です。</p><a name="c360_a_batch_transform_run_types__ul_gzq_ps2_kcc"></a><ul id="c360_a_batch_transform_run_types__ul_gzq_ps2_kcc">
+        <li>変換がスケジュールされている。</li>
+
+        <li>入力データの更新は、データ量の 5% 未満です。</li>
+
+        <li>データ入力オブジェクトは DLO または DMO です。</li>
+
+        <li>DMO 入力の場合、プライマリキー項目はいずれかの DLO のプライマリキー項目に対応付けられます。</li>
+
+        <li>出力の書き込みモードで [置換] が選択されている場合 <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div id="c360_a_batch_transform_run_types__note_rym_xqp_zfc" style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><a name="c360_a_batch_transform_run_types__note_rym_xqp_zfc"></a><span class="slds-text-title_caps">メモ</span>  出力書き込みモードとして [置換] を選択すると、増分モードで変換が試行されます。変換を増分モードで実行すると、変更レコードのみが更新/挿入または削除され、置換されません。以前の成功した実行の入力ソースからの変更のみが読み込まれ、データが出力ノードにマージされます。変換が増分の対象にならない場合は、フルモードで実行されます。</div></div></div>
+</li>
+
+      </ul>
+<p>増分実行では、次の機能がサポートされます。</p><a name="c360_a_batch_transform_run_types__ul_xm3_5s2_kcc"></a><ul id="c360_a_batch_transform_run_types__ul_xm3_5s2_kcc">
+        <li>バケット</li>
+
+        <li>属性の編集</li>
+
+        <li>列を削除</li>
+
+        <li>検索条件</li>
+
+        <li>単一行の数式</li>
+
+        <li>データ型変換 — テキストから日付、テキストから数値、数値からテキスト</li>
+
+        <li>日付変換 — 日数または月数の加算または減算、日付差、抽出</li>
+
+        <li>数値変換 — 入力</li>
+
+        <li>テキスト変換 — 切り取り、サブ文字列、分割、大文字、小文字、置換、日付書式設定</li>
+
+      </ul>
+<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> 
+        <p>特定のシナリオでは、増分変換出力でデータドリフトによって重複または誤ったレコードが発生する可能性があります。データドリフトは次回のフル実行で修正されます。「<a title="増分モードで一括処理データ変換を実行すると、データ ドリフトによって、出力オブジェクトから除外または置換される代わりに、変更されたレコードが含まれることがあります。データドリフトは、毎日スケジュールされた「フル実行」で修正されます。" href="transform_prep-1.html#c360_a_batch_transform_data_drift">Data Drift in Incremental Runs</a>」を参照してください。</p>
+      </div></div></div>
+</div>
+    <div id="c360_a_batch_transform_run_types__section_gxk_4t2_kcc"><a name="c360_a_batch_transform_run_types__section_gxk_4t2_kcc"></a><h2 class="slds-text-heading_medium slds-p-top_small">フル実行</h2><p>次の機能を備えた変換では、フル実行が必要です。</p><a name="c360_a_batch_transform_run_types__ul_g2y_pt2_kcc"></a><ul id="c360_a_batch_transform_run_types__ul_g2y_pt2_kcc">
+        <li>フローによってトリガーされた手動実行、または [今すぐ実行] をクリックして開始された手動実行</li>
+
+        <li>集計</li>
+
+        <li>複数行の数式</li>
+
+        <li>結合</li>
+
+        <li>総データ量の 5% を超えるデータへの更新</li>
+
+        <li>出力の書き込みモードで [更新/挿入] が選択されている場合</li>
+
+        <li>外部 DLO または DMO が入力ソースとして使用される場合</li>
+
+      </ul>
+<p>フル実行は、増分実行する条件を満たしている変換であっても、これらのアクションの後に必ず実行されます。</p><a name="c360_a_batch_transform_run_types__ul_csp_st2_kcc"></a><ul id="c360_a_batch_transform_run_types__ul_csp_st2_kcc">
+        <li>変換の編集</li>
+
+        <li>入力 DMO の対応付けを更新する</li>
+
+        <li>入力データオブジェクトの再構築</li>
+
+      </ul>
+<p>ドリフトを軽減するために、すべての変換で、その日の最初のスケジュールされた実行でフル実行が常に実行されます。ドリフトは、以前に検索条件を満たした結果が更新された条件と一致しなくなった後も表示され続ける場合に発生します。日次フル実行でこの問題は修正されます。</p></div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="transform_prep-1.html#c360_a_batch_transform_data_drift">増分実行でのデータドリフト</a></strong><br>増分モードで一括処理データ変換を実行すると、データ ドリフトによって、出力オブジェクトから除外または置換される代わりに、変更されたレコードが含まれることがあります。データドリフトは、毎日スケジュールされた「フル実行」で修正されます。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="増分モードで一括処理データ変換を実行すると、データ ドリフトによって、出力オブジェクトから除外または置換される代わりに、変更されたレコードが含まれることがあります。データドリフトは、毎日スケジュールされた「フル実行」で修正されます。" href="transform_prep-1.html#c360_a_batch_transform_data_drift">増分実行でのデータドリフト</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_batch_transform_schedule">
+<h1 class="slds-text-heading_large">一括処理データ変換のスケジュール</h1>
+  
+  <p>最新のデータを特定の時間までに確実に使用できるようにするか、ジョブを営業時間外に実行するように一括処理データ変換をスケジュールします。</p>
+<ol><li><span>データ変換で、[最近参照したデータ] から、データ変換名の横にある [<span style="vertical-align:text-bottom;display:inline-block;"><img alt="[アクション] ボタン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/resources-global/analytics/images/bi_button_menu.png" style="margin-bottom:0;"></span>] をクリックし、[<strong class="uicontrol">スケジュール] を</strong>選択します。</span></li><li><span>[実行モード] で <strong class="uicontrol">[スケジュール済み]</strong> を選択します。</span></li><li><span>頻度と時間間隔を選択します。</span><ul><li>日間隔 — 日数の間隔で変換を実行するようにスケジュールする場合、スケジュールはその月の初日に基づきます。<p>たとえば、4 月 19 日に、10 日ごとに一括処理データ変換を実行するようにスケジュールします。その月の初日から 10 日先の 4 月 11 日、11 日後の 10 日後が 4 月 21 日で、スケジュールが 4 月 19 日に設定されてから最初の日付になります。</p><p>変換は、4 月 21 日、5 月 1 日、5 月 11 日、5 月 21 日、5 月 31 日に実行されます。 6 月 1 日にスケジュールがリセットされ、10 日ごとに実行が継続されます。</p></li>
+<li>1 時間間隔 — 時間間隔で変換を実行するようにスケジュールすると、スケジュールは指定した開始時刻に開始し、その日の終わりまで実行されます。<p>たとえば、午後 8 時に、各日の午後 6 時から 4 時間ごとに一括処理データ変換を実行するようにスケジュールします。変換は、ユーザーがスケジュールを作成した日の午後 6 時以降の最初の間隔で開始されます。変換は、午後 10 時、午後 6 時、午後 10 時に実行されます。</p><p>午後 8 時にスケジュールを作成した場合でも、一括処理データ変換は定義された開始時刻の午後 6 時 (つまり午後 10 時) から 4 時間後に実行されます。翌日の午後 6 時に実行され、午後 10 時に 2 回目の実行が行われます。スケジュールは終業時に完了するため、変換は翌日の午後 6 時まで再度実行されません。</p></li>
+</ul>
+</li><li><span>開始時刻とタイムゾーンを選択します。</span><div>別の実行が開始されるように設定する前にスケジュール済み変換が完了しないと、2 番目のインスタンスは実行されません。<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 以前のバージョンのスケジューラーで一括処理データ変換を作成している場合、[レコードの詳細] ページの開始時刻は、スケジュールしたユーザーのタイムゾーンではなく GMT で表示されます。</div></div></div>
+</div></li></ol>
+
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 一括処理データ変換をデータキットにリリースすると、スケジュールが含まれ、自動的に対象組織に転送されます。</div></div></div>
+</div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_batch_transform_split">
+<h1 class="slds-text-heading_large">分割変換: 列値の分割</h1>
+  
+  <p>区切り文字を指定して、テキスト列の文字列を 2 つの値に分割します。列値を 2 個以上の部分に分割するには、複数の分割変換インスタンスを追加します。たとえば、3 個の分割変換を使用して、住所を町名・番地、市区郡、都道府県、郵便番号に分割できます。</p>
+
+    <ol><li>
+        <span>変換ノードの [プレビュー] タブでテキスト列を選択します。</span>
+      </li><li>
+        <span>変換ツールバーで [分割] ボタン (<span style="vertical-align:text-bottom;display:inline-block;"><img alt="[分割] ボタン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/resources-global/analytics/images/bi_button_split.png" style="margin-bottom:0;"></span>) をクリックします。</span>
+      </li><li>
+        <span>区切り文字を選択します。</span>
+      </li><li>
+        <span>両方の新しい列に対して列の表示ラベルを入力します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[適用]</strong> をクリックします。</span>
+        <div>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> 元の分割されていない列を削除するには、split 変換の後に drop columns 変換を追加します。</div></div></div>
+
+        </div>
+      </li><li>
+        <span>キャンバスを表示するには、[折りたたむ] ボタン (<span style="vertical-align:text-bottom;display:inline-block;"><img alt="[折りたたむ] ボタン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/resources-global/analytics/images/bi_button_collapse.png" style="margin-bottom:0;"></span>) をクリックします。</span>
+      </li><li>
+        <span>データ変換を保存します。</span>
+      </li></ol>
+
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_batch_transform_status">
+<h1 class="slds-text-heading_large">一括処理データ変換状況の確認</h1>
+  <p>少なくとも 1 つの一括処理データ変換を作成した後、[データ変換] タブをクリックすると、[最近参照したデータ] 画面に移動し、データ変換の状況を確認できます。</p>
+
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d67232e35" style="vertical-align:top;" class="slds-cell-wrap" scope="col">データ変換状況</th>
+            <th id="d67232e38" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d67232e35" style="vertical-align:top;" class="slds-cell-wrap" data-label="データ変換状況"><p style="margin-bottom:0;">有効</p></td>
+
+            <td headers="d67232e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">データ変換が有効であり、実行可能です。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d67232e35" style="vertical-align:top;" class="slds-cell-wrap" data-label="データ変換状況"><p style="margin-bottom:0;">処理中</p></td>
+
+            <td headers="d67232e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">データ変換が進行中です。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d67232e35" style="vertical-align:top;" class="slds-cell-wrap" data-label="データ変換状況"><p style="margin-bottom:0;">削除中</p></td>
+
+            <td headers="d67232e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">データ変換は削除処理中です。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d67232e35" style="vertical-align:top;" class="slds-cell-wrap" data-label="データ変換状況"><p style="margin-bottom:0;">エラー</p></td>
+
+            <td headers="d67232e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">データ変換でエラーが発生しました。データ変換は有効ではありません。</td>
+
+          </tr>
+        </tbody></table>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d67232e108" style="vertical-align:top;" class="slds-cell-wrap" scope="col">最終実行</th>
+            <th id="d67232e111" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d67232e108" style="vertical-align:top;" class="slds-cell-wrap" data-label="最終実行"><p style="margin-bottom:0;">なし</p></td>
+
+            <td headers="d67232e111" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">一括処理データ変換は実行されませんでした。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d67232e108" style="vertical-align:top;" class="slds-cell-wrap" data-label="最終実行"><p style="margin-bottom:0;">保留中</p></td>
+
+            <td headers="d67232e111" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ユーザーが設定したスケジュールに基づいてまたはユーザーが [今すぐ実行] をクリックすることで一括処理データ変換を実行する準備を整えています。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d67232e108" style="vertical-align:top;" class="slds-cell-wrap" data-label="最終実行"><p style="margin-bottom:0;">進行中</p></td>
+
+            <td headers="d67232e111" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">一括処理データ変換が実行中です。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d67232e108" style="vertical-align:top;" class="slds-cell-wrap" data-label="最終実行"><p style="margin-bottom:0;">成功</p></td>
+
+            <td headers="d67232e111" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">すべてのノードで一括処理データ変換が正常に実行されました。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d67232e108" style="vertical-align:top;" class="slds-cell-wrap" data-label="最終実行"><p style="margin-bottom:0;">失敗</p></td>
+
+            <td headers="d67232e111" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">一括処理データ変換を実行できませんでした。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d67232e108" style="vertical-align:top;" class="slds-cell-wrap" data-label="最終実行"><p style="margin-bottom:0;">キャンセル済み</p></td>
+
+            <td headers="d67232e111" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ユーザーが一括処理データ変換をキャンセルしました。</td>
+
+          </tr>
+        </tbody></table>
+    <p>ジョブが失敗した場合や警告付きで完了した場合、ジョブ名をクリックすると詳細が表示されます。</p>
+    <p>個々の一括処理データ変換の状況を参照するには、その名前をクリックします。詳細画面には、最終実行状況、データ変換状況、その定義、作成日、最終実行の時刻が表示されます。</p>
+    <p>詳細画面の [更新履歴] タブには、一括処理データ変換が実行されるたびに状況が表示されます。データ変換に関するエラーメッセージ、最終実行日、および最終実行の状況を確認できます。</p>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_batch_transform_string">
+<h1 class="slds-text-heading_large">数式の文字列関数</h1>
+  <p>string 関数を使用して、メール、電話、時間、日付値などのテキストデータ型を操作します。たとえば、テキストを大文字から小文字に変更したり、複数の項目の値を連結したり、値を置き換えたりします。</p>
+
+    <p>数式を入力する場合、式では項目の API 参照名 (表示ラベルではない) を使用します。テキストは一重引用符 (<code>'This is a string.'</code>) で囲み、パラメーターは括弧で囲みます。</p>
+    <p>数式では、次の文字列関数がサポートされます。</p>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:11.614401858304298%"><col style="width:17.18931475029036%"><col style="width:71.19628339140534%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d108998e46" style="vertical-align:top;" class="slds-cell-wrap" scope="col">文字列関数</th>
+            <th id="d108998e49" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+            <th id="d108998e52" style="vertical-align:top;" class="slds-cell-wrap" scope="col">構文</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d108998e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="文字列関数">
+              <code>char_length</code>
+            </td>
+
+            <td headers="d108998e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">指定した文字列内の文字数を返します。長さには、先頭と末尾のスペースが含まれます。</td>
+
+            <td headers="d108998e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p>
+              <code>char_length(<var>field</var>)</code>
+              </p><p><var>field</var>: 測定するテキストフィールド。</p><p>例</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>char_length(product_name)</code></pre></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d108998e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="文字列関数">
+              <code>concat</code>
+            </td>
+
+            <td headers="d108998e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">指定された項目の値と入力文字列をマージして文字列を返します。</td>
+
+            <td headers="d108998e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p>
+              <code>concat(<var>field1</var>,<var>field2</var>,...<var>fieldN</var>)</code>
+              </p><p><var>field1</var>: 連結値に含める最初のテキスト項目。</p><p><var>field2</var> は、含める 2 番目のテキストフィールドです。</p><p><var>fieldN</var>: 含める追加のテキストフィールドの数。</p><p>例</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>concat("OwnerId.FirstName",' ',"OwnerId.LastName")</code></pre></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d108998e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="文字列関数">
+              <code>endsWith</code>
+            </td>
+
+            <td headers="d108998e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">指定された文字列が項目値の末尾で見つかった場合、true を返します。この関数は、<code>case</code> 関数でのみ使用できます。</td>
+
+            <td headers="d108998e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p><code>ends_with(<var>fieldName</var>,<var>literal</var></code>)</p><p><var>fieldName</var>: 検索するテキストフィールド。</p><p style="margin-bottom:0;"><var>literal</var>: 項目の末尾で検索する値。</p></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d108998e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="文字列関数">
+              <code>instr</code>
+            </td>
+
+            <td headers="d108998e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">指定された項目内のテキストの最初の位置を返します。別の位置を指定して検索を開始したり、別の検索文字列の場所を検索したりできます。</td>
+
+            <td headers="d108998e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p>
+              <code>instr(<var>field</var>,
+         <var>searchString</var>, [<var>position</var>,
+         [<var>occurrence</var>]])</code>
+              </p><p><var>field</var>: <var>searchString</var> を見つけるために評価されるテキストフィールド。</p><p><var>searchString</var>: <var>項目</var>内で検索されるテキスト項目。</p><p><var>position</var>: 検索を開始する <var>field</var> 内の場所。位置を指定しない場合、検索は位置 1 で開始します。</p><p><var>occurrence</var>: 返す <var>searchString</var> インスタンス。出現位置を指定しない場合、検索は位置 1 で開始します。</p><p>例: 感嘆符のテキストを評価する</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>instr('123!456!78!', !)
+--The result is 4
+
+
+instr('123!456!8!', !, [4])
+--The result is 7
+
+
+instr('123!456!8!', !, [4, [2]])
+--The result is 9</code></pre></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d108998e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="文字列関数">
+              <code>lower</code>
+            </td>
+
+            <td headers="d108998e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">文字列のすべての文字を小文字にして返します。入力文字列が null の場合、結果は null になります。</td>
+
+            <td headers="d108998e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p>
+              <code>lower(<var>field</var>)</code>
+              </p><p><var>field</var>: 小文字に変換するテキストフィールド。</p><p>例</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>lower("Account.Industry")</code></pre></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d108998e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="文字列関数">
+              <code>ltrim</code>
+            </td>
+
+            <td headers="d108998e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">項目の文字列の先頭から指定された文字を削除します。文字を指定しない場合、文字列の先頭のスペースが削除されます。</td>
+
+            <td headers="d108998e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p><code>ltrim(<var>field</var>,[<var>valueToBeRemoved</var>]</code>)</p><p><var>field</var>: 先頭のスペースまたは指定した文字を削除するテキストフィールド。</p><p><var>valueToBeRemoved</var>: 文字列から削除する値。指定しない場合、変換で先頭のスペースが削除されます。</p><p>例: 文字列の先頭のスペース文字を切り取る</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>ltrim('     5 Spaces Before')</code></pre></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d108998e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="文字列関数"><code>md5</code></td>
+
+            <td headers="d108998e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">128 ビットチェックサムの 16 進値をテキスト表現した 32 文字の文字列を返します。</td>
+
+            <td headers="d108998e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p><code>md5(<var>field</var>)</code></p><p><var>field</var> (必須) は、チェックサムを計算するテキストです。</p><p>例</p><pre id="c360_a_batch_transform_string__codeblock_njs_1zf_w2c" class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><a name="c360_a_batch_transform_string__codeblock_njs_1zf_w2c"></a><code>md5("Account_Name")</code></pre></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d108998e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="文字列関数">
+              <code>replace</code>
+            </td>
+
+            <td headers="d108998e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">文字列を別の文字列に置換します。いずれかの引数が null の場合、関数は null を返します。この関数では、大文字と小文字が区別されます。</td>
+
+            <td headers="d108998e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p>
+              <code>replace(<var>field</var>,<var>searchString</var>,<var>replacementString</var>)</code>
+              </p><p><var>string</var>: 置換する文字列が含まれるテキストフィールド。</p><p><var>searchString</var>: 置換する文字列。</p><p><var>replacementString</var>: 文字列を置き換える値。</p><p>例</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>replace(Account_Name,'salesforce.com','Salesforce') </code></pre></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d108998e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="文字列関数">
+              <code>rtrim</code>
+            </td>
+
+            <td headers="d108998e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">項目の文字列の末尾から指定された文字を削除します。文字を指定しない場合、文字列の末尾のスペースが削除されます。</td>
+
+            <td headers="d108998e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p><code>rtrim(<var>field</var>,
+         [<var>valueToBeRemoved</var>]</code>)</p><p><var>field</var>: 末尾のスペースまたは指定されたサブ文字列の削除元のテキスト項目。</p><p><var>valueToBeRemoved</var>: 文字列から削除する値。指定しない場合、変換で末尾のスペースが削除されます。</p><p>例: 文字列の末尾の 2 つのスペース文字を切り取る</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>rtrim('2 Spaces After  ')</code></pre></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d108998e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="文字列関数"><code>sha2</code></td>
+
+            <td headers="d108998e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">可変長の文字列を固定長の文字列に変換します。文字列は、指定されたビット数のチェックサムの 16 進値をテキスト表現したものです。SHA-224、SHA-256、SHA-384、SHA-512 がサポートされています。ビット長 0 は 256 と同じです。</td>
+
+            <td headers="d108998e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p><code>sha2(<var>field</var>, <var>bitLength</var></code></p><p dir="ltr"><var>field</var> (必須) は、 を文字列に変換するテキストです。</p><p><var>bitLength</var> (必須) は、ハッシュ関数のビット数を定義する整数です。有効な値は 0、224、256、384、512 です。</p><p>例</p><pre id="c360_a_batch_transform_string__codeblock_vqg_c1g_w2c" class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><a name="c360_a_batch_transform_string__codeblock_vqg_c1g_w2c"></a><code>sha2('account_name', 224);</code></pre></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d108998e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="文字列関数">
+              <code>startsWith</code>
+            </td>
+
+            <td headers="d108998e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">指定された文字列が項目値の先頭で見つかった場合、true を返します。この関数は、<code>case</code> 関数でのみ使用できます。</td>
+
+            <td headers="d108998e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p><code>startsWith(<var>fieldName</var>,<var>literal</var></code>)</p><p><var>fieldName</var>: 検索するテキストフィールド。</p><p style="margin-bottom:0;"><var>literal</var>: 項目の先頭で検索する値。</p></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d108998e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="文字列関数">
+              <code>string</code>
+            </td>
+
+            <td headers="d108998e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">日付または数値を文字列データ型に変換します。</td>
+
+            <td headers="d108998e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p>
+              <code>string(<var>expression</var>)</code>
+              </p><p style="margin-bottom:0;"><var>expression</var>: 変換する日付項目または数値項目。</p></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d108998e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="文字列関数">
+              <code>substr</code>
+            </td>
+
+            <td headers="d108998e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">文字列の指定の位置から開始する、指定の数の文字を返します。<code>substring</code> とも呼ばれます。</td>
+
+            <td headers="d108998e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p>
+              <code>substr(<var>field</var>,<var>position</var>,<var>len</var>)</code>
+              </p><p><var>field</var>: サブ文字列の抽出元のテキストフィールド。</p><p><var>position</var>: サブ文字列の文字の開始位置。文字列の最初の文字は position 1 です。 position が負の場合、位置は文字列の末尾からの相対位置になります。position に -1 を指定すると、最後の文字になります。</p><p><var>len</var>: 返される文字数。長さが 0 の場合、出力は空の文字列になります。length が負の場合、関数は null を返します。このパラメーターは省略可能です。</p><p>例</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>substr(Account_Id,13,3)</code></pre></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d108998e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="文字列関数">
+              <code>title</code>
+            </td>
+
+            <td headers="d108998e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"> 各単語の最初の文字を大文字にし、残りの文字を小文字にした文字列を返します。</td>
+
+            <td headers="d108998e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p>
+              <code>title(<var>field</var>)</code>
+              </p><p><var>field</var>: タイトルケースを適用するテキストフィールド。</p><p>例</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>title(Opp_Name)</code></pre></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d108998e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="文字列関数">
+              <code>trim</code>
+            </td>
+
+            <td headers="d108998e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">項目値の先頭と末尾から指定された文字を削除します。文字列が指定されていない場合、文字列の先頭と末尾から空白が削除されます。</td>
+
+            <td headers="d108998e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p>
+              <code>trim(<var>field</var>,
+         [<var>valueToBeRemoved</var>)]</code>
+              </p><p><var>field</var>: 指定したサブ文字列の削除元のテキストフィールド。</p><p><var>valueToBeRemoved</var>: 文字列から削除する値。このパラメーターは省略可能です。指定しない場合、変換で末尾のスペースが削除されます。</p><p>例</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>trim('  Spaces Before and After  ')</code></pre></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d108998e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="文字列関数">
+              <code>upper</code>
+            </td>
+
+            <td headers="d108998e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">文字列のすべての文字を大文字にして返します。文字列が null の場合、結果は null になります。</td>
+
+            <td headers="d108998e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p>
+              <code>upper(<var>field</var>)</code>
+              </p><p><var>field</var>: 大文字に変換するテキストフィールド。</p><p>例</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>upper(First_Name)</code></pre></td>
+
+          </tr>
+        </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#c360_a_batch_transform_string_notation">文字列数式の表記</a></strong><br>数式を手動で入力する場合、文字列リテラルには単一引用符 <code>‘</code>、ドット表記または予約キーワードを含む結合項目には二重引用符 <code>“</code> を使用します。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_batch_transform_string_keywords">数式での予約キーワード</a></strong><br>一括処理データ変換には、数式を手動で記述するときに特別な処理が必要となる予約キーワードがあります。名前を予約キーワードと共有している項目を参照する場合は、二重引用符 " を使用します。項目名をこのリストと相互参照することを回避するには、ベストプラクティスとしてすべての項目名を二重引用符で囲みます。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_batch_transform_string_keywords">
+<h1 class="slds-text-heading_large">数式での予約キーワード</h1>
+  <p>一括処理データ変換には、数式を手動で記述するときに特別な処理が必要となる予約キーワードがあります。名前を予約キーワードと共有している項目を参照する場合は、二重引用符 " を使用します。項目名をこのリストと相互参照することを回避するには、ベストプラクティスとしてすべての項目名を二重引用符で囲みます。</p>
+
+    <p>名前を予約キーワードと共有している項目は二重引用符で囲みます。たとえば、データに <strong class="uicontrol">[Month]</strong> という項目がある場合、次の式を入力できます。</p>
+    <div><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>case when "Month" = ‘New’ then ‘High’ else ‘Low’</code></pre></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">予約キーワード</h2><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><ul class="simple">
+                  <li>
+                    <code>ABS</code>
+                  </li>
+
+                  <li>
+                    <code>ADD_MONTHS</code>
+                  </li>
+
+                  <li>
+                    <code>AND</code>
+                  </li>
+
+                  <li>
+                    <code>ARRAY</code>
+                  </li>
+
+                  <li>
+                    <code>ARRAY_JOIN</code>
+                  </li>
+
+                  <li>
+                    <code>ARRAY_CONTAINS</code>
+                  </li>
+
+                  <li>
+                    <code>BETWEEN</code>
+                  </li>
+
+                  <li>
+                    <code>CASE</code>
+                  </li>
+
+                  <li>
+                    <code>CEIL</code>
+                  </li>
+
+                  <li>
+                    <code>CHAR_LENGTH</code>
+                  </li>
+
+                  <li>
+                    <code>COALESCE</code>
+                  </li>
+
+                  <li>
+                    <code>CONCAT</code>
+                  </li>
+
+                  <li>
+                    <code>CONTAINS</code>
+                  </li>
+
+                  <li>
+                    <code>CURRENT_DATE</code>
+                  </li>
+
+                  <li>
+                    <code>CURRENT_TIMESTAMP</code>
+                  </li>
+
+                  <li>
+                    <code>DATE_ADD</code>
+                  </li>
+
+                  <li>
+                    <code>DATEDIFF</code>
+                  </li>
+
+                  <li>
+                    <code>DATE_FORMAT</code>
+                  </li>
+
+                  <li>
+                    <code>DATE_SUB</code>
+                  </li>
+
+                  <li>
+                    <code>DATE_TRUNC</code>
+                  </li>
+
+                  <li>
+                    <code>DAY</code>
+                  </li>
+
+                  <li>
+                    <code>DAYOFMONTH</code>
+                  </li>
+
+                  <li>
+                    <code>DAYOFWEEK</code>
+                  </li>
+
+                  <li>
+                    <code>DAYOFYEAR</code>
+                  </li>
+
+                  <li>
+                    <code>DISTINCT</code>
+                  </li>
+
+                  <li>
+                    <code>ELSE</code>
+                  </li>
+
+                  <li>
+                    <code>END</code>
+                  </li>
+
+                </ul>
+</td>
+
+              <td style="vertical-align:top;" class="slds-cell-wrap"><ul class="simple">
+                  <li>
+                    <code>ENDSWITH</code>
+                  </li>
+
+                  <li>
+                    <code>EXP</code>
+                  </li>
+
+                  <li>
+                    <code>FALSE</code>
+                  </li>
+
+                  <li>
+                    <code>FROM</code>
+                  </li>
+
+                  <li>
+                    <code>FLOOR</code>
+                  </li>
+
+                  <li>
+                    <code>FORMAT_NUMBER</code>
+                  </li>
+
+                  <li>
+                    <code>FROM_UNIXTIME</code>
+                  </li>
+
+                  <li>
+                    <code>HOUR</code>
+                  </li>
+
+                  <li>
+                    <code>IN</code>
+                  </li>
+
+                  <li>
+                    <code>INTERVAL</code>
+                  </li>
+
+                  <li>
+                    <code>IS</code>
+                  </li>
+
+                  <li>
+                    <code>ISNTR</code>
+                  </li>
+
+                  <li>
+                    <code>LAST_DAY</code>
+                  </li>
+
+                  <li>
+                    <code>LIKE</code>
+                  </li>
+
+                  <li>
+                    <code>LOG</code>
+                  </li>
+
+                  <li>
+                    <code>LOWER</code>
+                  </li>
+
+                  <li>
+                    <code>LTRIM</code>
+                  </li>
+
+                  <li>
+                    <code>MINUTE</code>
+                  </li>
+
+                  <li>
+                    <code>MONTH</code>
+                  </li>
+
+                  <li>
+                    <code>MONTHS_BETWEEN</code>
+                  </li>
+
+                  <li>
+                    <code>NEXT_DAY</code>
+                  </li>
+
+                  <li>
+                    <code>NOW</code>
+                  </li>
+
+                  <li>
+                    <code>NOT</code>
+                  </li>
+
+                  <li>
+                    <code>NULL</code>
+                  </li>
+
+                  <li>
+                    <code>NULLIF</code>
+                  </li>
+
+                  <li>
+                    <code>OR</code>
+                  </li>
+
+                  <li>
+                    <code>POWER</code>
+                  </li>
+
+                </ul>
+</td>
+
+              <td style="vertical-align:top;" class="slds-cell-wrap"><ul class="simple">
+                  <li>
+                    <code>QUARTER</code>
+                  </li>
+
+                  <li>
+                    <code>REPLACE</code>
+                  </li>
+
+                  <li>
+                    <code>ROUND</code>
+                  </li>
+
+                  <li>
+                    <code>RTRIM</code>
+                  </li>
+
+                  <li>
+                    <code>SECOND</code>
+                  </li>
+
+                  <li>
+                    <code>SIZE</code>
+                  </li>
+
+                  <li>
+                    <code>SPLIT</code>
+                  </li>
+
+                  <li>
+                    <code>SQRT</code>
+                  </li>
+
+                  <li>
+                    <code>STRING</code>
+                  </li>
+
+                  <li>
+                    <code>SUBSTR</code>
+                  </li>
+
+                  <li>
+                    <code>SUBSTRING</code>
+                  </li>
+
+                  <li>
+                    <code>STARTSWITH</code>
+                  </li>
+
+                  <li>
+                    <code>THEN</code>
+                  </li>
+
+                  <li>
+                    <code>TITLE</code>
+                  </li>
+
+                  <li>
+                    <code>TO</code>
+                  </li>
+
+                  <li>
+                    <code>TO_DATE</code>
+                  </li>
+
+                  <li>
+                    <code>TO_TIMESTAMP</code>
+                  </li>
+
+                  <li>
+                    <code>TO_UNIX_TIMESTAMP</code>
+                  </li>
+
+                  <li>
+                    <code>TRIM</code>
+                  </li>
+
+                  <li>
+                    <code>TRUE</code>
+                  </li>
+
+                  <li>
+                    <code>TRUNC</code>
+                  </li>
+
+                  <li>
+                    <code>TRUNCNUMBER</code>
+                  </li>
+
+                  <li>
+                    <code>UPPER</code>
+                  </li>
+
+                  <li>
+                    <code>WHEN</code>
+                  </li>
+
+                  <li>
+                    <code>WEEK</code>
+                  </li>
+
+                  <li>
+                    <code>WEEKOFYEAR</code>
+                  </li>
+
+                  <li>
+                    <code>YEAR</code>
+                  </li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">行数式の数式の追加キーワード</h2><p>次のキーワードは、<strong class="uicontrol">[行数式の数式]</strong> を有効にした数式で予約されています。次の名前のいずれかを含む項目を参照する場合は、二重引用符 <code>"</code> を使用します。</p><ul>
+        <li>
+          <code>CURRENT</code>
+        </li>
+
+        <li>
+          <code>DENSE_RANK</code>
+        </li>
+
+        <li>
+          <code>FIRST_VALUE</code>
+        </li>
+
+        <li>
+          <code>LAG</code>
+        </li>
+
+        <li>
+          <code>LAST_VALUE</code>
+        </li>
+
+        <li>
+          <code>LEAD</code>
+        </li>
+
+        <li>
+          <code>RANK</code>
+        </li>
+
+        <li>
+          <code>ROW_NUMBER</code>
+        </li>
+
+        <li>
+          <code>SUM</code>
+        </li>
+
+      </ul>
+</div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_batch_transform_string_notation">
+<h1 class="slds-text-heading_large">文字列数式の表記</h1>
+  <p>数式を手動で入力する場合、文字列リテラルには単一引用符 <code>‘</code>、ドット表記または予約キーワードを含む結合項目には二重引用符 <code>“</code> を使用します。</p>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_batch_transform_transform_node">
+<h1 class="slds-text-heading_large">変換ノード: 出力に読み込む前のデータの変換</h1>
+  
+  <p>変換ノードを使用して、ノードに追加した変換に基づいてデータを操作します。各変換ノードに 1 つ以上の変換を追加できます。たとえば、2 つの列を連結し、日付列の形式を標準化し、フィードバック列でコメントのセンチメントを検出する変換を追加できます。各変換で独自の方法でデータが変更されます。データ変換の複数のフェーズでデータを操作するには、各フェーズで個別の変換ノードを追加します。</p>
+
+    <ol><li>
+        <span>一括処理データ変換の 2 つのノード間または一括処理データ変換の最後にある <strong class="uicontrol">[ノードを追加]</strong> ボタン (<span style="vertical-align:text-bottom;display:inline-block;"><img alt="[ノードを追加] ボタン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/resources-global/analytics/images/bi_button_add_node.png" style="margin-bottom:0;"></span>) を選択します。2 つのノード間に [ノードを追加] ボタンを表示するには、結線にカーソルを置きます。</span>
+      </li><li>
+        <span>[ノードを追加] ダイアログボックスで、[<strong class="uicontrol">変換]</strong> を選択します。<div style="text-align:left;"><img alt="[ノードを追加] モーダルには、変換ノードを含め、追加可能なすべてのノードが表示されます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/resources-global/analytics/images/bi_integrate_recipe_node_transform.png" style="width:300px;"></div></span>
+      </li><li>
+        <span>詳細セクションの [プレビュー] タブで、データを変換する 1 つ以上の列を選択します。</span>
+      </li><li>
+        <span>変換ツールバー (1) を使用して、選択した列に基づいて変換を追加します。変換を変換ノードに追加するたびに、その変換が左パネル (2) に表示されます。左パネルの各カードはステップと呼ばれます。<div style="text-align:left;"><img alt="変換ツールバーは、選択した列の種別と数に基づいて変更されます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/resources-global/analytics/images/bi_integrate_transform_choose_transformation.png" style="width:750px;"></div></span>
+      </li><li>
+        <span>[プレビュー] タブで変換の結果をプレビューするには、左パネルでステップを選択します。<div><img alt="[プレビュー] タブでは、選択した変換またはノードの結果をプレビューします。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/resources-global/analytics/images/bi_integrate_transform_transformation_preview.png" style="width:750px;"></div></span>
+      </li><li>
+        <span>キャンバスを表示するには、[<strong class="uicontrol">折りたたむ</strong>] ボタン (<span style="vertical-align:text-bottom;display:inline-block;"><img alt="[折りたたむ] ボタン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/resources-global/analytics/images/bi_button_collapse.png" style="margin-bottom:0;"></span>) をクリックします。</span>
+      </li><li>
+        <span>必要に応じて、キャンバス内のノードを選択して、ノードの結果をプレビューします。結果をプレビューし、各ノードと変換で期待される結果が返されていることを確認することをお勧めします。</span>
+      </li><li>
+        <span>必要に応じて、変換ノードに他の変換を追加します。</span>
+      </li><li>
+        <span>一括処理データ変換を保存します。</span>
+      </li></ol>
+
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_batch_transform_transformation_dimensiontodate">
+<h1 class="slds-text-heading_large">[テキストから日付] 変換: 列の型の変換</h1>
+  
+  <p>日付列に予期しない文字列値または異なる形式の日付が含まれている場合、日付列がテキストとしてタグ付けされることがあります。月別にグループ化するなど、日付機能を使用するには、[テキストから日付] 変換を使用して、列の型をテキストから日付に変更します。</p>
+
+    <ol><li>
+        <span> 変換ノードで、列の型を日付に変換するテキスト列を選択します。たとえば、日付をテキスト列で標準化していましたが、その列の型を日付に変換する必要が生じたとします。</span>
+      </li><li>
+        <span> 変換ツールバーで、<span class="menucascade"><strong class="uicontrol">「Text to</strong> | <strong class="uicontrol">Date」</strong></span>を選択します。 <div><img alt="[日付に変更] モーダルでは、日付形式を指定するオプションが提供されます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/resources-global/analytics/images/bi_integrate_dim2date_settings.png" style="width:200px;"></div></span>
+      </li><li>
+        <span>[日付形式] 項目で、日付を表示する日付形式を選択します。</span>
+      </li><li>
+        <span>[結果の表示先] で、新しい値を新しい列に表示するかどうかと、元の列を保持するかどうかを選択します。</span>
+      </li><li>
+        <span>列を作成するように選択した場合は、[列の表示ラベル] で表示ラベルを設定します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[適用]</strong> をクリックして、変換ノードに変換を追加します。[プレビュー] タブに新しい日付コンポーネント列が表示されます。</span>
+      </li><li>
+        <span>キャンバス領域を表示するには、<strong class="uicontrol">[折りたたむ]</strong> ボタン (<span style="vertical-align:text-bottom;display:inline-block;"><img alt="[折りたたむ] ボタン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/resources-global/analytics/images/bi_button_collapse.png" style="margin-bottom:0;"></span>) をクリックします。</span>
+      </li></ol>
+
+    <div><p>データ変換を実行すると、列の型が日付に変更され、日付値が、指定された形式に変換されます。変換で日付値を解析できない場合、値は null に置換されます。</p></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_batch_transform_transformation_dimensiontomeasure">
+<h1 class="slds-text-heading_large">[テキストから数値] 変換: 列の型の変換</h1>
+  
+  <p>平均の計算など、列で数学的計算を実行するには、[テキストから数値] 変換を使用して、列の型をテキストから数値に変更します。数学的計算は数値列でのみ実行できます。数値型には、パーセントデータ型が含まれます。</p>
+
+    <div><p>列の型の変換時に、[ディメンションから基準] 変換では、小数が最も近い整数に丸められます。たとえば、300.2939 が 300 になります。</p></div>
+    <ol><li>
+        <span> 変換ノードで、列の型を基準に変換するディメンション列を選択します。</span>
+      </li><li>
+        <span>変換ツールバーで、<span class="menucascade"><strong class="uicontrol">［Dimension to</strong> | <strong class="uicontrol">Measure］</strong></span> を選択します。<div><img alt="[日付に変更] モーダルでは、日付形式を指定するオプションが提供されます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/resources-global/analytics/images/bi_integrate_dim2mea_settings.png" style="width:200px;"></div></span>
+      </li><li>
+        <span>[結果の表示先] で、新しい値を新しい列に表示するかどうかと、元の列を保持するかどうかを選択します。</span>
+      </li><li>
+        <span>列を作成するように選択した場合は、[列の表示ラベル] で表示ラベルを設定します。</span>
+      </li><li>
+        <span>他の列属性を変更するには、[<strong class="uicontrol">列属性]</strong> ボックスをクリックして変更し、[<strong class="uicontrol">適用]</strong> をクリックします。<div style="text-align:left;"><img alt="[列属性] ボックスに、結果の基準列の API 参照名、出力種別、精度、スケールが表示されます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/resources-global/analytics/images/bi_integrate_dim2mea_moreSettings.png"></div></span>
+      </li><li>
+        <span>出力列のデータ型に応じて、次の属性を設定できます。</span>
+        <div><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:17.064846416382252%"><col style="width:82.93515358361775%"></colgroup><thead class="slds-text-title_caps"><tr class=""><th id="d54945e95" style="vertical-align:top;" class="slds-cell-wrap" scope="col">属性</th><th id="d54945e97" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th></tr></thead><tbody><tr class=""><td headers="d54945e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="属性">API 参照名</td>
+<td headers="d54945e97" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">列の API 参照名。列の API 参照名には、それぞれ最大 255 文字を使用できます。また、API 参照名は一括処理データ変換内で一意である必要があります。</td>
+</tr><tr class=""><td headers="d54945e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="属性">精度</td>
+<td headers="d54945e97" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>数値列の最大桁数。小数点の右側と左側の両方をあわせたすべての桁数 (ただし小数点自体は含まない) が含まれます。1 ～ 18 の整数 (両端を含む) を入力します。</p><p style="margin-bottom:0;">数値が指定の精度を超えている場合、null 基準の処理が有効になっているかどうかに応じて、値は 0 または null に設定されます。たとえば、精度が 5 に設定されていて、null 基準の処理が有効になっている場合、123456.78 は null に置き換えられます。</p></td>
+</tr><tr class=""><td headers="d54945e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="属性">スケール</td>
+<td headers="d54945e97" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">数値列での小数点の右側の桁数。0 ～ 17 の整数 (両端を含む) を入力します。スケールは精度より小さくする必要があります。たとえば、数値が 123456.789 で、スケールを 2 に設定した場合、数値は 123456.78 と表示されます。</td>
+</tr><tr class=""><td headers="d54945e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="属性">長さ</td>
+<td headers="d54945e97" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">テキスト列の最大文字数。1 ～ 32000 の整数 (両端を含む) を入力します。デフォルトの長さは 255 文字です。</td>
+</tr><tr class=""><td headers="d54945e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="属性">日付形式</td>
+<td headers="d54945e97" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"> 日付列の日付形式。</td>
+</tr></tbody></table>詳細は、<a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.bi_dev_guide_ext_data_format.meta/bi_dev_guide_ext_data_format/bi_ext_data_schema_reference.htm">『Analytics 外部データ形式開発者ガイド: 外部データメタデータ形式のリファレンス』</a>の「項目名の制限事項」を参照してください。</div>
+      </li><li>
+        <span><strong class="uicontrol">[適用]</strong> をクリックして、変換ノードに変換を追加します。[プレビュー] タブに基準列が表示されます。</span>
+      </li><li>
+        <span>キャンバス領域を表示するには、<strong class="uicontrol">[折りたたむ]</strong> ボタン (<span style="vertical-align:text-bottom;display:inline-block;"><img alt="[折りたたむ] ボタン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/resources-global/analytics/images/bi_button_collapse.png" style="margin-bottom:0;"></span>) をクリックします。</span>
+      </li></ol>
+
+    <div><p>データ変換を実行すると、列の型が基準に変換されます。</p></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_batch_transform_transformation_measuretodimension">
+<h1 class="slds-text-heading_large">[数値からテキスト] 変換: 列の型の変換</h1>
+  
+  <p>数値列でグループ化および絞り込むには、[数値からテキスト] 変換を使用します。グループ化や絞り込みはテキスト列でのみ行うことができます。</p>
+
+    <ol><li>
+        <span>変換ノードで、列の型をテキストに変換する数値列を選択します。</span>
+      </li><li>
+        <span>変換ツールバーで、[<span class="menucascade"><strong class="uicontrol">数値から</strong> | <strong class="uicontrol">テキスト</strong></span>] を選択します。<div><img alt="[日付に変更] モーダルでは、日付形式を指定するオプションが提供されます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/resources-global/analytics/images/bi_integrate_mea2dim_settings.png" style="width:200px;"></div></span>
+      </li><li>
+        <span>[結果の表示先] で、新しい値を新しい列に表示するかどうかと、元の列を保持するかどうかを選択します。</span>
+      </li><li>
+        <span>列を作成するように選択した場合は、[列の表示ラベル] で表示ラベルを設定します。</span>
+      </li><li>
+        <span>他の列属性を変更するには、<strong class="uicontrol">[列属性]</strong> ボックスをクリックして列属性を変更し、<strong class="uicontrol">[適用]</strong> をクリックします。<div><img alt="[列属性] ボックスに、結果のディメンション列の API 参照名、出力種別、長さが表示されます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/resources-global/analytics/images/bi_integrate_mea2dim_moreSettings.png"></div></span>
+      </li><li>
+        <span>出力列のデータ型に応じて、次の属性を設定できます。</span>
+        <div><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:17.064846416382252%"><col style="width:82.93515358361775%"></colgroup><thead class="slds-text-title_caps"><tr class=""><th id="d89935e89" style="vertical-align:top;" class="slds-cell-wrap" scope="col">属性</th><th id="d89935e91" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th></tr></thead><tbody><tr class=""><td headers="d89935e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="属性">API 参照名</td>
+<td headers="d89935e91" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">列の API 参照名。列の API 参照名には、それぞれ最大 255 文字を使用できます。また、API 参照名は一括処理データ変換内で一意である必要があります。</td>
+</tr><tr class=""><td headers="d89935e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="属性">精度</td>
+<td headers="d89935e91" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>数値列の最大桁数。小数点の右側と左側の両方をあわせたすべての桁数 (ただし小数点自体は含まない) が含まれます。1 ～ 18 の整数 (両端を含む) を入力します。</p><p style="margin-bottom:0;">数値が指定した精度を超える場合、値は 0 または null に設定されます。たとえば、精度が 5 に設定されている場合、数値は null に置き換えられます。</p></td>
+</tr><tr class=""><td headers="d89935e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="属性">スケール</td>
+<td headers="d89935e91" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">数値列での小数点の右側の桁数。0 ～ 17 の整数 (両端を含む) を入力します。スケールは精度より小さくする必要があります。たとえば、数値が 123456.789 で、スケールを 2 に設定した場合、数値は 123456.78 と表示されます。</td>
+</tr><tr class=""><td headers="d89935e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="属性">長さ</td>
+<td headers="d89935e91" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">テキスト列の最大文字数。1 ～ 32000 の整数 (両端を含む) を入力します。デフォルトの長さは 255 文字です。</td>
+</tr><tr class=""><td headers="d89935e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="属性">日付形式</td>
+<td headers="d89935e91" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">日付列の日付形式。</td>
+</tr></tbody></table>詳細は、<a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.bi_dev_guide_ext_data_format.meta/bi_dev_guide_ext_data_format/bi_ext_data_schema_reference.htm">『Analytics 外部データ形式開発者ガイド: 外部データメタデータ形式のリファレンス』</a>の「項目名の制限事項」を参照してください。</div>
+      </li><li>
+        <span><strong class="uicontrol">[適用]</strong> をクリックして、変換ノードに変換を追加します。[プレビュー] タブにテキスト列が表示されます。</span>
+      </li><li>
+        <span>キャンバス領域を表示するには、<strong class="uicontrol">[折りたたむ]</strong> ボタン (<span style="vertical-align:text-bottom;display:inline-block;"><img alt="[折りたたむ] ボタン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/resources-global/analytics/images/bi_button_collapse.png" style="margin-bottom:0;"></span>) をクリックします。</span>
+      </li></ol>
+
+    <div><p>一括処理データ変換を実行すると、列の型がテキストに変換されます。</p></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_batch_transform_update">
+<h1 class="slds-text-heading_large">[更新] ノード: 列値のスワップ</h1>
+  
+  <p>[更新] ノードでキーペアが一致した場合、列値を別のデータソースのデータに置き換えます。たとえば、最近の一連の買収や合併後に、選択した取引先名を更新するには、アップロードしたスプレッドシートからの名前を、一致する取引先 ID に基づいて置き換えます。処理時間を最短にするには、列のすべての値ではなく、キーペアが一致する列の値のみを変更します。</p>
+
+    <ol><li>
+        <span>すでに 1 つ以上の入力ノードが含まれる一括処理データ変換で、2 つのノード間またはデータ変換の最後にある [<strong class="uicontrol">ノードを追加</strong>] <span style="vertical-align:text-bottom;display:inline-block;"><img alt="[ノードを追加] ボタン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/resources-global/analytics/images/bi_button_add_node.png" style="width:16px;margin-bottom:0;"></span>を選択します。2 つのノード間に [ノードを追加] ボタンを表示するには、結線にカーソルを置きます。</span>
+      </li><li>
+        <span>[ノードを追加] ダイアログで、[<strong class="uicontrol">更新]</strong> を選択します。<div style="text-align:left;"><img alt="[ノードを追加] モーダルには、[更新] ノードを含め、追加可能なすべてのノードが表示されます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_batch_transform_update.png"></div></span>
+      </li><li>
+        <span>更新データが含まれるデータソースを選択します。または、元のデータと更新データが入力ノードとしてすでに追加されている場合は、一方の [<strong class="uicontrol">ノードを追加</strong>] (<span style="vertical-align:text-bottom;display:inline-block;"><img alt="[ノードを追加] ボタン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/resources-global/analytics/images/bi_button_add_node.png" style="width:16px;margin-bottom:0;"></span>) を他方にドラッグして、[<strong class="uicontrol">更新] を</strong>クリックします。これらの 2 つの入力は、ソースおよび更新の場所として使用されます。</span>
+      </li><li>
+        <span>元のデータと更新データ間で一致する必要があるキーペアの値を選択します。</span>
+      </li><li>
+        <span>更新する列を選択します。1 つの行ですべてのキーペアが一致した場合は、列値が更新されます。</span>
+      </li><li>
+        <span><strong class="uicontrol">[適用]</strong> をクリックします。一括処理データ変換が実行されると、[更新] ノードには、列値が更新された元のデータが含まれます。</span>
+      </li><li>
+        <span>データ変換を保存します。</span>
+      </li></ol>
+
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_batch_transform_window">
+<h1 class="slds-text-heading_large">数式のウィンドウ関数</h1>
+  <p>ウィンドウ関数を使用して行全体の計算を実行します。入力データの行ごとに、関連する行の選択内容 (ウィンドウ) に関する計算を実行します。行をグループ化する集計関数とは異なり、ウィンドウ関数は各行の結果を返します。たとえば、各商談のフェーズ全体の商談金額の変化を計算して、販売目標を達成できるかどうかを確認できます。</p>
+
+    <p>数式を入力する場合、式では項目の API 参照名 (表示ラベルではない) を使用します。パラメーターは括弧で囲みます。</p>
+    <p>数式では次のウィンドウ関数を使用できます。</p>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:18.02773497688752%"><col style="width:15.408320493066254%"><col style="width:66.56394453004623%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d99872e43" style="vertical-align:top;" class="slds-cell-wrap" scope="col">文字列関数</th>
+            <th id="d99872e46" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+            <th id="d99872e49" style="vertical-align:top;" class="slds-cell-wrap" scope="col">構文</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d99872e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="文字列関数">
+              <code>collect_list</code>
+            </td>
+
+            <td headers="d99872e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">重複を含む配列型を返します。</td>
+
+            <td headers="d99872e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p>
+              <code>collect_list(<var>field</var>)</code>
+              </p><p><var>field は</var>、すべての値を取得する項目です。
+                </p><p>例: [所有者 ID] 列からすべての値を返します。</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>Owner Id
+--------
+A
+B
+C
+
+array_join(collect_list(OwnerId), ',') -&gt; A,B,C</code></pre></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d99872e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="文字列関数">
+              <code>collect_set</code>
+            </td>
+
+            <td headers="d99872e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">重複のない配列型を返します。</td>
+
+            <td headers="d99872e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p>
+              <code>collect_set(<var>field</var>)</code>
+              </p><p><var>field</var> は、重複する値を削除する項目です。</p><p>例: [所有者 ID] 列から一意の値のみを返します。</p><pre id="c360_a_batch_transform_window__codeblock_qk2_z5d_f2c" class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><a name="c360_a_batch_transform_window__codeblock_qk2_z5d_f2c"></a><code>Owner Id
+--------
+A
+B
+C
+
+array_join(collect_set(OwnerId), ',') -&gt; A,B,C</code></pre></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d99872e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="文字列関数">
+              <code>current</code>
+            </td>
+
+            <td headers="d99872e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">パーティションの現在のレコードの値を返します。</td>
+
+            <td headers="d99872e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p>
+              <code>current(<var>field</var>)</code>
+              </p><p><var>field</var> は、現在の値を取得する項目です。</p><div><p>例: 現在の行の [金額] 項目の値を取得します。</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>current(Amount)</code></pre></div></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d99872e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="文字列関数">
+              <code>dense_rank</code>
+            </td>
+
+            <td headers="d99872e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">順序に基づいてパーティションの各レコードのランクを返します。ランクは連続しており、値が一致してもそのランクが繰り返されることはありません。たとえば、最初の 3 つの行の値が同じ場合、最初の 4 つのランクは 1、1、1、2 になります。</td>
+
+            <td headers="d99872e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p>
+              <code>dense_rank()</code>
+              </p><div><p>例: 各パーティションの行についてデータの多さのランクを計算します。</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>dense_rank()</code></pre></div></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d99872e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="文字列関数">
+              <code>first_value</code>
+            </td>
+
+            <td headers="d99872e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">パーティションの最初のレコードの値を返します。</td>
+
+            <td headers="d99872e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p>
+              <code>first_value(<var>field</var>)</code>
+              </p><p><var>field</var> は、最初の値を取得する項目です。</p><div><p>例: [見積] 項目の元の見積値を取得します。</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>first_value(Quote)</code></pre></div></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d99872e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="文字列関数">
+              <code>lag</code>
+            </td>
+
+            <td headers="d99872e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">パーティションの以前のレコードの値を返します。</td>
+
+            <td headers="d99872e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p><code>lag(<var>field</var></code>)</p><p><var>field</var> は、前の値を取得する項目です。</p><div><p>例: 現在のレコードと以前のレコード間の収益の変化率を計算します。</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>(((current(Profit)-lag(Profit)))/current(Profit))*100</code></pre></div></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d99872e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="文字列関数">
+              <code>last_value</code>
+            </td>
+
+            <td headers="d99872e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">パーティションの最後のレコードの値を返します。</td>
+
+            <td headers="d99872e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p>
+              <code>last_value(<var>field</var>)</code>
+              </p><p><var>field</var> は、最後の値を取得する項目です。</p><div><p>例: 元の見積と最終見積の差を計算します。</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>first_value(Quote)-last_value(Quote)</code></pre></div></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d99872e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="文字列関数">
+              <code>lead</code>
+            </td>
+
+            <td headers="d99872e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">パーティションの次のレコードの値を返します。</td>
+
+            <td headers="d99872e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p><code>lead(<var>field</var></code>)</p><p><var>field</var> は、次の値を取得する項目です。</p><div><p>例: [フェーズ] 項目の次の値を取得します。</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>lead(Stage)</code></pre></div></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d99872e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="文字列関数">
+              <code>rank</code>
+            </td>
+
+            <td headers="d99872e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">順序に基づいてパーティションの各レコードのランクを返します。値が同じ場合は同じ順位を繰り返し、次の一致しない値で繰り返した数だけ順位をスキップします。たとえば、最初の 3 つの行の値が同じ場合、最初の 4 つのランクは 1、1、1、4 になります。</td>
+
+            <td headers="d99872e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p>
+              <code>rank()</code>
+              </p><div><p>例: 各パーティションのレコードをランク付けします。</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>rank()</code></pre></div></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d99872e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="文字列関数">
+              <code>row_number</code>
+            </td>
+
+            <td headers="d99872e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">パーティションの行番号を返します。パーティションの行ごとに 1 つずつ増加します。たとえば、最初の 3 つの行の値が同じ場合、最初の 4 つのランクは 1、2、3、4 になります。</td>
+
+            <td headers="d99872e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p>
+              <code>row_number()</code>
+              </p><div><p>例: 各パーティションの各レコードに行番号を割り当てます。</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>row_number()</code></pre></div></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d99872e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="文字列関数">
+              <code>sum</code>
+            </td>
+
+            <td headers="d99872e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">値のグループから累積合計を返します。</td>
+
+            <td headers="d99872e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="構文"><p>
+              <code>sum()</code>
+              </p><div><p>例: 特定の販売計画に関連付けられた毎月の出荷単位の累計数を追跡します。</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>sum()</code></pre></div></td>
+
+          </tr>
+        </tbody></table>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_cleansing_data">
+<h1 class="slds-text-heading_large">データの整理とデータプレップ</h1>
+  <p><span>Data 360</span>のセグメンテーションおよび有効化機能を使用する場合、データのクリーンアップと準備は成功のために不可欠です。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+          </tr>
+        </tbody></table>
+    <p>データを <span>Data 360</span> に取り込んだら、ライブラリ関数、演算子、未加工データ項目を使用してデータマッピングの準備を行います。</p>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=data.c360_a_streaming_transform_overview.htm&amp;language=ja&amp;type=5">ストリーミングデータ変換</a></strong><br>ストリーミングデータ変換では、ソースオブジェクトの 1 つのレコードを読み取り、レコードデータを再形成して、1 つ以上のレコードを対象オブジェクトに書き込みます。ソースオブジェクトと対象オブジェクトは異なるオブジェクトである必要があります。ストリーミングデータ変換は、ストリーミングプロセスとして連続的に実行され、新規または変更されたデータが選択されます。</li><li class="slds-p-bottom_small"><strong><a href="getstarted-1.html#c360_a_batch_transform_overview">一括処理データ変換</a></strong><br>一括処理データ変換を使用すると、ID 解決、セグメンテーション、計算済みインサイトなど、データをさらに活用できるように変換したり、Salesforce レポートからインサイトを引き出したりできます。一括処理変換は、データの更新時に実行できる反復可能な一連の操作です。一括処理データ変換を初めて実行すると、手順に従ってデータが取り込まれ、定義されます。次に、変換を手動で実行するか、スケジュールされた間隔で実行するかを設定できます。</li><li class="slds-p-bottom_small"><strong><a href="getstarted-1.html#c360_a_billing_considerations_for_data_transforms">データ変換の請求に関する考慮事項</a></strong><br>データ変換を使用すると、Data 360 ライセンスで Data 360 を運用している組織の請求に使用するクレジットの消費に影響します。</li><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=data.c360_a_transform_platform_event_flow.htm&amp;language=ja&amp;type=5">データ変換プラットフォームイベントフローの作成</a></strong><br>データ変換イベントアクションのプラットフォームトリガーフローを作成します。</li><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=data.c360_a_transform_record_event_flow.htm&amp;language=ja&amp;type=5">データ変換レコードイベントフローの作成</a></strong><br>データ変換イベントアクションのレコードトリガーフローを作成します。レコードトリガーフローでは、別のレコードを更新したり、通知を送信したり、プロセスを開始したりできます。</li><li class="slds-p-bottom_small"><strong><a href="data360_general-2.html#c360_a_normalized_and_denormalized_data">正規化および非正規化されたデータ</a></strong><br>データは複数のソースから取得され、正規化または非正規化できます。<span>Data 360</span> 標準データモデルは正規化されているため、受信データをデータモデルにマッピングする前に正規化する必要があります。すべてのソースシステムが正規化してエクスポートするオプションを備えていたり、データを正規化したりするわけではないため、項目レベルでデータを評価し、ソースデータを変換して標準データモデルにマッピングする方法を確立します。</li><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=data.c360_a_uc_normalize_denormalized_data_from_marketing_cloud.htm&amp;language=ja&amp;type=5">非正規化されたデータ使用事例の正規化</a></strong><br>この使用事例では、データは1つのMarketing Cloud Engagementデータエクステンションから取得されますが、<span>Data 360</span> DMO(データ モデル オブジェクト)にマッピングするには正規化する必要があります。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_copy_field_enrichment_deploy_sandbox">
+<h1 class="slds-text-heading_large">Data 360 Sandbox からのコピー項目強化の構築とリリース</h1>
+  <p>データキットと変更セットを使用して、テスト済みのコピー項目強化を Data 360 Sandbox から本番環境にパッケージ化してリリースします。</p>
+
+    <p>Data 360 でコピー項目強化を作成、テスト、リリースするには、次の手順を実行します。</p>
+    <ol>
+      <li>Sandbox 組織で、<a target="_blank" href="#c360_a_create_a_copy_field_enrichment">コピー項目強化</a>を作成します。</li>
+
+      <li>Sandbox でコピー項目の強化をテストします。</li>
+
+      <li>強化をパッケージ化するには、<a target="_blank" href="sharing_dev.html#c360_a_data_package_kits">DevOpsデータ キット</a>を作成し、次の手順を実行します。</li>
+
+      <li>
+        <ol>
+          <li>「<a target="_blank" href="getstarted-2.html#c360_a_data_cloud_sandbox_deploy">Deploy Data 360 Changes Across Orgs</a> (組織全体での Data 360 の変更のリリース)」の最初の 2 つの手順に従います。</li>
+
+          <li>データキットの [データキットコンテンツ] ページで、[Copy Field Enrichments (項目強化をコピー)] セクションに移動し、[<strong>追加] を</strong>クリックします。次に、リリースするコピー項目強化を選択します。</li>
+
+          <li>「<a target="_blank" href="getstarted-2.html#c360_a_data_cloud_sandbox_deploy">Deploy Data 360 Changes Across Orgs</a> (組織全体での Data 360 の変更のリリース)」のステップ 3 に従って、データキットを送信変更セットにリンクします。</li>
+
+          <li>「<a target="_blank" href="getstarted-2.html#c360_a_data_cloud_sandbox_deploy">Deploy Data 360 Changes Across Orgs</a> (組織全体での Data 360 の変更のリリース)」のステップ 3 のサブステップ 5 で、コピー項目強化の連動コンポーネントをすべて変更セットに追加します。</li>
+
+          <li>「<a target="_blank" href="getstarted-2.html#c360_a_data_cloud_sandbox_deploy">Deploy Data 360 Changes Across Orgs</a> (組織全体での Data 360 の変更のリリース)」のステップ 4 に従ってリリースを完了します。</li>
+
+        </ol>
+      </li>
+
+    </ol>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 標準データキットは現在サポートされていません。</div></div></div>
+
+    <p><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.changesets_about_inbound.htm&amp;language=ja&amp;type=5">受信変更セット</a>を本番組織にリリースしたら、<a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.extend_click_find_objectmgmt_parent.htm&amp;language=ja&amp;type=5">オブジェクトマネージャー</a>で、サポートされるオブジェクトの [Data Cloud Copy Field Enrichments (Data Cloud コピー項目強化)] のリストの下にコピー項目強化が表示されます。</p>
+    <p><strong>リリースに関する考慮事項</strong></p>
+    <p>コピー項目強化と関連メタデータをリリースするときは、次の詳細を考慮してください。</p>
+    <ul>
+      <li>同じ定義ですでに強化があるコピー項目強化を対象組織にリリースすると、リリースは成功しますが、変更は行われません。</li>
+
+      <li>データモデルオブジェクト (DMO) をリリースするには、データキットにデータレイクオブジェクト (DLO) マッピングまたは関連付けられたデータストリームが含まれている必要があります。DMO または計算済みインサイトオブジェクト (CIO) 間のリレーションをマージするには、DMO または CIO がこの要件を満たしていることを確認し、[項目取得元リレーション] を送信変更セットに追加します。</li>
+
+      <li>Data 360 連動関係: データストリームまたは関連する DLO を手動で追加する必要があります。コピー項目の強化に CIO が必要な場合は、その連動関係 (DMO など) が含まれていることを確認します。</li>
+
+      <li>CRM 連動関係: 変更セットに項目を追加すると、カスタム CRM 項目が自動的に検出されます。必要に応じて、カスタム CRM オブジェクトを変更セットに手動で追加する必要があります。</li>
+
+      <li>コピー項目は常に無効 (ドラフト) 状態でリリースされます。コピー項目強化をリリースしたら、手動で有効化する必要があります。</li>
+
+    </ul>
+
+    <p><strong>制限事項</strong></p>
+    <p>これらのアクションは、コピー項目強化ではサポートされません。</p>
+    <ul>
+      <li>更新されたコピー項目強化のリリースはサポートされていません。</li>
+
+      <li>リリースの取り消しはサポートされていません。</li>
+
+    </ul>
+
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_copy_field_enrichment_matching">
+<h1 class="slds-text-heading_large">コピー項目強化の一致</h1>
+  <p>コピー項目強化では、他のデータソースからデータを追加して、組織のレコードを強化します。組織のレコードに関連しないデータが返されるのを回避するために、強化では組織のデータと Data Cloud のデータが照合されます。データの照合方法によって、返されるデータが決まります。</p>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">リンク項目</h2><p>組織のレコードを Data Cloud のデータと照合するために、強化では他のオブジェクトとの関連付けが使用されます。コピー項目強化で使用される関連付けを作成するには、統合個人または統合取引先オブジェクトを作成します。</p><div>
+        <img alt="項目は、統合オブジェクトとの関係でリンクされます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_enrichment_matching_link_table.png">
+      </div></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">コピー項目の一致</h2><p>コピー項目強化では、選択した ID 一致種別とオブジェクトに応じて、レコードの照合方法が異なります。</p><div>
+        <img alt="強化一致ロジックでは、統合リンクテーブルオブジェクトと参照関係が使用されます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_enrichment_matching_logic.png">
+      </div></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">例: プライマリキーを使用してニックネーム項目をコピーする</h2><p>Data Cloud に個人 DMO のニックネーム項目がある場合、組織の取引先責任者オブジェクトのプライマリキー値に一致する個人のデータをコピーできます。</p><div>
+        <img alt="主キーに対する一致" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_enrichment_matching_logic_pink.png">
+      </div></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">例: 個人 DMO または取引先 DMO ルックアップを使用して計算済みインサイトオブジェクトから [マイル] 項目をコピーする</h2><p>ディメンションで個人 DMO または取引先 DMO とのリレーションを持つ計算済みインサイトオブジェクトがある場合、そのリレーションを使用して、組織の取引先責任者オブジェクトと同じ主キーを持つ個人のレコードを照合できます。</p><div>
+        <img alt="個人または取引先のルックアップに対する一致" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_enrichment_matching_logic_blue.png">
+      </div></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">例: 統合個人 DMO または統合取引先 DMO ルックアップを使用して計算済みインサイトオブジェクトからマイル項目をコピーする</h2><p>ディメンションで統合個人 DMO または統合取引先 DMO とのリレーションを持つ計算済みインサイトオブジェクトがある場合、そのリレーションを使用して、組織の取引先責任者オブジェクトと同じ主キーを持つ個人のレコードを照合できます。</p><div>
+        <img alt="統合オブジェクトの参照に関する CIO の照合" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_enrichment_matching_logic_green_cio.png">
+      </div></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">例: Unified DMO からのニックネームのコピー </h2><p>統合個人 DMO がある場合、統合リンク個人 DMO を使用して、Data Cloud オブジェクトの UID と取引先責任者オブジェクトの主キーを一致させることができます。</p><div><img alt="統合オブジェクト参照での DMO の照合" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_enrichment_matching_logic_green_dmo.png"></div></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_create_a_copy_field_enrichment">
+<h1 class="slds-text-heading_large">コピー項目強化の作成</h1>
+  <p>Data 360 データモデルオブジェクト (DMO) の情報を組織のレコードページに追加して、複数のシステム、組織、またはビジネスユニットからの情報とインタラクションを関連リストに表示できるようにします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d223415e65" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d223415e65" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">[設定] で強化を表示する</td>
+
+              <td headers="d223415e65" style="vertical-align:top;" class="slds-cell-wrap">「設定の参照」 </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d223415e65" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">特定の強化を表示する</td>
+
+              <td headers="d223415e65" style="vertical-align:top;" class="slds-cell-wrap"><p>強化で使用されるデータスペースへのアクセス権が必要です。</p><p style="margin-bottom:0;">データスペースへのアクセスを許可する機能権限として「データアウェアスペシャリスト」などの Data Cloud 権限セットを設定します。</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d223415e65" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">強化を作成または更新する</td>
+
+              <td headers="d223415e65" style="vertical-align:top;" class="slds-cell-wrap"><p>「アプリケーションのカスタマイズ」、「Data Cloud ユーザー」、データアクションに対する「書き込みアクセス」、データスペース定義に対する「書き込みアクセス」</p><p style="margin-bottom:0;">強化されたセキュリティデータスペースを有効にした場合は、「データスペース範囲のデータアクションのカスタマイズ」権限も必要です。</p></td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d223415e126" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なオブジェクト権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d223415e126" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なオブジェクト権限">[設定] で強化を表示する</td>
+
+              <td headers="d223415e126" style="vertical-align:top;" class="slds-cell-wrap">データアクション定義オブジェクトに対する「参照」権限</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d223415e126" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なオブジェクト権限">強化を作成または更新する</td>
+
+              <td headers="d223415e126" style="vertical-align:top;" class="slds-cell-wrap">データアクションオブジェクト「作成」、「更新」、およびデータアクション定義オブジェクト「作成」、「更新」、「削除」</td>
+
+            </tr>
+          </tbody></table><p>このタスクを開始する前に、「<a title="Data 360 データを組織で使用する強化を作成する前に、セキュリティ、データストレージ、コスト、削除、その他の考慮事項に関する重要な情報を確認してください。" href="getstarted-2.html#c360_a_enrichment_considerations">強化の考慮事項</a>」を参照してください。次に、「360 データとインサイトを使用した<a title="Data 360 強化を使用して、組織全体のクリーンアップおよびハーモナイズされたデータを組織に追加します。Data 360 のデータを使用して、レコードページの関連リストとコピー項目の強化を作成します。" href="insights_query-2.html#c360_a_enrich_your_org_with_data_and_insights">組織の強化</a>」の手順を実行します。</p></div>
+    <ol><li>
+        <span>[設定] から、<strong class="uicontrol">[インテグレーション]</strong>、<strong class="uicontrol">[強化]</strong>、<strong class="uicontrol">[コピー項目]</strong> の順に選択します。</span>
+        <div>
+          <p>オブジェクトマネージャーからコピー項目強化を作成することもできます。</p>
+        </div>
+      </li><li>
+        <span><strong class="uicontrol">[新規]</strong> をクリックします。</span>
+      </li><li>
+        <span>[ソースオブジェクト] で、データスペースを選択します。</span>
+        <div>統合オブジェクトに関連付けられたオブジェクトの項目をコピーするには、データスペースに少なくとも 1 つの統合オブジェクトが必要です。データスペースごとに使用できるデータのビューが異なります。たとえば、特定のブランドのビューがあるデータスペース、またはレポートと顧客対応データを使用するさまざまなデータスペースがあるデータスペースなどです。</div>
+      </li><li>
+        <span><strong class="uicontrol">Data Cloud オブジェクト</strong>を選択します。</span>
+        <div>サポートされるオブジェクトの詳細については、「<a title="Data 360 データを組織で使用する強化を作成する前に、セキュリティ、データストレージ、コスト、削除、その他の考慮事項に関する重要な情報を確認してください。" href="getstarted-2.html#c360_a_enrichment_considerations">強化に関する</a>考慮事項」トピックを参照してください。</div>
+        <div>
+          <p>Data Cloud ソースオブジェクトと CRM 対象オブジェクトの組み合わせごとに 1 つの強化のみを作成できます。<strong class="uicontrol">[既存の強化を開く]</strong> が存在する場合はクリックします。強化を編集し、コピーする項目を追加または削除できます。</p>
+        </div>
+      </li><li>
+        <span>組織にコピーするデータを決定する ID 照合方法を選択します。</span>
+        <div>
+            個人参照、取引先参照、統合個人参照、統合取引先参照、主キー、非主一意キーなど、複数の異なる照合方法を使用できます。Data 360 でソース CRM オブジェクトとの参照関係を作成した場合、適切な参照照合方法を選択できます。デフォルトでは、CRM オブジェクトのプライマリキーは Data 360 オブジェクトのプライマリキーと一致します。通常、プライマリキーはレコードを照合する最適なデータです。ただし、ML 予測 DMO では任意の一意のキーを使用できます。この場合、照合方法としてプライマリ以外の一意のキーを選択する必要があります。一意の値を保証するために一意のキー列にデータベース制約を適用し、最適なパフォーマンスを得るために列にインデックスを付けます。
+        </div>
+        <div>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> [プライマリキー ID] の一致を選択した場合、強化ではデータソース ID で対象オブジェクトが絞り込まれません。 ソースオブジェクトが DMO の場合、キー修飾子を使用して対象オブジェクトが絞り込まれます。取得元オブジェクトが CIO の場合、絞り込みはありません。</div></div></div>
+
+        </div>
+        <div> ロイヤルティプログラムに入力されたニックネーム「Nick Anderson」を取引先責任者ページに表示したいと考えています。ニックネームは CustomerLoyaltyProgram カスタム DMO で取得されます。そのオブジェクトのプライマリキーがプログラム ID であり、照合する CRM オブジェクトのプライマリキーと一致しません。ただし、CustomerLoyaltyProgram には、CRM オブジェクトの顧客 ID と一致するデータがある CRM ID 項目もあります。統合個人の CRM ID への Data Cloud ルックアップを作成し、照合 ID 方法として [<strong class="uicontrol">Use the Unified Individual Lookup</strong> (統合個人ルックアップを使用)] を選択します。</div>
+      </li><li>
+        <span>[Target Object (対象オブジェクト)] で、<strong class="uicontrol">[Target Object</strong> (対象オブジェクト)] を選択し、[<strong class="uicontrol">Next (次</strong>へ)] をクリックします。これは、データのコピー先の組織内のオブジェクトです。</span>
+      </li><li>
+        <span>プラス記号をクリックしてコピーするフィールドを選択し、[<strong class="uicontrol">保存]</strong> をクリックします。</span>
+      </li><li>
+        <span>Data Cloud オブジェクトの項目ごとに、データをコピーする Salesforce 組織の項目を検索して選択します。</span>
+      </li><li>
+        <span>関連するデータのみがコピーされるようにするには、検索条件を定義します。検索条件を使用すると、検索条件に一致するソースオブジェクトのデータのみがコピーされます。</span>
+        <div>コピーするデータの量を減らすと、クレジットを節約できます。</div>
+        <ol>
+          <li>
+            <span>満たす条件を選択します。</span>
+          </li>
+
+          <li>
+            <span>絞り込むソースオブジェクト項目を選択します。</span>
+          </li>
+
+          <li>
+            <span>演算子と値を選択します。</span>
+            <div>たとえば、従業員が 1,000 人を超える取引先または航空宇宙取引先からのみデータをコピーするには、次の条件で検索条件を作成します。<ul><li><kbd>いずれかの条件に一致 (OR)</kbd></li>
+<li><kbd>Employee Cloud Greater than 1,000</kbd></li>
+<li><kbd>Account Type Equals Aerospace</kbd></li>
+</ul>
+</div>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>強化の識別に使用できる強化表示ラベルを入力します。</span>
+      </li><li>
+        <span>強化を一意に識別する API 参照名を入力します。</span>
+        <div>
+          <p>デフォルトでは、API 参照名は <var>SourceObject_TargetObject_DataSpace</var> として生成されます。</p>
+        </div>
+      </li><li>
+        <span>強化を保存します。</span>
+        <ul>
+          <li>CRM コネクタを使用してデータを取得している場合、<strong class="uicontrol">[保存して同期を開始]</strong> をクリックします。</li>
+
+          <li>まれなケースとして CRM コネクタ以外のデータストリームを使用してデータを取り込む場合には、データストリームのキー修飾子を指定して <strong class="uicontrol">[保存して同期を開始]</strong> をクリックします。</li>
+
+        </ul>
+
+        <div>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 不正な権限が検出されたことを示すエラーメッセージが表示された場合は、<a title="データをコピーするには、組織に項目が必要です。既存のデータを上書きしない場合、または既存の項目がない場合は、項目を作成する必要があります。このタスクを開始する前に、コピー先となるすべての項目を作成していることを確認してください。組織の Salesforce システム管理者は、すべての項目にインテグレーション権限を設定する必要があります。コピーする項目数が多い場合を除き、このタスクは約 5 分で完了します。" href="insights_query-2.html#c360_a_enrich_your_org_with_data_and_insights">「ステップ 3:</a> コピー項目のインテグレーションユーザー項目権限の設定」に従って正しい権限を追加します。</div></div></div>
+
+        </div>
+        <div>最初の同期は、コピーするレコードの数に応じて数時間から数日かかる完全なデータ同期になります。コピー先の項目に既存のデータがある場合、このデータは同期時に上書きされ、復元できません。</div>
+      </li><li>
+        <span><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.monitoring_async_api_jobs.htm&amp;language=ja&amp;type=5">完全同期一括</a>ジョブを監視するか、[同期履歴] タブを使用して同期ログを調べます。</span>
+      </li></ol>
+
+    <div><p>
+        <span style="vertical-align:text-bottom;display:inline-block;"><img alt="ブックマーク画像" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/bookmark_60.png" style="margin-bottom:0;"></span> 360 データとインサイトによる組織の<a title="Data 360 強化を使用して、組織全体のクリーンアップおよびハーモナイズされたデータを組織に追加します。Data 360 のデータを使用して、レコードページの関連リストとコピー項目の強化を作成します。" href="insights_query-2.html#c360_a_enrich_your_org_with_data_and_insights">強化</a>
+      </p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="強化に関する問題を診断して解決します。" href="#c360_a_enrichment_troubleshooting">強化のトラブルシューティング</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=data.c360_a_syncing_copy_field_enrichments.htm&amp;language=ja&amp;type=5">Salesforce ヘルプ: コピー項目強化の同期</a></li><li><a title="コピー項目強化のために、Data 360 と組織間でデータがコピーおよび同期される方法について説明します。データ同期のトラブルシューティングと強化の変更に関するヒントを紹介します。" href="https://help.salesforce.com/s/articleView?id=data.c360_a_syncing_copy_field_enrichments.htm&amp;language=ja&amp;type=5">コピー項目強化の同期</a></li><li><a title="コピー項目強化では、他のデータソースからデータを追加して、組織のレコードを強化します。組織のレコードに関連しないデータが返されるのを回避するために、強化では組織のデータと Data Cloud のデータが照合されます。データの照合方法によって、返されるデータが決まります。" href="#c360_a_copy_field_enrichment_matching">コピー項目強化の一致</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_create_a_related_list_enrichment">
+<h1 class="slds-text-heading_large">関連リストの強化の作成</h1>
+  <p>Data Cloud DMO からの情報を組織のレコードページに追加して、複数のシステム、組織、またはビジネスユニットからの情報とインタラクションを関連リストに表示できるようにします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><p>強化を使用するには、Data Cloud ユーザーとしてのアクセス権が必要です。ID 解決を完了し、統合個人 DMO または統合取引先 DMO を作成している必要があります。
+        </p><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d47540e68" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d47540e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">オブジェクトマネージャーで強化を表示する</td>
+
+              <td headers="d47540e68" style="vertical-align:top;" class="slds-cell-wrap">「設定の参照」 </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d47540e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">特定の強化を表示する</td>
+
+              <td headers="d47540e68" style="vertical-align:top;" class="slds-cell-wrap"><p style="margin-bottom:0;">強化で使用されるデータスペースへのアクセス権が必要です。</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d47540e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">強化を作成または更新する</td>
+
+              <td headers="d47540e68" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d47540e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">関連リストを表示する</td>
+
+              <td headers="d47540e68" style="vertical-align:top;" class="slds-cell-wrap"><p>Data Cloud からのアクセス権がある。</p><p>データスペースに対するユーザー権限セット</p><p style="margin-bottom:0;">または、強化されたセキュリティデータスペースを有効にした場合は、データスペースのユーザー権限セットデータアクセスレベルで「親による制御」を有効にしてください。</p></td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d47540e132" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なオブジェクト権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d47540e132" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なオブジェクト権限">オブジェクトマネージャーで強化を表示する</td>
+
+              <td headers="d47540e132" style="vertical-align:top;" class="slds-cell-wrap">データモデルオブジェクトオブジェクトの「参照」権限</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d47540e132" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なオブジェクト権限">強化を作成または更新する</td>
+
+              <td headers="d47540e132" style="vertical-align:top;" class="slds-cell-wrap">データモデルオブジェクトオブジェクトの作成、更新、削除</td>
+
+            </tr>
+          </tbody></table><p>この作業を開始する前に<a title="Data 360 データを組織で使用する強化を作成する前に、セキュリティ、データストレージ、コスト、削除、その他の考慮事項に関する重要な情報を確認してください。" href="getstarted-2.html#c360_a_enrichment_considerations">「Enrichment Considerations (強化に関する考慮事項)」</a>を参照してください。</p></div>
+    <div><p>個人 ID または統合個人 ID のプライマリキーを使用して、統合個人 DMO または個人 DMO との多対一リレーションが 1 つのエンゲージメント種別の DMO である DMO の関連リストを作成できます。 たとえば、リードのすべてのメールエンゲージメントの関連リストを作成する場合は、オブジェクトとして [メールエンゲージメント] を選択します。</p><p>連絡先メールなど、統合連絡先 DMO の関連リストを作成することもできます。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 個人に関連する DMO を使用している場合でも、ID 解決を完了し、統合個人を作成しておく必要があります。</div></div></div>
+</div>
+    <ol><li>
+        <span>取引先責任者、リード、または取引先オブジェクトの管理設定から、[<strong class="uicontrol">Data Cloud 関連リスト</strong>] を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[新規]</strong> をクリックします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[関連リスト]</strong> をクリックして、<strong class="uicontrol">[開始]</strong> をクリックします。</span>
+      </li><li>
+        <span><strong class="uicontrol">データスペース</strong>を選択します。データスペースにより、関連リストを作成できるオブジェクトが決まります。データスペースごとに使用できるデータのビューが異なります。たとえば、ブランドごとに独自のデータスペースがある場合や、本社レポートと顧客向けデータにそれぞれ異なるデータスペースがある場合などです。</span>
+      </li><li>
+        <span><strong class="uicontrol">Data Cloud オブジェクト</strong>を選択します。</span>
+      </li><li>
+        <span>Data Cloud から一致するレコードを取得するために使用される ID を識別する<strong class="uicontrol">参照フィールド</strong>を入力します。たとえば、個人を顧客としてレコードを取得する場合、[顧客 ID] 項目を使用します。サプライヤーとして個人のレコードを取得する場合は、[サプライヤー ID] 項目を使用します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>組織で強化されたセキュリティデータスペースが有効になっている場合、このステップは変更されます。</span>
+        <ul>
+          <li>拡張セキュリティデータスペースが有効になっていない場合は、[<strong class="uicontrol">Enable Controlled by Parent Permissions</strong> (親権限によって制御される有効化)] を選択し、<strong class="uicontrol">[次へ</strong>] をクリックします。</li>
+
+          <li>拡張セキュリティデータスペースが有効になっている場合は、次のステップにスキップします。</li>
+
+        </ul>
+
+      </li><li>
+        <span>組織オブジェクトのレコードページに表示される <strong class="uicontrol">[関連リストの表示ラベル]</strong> を入力します。</span>
+      </li><li>
+        <span>関連リストを追加するページレイアウトを選択します。リストはページの最後の項目として自動的に追加されますが、ページレイアウトエディターで適切な場所にドラッグできます。</span>
+        <div>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span>  個人取引先を有効にしている場合は、関連リストを個人取引先に追加することもできます。「<a title="Data 360 データを組織で使用する強化を作成する前に、セキュリティ、データストレージ、コスト、削除、その他の考慮事項に関する重要な情報を確認してください。" href="getstarted-2.html#c360_a_enrichment_considerations">強化に関する</a>考慮事項」を参照してください。</div></div></div>
+
+        </div>
+      </li><li>
+        <span>変更内容を保存します。</span>
+      </li></ol>
+
+    <div><p>関連リストに表示されるデータを絞り込む場合は、動的関連リストを作成して検索条件を追加します。たとえば、特定のデータスペースに関連するデータのみが関連リストに表示されるようにする場合は、動的関連リストでその絞り込み条件を追加します。</p></div>
+    <div><p>
+        <a name="c360_a_create_a_related_list_enrichment__image_s4w_rf1_5bc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ブックマーク" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/bookmark_60.png" id="c360_a_create_a_related_list_enrichment__image_s4w_rf1_5bc" style="width:30px;margin-bottom:0;"></span> 関連リスト強化の<a title="関連リスト強化を表示できるユーザーを制御するには、Data Cloud データスペースへのアクセス権を持つ権限セットにそれらのユーザーを割り当てます。" href="data360_general-1.html#c360_a_create_a_related_list_permset">権限セットの作成</a>
+      </p><p><strong>関連リストでサポートされるソースオブジェクトと対象オブジェクト</strong></p><p>これらの対象オブジェクトで関連リスト強化を作成できます。</p><ul>
+        <li>取引先</li>
+
+        <li>取引先責任者</li>
+
+        <li>リード</li>
+
+      </ul>
+</div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="強化に関する問題を診断して解決します。" href="#c360_a_enrichment_troubleshooting">強化のトラブルシューティング</a></li><li><a title="Data 360 データを組織で使用する強化を作成する前に、セキュリティ、データストレージ、コスト、削除、その他の考慮事項に関する重要な情報を確認してください。" href="getstarted-2.html#c360_a_enrichment_considerations">強化に関する考慮事項</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_currency_for_batch_transform">
+<h1 class="slds-text-heading_large">一括処理データ変換の通貨の設定</h1>
+ 
+ <p>データ変換で通貨値を使用するには、通貨を設定します。それ以外の場合、データは変更されません。この設定では、マルチ通貨のデータを 1 つの値に変換します。たとえば、データに GBP と USD が含まれており、通貨を USD に設定した場合、GBP 値は変換で使用するために自動的に USD に変換されます。</p>
+
+  <ol><li>
+    <span>1 つ以上の入力ノードを含む一括処理データ変換で、[設定] から [<strong class="uicontrol">通貨を設定</strong>] を選択します。</span>
+   </li><li>
+    <span>使用可能な通貨のドロップダウンから通貨を選択します。</span>
+    <div>入力ノードの通貨値は、選択した通貨に変換されます。</div>
+   </li><li>
+    <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+    <div>
+     <p dir="ltr">データプレビューには新しい通貨設定が反映されます。</p>
+    </div>
+   </li></ol>
+
+ 
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_delete_a_copy_field_enrichment">
+<h1 class="slds-text-heading_large">コピー項目強化の削除</h1>
+  <p>コピー項目強化を削除して、Data Cloud からのデータの更新を停止します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table><p>強化を使用するには、Data Cloud ユーザーとしてのアクセス権が必要です。</p><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d193448e62" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d193448e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">オブジェクトマネージャーで強化を表示する</td>
+
+              <td headers="d193448e62" style="vertical-align:top;" class="slds-cell-wrap">「設定の参照」 </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d193448e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">特定の強化を表示する</td>
+
+              <td headers="d193448e62" style="vertical-align:top;" class="slds-cell-wrap">強化で使用されるデータスペースへのアクセス権が必要です。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d193448e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">特定の強化を作成または更新する</td>
+
+              <td headers="d193448e62" style="vertical-align:top;" class="slds-cell-wrap"><p>標準データスペースの場合: 強化で使用されるデータスペースへのアクセス権が必要です。</p><p style="margin-bottom:0;">強化されたセキュリティデータスペース: Data Cloud データスペース管理権限の場合、自分に割り当てられている各データスペースの「データアクション」機能の「カスタマイズ」権限が有効になっている必要があります。</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d193448e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">特定の強化を削除する</td>
+
+              <td headers="d193448e62" style="vertical-align:top;" class="slds-cell-wrap">強化で使用されるデータスペースへのアクセス権が必要です。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d193448e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">強化を削除する</td>
+
+              <td headers="d193448e62" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d193448e135" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なオブジェクト権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d193448e135" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なオブジェクト権限">オブジェクトマネージャーで強化を表示する</td>
+
+              <td headers="d193448e135" style="vertical-align:top;" class="slds-cell-wrap">データアクション定義オブジェクトに対する「参照」権限。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d193448e135" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なオブジェクト権限">オブジェクトマネージャーで強化を削除する</td>
+
+              <td headers="d193448e135" style="vertical-align:top;" class="slds-cell-wrap">データアクション定義オブジェクトに対する「作成」、「更新」、および「削除」権限。</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>コピー項目強化を削除すると、Data Cloud のデータを含む項目の更新は停止されますが、項目またはデータは組織から削除されません。</p></div>
+    <ol><li>
+        <span>[設定] から、[<strong class="uicontrol">インテグレーション]</strong>、[<strong class="uicontrol">強化]</strong>、[<strong class="uicontrol">フィールドをコピー</strong>] の順に選択します。</span>
+      </li><li>
+        <span>削除する強化の名前をクリックします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[削除]</strong> をクリックします。</span>
+      </li><li>
+        <span>強化を削除することを確認するには、<strong class="uicontrol">[削除]</strong> をもう一度クリックします。</span>
+      </li></ol>
+
+    <div><p>
+      <a name="c360_a_delete_a_copy_field_enrichment__image_s4w_rf1_5bc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ブックマーク" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/bookmark_60.png" id="c360_a_delete_a_copy_field_enrichment__image_s4w_rf1_5bc" style="width:30px;margin-bottom:0;"></span> 360 データとインサイトによる組織の<a title="Data 360 強化を使用して、組織全体のクリーンアップおよびハーモナイズされたデータを組織に追加します。Data 360 のデータを使用して、レコードページの関連リストとコピー項目の強化を作成します。" href="insights_query-2.html#c360_a_enrich_your_org_with_data_and_insights">強化</a>
+    </p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_delete_a_related_list_enrichment">
+<h1 class="slds-text-heading_large">関連リストの強化の削除</h1>
+  <p>関連リストの強化を削除して、Data 360 のデータを照会できないようにします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table><p>強化を使用するには、Data Cloud ユーザーとしてのアクセス権が必要です。</p><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d119888e62" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d119888e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">オブジェクトマネージャーで強化を表示する</td>
+
+              <td headers="d119888e62" style="vertical-align:top;" class="slds-cell-wrap">「設定の参照」 </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d119888e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">特定の強化を表示する</td>
+
+              <td headers="d119888e62" style="vertical-align:top;" class="slds-cell-wrap">強化で使用されるデータスペースへのアクセス権が必要です。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d119888e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">強化を削除する</td>
+
+              <td headers="d119888e62" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d119888e111" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なオブジェクト権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d119888e111" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なオブジェクト権限">強化を削除する</td>
+
+              <td headers="d119888e111" style="vertical-align:top;" class="slds-cell-wrap">データアクション定義オブジェクトに対する「作成」、「更新」、および「削除」権限。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d119888e111" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なオブジェクト権限">オブジェクトマネージャーで強化を表示する</td>
+
+              <td headers="d119888e111" style="vertical-align:top;" class="slds-cell-wrap">データアクション定義オブジェクトに対する「参照」権限。</td>
+
+            </tr>
+          </tbody></table><p>強化を削除する前に、ページレイアウトエディターを使用して、取引先責任者またはリードレコードページから強化を削除します。</p></div>
+    <div><p>関連リスト強化を削除すると、強化の関連リストコンポーネントは Data 360 からデータを取得できなくなります。</p></div>
+    <ol><li>
+        <span>取引先責任者またはリードのオブジェクト管理設定で、<strong class="uicontrol">[Data Cloud 関連リスト]</strong> を選択します。</span>
+      </li><li>
+        <span>削除する強化の名前をクリックします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[削除]</strong> をクリックします。</span>
+      </li><li>
+        <span>強化を削除することを確認するには、<strong class="uicontrol">[削除]</strong> をもう一度クリックします。</span>
+      </li></ol>
+
+    <div><p>
+        
+        <a name="c360_a_delete_a_related_list_enrichment__image_bq1_nf1_5bc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ブックマーク" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/bookmark_60.png" id="c360_a_delete_a_related_list_enrichment__image_bq1_nf1_5bc" style="width:30px;margin-bottom:0;"></span> 360 データとインサイトによる組織の<a title="Data 360 強化を使用して、組織全体のクリーンアップおよびハーモナイズされたデータを組織に追加します。Data 360 のデータを使用して、レコードページの関連リストとコピー項目の強化を作成します。" href="insights_query-2.html#c360_a_enrich_your_org_with_data_and_insights">強化</a>
+      </p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_enrichment_troubleshooting">
+<h1 class="slds-text-heading_large">強化のトラブルシューティング</h1>
+  <p>強化に関する問題を診断して解決します。</p>
+
+    <p>組織のデータは、データスペース、オブジェクト、対応付け、Data Cloud のデータ取り込みによって異なります。</p>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">空白の関連リスト</h2><p>ユーザーから関連リストが空白であるという問い合わせがあり、確認したらデータが表示されている場合は、そのユーザーに割り当ててある権限セットでデータスペースにアクセスできることを確認してください。</p><p>関連リストが空白になっている場合は、データストリームでキー修飾子が必要ないことを確認してください。キー修飾子が必要なのは、CRM コネクタを使用して直接データを取り込まず、別のシステムやサービスを経由してデータを取り込むという、まれなケースにおいてのみです。</p><p>Data Cloud では、特定の<a target="_blank" href="data360_general-1.html#c360_a_data_types_and_date_formats">日付形式が</a>サポートされています。サポートされている日付形式を使用していることを確認します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">空白のコピー項目</h2><p>コピーする項目のデータが使用できない場合は、次の点を確認してください。</p><ul>
+        <li>有効な ID 照合方法が選択されました。使用している条件が基礎となるデータと一致しない場合、データは返されません。</li>
+
+        <li>オブジェクトとオブジェクトに対して設定されているデータスペースが変更されていない。</li>
+
+        <li>オブジェクトのデータストリームが正常に接続され、データが取り込まれている。</li>
+
+        <li>正しいキー修飾子を指定した。通常、キー修飾子は必要ありません。ただし、誤ったキー修飾子を指定すると、コピー項目強化で誤ったデータがコピーされる可能性があります。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">コピー項目が誤ったデータをコピーしている</h2><p>コピー項目に正しい項目のデータが表示されない場合は、正しいキー修飾子が指定されていることを確認してください。キー修飾子が必要なのは、CRM コネクタを使用して組織から Data Cloud にデータを取り込まない場合のみです。誤ったキー修飾子を指定すると、コピー項目強化で誤ったデータがコピーされる可能性があります。</p><p>コピー項目に期待するデータが表示されない場合 (法人購入ではなく個人購入に関連するケースが表示される場合など)、正しいオブジェクトと照合する ID 照合方法を使用していることを確認します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">コピー項目の完全同期が失敗する</h2><p>取引先責任者オブジェクトまたはリードオブジェクトに対する権限がインテグレーションユーザーに対して設定されていることを確認してください。権限の設定手順については、「<a title="Data 360 強化を使用して、組織全体のクリーンアップおよびハーモナイズされたデータを組織に追加します。Data 360 のデータを使用して、レコードページの関連リストとコピー項目の強化を作成します。" href="insights_query-2.html#c360_a_enrich_your_org_with_data_and_insights">Enrich Your Org with 360</a> Data and Insights」を参照してください。権限を設定したら、同期を停止してもう一度開始します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">予期しない動作</h2><p>強化が期待どおりに動作せず、他のトラブルシューティング手順でも解決しない場合は、次の点を確認してください。</p><ul>
+        <li>オブジェクトとオブジェクトに対して設定されているデータスペースが変更されていない。</li>
+
+        <li>オブジェクトのデータストリームが正常に接続され、データが取り込まれている。</li>
+
+      </ul>
+</div>
+    <div><p>
+        <a name="c360_a_enrichment_troubleshooting__image_s4w_rf1_5bc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ブックマーク" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/bookmark_60.png" id="c360_a_enrichment_troubleshooting__image_s4w_rf1_5bc" style="width:30px;margin-bottom:0;"></span> 360 データとインサイトによる組織の<a title="Data 360 強化を使用して、組織全体のクリーンアップおよびハーモナイズされたデータを組織に追加します。Data 360 のデータを使用して、レコードページの関連リストとコピー項目の強化を作成します。" href="insights_query-2.html#c360_a_enrich_your_org_with_data_and_insights">強化</a>
+      </p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="コピー項目強化では、他のデータソースからデータを追加して、組織のレコードを強化します。組織のレコードに関連しないデータが返されるのを回避するために、強化では組織のデータと Data Cloud のデータが照合されます。データの照合方法によって、返されるデータが決まります。" href="#c360_a_copy_field_enrichment_matching">コピー項目強化の一致</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_llm_parsing_preprocessing">
+<h1 class="slds-text-heading_large">LLM ベースの解析と前処理</h1>
+  <p>LLM ベースの解析と前処理を使用して、非構造化ドキュメントからテキスト、メタデータ、テーブル、画像を抽出し、チャンク用に準備します。</p>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span>  LLM を使用してコンテンツを解析および前処理すると、クレジット消費に影響します。これは、インテリジェントな処理の利用状況種別に対して請求されます。詳細は、「非構造化データの<a target="_blank" href="https://help.salesforce.com/s/articleView?id=data.c360_a_unstructured_data_billing_considerations.htm&amp;language=ja&amp;type=5">請求に関する</a>考慮事項」を参照してください。</div></div></div>
+
+    <p>LLM ベースの解析では、テキストとメタデータが非構造化ドキュメント形式から構造化表現または半構造化表現に変換されます。たとえば、解析ではドキュメント構造 (ヘッダー、段落、またはテーブル) を識別し、無関係のコンテンツ (ヘッダー、フッター、または HTML タグ) を削除し、さらにテキストを前処理およびチャンク用に準備します。</p>
+    <p>LLM ベースのビジュアルデータの前処理では、チャンク用の画像やテーブルなどのマルチモーダル要素が準備されます。たとえば、前処理では、テーブルデータ内のコンテキストとリレーションを維持しながら、画像からコンテキストを抽出し、テーブルからデータを抽出します。</p>
+    <p>検索インデックスで LLM ベースの解析オプションと LLM ベースのビジュアル データ前処理オプションの両方を選択することはできません。LLM ベースの解析は、ドキュメント全体に画像、グラフ、テーブルなどのリッチなビジュアルコンテンツが含まれるドキュメントで使用します。このような場合は、ドキュメント全体を処理することで、コンテキストと理解が向上します。</p>
+    <p>または、ドキュメントの完全なコンテンツではなく、テーブル、グラフ、画像などの構造化されたビジュアル要素を特に処理する場合は、LLM ベースのビジュアルデータ前処理を使用します。</p>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span>  解析および前処理オプションは、UDMO の PDF、HTML、DOCX、PPTX ファイルタイプでのみ使用できます。データモデルオブジェクト (DMO) (UDMO が添付ファイルを含む) では使用できません。</div></div></div>
+
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_packaging_data_cloud_enrichments">
+<h1 class="slds-text-heading_large">Data 360 強化のパッケージ化</h1>
+ 
+ <p>第二世代管理パッケージ (2GP) を使用して、Data 360 強化を組織間で移行します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+  <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d119288e68" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d119288e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">パッケージを作成する</td>
+
+       <td headers="d119288e68" style="vertical-align:top;" class="slds-cell-wrap">「AppExchange パッケージの作成」権限</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d119288e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">パッケージをアップロードする</td>
+
+       <td headers="d119288e68" style="vertical-align:top;" class="slds-cell-wrap">「AppExchange パッケージのアップロード」権限</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d119288e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">データキットを作成する</td>
+
+       <td headers="d119288e68" style="vertical-align:top;" class="slds-cell-wrap">「Data Cloud アーキテクト」権限セット</td>
+
+      </tr>
+     </tbody></table><p>パッケージを作成するには Salesforce Developer Edition 組織、パッケージをインストールするには登録者組織が必要です。</p></div>
+  <div><p>第一世代管理パッケージ (1GP) を使用して直接 DMO メタデータをリリースするには、大きな制限があります。すべての連動関係は 1 つのパッケージに含める必要があります。つまり、基本的な CRM コンポーネント、<code>FieldSrcTrgtRelationship</code>、データキット、およびリレーションを参照する CRM カスタマイズを個別のパッケージに分割することはできません。現在、1GP では、インストール中に対象組織にメタデータがリリースされる順序を制御または順序付けることはできません。その結果、パッケージにリレーションのメタデータと参照元のカスタマイズ （ページレイアウト、Apex クラス、フローなど） の両方が含まれている場合、カスタマイズの前にリレーションが作成される保証ができないため、リリースが失敗する可能性があります。これらの順序付けと依存関係の制約により、1GP 管理パッケージでは直接 DMO パッケージがサポートされていないため、代わりに 2GP パッケージを使用して実装する必要があります。これにより、パッケージ間で依存関係を分割し、設定された順序でインストールできます。</p></div>
+  <ol><li>
+    <span>Salesforce DXプロジェクトで、パッケージ開発の情報源となるスクラッチ組織を作成します。</span>
+   </li><li>
+    <span>スクラッチ組織で、カスタムオブジェクトやカスタム項目などの基本的な CRM メタデータを設定します。</span>
+   </li><li>
+    <span><code>FieldSrcTrgtRelationship</code>を作成する直接 DMO リレーションを設定します。</span>
+   </li><li>
+    <span>作成したカスタム Data 360 メタデータを含む Data 360 データキットを作成します。</span>
+   </li><li>
+    <span>データキットを確認して公開し、必要なすべての連動関係が含まれていることを確認します。</span>
+   </li><li>
+    <span>CRMコンポーネント、データ キット、リレーションのメタデータをSalesforce DXプロジェクトに取り込みます。</span>
+   </li><li>
+    <span>最初の 2GP パッケージを作成します。これには、基本的な CRM メタデータ (カスタムオブジェクト、カスタムフィールド)、リレーションの<code>FieldSrcTrgtRelationship</code>およびカスタム参照項目、データキットが含まれます。</span>
+   </li><li>
+    <span>同じスクラッチ組織で、直接 DMO リレーションを参照する追加の CRM カスタマイズ (ページレイアウト、Apex クラス、フローなど) を作成します。</span>
+   </li><li>
+    <span>これらのカスタマイズをプロジェクトに取り込みます。</span>
+   </li><li>
+    <span>直接 DMO リレーションを参照する CRM カスタマイズが含まれる 2 番目の 2GP パッケージを作成します。</span>
+   </li><li>
+    <span>両方のパッケージを順序どおりにインストールして (最初に基盤、次にカスタマイズ)、対象組織にダイレクト DMO 機能をリリースします。</span>
+   </li></ol>
+
+ 
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_parsing_preprocessing_content">
+<h1 class="slds-text-heading_large">コンテンツの解析と前処理</h1>
+  <p><span>Data 360</span>のコンテンツ解析および前処理方法を使用して、チャンク用の非構造化データを準備します。解析と前処理では、ヘッダー、段落、テーブルなどのドキュメント構造を識別し、無関係のコンテンツを削除して、チャンクやインデックス付けのためにテキストを準備します。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="#c360_a_llm_parsing_preprocessing">LLM ベースの解析と前処理</a></strong><br>LLM ベースの解析と前処理を使用して、非構造化ドキュメントからテキスト、メタデータ、テーブル、画像を抽出し、チャンク用に準備します。</li><li class="slds-p-bottom_small"><strong><a href="data360_general-1.html#c360_a_docling_parser">Docling Parser</a></strong><br>Docling パーサーは、レイアウトの理解とテーブルの抽出のために複数のオープンソースモデルをまとめたサードパーティのインテリジェントなドキュメント解析フレームワークです。画像や複雑なテーブルで使用可能な情報からの回答を強化するには、大規模言語モデル (LLM) を使用して Docling パーサーを画像処理と組み合わせます。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_prepare_and_model_data">
+<h1 class="slds-text-heading_large">データの準備とモデル化</h1>
+  <p><span>Data 360</span>に取り込まれるデータは、マッピングする前に変換および準備できます。データ マッピング時に、保持されたデータソース スキーマは、Customer 360 データ モデルと呼ばれる、評価され拡張可能なデータ モデルにマッピングされます。データがマッピングされたら、データをさらに照会および操作して、Salesforce 全体で使用しやすくすることができます。</p>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 
+        <p>2025 年 10 月 14 日以降、Data Cloud は Data 360 にブランド変更されました。 この移行中に、アプリケーションやドキュメントで Data Cloud への参照が見られることがあります。名前は新しくなりますが、機能とコンテンツに変更はありません。</p>
+      </div></div></div>
+
+    <div><p>このデータモデルは、データソースオブジェクト (DLO) からデータモデルオブジェクト (DMO) へのマッピングとリレーションの操作を介して、Customer 360 データモデルによって提供されます。個人に関する情報は統合個人 DMO に保存されるため、マーケターはセグメンテーション戦略を作成して有効化対象を介してこれらのセグメントを公開できます。</p><p>詳細については、関連する Trailhead コンテンツを参照してください。</p><p><span style="vertical-align:text-bottom;display:inline-block;"><img alt="Trailhead のアイコン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/landing_trailhead_alt.png" style="width:20px;margin-bottom:0;"></span><a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/modules/customer-360-data-model-for-customer-data-platform">Data 360のCustomer 360データ モデル</a></p><p><span style="vertical-align:text-bottom;display:inline-block;"><img alt="Trailhead のアイコン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/landing_trailhead_alt.png" style="width:20px;margin-bottom:0;"></span><a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/modules/batch-data-transforms-in-data-cloud-quick-look">Data 360 での一括処理データ変換: クイックルック</a></p><p><span style="vertical-align:text-bottom;display:inline-block;"><img alt="Trailhead のアイコン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/landing_trailhead_alt.png" style="width:20px;margin-bottom:0;"></span><a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/modules/streaming-data-transforms-quick-look">Data 360 でのストリーミングデータ変換: クイックルック</a></p><div style="text-align:left;">
+        <a name="c360_a_prepare_and_model_data__image_xvq_dhs_vcc"></a><img alt="グラフィック区切り" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/Comms_DC_Divider_tan.png" id="c360_a_prepare_and_model_data__image_xvq_dhs_vcc" style="width:1200px;">
+      </div></div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#c360_a_cleansing_data">データの整理とデータプレップ</a></strong><br><span>Data 360</span>のセグメンテーションおよび有効化機能を使用する場合、データのクリーンアップと準備は成功のために不可欠です。</li><li class="slds-p-bottom_small"><strong><a href="model_mapping-1.html#c360_a_data_mapping">データマッピング</a></strong><br>すべてのデータストリームによって取り込まれたデータは、データレークオブジェクト (DLO) に書き込まれます。データストリームを作成したら、DLO をデータモデルオブジェクト (DMO) に関連付ける必要があります。リレーションによりマッピングされた項目およびオブジェクトのみをセグメンテーションと有効化で使用できます。</li><li class="slds-p-bottom_small"><strong><a href="model_mapping-2.html#c360_a_data_model_objects">データモデルオブジェクト (DMO)</a></strong><br>データモデルオブジェクト (DMO) を作成、表示、管理します。DMO は Data 360 の基本です。 DMO を作成または操作する前に、DMO に関連する定義、概念、リソースについてよく理解してください。</li><li class="slds-p-bottom_small"><strong><a href="insights_query-2.html#c360_a_data_graphs">データグラフ</a></strong><br>データグラフでは、<span>Data 360</span> のデータモデルオブジェクト (DMO) の構造化データがまとめられます。このデータを組み合わせて、情報の使いやすいビューを作成します。</li><li class="slds-p-bottom_small"><strong><a href="data360_general-2.html#c360_a_simple_start">Data 360 での簡単な開始</a></strong><br>シンプルスタートで Data 360 の初期設定を合理化します。メタデータを同期し、Salesforce CRM データの標準化されたデータ構造を数分で作成することで、手動のバンドル設定と項目の対応付けをスキップします。最初はメタデータのみが同期されるため、クレジットは関連データストリームとダウンストリームプロセスを有効化した後にのみ消費します。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_prepare_home_org_for_dcone">
+<h1 class="slds-text-heading_large">Data Cloud ホーム組織から Data Cloud One コンパニオン組織への変換</h1>
+  
+  <p>ホーム組織をコンパニオン組織に変換するには、まず組織からすべての Data Cloud データを削除してから、コンパニオン組織として別の Data Cloud インスタンスに接続します。Data Cloud が有効になっている組織を変換することはできません。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d155385e69" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d155385e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Data Cloud 設定にアクセスする</td>
+
+              <td headers="d155385e69" style="vertical-align:top;" class="slds-cell-wrap"><p>システム管理者プロファイルまたは </p><p style="margin-bottom:0;">「Data Cloud アーキテクト」権限セット</p></td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>Data Cloud データに依存するプロセスを削除または更新します。</span>
+        <div>Data Cloud を無効にすると、更新されていないプロセスと機能が中断します。</div>
+      </li><li>
+        <span>Data Cloud ホーム組織ライセンスを Data Cloud One コンパニオン組織ライセンスと交換するには、アカウントエグゼクティブにお問い合わせください。</span>
+        <div>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Data Cloud ホーム組織ライセンスを置き換えると、Data Cloud データ、メタデータ、設定、およびデータスペースは 120 日間の猶予期間中組織に残りますが、アクセスできなくなります。組織を Data Cloud One コンパニオン組織として接続するには、すべてのメタデータ、データ、データスペースを削除します。</div></div></div>
+
+        </div>
+      </li><li>
+        <span>Data Cloud クリーンアッププロセスに従って、組織からすべての Data Cloud データを削除します。</span>
+      </li></ol>
+
+    <div><p>Data Cloud インスタンスとそのデータが削除されたら、ホーム組織から接続を開始してコンパニオン組織として接続します。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_segmentation_b2b_hierarchical_aggregation">
+<h1 class="slds-text-heading_large">セグメント検索条件での階層集計 </h1>
+  <p>階層集計では、取引先とその関連子会社の収益を積み上げ集計することで、データを包括的に把握できます。その後、複数のレベルの集計値に基づいて、より正確なセグメント検索条件を定義できます。</p>
+
+    <p>階層集計にはいくつかの利点があります。</p>
+    <ul>
+      <li>データ集計を実行するときに階層化された取引先構造を正確に反映します。</li>
+
+      <li>取引先とその関連子会社の収益を積み上げ集計することで、データをより包括的に把握できます。集計値を使用して、より正確で意味のあるセグメント検索条件を作成します。</li>
+
+    </ul>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">例</h2><p>Global Corp は複数の地域支店と現地オフィスを監視しており、商談金額の合計 (潜在的な売上または商談) は 300,000 ドルです。 米国支店はこの合計に 100,000 ドルを拠出し、2 つの EU 支店の現地オフィスはそれぞれ 100,000 ドルを拠出しています。</p><div style="text-align:left;">
+        <img alt="階層集計のしくみを説明する図。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_b2b_hierarchy_example.png" style="width:660px;">
+      </div><p>Global Corp の商談金額の合計は次のとおりです。</p><ul>
+        <li>米国支店から $100,000</li>
+
+        <li>EU 支店から $200,000 (ローカルオフィス 1 とローカルオフィス 2 の合計)</li>
+
+      </ul>
+<p>この階層集計は、最上位の会社から地域の支店や現地オフィスに至るまで、商談がどのように構成されているかを示しています。</p></div>
+    <div><p>階層集計を使用するには、<a target="_blank" href="https://help.salesforce.com/s/articleView?id=data.c360_a_use_a_container.htm&amp;language=ja&amp;type=5">セグメンテーションのコンテナ</a>を作成するときに有効にします。</p></div>
+  
+</div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="transform_prep-1.html">&larr; データ変換・準備・クレンジング・バッチ/ストリーミング（1/2）</a><a href="identity-1.html">ID解決・プロファイル統合・照合（1/2） &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=data.c360_a_data_cloud.htm&type=5&language=ja">help.salesforce.com — Data 360（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>

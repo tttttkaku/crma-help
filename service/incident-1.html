@@ -1,0 +1,1902 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>インシデント管理・スウォーミング（1/3） | Service Cloud ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（34）</h2>
+    <ol>
+      <li><a href="#actions_and_recs_swarming">アクション &amp; おすすめを使用したスウォーム</a></li>
+      <li><a href="#add_members_swarm">Lightning Experience でのスウォームへのメンバーの追加</a></li>
+      <li><a href="#console_objects_swarming">スウォーミング用のサービスコンソールの設定</a></li>
+      <li><a href="#create_swarm_report">スウォームレポートの作成</a></li>
+      <li><a href="#dynamic_actions_swarming">動的アクションを使用したスウォーム</a></li>
+      <li><a href="#finish_swarming">Lightning Experience でのスウォームのクローズ</a></li>
+      <li><a href="#incident_mgmt">カスタマーサービスインシデント管理を使用した中断の解決</a></li>
+      <li><a href="#incident_mgmt_add_a_broadcast_site_banner">ヘルプサイトへのブロードキャストサイトバナーの追加</a></li>
+      <li><a href="#incident_mgmt_add_broadcasts_to_incident">インシデントレコードへのブロードキャスト通信の追加</a></li>
+      <li><a href="#incident_mgmt_add_entitlements_page_layout">ページレイアウトへのエンタイトルメントの追加</a></li>
+      <li><a href="#incident_mgmt_add_incident_alert">インシデントアラートユーティリティの Lightning コンソールアプリケーションへの追加</a></li>
+      <li><a href="#incident_mgmt_add_milestones">インシデントページレイアウトへのマイルストーンコンポーネントの追加</a></li>
+      <li><a href="#incident_mgmt_add_related_to_cases">インシデントおよびケースページレイアウトへの関連項目の追加</a></li>
+      <li><a href="#incident_mgmt_add_site_banner_component">サイトバナーコンポーネントのサイトへの追加</a></li>
+      <li><a href="#incident_mgmt_admin_setup_work_plan">システム管理者による設定</a></li>
+      <li><a href="#incident_mgmt_agent_work_plans">サポート担当者の作業プラン</a></li>
+      <li><a href="#incident_mgmt_alerts_customize_all_incidents">インシデントアラートの [すべて] タブのカスタマイズ</a></li>
+      <li><a href="#incident_mgmt_assign_access">ユーザーへのカスタマーサービスインシデント管理に対するアクセス権の付与</a></li>
+      <li><a href="#incident_mgmt_assign_broadcast_comms_access">ユーザーへのブロードキャスト通信に対するアクセス権の付与</a></li>
+      <li><a href="#incident_mgmt_assign_topic_to_channel">Slack チャンネルへのブロードキャストトピックの割り当て</a></li>
+      <li><a href="#incident_mgmt_assign_topic_to_group">グループへのブロードキャストトピックの割り当て</a></li>
+      <li><a href="#incident_mgmt_assign_topic_to_network">ネットワークサイトへのブロードキャストトピックの割り当て</a></li>
+      <li><a href="#incident_mgmt_automate">カスタマーサービスインシデント管理を使用した自動化</a></li>
+      <li><a href="#incident_mgmt_broadcast_communications_for_incident_management">ブロードキャスト通信の使用</a></li>
+      <li><a href="#incident_mgmt_case_vs_incident">ケースとインシデント</a></li>
+      <li><a href="#incident_mgmt_comms">ブロードキャスト通信を使用したインシデントの最新情報の共有</a></li>
+      <li><a href="#incident_mgmt_comms_limitations">ブロードキャスト通信に関する考慮事項</a></li>
+      <li><a href="#incident_mgmt_create_broadcast_topic">ブロードキャストサイトバナーのブロードキャストトピックの作成</a></li>
+      <li><a href="#incident_mgmt_create_bt_alert">ブロードキャストアラートのブロードキャストトピックの作成</a></li>
+      <li><a href="#incident_mgmt_create_bt_slack">ブロードキャスト Slack メッセージのブロードキャストトピックの作成</a></li>
+      <li><a href="#incident_mgmt_create_change_request">変更要求の作成</a></li>
+      <li><a href="#incident_mgmt_create_entitlement">インシデントのエンタイトルメントの作成</a></li>
+      <li><a href="#incident_mgmt_create_incident">インシデントの作成</a></li>
+      <li><a href="#incident_mgmt_create_incident_channel">インシデントチャネルの作成</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>インシデント管理・スウォーミング（1/3）</h1>
+      <div class="meta">Salesforce Service Cloud ヘルプ · 34 記事 · 生成 2026-08-13</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="voice_messaging-2.html">&larr; Voice・メッセージング・チャネル（2/2）</a><a href="incident-2.html">インシデント管理・スウォーミング（2/3） &rarr;</a></div>
+<section class="article" id="actions_and_recs_swarming">
+<h1 class="slds-text-heading_large">アクション &amp; おすすめを使用したスウォーム</h1>
+  <p>アクション &amp; おすすめコンポーネントを使用すると、ユーザーはコンソールで有効になっているフローに簡単にアクセスできます。このコンポーネントのフローは、レコードのネストされたサブタブで起動されます。レコードを切り替えて、他のタブで使用する情報を表示できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> アクション &amp; おすすめコンポーネントは、フローや関連リストなどのスウォーミングアクションを専用の [スウォーミング] タブにまとめて、ページの上限超過を軽減することを目的とする場合に最適です。</div></div></div>
+</div>
+    <ol><li>
+        <span>オブジェクトを使用してリリースを作成します。ケースを使用したアクション &amp; おすすめリリースがある場合は、このステップをスキップできます。<a name="actions_and_recs_swarming__image_mzy_wfk_2tb"></a><div style="text-align:left;"><img alt="アクション &amp;amp; おすすめでのスウォーミング" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/actions_and_recs.png" id="actions_and_recs_swarming__image_mzy_wfk_2tb" style="width:800px;"></div></span>
+        <ol>
+          <li>
+            <span>[設定] から、[クイック検索] ボックスに<kbd>「アクション &amp; おすすめ」</kbd>と入力し、<strong class="uicontrol">[アクション &amp; おすすめ]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>アクション &amp; おすすめリリースを作成するには、<strong class="uicontrol">[新規リリース]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>新しいリリースに「Swarming Flows」 (スウォーミングフロー) のような簡潔でわかりやすい名前を付けます。<a name="actions_and_recs_swarming__image_xlj_1gk_2tb"></a><div><img alt="新しいリリースの設定" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/new_deployment.png" id="actions_and_recs_swarming__image_xlj_1gk_2tb" style="width:600px;"></div></span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[フローおよびクイックアクション]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>ケースやインシデントなど、スウォーミングをサポートするオブジェクトを選択します。複数のオブジェクトを選択できます。</span>
+          </li>
+
+          <li>
+            <span>[デフォルト] タブで、次のフローをリリースのチャネルのデフォルトアクションとして使用します。<div style="text-align:left;"><img alt="[デフォルト] タブに追加されたスウォーミングフローが含まれるリリースモーダル" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/edit_deployment.png"></div></span>
+            
+              <ul>
+                <li>スウォーミングを開始</li>
+
+                <li>メンバーをスウォームに追加</li>
+
+                <li>スウォーミングを完了</li>
+
+                <li>スウォーム<a name="actions_and_recs_swarming__image_r5q_ggk_2tb"></a><div><img alt="アクション &amp;amp; おすすめリリースの設定" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/edit_deployment.png" id="actions_and_recs_swarming__image_r5q_ggk_2tb" style="width:600px;"></div>を再オープン</li>
+
+              </ul>
+
+            
+          </li>
+
+          <li>
+            <span>ユーザーが独自のフローをアクション &amp; おすすめコンポーネントに追加できるようにするには、アクションを選択して保存します。自分で設定したアクションのみを表示するには、すべてのアクションを選択解除して、変更内容を保存します。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span><strong class="uicontrol">[アクション &amp; おすすめ]</strong> をオブジェクトレコードページレイアウトに追加して、スウォーミングフローを追加したリリースを選択します。</span>
+        <ol>
+          <li>
+            <span><strong class="uicontrol">[Lightning アプリケーションビルダーに移動]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>スウォーミングフローを追加する Lightning ページを選択して、<strong class="uicontrol">[編集]</strong> をクリックします。</span>
+          </li>
+
+          <li>
+            <span>該当する場合は、アクション &amp; おすすめコンポーネントを追加します。</span>
+          </li>
+
+          <li>
+            <span>コンポーネントから <strong class="uicontrol">[Swarming Flows (スウォーミングフロー)]</strong> リリースを選択します。</span>
+          </li>
+
+          <li>
+            <span>変更内容を保存します。</span>
+          </li>
+
+        </ol>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=service.console_lex_guided_action_list_component.htm&amp;language=ja&amp;type=5">サービスの Flow Builder とアクション &amp; おすすめコンポーネント</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=service.console_lex_guided_action_deployment.htm&amp;language=ja&amp;type=5">アクション &amp; おすすめリリースの作成</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="add_members_swarm">
+<h1 class="slds-text-heading_large">Lightning Experience でのスウォームへのメンバーの追加</h1>
+  <p>顧客の問題を解決するときに異なるスキルを持つ他のユーザーから支援が必要な場合、進行中のスウォームにメンバーを追加できます。エキスパートファインダーを使用して、スキル、対応可能状況、業務量の観点から最適なユーザーを検索します。またはユーザーを直接名前で追加します。エキスパートファインダーを使用している場合、オムニチャネルは、対応可能で指定されたスキルを持つ最適なユーザーに招待を転送し、ケースとスウォームのスウォームメンバーレコードを作成します。スウォームメンバーを名前で追加したり、エキスパートファインダーでスキル別に検索したり、スウォームメンバーの追加をスキップして後で追加したりできます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table></div>
+    <ol><li>
+        <span>アクション &amp; おすすめ、動的アクション、クイックアクションから [<strong class="uicontrol">メンバーをスウォーム</strong>に追加] フローを開始します。 <a name="add_members_swarm__image_acy_1jl_2tb"></a><div style="text-align:left;"><img alt="メンバー追加モーダル" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/lex_member.png" id="add_members_swarm__image_acy_1jl_2tb" style="width:400px;"></div></span>
+      </li><li>
+        <span>特定のチームメンバーを追加するには、対応するオプションを選択し、促されたら名前を入力します。「<a title="スウォーミングを使用する前に、その制限事項を理解しておきましょう。" href="incident-3.html#service_swarming_limitations">スウォームメンバーの追加</a>に関する考慮事項」を参照してください。<a name="add_members_swarm__image_onp_djl_2tb"></a><div style="text-align:left;"><img alt="メンバー追加モーダル" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/add_member_lex.png" id="add_members_swarm__image_onp_djl_2tb" style="width:400px;"></div></span>
+      </li><li>
+        <span>エキスパートファインダーを使用してチームメンバーを追加するには、対応するオプションを選択し、スウォームを完了するのに必要なスキルを選択します。このオプションでは、エキスパートファインダーはオムニチャネルルーティングを使用して、サポート業務量がある適格なサポート担当者を検索します。エキスパートサポート担当者は、スウォームメンバー要求を受信し、受け入れるか却下するかを選択できます。<a name="add_members_swarm__image_ycd_hjl_2tb"></a><div style="text-align:left;"><img alt="エキスパートファインダーを使用したメンバーの追加" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/swarm_begin_swarm_modal.png" id="add_members_swarm__image_ycd_hjl_2tb" style="width:400px;"></div></span>
+      </li><li>
+        <span>フローを使用して複数の新規メンバーをスウォームに追加するには、そのメンバーの名前を入力するか、エキスパートファインダーを使用して、スウォームに目的のメンバーがすべて入るまでこのステップを繰り返します。メンバーを追加し終えたら、<strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li></ol>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> サービス契約エキスパートとスウォーミングしていて、問題が顧客の契約に違反するかどうかを判断する必要が生じた場合、取引先スペシャリストをスウォームに追加します。</div></div></div>
+    <div><p>オムニチャネルは、スウォーム要求レコードを、スキル仕様に一致する業務量を持つ他の対応可能なサポート担当者に転送します。スウォームメンバーが作成されると、ケース所有者がデフォルトで所有者として割り当てられます。誰かが招待を受け入れると、レコードの状況が [新規] から [処理中] に自動的に変更され、そのユーザーがスウォームメンバーのレコード所有者として再割り当てされます。</p><div style="text-align:left;">
+        <a name="add_members_swarm__image_k4q_kjl_2tb"></a><img alt="オムニチャネルビューアーでのスウォーミング" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/omni_viewer.png" id="add_members_swarm__image_k4q_kjl_2tb" style="width:600px;">
+      </div><p>スウォームとスウォームメンバーを参照するには、レコードの [スウォームメンバー] 関連リストおよび [スウォーム] 関連リストを確認します。スウォームメンバーの状況が自動的に [新規] に設定されます。</p><p>Slack からスウォームチャネルに参加したまたは追加された Salesforce ユーザーや、スウォーム会話に貢献している Salesforce ユーザーは、スウォームが開いている限り、スウォームメンバーとして Salesforce に自動的に追加されます。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="console_objects_swarming">
+<h1 class="slds-text-heading_large">スウォーミング用のサービスコンソールの設定</h1>
+  <p>サポート担当者のスウォーミング環境を最適化し、スウォーミングページレイアウト、タブ、および関連リストを使用してスウォーミングを前面中央に配置します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table><div>
+        <a name="console_objects_swarming__image_vzh_v2d_tcc"></a><img alt="サービスコンソール" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/service_slack_console.png" id="console_objects_swarming__image_vzh_v2d_tcc" style="width:800px;">
+      </div></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=service.console_lex_create_custom.htm&amp;language=ja&amp;type=5">カスタム Lightning コンソールアプリケーションの作成および編集</a></li></ul></div>
+<div id="swarming_add_swarming_objects" lang="ja-jp" aria-labelledby="ariaid-title2" class="nested1"><a name="swarming_add_swarming_objects"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">サービスコンソール Lightning コンソールアプリケーションへのスウォーミングオブジェクトの追加</h2>
+  <p>スウォームコラボレーターが進行中のスウォームを容易に見つけられるようにするには、スウォーミングオブジェクトをコンソールアプリケーションのナビゲーション項目に追加します。</p>
+
+    <ol><li>
+        <span>[設定] で、[クイック検索] ボックスに<kbd>「スウォーミング」</kbd>と入力して、<strong class="uicontrol">[スウォーミング]</strong> を選択します。</span>
+      </li><li>
+        <span>[スウォーミング用のサービスコンソールを設定] で、<strong class="uicontrol">[アプリケーションマネージャーに移動]</strong> を選択します。</span>
+      </li><li>
+        <span>[サービスコンソール] の横にあるドロップダウンをクリックし、<strong class="uicontrol">[編集]</strong> を選択します。</span>
+      </li><li>
+        <span>[ナビゲーション項目] で、次のナビゲーション項目を追加します。</span>
+        <ol>
+          <li>
+            <span>スウォーム</span>
+          </li>
+
+          <li>
+            <span>スウォームメンバー</span>
+          </li>
+
+          <li>
+            <span>ケース</span>
+          </li>
+
+          <li>
+            <span>レポート</span>
+          </li>
+
+          <li>
+            <span>ダッシュボード</span>
+          </li>
+
+          <li>
+            <span>オムニスーパーバイザー (エキスパートファインダーを使用するために必要)</span>
+          </li>
+
+          <li>
+            <span>サービスリソース (エキスパートファインダーを使用するために必要)</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>変更内容を保存します。<a name="swarming_add_swarming_objects__image_zt2_qfk_2tb"></a><div style="text-align:left;"><img alt="ナビゲーション項目設定ページ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/nav_items.png" id="swarming_add_swarming_objects__image_zt2_qfk_2tb"></div></span>
+      </li><li>
+        <span>Lightning コンソールアプリケーションをスウォーミングユーザープロファイルに割り当てます。</span>
+        <ol>
+          <li>
+            <span>アプリケーションマネージャーで、<strong class="uicontrol">[ユーザープロファイル]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span><a title="Lightning Experience でレコードをスウォーミングするために必要な権限をユーザーに付与します。Slack でのスウォーミングへのアクセス権を含む「Slack Service ユーザー」権限セットを割り当てるか、必要な権限を含む権限セットを作成します。" href="incident-3.html#set_up_perms_swarming">スウォーミングユーザープロファイル</a>を [選択済みプロファイル] に追加して、変更内容を保存します。</span>
+          </li>
+
+        </ol>
+      </li></ol>
+
+  
+</div>
+<div id="swarming_related_lists" lang="ja-jp" aria-labelledby="ariaid-title3" class="nested1"><a name="swarming_related_lists"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">ページレイアウトへの [スウォーム] 関連リストと [スウォームメンバー] 関連リストの追加</h2>
+  <p>Salesforce で問題に関連するスウォームとそのスウォームメンバーを表示するには、[スウォーム] 関連リストと [スウォームメンバー] 関連リストをページレイアウトに追加します。</p>
+
+    <ol><li>
+        <span>[設定] から、<kbd>「スウォーミング」</kbd>と入力し、<strong class="uicontrol">[スウォーミング]</strong> を選択します。</span>
+      </li><li>
+        <span>[スウォーミング用のサービスコンソールを設定] で、<strong class="uicontrol">[オブジェクトマネージャーに移動]</strong> を選択します。</span>
+      </li><li>
+        <span>ページレイアウトを設定するオブジェクトを選択します。たとえば、スウォーム関連リストをケースレコードに追加するには、ケースページレイアウトを設定します。</span>
+      </li><li>
+        <span>オブジェクトの [<strong class="uicontrol">ページレイアウト]</strong> に移動し、[スウォーム] 関連リストと [スウォームメンバー] 関連リストを追加します。<div style="text-align:left;"><img alt="ページレイアウトで強調表示されている [スウォームメンバー] 関連リストと [スウォーム] 関連リスト" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/service_swarm_page_layout.png"></div></span>
+      </li><li>
+        <span>変更内容を保存します。</span>
+      </li><li>
+        <span>レコードから [スウォーム] 関連リストと [スウォームメンバー] 関連リストを表示するためのレコードページの [スウォーミング] タブを作成します。</span>
+        <ol>
+          <li>
+            <span>[オブジェクトマネージャー] のオブジェクトで、<strong class="uicontrol">[Lightning レコードページ]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[スウォーミング] 関連リストを追加するレコードページ (ケースレコードページなど) を選択して、<strong class="uicontrol">[編集]</strong> をクリックします。</span>
+          </li>
+
+          <li>
+            <span>[コンポーネント] パネルでタブを追加し、カスタム名オプションを選択して、「<kbd>Swarming」</kbd> (スウォーミング) という名前を付けます。<div style="text-align:left;"><img alt="スウォーミングカスタムタブが強調表示" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/service_swarm_swarming_tab.png"></div></span>
+          </li>
+
+          <li>
+            <span>[スウォーム] および [スウォームメンバー] 関連リストコンポーネントを含めます。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>レコードのスウォームメンバーリストを表示します。</span>
+        <ol>
+          <li>
+            <span>Lightning アプリケーションビルダーで、[関連リスト - 1 つ] コンポーネントを [Swarming (スウォーミング)] タブのコンソールページレイアウトに追加します。</span>
+          </li>
+
+          <li>
+            <span>関連リストとして <strong class="uicontrol">[スウォームメンバー]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>変更内容を保存します。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>レコードのスウォームリストを表示します。</span>
+        <ol>
+          <li>
+            <span>Lightning アプリケーションビルダーで、[関連リスト - 1 つ] コンポーネントを [Swarming (スウォーミング)] タブのコンソールページレイアウトに追加します。</span>
+          </li>
+
+          <li>
+            <span>関連リストとして <strong class="uicontrol">[スウォーム]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>変更内容を保存します。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>Lightning レコードページを有効化して、アプリケーションのデフォルトとして設定します。</span>
+      </li></ol>
+
+  
+</div>
+</div>
+
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="create_swarm_report">
+<h1 class="slds-text-heading_large">スウォームレポートの作成</h1>
+  <p>スウォームレポートを作成するには、標準の Service Cloud Swarming Reports and Dashboards AppExchange パッケージを使用するか、次の 3 つのレポートタイプのいずれかを作成します。このパッケージでは、レポートタイプが事前設定され、いくつかのスウォーミングレポートが提供され、完全なスウォーミングダッシュボードが含まれます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table></div>
+    <ol><li>
+        <span>標準のスウォーミングレポートとダッシュボードを使用するには、<a target="_blank" href="https://appexchange.salesforce.com/appxListingDetail?listingId=a0N4V00000DYQZuUAP&amp;preview=%222021-10-05T16%3A22%3A14.000Z%22">AppExchange パッケージ</a>をインストールします。</span>
+      </li><li>
+        <span>手動でスウォーミングレポートを作成するには、次のいずれかのレポートタイプを選択します。</span>
+        <div>
+          <p>ケースレポートタイプでは、サポート担当者が参照項目を使用してケース所有者とスウォームの詳細を追加できるように、スウォームメンバーをセカンダリリレーションとして使用します。</p>
+          <a name="create_swarm_report__image_xvk_vtl_2tb"></a><div style="text-align:left;"><img alt="レポートレコードの定義" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/define_reports.png" id="create_swarm_report__image_xvk_vtl_2tb" style="width:400px;"></div>
+          <p>[スウォームメンバー] レポートタイプでは、スウォームメンバーを主リレーションとして使用し、参照項目を使用してケース ID、スウォーム所有者、その他のスウォームの詳細などの情報を追加します。</p>
+          <a name="create_swarm_report__image_uvq_xtl_2tb"></a><div style="text-align:left;"><img alt="レポートリレーションの選択" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/define_reports2.png" id="create_swarm_report__image_uvq_xtl_2tb" style="width:400px;"></div>
+          <p>[スウォーム] レポートタイプでは、スウォームを主リレーションとして使用して、ケース ID、スウォーム所有者、その他のスウォームの詳細などの情報を追加します。ただし、[所有者] 参照項目のみを使用できます。</p>
+          <a name="create_swarm_report__image_jhy_ztl_2tb"></a><div style="text-align:left;"><img alt="スウォームメンバーのレポートタイプ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/report_types.png" id="create_swarm_report__image_jhy_ztl_2tb" style="width:400px;"></div>
+        </div>
+        <ol>
+          <li>
+            <span>[設定] から、[クイック検索] ボックスに<kbd>「レポートおよびダッシュボード」</kbd>と入力し、<strong class="uicontrol">[レポートタイプ]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>レポートタイプ ([ケース]、[スウォーム]、または [スウォームメンバー]) を選択します。</span>
+          </li>
+
+          <li>
+            <span>レポートにセカンダリリレーションを割り当てます。</span>
+          </li>
+
+          <li>
+            <span>変更内容を保存します。</span>
+          </li>
+
+        </ol>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=analytics.rd_reports_overview.htm&amp;language=ja&amp;type=5">レポート</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="dynamic_actions_swarming">
+<h1 class="slds-text-heading_large">動的アクションを使用したスウォーム</h1>
+  <p>動的アクションを使用して、サポート担当者のエクスペリエンスを合理化し、エラーの防止に役立つルールでスウォーミングフローを表示します。ルールを追加し、レコード条件に基づいて [編集] ドロップダウンに適切な ToDo のみが表示されるようにします。たとえば、ルールを設定して、ケースの状況が [クローズ] に設定されている場合にのみ [スウォーミングを完了] が表示されるようにします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> レコードが特定の条件を満たすときにのみスウォーミングアクションを表示する場合は、動的アクションが最適です。</div></div></div>
+<div>
+        <a name="dynamic_actions_swarming__image_pvz_vgk_2tb"></a><img alt="クイックアクションを使用したスウォーミング" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/quick_actions.png" id="dynamic_actions_swarming__image_pvz_vgk_2tb">
+      </div><p>動的アクションを使用すると、スウォーミングフローがレコードページ上の別のウィンドウに表示されます。</p></div>
+    <ol><li>
+        <span>コンソールに追加するフローごとに、[スウォーミングを開始] や [メンバーをスウォームに追加] など、アクション種別が [フロー] のクイックアクションを作成します。</span>
+      </li><li>
+        <span>アクションを作成したオブジェクトの管理設定で、<strong class="uicontrol">[ページレイアウト]</strong> をクリックします。</span>
+      </li><li>
+        <span>フローアクションを [モバイルおよび Lightning のアクション] セクションから、ページレイアウトの [Salesforce モバイルおよび Lightning Experience アクション] セクションにドラッグします。<div style="text-align:left;"><img alt="ページレイアウトで強調表示された [スウォーミングを開始] フロー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/swarm_quick_action_page_layout.png"></div></span>
+      </li><li>
+        <span>変更内容を保存します。</span>
+      </li><li>
+        <span>[設定] から、[クイック検索] ボックスに<kbd>「Lightning アプリケーションビルダー」</kbd>と入力し、<strong class="uicontrol">[Lightning アプリケーションビルダー]</strong> を選択します。</span>
+      </li><li>
+        <span>クイックアクションを追加するページレイアウトを選択して、<strong class="uicontrol">[編集]</strong> をクリックします。</span>
+      </li><li>
+        <span>強調表示パネルを選択します。</span>
+      </li><li>
+        <span>アプリケーションビルダーの右側で動的アクションにアップグレードします。移行していずれかのページレイアウトのアクションから開始するか、[<strong class="uicontrol">ゼロから開始</strong>] を選択して新規アクションを選択します。 <a name="dynamic_actions_swarming__image_fkf_jhk_2tb"></a><div><img alt="動的アクションのカスタマイズ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/edit_dynamic_actions.png" id="dynamic_actions_swarming__image_fkf_jhk_2tb" style="width:500px;"></div></span>
+      </li><li>
+        <span>強調表示パネル設定で <strong class="uicontrol">[アクションを追加]</strong> をクリックして、作成したクイックアクションを選択します。</span>
+      </li><li>
+        <span>[アクションの表示を設定] で、動的アクションをユーザーに表示する時点を決定する検索条件 (例: [状況] [次の文字列と一致しない] [クローズ]) を追加します。<div style="text-align:left;"><img alt="[項目] [状況] [次の文字列と一致しない] が [クローズ] に設定された検索条件" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/swarm_dynamic_action_example.png"></div></span>
+      </li><li>
+        <span>動的アクションドロップダウンにアクションが表示される順序を選択し、保存する前にサポート担当者に必要なアクションを追加します。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="finish_swarming">
+<h1 class="slds-text-heading_large">Lightning Experience でのスウォームのクローズ</h1>
+  <p>Lightning Experience からスウォームを完了としてマークします。スウォーミングを完了すると、終了日時が設定され、状況とすべての関連するスウォームメンバーが [完了] に変更されます。また、サポート担当者がより多くの作業を受け入れることができるように、サポート担当者のオムニチャネルプレゼンス設定の領域も解放されます。また、スウォームに関与しているメンバーがレポートに表示されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table></div>
+    <ol><li>
+        <span>スウォームが開始された Salesforce レコードページから、<strong class="uicontrol">[スウォーミングを完了]</strong> を選択します。このスウォーム用に作成されたチャネルはアーカイブすることができます。ただし、チャネルをアーカイブした後にスウォームを再オープンする場合は、Slack でチャネルをアーカイブから手動で削除する必要があります。アーカイブされたチャネルは引き続き表示できますが、ユーザーはそのチャネルに投稿できなくなります。</span>
+      </li><li>
+        <span><strong class="uicontrol">[スウォームをクローズ]</strong> を選択し、<strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li></ol>
+
+    <div><p>引き続き、メンバーをクローズされたスウォームに追加できます。追加するには、スウォームを再オープンし、新しいスウォーム要求を追加して、スウォームレコードの状況を [進行中] に設定します。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt">
+<h1 class="slds-text-heading_large">カスタマーサービスインシデント管理を使用した中断の解決</h1>
+  <p>カスタマーサービスインシデント管理を使用すると、エスカレーションスペシャリストは重大なビジネスの中断を効率的に解決できます。インシデント、問題、変更要求により、サービス中断を追跡、診断し、再発を防止するために必要なツールを Salesforce 内ですべて利用できます。カスタマーサービスインシデント管理は、Winter '22 リリース以降に作成されたすべての組織で自動的に有効になります。</p>
+
+    <p>
+      <span style="vertical-align:text-bottom;display:inline-block;"><img alt="カスタマーサービスインシデント管理のバナー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_main_banner_2.png" style="margin-bottom:0;"></span>
+    </p>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:100%"></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">
+              <em><strong>稼働開始</strong> </em>
+            </td>
+
+          </tr>
+        </tbody></table>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><p>
+              <a name="incident_mgmt__image_usk_yk1_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="開始" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/resources-global/_corporate/images/learning_maps/lm_start.png" id="incident_mgmt__image_usk_yk1_scc" style="margin-bottom:0;"></span>
+              </p><p>
+                <strong>はじめに</strong>
+              </p><p>
+                <a name="incident_mgmt__image_ccz_wl1_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="incident_mgmt__image_ccz_wl1_scc" style="margin-bottom:0;"></span> <a title="現在のデジタル環境では、サービスの中断は避けられません。Web の停止が発生したり、コードの変更やデータの破損によりサーバーがダウンしたり、悪天候によって停電や配信の遅延が発生したりします。このようなサービスインシデントがビジネスで発生した場合、原因を分析し、サービス業務を効率化して、ダウンタイムを最小限に抑える必要があります。Agentforce Service(旧称Service Cloud)のカスタマーサービスインシデント管理を使用して、この手順を実行できます。" href="incident-3.html#incident_mgmt_what_is_this">カスタマーサービスインシデント管理とは</a>?
+              </p><p>
+                <a name="incident_mgmt__image_ryb_bm1_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="Trailhead" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_trailhead.png" id="incident_mgmt__image_ryb_bm1_scc" style="margin-bottom:0;"></span> <a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/modules/customer-service-incident-management-quick-look">カスタマーサービスインシデント管理: クイックルック</a>
+              </p><p>
+                <a name="incident_mgmt__image_qqt_xl1_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="incident_mgmt__image_qqt_xl1_scc" style="margin-bottom:0;"></span> <a title="ケースとインシデントが、サービスチームがさまざまな規模の顧客の問題を解決するのにどのように役立つかを説明します。" href="#incident_mgmt_case_vs_incident">ケースとインシデント</a>
+              </p><p style="margin-bottom:0;">
+                <a name="incident_mgmt__image_epw_xl1_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="incident_mgmt__image_epw_xl1_scc" style="margin-bottom:0;"></span> <a title="Take-Out のインシデントマネージャーは、メール、チャット、メッセージング、電話など、複数のチャネルで、新しいマーケティング割引コードのエラーに関する顧客ケースが急増していることに気が付きます。" href="incident-2.html#incident_mgmt_example">インシデントライフサイクルの例: インシデントチームの 1 日</a>
+              </p></td>
+
+            <td style="vertical-align:top;" class="slds-cell-wrap"><p>
+              <a name="incident_mgmt__image_d12_1l1_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="接続" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/resources-global/_corporate/images/learning_maps/lm_integrate_1.png" id="incident_mgmt__image_d12_1l1_scc" style="margin-bottom:0;"></span>
+              </p><p>
+                <strong>使用開始</strong>
+              </p><p>
+                <a name="incident_mgmt__image_m1b_yl1_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="incident_mgmt__image_m1b_yl1_scc" style="margin-bottom:0;"></span> <a title="いくつかのステップを行うことでカスタマーサービスインシデント管理を有効にして、サービスチームがサービスの中断を追跡して診断し、再発を防止できるようにします。これらをすべて Salesforce 内で実行できます。" href="incident-2.html#incident_mgmt_enable_incident_management">Enable Customer Service Incident Management</a> (カスタマーサービスインシデント管理の有効化)
+              </p><p style="margin-bottom:0;">
+                <a title="ユーザーにカスタマーサービスインシデント管理機能へのアクセス権を付与するには、ユーザープロファイルにインシデント、問題、および変更要求へのアクセス権を割り当てます。" href="#incident_mgmt_assign_access">カスタマーサービスインシデント管理へのアクセス権をユーザーに付与する<span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="incident_mgmt__image_blc_yl1_scc" style="margin-bottom:0;"></span></a>
+              </p></td>
+
+            <td style="vertical-align:top;" class="slds-cell-wrap"><p>
+              <a name="incident_mgmt__image_osd_cl1_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="サポート担当者" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/resources-global/_corporate/images/learning_maps/lm_user_2.png" id="incident_mgmt__image_osd_cl1_scc" style="margin-bottom:0;"></span>
+              </p><p>
+                <strong>適切なサポート担当者へのインシデントの転送</strong>
+              </p><p>
+                <a name="incident_mgmt__image_vf3_yl1_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="incident_mgmt__image_vf3_yl1_scc" style="margin-bottom:0;"></span> <a title="オムニチャネルを介してインシデントをサポート担当者に転送します。" href="#incident_mgmt_create_incident_channel">Create an Incident Channel</a> (インシデントチャネルの作成)
+              </p><p>
+                <a name="incident_mgmt__image_mlj_yl1_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="incident_mgmt__image_mlj_yl1_scc" style="margin-bottom:0;"></span> <a title="インシデントチャネルに割り当てられたサポート担当者がインシデントを解決できるとマークできるようにします。" href="incident-2.html#incident_mgmt_create_presence_status">Set Up an Incident Presence Status</a> (インシデントプレゼンス状況の設定)
+              </p><p>
+                <a name="incident_mgmt__image_xll_yl1_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="incident_mgmt__image_xll_yl1_scc" style="margin-bottom:0;"></span> <a title="インシデントを特定のキューに自動的に転送します。" href="incident-2.html#incident_mgmt_create_queue">Create an Incident Queue</a> (インシデントキューの作成)
+              </p><p>
+                スキルベース ルーティングのインシデント スキル<a title="適切なスキルを持つサポート担当者がインシデントを解決できるように、スキルに基づいてインシデントをサポート担当者に転送します。" href="incident-2.html#incident_mgmt_create_skill">の作成</a>の<a name="incident_mgmt__image_irm_yl1_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="incident_mgmt__image_irm_yl1_scc" style="margin-bottom:0;"></span>
+              </p><p style="margin-bottom:0;">
+                <a name="incident_mgmt__image_rc4_yl1_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="incident_mgmt__image_rc4_yl1_scc" style="margin-bottom:0;"></span> <a title="サポート担当者をインシデントに転送します。" href="omnichannel-1.html#incident_mgmt_setup_routing">Set Up Routing Configuration</a> for Incidents (インシデントのルーティング設定の定義)
+              </p></td>
+
+          </tr>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><p>
+              <a name="incident_mgmt__image_hq2_dl1_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="接続" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/resources-global/_corporate/images/learning_maps/lm_integrate_1.png" id="incident_mgmt__image_hq2_dl1_scc" style="margin-bottom:0;"></span>
+              </p><p>
+                <strong>サービスレベル契約に従ったサービス提供</strong>
+              </p><p>
+                <a name="incident_mgmt__image_hwy_yl1_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="incident_mgmt__image_hwy_yl1_scc" style="margin-bottom:0;"></span> <a title="インシデントのエンタイトルメントを有効にして、サポート担当者が顧客に適切なサービスレベルを提供できるようにします。エンタイトルメントプロセスを設定して、サポート担当者がインシデントを解決するために実行する必要のあるすべてのステップ (マイルストーン) を含むカスタマイズされたタイムラインを作成します。" href="incident-3.html#incident_mgmt_set_up_entitlement_process">Set Up an Entitlement Process for Incidents</a> (インシデントのエンタイトルメントプロセスの設定)
+              </p><p>
+                <a name="incident_mgmt__image_l21_zl1_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="incident_mgmt__image_l21_zl1_scc" style="margin-bottom:0;"></span> ページレイアウトへの<a title="エンタイトルメント項目をインシデントページレイアウトに追加します。" href="#incident_mgmt_add_entitlements_page_layout">エンタイトルメントの追加</a>
+              </p><p style="margin-bottom:0;">
+                <a name="incident_mgmt__image_wsb_zl1_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="incident_mgmt__image_wsb_zl1_scc" style="margin-bottom:0;"></span> インシデントページレイアウトへのマイルストーンコンポーネントの<a title="インシデントの時間ベースのステップ (最初の対応やインシデント解決時間など) を表示します。" href="#incident_mgmt_add_milestones">追加</a>
+              </p></td>
+
+            <td style="vertical-align:top;" class="slds-cell-wrap"><p>
+              <a name="incident_mgmt__image_dn3_2l1_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="書籍" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/resources-global/_corporate/images/learning_maps/lm_learn_end_1.png" id="incident_mgmt__image_dn3_2l1_scc" style="margin-bottom:0;"></span>
+              </p><p>
+                <strong>作業プランを使用した修正のロールアウト</strong>
+              </p><p style="margin-bottom:0;">
+                <a name="incident_mgmt__image_zm5_yl1_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="incident_mgmt__image_zm5_yl1_scc" style="margin-bottom:0;"></span> <a title="作業プランテンプレートを使用して、インシデント管理担当者の作業プランを簡素化します。" href="incident-2.html#incident_mgmt_create_work_plan_template">作業プランテンプレートの作成</a>
+              </p></td>
+
+            <td style="vertical-align:top;" class="slds-cell-wrap">&nbsp;</td>
+
+          </tr>
+        </tbody></table>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:100%"></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">
+              <em><strong>インシデント管理プロセスの最適化</strong></em>
+            </td>
+
+          </tr>
+        </tbody></table>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><p>
+              <a name="incident_mgmt__image_anf_fl1_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="開始" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/resources-global/_corporate/images/learning_maps/lm_start.png" id="incident_mgmt__image_anf_fl1_scc" style="margin-bottom:0;"></span>
+              </p><p>
+                <strong>ワークフローの自動化</strong>
+              </p><p>
+                <a name="incident_mgmt__image_jl4_zl1_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="incident_mgmt__image_jl4_zl1_scc" style="margin-bottom:0;"></span> <a title="カスタマーサービスインシデント管理には、インシデント解決プロセスを合理化するためにカスタマイズおよび有効化できる一連のサンプルフローが用意されています。" href="incident-2.html#incident_mgmt_sample_flows">カスタマーサービスインシデント管理のサンプルフロー</a>
+              </p><p style="margin-bottom:0;">
+                <a name="incident_mgmt__image_aqr_zl1_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="incident_mgmt__image_aqr_zl1_scc" style="margin-bottom:0;"></span> <a title="[ケース所有者をインシデント所有者に変更] や [変更要求および関連問題をクローズする] などのカスタマーサービスインシデント管理のサンプルフローを使用するには、設定を完了してください。" href="incident-3.html#incident_mgmt_setup_flows">Set Up Customer Service</a> Incident Management Flows (カスタマーサービスインシデント管理フローの設定)
+              </p></td>
+
+            <td style="vertical-align:top;" class="slds-cell-wrap"><p>
+              <a name="incident_mgmt__image_jr1_hl1_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="サポート担当者" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/resources-global/_corporate/images/learning_maps/lm_user_2.png" id="incident_mgmt__image_jr1_hl1_scc" style="margin-bottom:0;"></span>
+              </p><p>
+                <strong>顧客へのタイムリーなコミュニケーションの送信</strong>
+              </p><p style="margin-bottom:0;">
+                <a name="incident_mgmt__image_bjt_zl1_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="incident_mgmt__image_bjt_zl1_scc" style="margin-bottom:0;"></span> ブロードキャスト通信を使用したインシデントの<a title="インシデントが発生し、チームがコラボレーションして解決したら、ブロードキャスト通信を使用して大規模に最新情報を顧客と共有します。" href="#incident_mgmt_comms">共有更新</a>
+              </p></td>
+
+            <td style="vertical-align:top;" class="slds-cell-wrap"><p>
+              <a name="incident_mgmt__image_iwk_gl1_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="接続" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/resources-global/_corporate/images/learning_maps/lm_integrate_1.png" id="incident_mgmt__image_iwk_gl1_scc" style="margin-bottom:0;"></span>
+              </p><p>
+                <strong>インテグレーションの活用</strong>
+              </p><p style="margin-bottom:0;">
+                <a name="incident_mgmt__image_n2z_zl1_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="incident_mgmt__image_n2z_zl1_scc" style="margin-bottom:0;"></span> <a title="カスタマーサービスインシデント管理をパートナーシステムと統合し、潜在的な問題を特定して、致命的な問題になる前に問題に積極的に対応します。" href="incident-2.html#incident_mgmt_integrations">Set Up Customer Service</a> Incident Management Integrations (カスタマーサービスインシデント管理インテグレーションの設定)
+              </p></td>
+
+          </tr>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><p>
+              <a name="incident_mgmt__image_blr_hl1_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="サポート担当者" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/resources-global/_corporate/images/learning_maps/lm_user_2.png" id="incident_mgmt__image_blr_hl1_scc" style="margin-bottom:0;"></span>
+              </p><p>
+                <strong>サイロの取り壊し</strong>
+              </p><p style="margin-bottom:0;">
+                インシデント、問題、または変更要求での<a name="incident_mgmt__image_uzj_1m1_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="incident_mgmt__image_uzj_1m1_scc" style="margin-bottom:0;"></span><a title="表示停止インシデントをすばやく解決するには、Slack でスウォームを開始して専門分野エキスパートとコラボレーションします。サポート担当者はインシデントでスウォーミングを行い、チームに最新情報を提供し、最新情報を共有できます。DevOps チームは問題でスウォーミングを行い、根本原因を見つけるのに最適なチームを編成できます。サポート担当者と DevOps チームは、ソリューションに合わせて変更要求でスウォーミングできます。" href="incident-3.html#incident_mgmt_swarm">スウォーム</a>
+              </p></td>
+
+            <td style="vertical-align:top;" class="slds-cell-wrap"><p>
+              <a name="incident_mgmt__image_h41_3l1_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="書籍" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/resources-global/_corporate/images/learning_maps/lm_learn_end_1.png" id="incident_mgmt__image_h41_3l1_scc" style="margin-bottom:0;"></span>
+              </p><p>
+                <strong>今後のアクションの確認と実行</strong>
+              </p><p style="margin-bottom:0;">
+                カスタマーサービスインシデント管理に関する<a name="incident_mgmt__image_jgg_1m1_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="incident_mgmt__image_jgg_1m1_scc" style="margin-bottom:0;"></span><a title="[カスタマーサービスインシデント管理ダッシュボード] 管理パッケージを使用してチームがインシデントを解決する方法を確認します。作成されたインシデント、問題、変更要求の数と、完了したそれらの数を追跡します。また、月次の有効ユーザー数を使用してユーザーの採用を測定します。" href="incident-2.html#incident_mgmt_reporting">レポート</a>
+              </p></td>
+
+            <td style="vertical-align:top;" class="slds-cell-wrap">&nbsp;</td>
+
+          </tr>
+        </tbody></table>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_add_a_broadcast_site_banner">
+<h1 class="slds-text-heading_large">ヘルプサイトへのブロードキャストサイトバナーの追加</h1>
+  <p>バナーを Web サイトに追加して、処理中のインシデントについて事前に顧客に通知します。ブロードキャストサイトバナーは、有効なバナーがないサイトにのみ追加できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table><ul>
+        <li>カスタマーサービスインシデント管理が有効になっている必要があります。</li>
+
+        <li>ブロードキャストサイトバナーが有効になっている必要があります。</li>
+
+        <li>ブロードキャストトピックをネットワークに割り当てる必要があります。</li>
+
+      </ul>
+</div>
+    <ol><li>
+        <span>[インシデント] 関連リストに移動し、[ブロードキャスト通信] 関連リストを見つけます。</span>
+      </li><li>
+        <span><strong class="uicontrol">[新規ブロードキャストサイトバナー]</strong> をクリックします。</span>
+      </li><li>
+        <span>バナーを追加するサイトを確認して、<strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>関連性の高いブロードキャストトピックを選択して、<strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>バナーメッセージを入力します。</span>
+      </li><li>
+        <span>サイトバナーをすべての Web サイト訪問者に表示するか、認証されたサイト訪問者にのみ表示するかを選択します。<div style="text-align:left;"><img alt="Web サイトにバナーを追加するためのプレビューボックス。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_broadcast_banner_preview.png"></div></span>
+      </li></ol>
+
+    <div><p>インシデントが解決したら、バナーを無効にしてサイトから削除します。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_add_broadcasts_to_incident">
+<h1 class="slds-text-heading_large">インシデントレコードへのブロードキャスト通信の追加</h1>
+  <p>インシデントの発生時にユーザーがブロードキャスト (ブロードキャストメールやサイトバナーなど) を作成できるようにするには、[ブロードキャスト通信] 関連リストをインシデントページレイアウトに追加します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table><p>[ブロードキャスト通信] 関連リストをページレイアウトに追加するには、少なくとも 1 つのブロードキャスト種別を有効にします。</p></div>
+    <ol><li>
+        <span>[設定] の [クイック検索] ボックスに<kbd>「カスタマーサービスインシデント管理」</kbd>と入力し、<strong class="uicontrol">[カスタマーサービスインシデント管理]</strong> をクリックします。</span>
+      </li><li>
+        <span>[ブロードキャスト設定] タブで、[ブロードキャスト通信関連リストをページレイアウトに追加] を見つけて <strong class="uicontrol">[レイアウトに追加]</strong> をクリックします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[インシデントレイアウト]</strong> を選択します。</span>
+      </li><li>
+        <span>[ブロードキャスト通信] 関連リストを [関連リスト] セクションに追加します。</span>
+      </li><li>
+        <span>変更内容を保存します。</span>
+      </li><li>
+        <span>[設定] から、[クイック検索] ボックスに<kbd>「Lightning アプリケーションビルダー」</kbd>と入力し、<strong class="uicontrol">[Lightning アプリケーションビルダー]</strong> を選択します。</span>
+      </li><li>
+        <span>インシデントレコードページを見つけ、<strong class="uicontrol">[編集]</strong> をクリックします。</span>
+      </li><li>
+        <span>[関連リスト - 1 つ] コンポーネントを [関連] タブのページレイアウトに追加します。</span>
+      </li><li>
+        <span>[関連リスト] として <strong class="uicontrol">[ブロードキャスト通信]</strong> を選択します。[ブロードキャスト通信] 関連リストで、ユーザーはインシデントに関連するブロードキャスト通信を作成および表示できます。</span>
+      </li><li>
+        <span>ページを保存して有効化します。</span>
+      </li></ol>
+
+    <div><p>[ブロードキャスト通信] 関連リストをインシデントレイアウトに追加したら、[カスタマーサービスインシデント管理] 設定ページからさまざまなブロードキャスト種別を有効にしてユーザーにアクセス権を付与します。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_add_entitlements_page_layout">
+<h1 class="slds-text-heading_large">ページレイアウトへのエンタイトルメントの追加</h1>
+  <p>エンタイトルメント項目をインシデントページレイアウトに追加します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>インシデントのオブジェクト管理設定から、[ページレイアウト] に移動します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[インシデントレイアウト]</strong> を選択します。</span>
+      </li><li>
+        <span>[エンタイトルメント]、[エンタイトルメント処理開始時刻]、[エンタイトルメント処理終了時刻]、[インシデントが完了]、[インシデントが一時停止]、[インシデントが一時停止した日]、[マイルストーン状況] 項目を [インシデントの詳細] に追加します。<div style="text-align:left;"><img alt="インシデントページレイアウト" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_incident_page_layout.png"></div></span>
+      </li><li>
+        <span>変更内容を保存します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[項目とリレーション]</strong> を選択します。インシデントページレイアウトに追加された各項目について、項目レベルセキュリティが <strong class="uicontrol">[選択したユーザープロファイルに表示]</strong> に設定されていることを確認します。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_add_incident_alert">
+<h1 class="slds-text-heading_large">インシデントアラートユーティリティの Lightning コンソールアプリケーションへの追加</h1>
+  <p>インシデントが発生したときにユーザーがブロードキャストアラートを受信できるようにするには、Lightning コンソールアプリケーションにインシデントアラートユーティリティ項目を追加します。このステップは、カスタム Lightning アプリケーションを使用するユーザーにのみ必要で、Lightning サービスコンソールユーザーで自動的に有効になります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>Lightning コンソールアプリケーションのユーティリティバーにインシデントアラートユーティリティが表示されます。そこから、サポート担当者は新しいインシデントに関するブロードキャストアラートを確認し、関連ケースを添付できます。</p></div>
+    <ol><li>
+        <span>[設定] の [クイック検索] ボックスに<kbd>「カスタマーサービスインシデント管理」</kbd>と入力し、<strong class="uicontrol">[カスタマーサービスインシデント管理]</strong> をクリックします。</span>
+      </li><li>
+        <span>[ブロードキャストアラートを設定] で [インシデントアラートユーティリティを追加] を見つけ、<strong class="uicontrol">[アプリケーションマネージャーに移動]</strong> を選択します。</span>
+      </li><li>
+        <span>インシデントアラートを追加するコンソールアプリケーションの横にあるドロップダウンをクリックし、<strong class="uicontrol">[編集]</strong> をクリックします。</span>
+      </li><li>
+        <span>[ユーティリティ項目] で、[ユーティリティ項目を追加] をクリックします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[インシデントアラート]</strong> をクリックします。</span>
+      </li><li>
+        <span>変更内容を保存します。</span>
+      </li></ol>
+
+    <div><p>インシデントアラートユーティリティを追加したら、ブロードキャストトピックを作成してグループに割り当てます。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_add_milestones">
+<h1 class="slds-text-heading_large">インシデントページレイアウトへのマイルストーンコンポーネントの追加</h1>
+  <p>インシデントの時間ベースのステップ (最初の対応やインシデント解決時間など) を表示します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>インシデントで <strong class="uicontrol">[設定]</strong> をクリックしてから <strong class="uicontrol">[編集ページ]</strong> をクリックします。</span>
+      </li><li>
+        <span>マイルストーンコンポーネントをページレイアウトに追加します。<div style="text-align:left;"><img alt="ページレイアウトのマイルストーンコンポーネント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_milestone_component.png"></div></span>
+      </li><li>
+        <span>変更を保存し、ページを有効化します。<div style="text-align:left;"><img alt="インシデントページレイアウト" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_page_layout.png"></div></span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_add_related_to_cases">
+<h1 class="slds-text-heading_large">インシデントおよびケースページレイアウトへの関連項目の追加</h1>
+  <p>ケースレコードからケースに関連したインシデント、問題、変更要求を確認するには、ケースページレイアウトに関連リストを追加します。また、Winter '24 より前にカスタマーサービスインシデント管理が有効化されている組織では、[商品] 項目を追加して、[インシデント] ページレイアウトに関連商品が表示されるようにします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>ケースページレイアウトにケースに関連するインシデント、問題、変更要求を表示します。</span>
+        <ol>
+          <li>
+            <span>ケースのオブジェクト管理設定から、[ページレイアウト] に移動します。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[ケースのレイアウト]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[ケース関連の問題]</strong> 関連リストと <strong class="uicontrol">[関連変更要求]</strong> 関連リストを [関連リスト] セクションに追加します。</span>
+          </li>
+
+          <li>
+            <span>変更内容を保存します。</span>
+          </li>
+
+          <li>
+            <span>[設定] から、[クイック検索] ボックスに<kbd>「Lightning アプリケーションビルダー」</kbd>と入力し、<strong class="uicontrol">[Lightning アプリケーションビルダー]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>ケースレコードページを見つけ、<strong class="uicontrol">[編集]</strong> をクリックします。</span>
+          </li>
+
+          <li>
+            <span>[関連リスト - 1 つ] コンポーネントを [関連] タブのページレイアウトに追加します。</span>
+          </li>
+
+          <li>
+            <span>[関連リスト] として <strong class="uicontrol">[ケース関連の問題]</strong> を選択します。[ケース関連の問題] 関連リストにより、ユーザーはケースレコードからケースに関連した問題とインシデントを確認できます。</span>
+          </li>
+
+          <li>
+            <span>もう 1 つの [関連リスト - 1 つ] コンポーネントをページレイアウトに追加し、<strong class="uicontrol">[関連変更要求]</strong> を選択します。[関連変更要求] 関連リストにより、ユーザーはケースレコードからケースに関連した変更要求を確認できます。</span>
+          </li>
+
+          <li>
+            <span>ページを保存して有効にします。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>インシデントページレイアウトに関連商品を表示します。Winter '24 以降にカスタマーサービスインシデント管理が有効化された組織では、これらのステップがデフォルトで有効化されています。</span>
+        <ol>
+          <li>
+            <span>インシデント関連項目のオブジェクト管理設定から、[ページレイアウト] に移動します。</span>
+          </li>
+
+          <li>
+            <span>[商品] 項目を [詳細] セクションに追加します。</span>
+          </li>
+
+          <li>
+            <span>[納入商品] 項目を省略可能にするには、[納入商品] の <strong class="uicontrol">[必須]</strong> 項目プロパティをオフにします。</span>
+          </li>
+
+          <li>
+            <span>変更を保存します。</span>
+          </li>
+
+        </ol>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_add_site_banner_component">
+<h1 class="slds-text-heading_large">サイトバナーコンポーネントのサイトへの追加</h1>
+  <p>ユーザーが Aura および LWR サイトにバナーを追加できるようにするには、エクスペリエンスビルダーでサイトバナーコンポーネントをサイトに追加します。バナーのデザインをカスタマイズすることもできます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>[設定] の [クイック検索] ボックスに<kbd>「カスタマーサービスインシデント管理」</kbd>と入力し、<strong class="uicontrol">[カスタマーサービスインシデント管理]</strong> をクリックします。</span>
+      </li><li>
+        <span>[ブロードキャストサイトバナーを設定] で [バナーをサイトに追加] を見つけ、<strong class="uicontrol">[デジタルエクスペリエンスに移動]</strong> を選択します。</span>
+      </li><li>
+        <span>ブロードキャストトピックを割り当てるサイトを見つけ、<strong class="uicontrol">[ビルダー]</strong> を選択します。</span>
+      </li><li>
+        <span>[コンポーネント] パネルから、[<strong class="uicontrol">サイトバナー</strong>] を選択してサイトレイアウトに追加します。<div style="text-align:left;"><img alt="強調表示されているサイトバナーコンポーネント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_site_banner_component.png"></div></span>
+      </li><li>
+        <span>必要に応じて、サイトバナーの高さ、フォント、色を設定します。</span>
+      </li><li>
+        <span>変更を公開します。</span>
+      </li></ol>
+
+    <div><p>ブロードキャストサイトバナーが設定されたので、ユーザーにアクセス権を付与します。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="インシデントが発生したときにユーザーが Aura および LWR サイトにブロードキャストサイトバナーを追加できるようにするには、ブロードキャストサイトバナーを有効化し、ブロードキャストトピックを作成してネットワークサイトに割り当てます。次にエクスペリエンスビルダーでサイトにサイトバナーコンポーネントをサイト追加します。" href="incident-3.html#incident_mgmt_setup_broadcast_banners">ブロードキャストサイトバナーの設定</a></li><li><a title="インシデントが解決したら、バナーを無効にしてサイトから削除します。" href="incident-2.html#incident_mgmt_deactivate_broadcast_site_banner">ブロードキャストサイトバナーの無効化</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_admin_setup_work_plan">
+<h1 class="slds-text-heading_large">システム管理者による設定</h1>
+  <p>インシデント管理チーム用の合理化された作業プランプロセスを設定します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="incident-2.html#incident_mgmt_create_work_plan_template">作業プランテンプレートの作成</a></strong><br>作業プランテンプレートを使用して、インシデント管理担当者の作業プランを簡素化します。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_agent_work_plans">
+<h1 class="slds-text-heading_large">サポート担当者の作業プラン</h1>
+  <p>作業プランを使用して、迅速にインシデントを解決します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="incident-2.html#incident_mgmt_create_work_plan">作業プランの作成</a></strong><br>インシデントの問題を特定して変更要求を作成したら、作業プランを作成して解決に必要なステップの概要を決定します。</li><li class="slds-p-bottom_small"><strong><a href="incident-2.html#incident_mgmt_related_change_requests">変更要求に関連する問題の特定</a></strong><br>インシデントを解決する作業をするときには、全体像を念頭に置いて連動関係を追跡し、関連リストを使用して可能性のある波及効果を把握します。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_alerts_customize_all_incidents">
+<h1 class="slds-text-heading_large">インシデントアラートの [すべて] タブのカスタマイズ</h1>
+  <p>インシデントアラートユーティリティの [すべて] タブからカスタムインシデントリストビューを表示します。デフォルトでは、標準のすべてのインシデント (デフォルト) リストビューが表示されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>インシデントアラートの [すべて] タブに追加できるのは、公開リストビューまたは共有リストビューのみです。デフォルトのすべてのインシデントリストビューの検索条件または項目をカスタマイズして、ユーティリティでインシデントチームに表示するインシデントと項目を変更することもできます。</p></div>
+    <ol><li>
+        <span>カスタムインシデントリストビューを作成します。</span>
+      </li><li>
+        <span>[設定] の [クイック検索] ボックスに<kbd>「カスタマーサービスインシデント管理」</kbd>と入力し、<strong class="uicontrol">[カスタマーサービスインシデント管理]</strong> をクリックします。</span>
+      </li><li>
+        <span>[ブロードキャストアラートを設定] で [インシデントアラートユーティリティを追加] を見つけ、<strong class="uicontrol">[アプリケーションマネージャーに移動]</strong> を選択します。</span>
+      </li><li>
+        <span>インシデントアラートユーティリティを使用するコンソールアプリケーションの横にあるドロップダウンをクリックし、<strong class="uicontrol">[編集]</strong> をクリックします。</span>
+      </li><li>
+        <span>[ユーティリティ項目] で、<strong class="uicontrol">[インシデントアラート]</strong> を選択します。</span>
+      </li><li>
+        <span>[コンポーネントのプロパティ] で [すべてのインシデントリストビュー] を見つけ、カスタム公開または共有リストビューを選択します。<div style="text-align:left;"><img alt="強調表示されている [すべてのインシデント] リストビュー項目" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_all_incidents_field.png"></div></span>
+      </li><li>
+        <span>変更内容を保存します。</span>
+      </li><li>
+        <span>ブラウザーを更新して、インシデントアラートユーティリティから新しいリストビューを表示します。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_assign_access">
+<h1 class="slds-text-heading_large">ユーザーへのカスタマーサービスインシデント管理に対するアクセス権の付与</h1>
+  <p>ユーザーにカスタマーサービスインシデント管理機能へのアクセス権を付与するには、ユーザープロファイルにインシデント、問題、および変更要求へのアクセス権を割り当てます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>[設定] の [クイック検索] ボックスに<kbd>「プロファイル」</kbd>と入力し、<strong class="uicontrol">[プロファイル]</strong> を選択します。</span>
+      </li><li>
+        <span>インシデント管理へのアクセス権を付与するユーザープロファイルを選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[編集]</strong> をクリックします。</span>
+      </li><li>
+        <span>[インシデント]、[問題]、または [変更要求] タブが <strong class="uicontrol">[デフォルトで表示]</strong> に設定されていることを確認します。</span>
+      </li><li>
+        <span>[標準オブジェクト権限] で、ユーザープロファイルに割り当てるカスタマーサービスインシデント管理オブジェクトのアクセスレベルを有効にします。「参照」、「作成」、「編集」、および「削除」権限を付与できます。</span>
+      </li><li>
+        <span>他の 2 つのカスタマーサービスインシデント管理オブジェクトに対して繰り返します。</span>
+      </li><li>
+        <span>必要に応じて、他のユーザープロファイルに対して繰り返します。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_assign_broadcast_comms_access">
+<h1 class="slds-text-heading_large">ユーザーへのブロードキャスト通信に対するアクセス権の付与</h1>
+  <p>ユーザーがさまざまなブロードキャスト種別を作成できるようにするには、ブロードキャスト通信オブジェクト権限へのアクセス権をユーザーに付与します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table><p>ユーザーにブロードキャスト通信オブジェクトへのアクセス権を付与する前に、ブロードキャスト種別を有効にします。</p></div>
+    <ol><li>
+        <span>[設定] の [クイック検索] ボックスに<kbd>「カスタマーサービスインシデント管理」</kbd>と入力し、<strong class="uicontrol">[カスタマーサービスインシデント管理]</strong> をクリックします。</span>
+      </li><li>
+        <span>[ブロードキャスト設定] タブで、[ブロードキャスト通信へのアクセス権をユーザーに付与] を見つけて <strong class="uicontrol">[権限セットに移動]</strong> をクリックします。</span>
+      </li><li>
+        <span>既存のインシデントチーム権限セットを選択するか、新規作成します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[オブジェクト設定]</strong> を選択し、次のアクセス権を付与します。</span>
+        <div>
+          <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:30.303030303030305%"><col style="width:69.69696969696969%"></colgroup><tbody>
+                <tr class="">
+                  <td style="vertical-align:top;" class="slds-cell-wrap">ブロードキャスト通信</td>
+
+                  <td style="vertical-align:top;" class="slds-cell-wrap">ユーザーがブロードキャストメールやブロードキャストサイトバナーなどのブロードキャスト通信を作成できるようにするには、ブロードキャスト通信に対する作成アクセス権をユーザーに付与します。</td>
+
+                </tr>
+                <tr class="">
+                  <td style="vertical-align:top;" class="slds-cell-wrap">ブロードキャスト通信利用者</td>
+
+                  <td style="vertical-align:top;" class="slds-cell-wrap">ユーザーがブロードキャスト通信レコードと送信されたメッセージを参照できるようにするには、ブロードキャスト通信利用者に対する作成アクセス権、およびブロードキャスト通信の [件名] 項目に対する編集アクセス権をユーザーに付与します。</td>
+
+                </tr>
+                <tr class="">
+                  <td style="vertical-align:top;" class="slds-cell-wrap">ブロードキャストトピック</td>
+
+                  <td style="vertical-align:top;" class="slds-cell-wrap">ユーザーがブロードキャストサイトバナーなどのブロードキャスト種別を設定できるようにするには、ブロードキャストトピックに対する作成アクセス権をユーザーに付与します。ユーザーは、ブロードキャストトピックを作成してネットワークに割り当てることができます。</td>
+
+                </tr>
+                <tr class="">
+                  <td style="vertical-align:top;" class="slds-cell-wrap">ブロードキャストトピックコラボレーションルーム</td>
+
+                  <td style="vertical-align:top;" class="slds-cell-wrap"><p>ユーザーがブロードキャスト Slack メッセージを設定できるようにするには、ブロードキャストトピックコラボレーションルームに対する作成アクセス権をユーザーに付与します。</p><p style="margin-bottom:0;">ユーザーがブロードキャスト Slack メッセージを送信できるようにするには、ブロードキャストトピックコラボレーションルームに対する参照アクセス権をユーザーに付与します。</p></td>
+
+                </tr>
+                <tr class="">
+                  <td style="vertical-align:top;" class="slds-cell-wrap">ブロードキャストトピックグループ</td>
+
+                  <td style="vertical-align:top;" class="slds-cell-wrap"><p>ユーザーがブロードキャストアラートを設定できるようにするには、ブロードキャストトピックグループに対する作成アクセス権をユーザーに付与します。</p><p style="margin-bottom:0;">ユーザーがブロードキャストアラートを作成できるようにするには、ブロードキャストトピックグループに対する参照アクセス権をユーザーに付与します。</p></td>
+
+                </tr>
+                <tr class="">
+                  <td style="vertical-align:top;" class="slds-cell-wrap">ブロードキャストトピックネットワーク</td>
+
+                  <td style="vertical-align:top;" class="slds-cell-wrap"><p>ユーザーがブロードキャストサイトバナーを設定できるようにするには、ブロードキャストトピックネットワークに対する作成アクセス権をユーザーに付与します。</p><p style="margin-bottom:0;">ユーザーがブロードキャストサイトバナーを作成できるようにするには、ブロードキャストトピックネットワークに対する参照アクセス権をユーザーに付与します。</p></td>
+
+                </tr>
+              </tbody></table>
+        </div>
+      </li><li>
+        <span>ユーザーがブロードキャストサイトバナー、アラート、または Slack メッセージを作成できるようにするには、権限セットで「フローを実行」システム権限が有効になっていることを確認します。</span>
+      </li><li>
+        <span>ユーザーがブロードキャスト Slack メッセージを送信できるようにするには、権限セットで「カスタム通知を送信」システム権限が有効になっていることを確認します。</span>
+      </li><li>
+        <span>サポートされる Experience Cloud ライセンスを持つユーザーがブロードキャストサイトバナーを確認できるようにするには、<a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.admin_sharing.htm&amp;language=ja&amp;type=5">ブロードキャスト通信利用者の共有のデフォルトを [公開/参照のみ] に設定</a>します。</span>
+      </li><li>
+        <span>権限セットをユーザーに割り当てます。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_assign_topic_to_channel">
+<h1 class="slds-text-heading_large">Slack チャンネルへのブロードキャストトピックの割り当て</h1>
+  <p>ユーザーが Slack でインシデントの更新を共有できるようにするには、ブロードキャストトピックを 1 つ以上の Slack チャンネルに割り当てます。インシデントが発生すると、インシデントチームはブロードキャストトピックに基づいてブロードキャスト Slack メッセージを Slack チャンネルに送信できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table><p>ブロードキャストトピックを Slack チャンネルに割り当てる前に、ブロードキャストトピックを作成します。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> ブロードキャスト Slack メッセージでは、公開チャンネルのみがサポートされます。</div></div></div>
+</div>
+    <div><p>ブロードキャストトピックは一度に 1 つの Slack チャンネルにのみ割り当てることができます。ブロードキャストトピックをチャンネルに割り当てたら、ブロードキャストトピックコラボレーションルームレコードが作成されます。</p></div>
+    <ol><li>
+        <span>ブロードキャストトピックレコードから、[<strong class="uicontrol">Slack チャンネルに割り当て</strong>] クイックアクションを選択します。<div style="text-align:left;"><img alt="[Slack チャンネルに割り当て] ボタンが強調された状態" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_assign_slack_button.png"></div></span>
+      </li><li>
+        <span>Slack ワークスペースを選択します。</span>
+      </li><li>
+        <span>選択したブロードキャストトピックに基づいて、インシデントチームメンバーがブロードキャスト Slack メッセージを送信できる Slack チャンネルを選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[割り当て]</strong> をクリックします。</span>
+      </li><li>
+        <span>ブロードキャストトピックを他の Slack チャンネルに割り当てるには、<strong class="uicontrol">[もう 1 つ追加する]</strong> をクリックして、ステップ 1 ～ 4 を繰り返します。</span>
+      </li></ol>
+
+    <div><p>ブロードキャストトピックを Slack チャンネルに割り当てたら、<a title="ユーザーがさまざまなブロードキャスト種別を作成できるようにするには、ブロードキャスト通信オブジェクト権限へのアクセス権をユーザーに付与します。" href="#incident_mgmt_assign_broadcast_comms_access">ブロードキャスト通信オブジェクトへのアクセス権をユーザーに付与</a>します。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_assign_topic_to_group">
+<h1 class="slds-text-heading_large">グループへのブロードキャストトピックの割り当て</h1>
+  <p>事前に決められた Salesforce ユーザーセットにブロードキャストアラートを送信するには、ブロードキャストトピックを 1 つ以上のグループに割り当てます。インシデントが発生すると、インシデントマネージャーはブロードキャストトピックに基づいてブロードキャストアラートを Salesforce のグループに送信できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table><p>ブロードキャストトピックをグループに割り当てる前に、ブロードキャストトピックを作成します。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> ブロードキャストアラートでサポートされるのは公開グループとキューのみです。</div></div></div>
+</div>
+    <ol><li>
+        <span>ブロードキャストトピックレコードから、[<strong class="uicontrol">グループに割り当て</strong>] クイックアクションを選択します。<div style="text-align:left;"><img alt="[グループに割り当て] ボタンが強調された状態" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_assign_groups_button.png"></div></span>
+      </li><li>
+        <span>選択したブロードキャストトピックに基づいて、インシデントマネージャーがアラートを送信できるグループを 1 つ以上選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[割り当て]</strong> をクリックします。</span>
+      </li></ol>
+
+    <div><p>ブロードキャストトピックをグループに割り当てたら、<a title="ユーザーがさまざまなブロードキャスト種別を作成できるようにするには、ブロードキャスト通信オブジェクト権限へのアクセス権をユーザーに付与します。" href="#incident_mgmt_assign_broadcast_comms_access">ブロードキャスト通信オブジェクトへのアクセス権をユーザーに付与</a>します。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_assign_topic_to_network">
+<h1 class="slds-text-heading_large">ネットワークサイトへのブロードキャストトピックの割り当て</h1>
+  <p>ユーザーが Aura および LWR サイトにブロードキャストサイトバナーを追加できるようにするには、ブロードキャストトピックを 1 つ以上のネットワークサイトに追加します。ブロードキャストトピックをネットワークサイトに割り当てると、ブロードキャストトピックと Experience Cloud サイト間のリンクが作成されます。インシデントが発生すると、ユーザーはブロードキャストトピックに基づいてブロードキャストサイトバナーを Experience Cloud サイトに追加できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table><p>ブロードキャストトピックをネットワークサイトに割り当てる前に、ブロードキャストトピックを作成します。</p></div>
+    <ol><li>
+        <span>ブロードキャストトピックレコードから、[<strong class="uicontrol">ネットワークに割り当て</strong>] クイックアクションを選択します。<div style="text-align:left;"><img alt="[ネットワークに割り当て] ボタンが強調された状態" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_assign_to_networks_button.png"></div></span>
+      </li><li>
+        <span>選択したブロードキャストトピックに基づいて、ユーザーがブロードキャストサイトバナーを追加できるネットワークサイトを 1 つ以上選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[割り当て]</strong> をクリックします。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_automate">
+<h1 class="slds-text-heading_large">カスタマーサービスインシデント管理を使用した自動化</h1>
+  <p>カスタマーサービスインシデント管理用のオートメーションツールを使用して問題をシームレスに解決します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="incident-2.html#incident_mgmt_flows">カスタマーサービスインシデント管理フロー</a></strong><br>フローを使用してカスタマーサービスインシデント管理プロセスを自動化します。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_broadcast_communications_for_incident_management">
+<h1 class="slds-text-heading_large">ブロードキャスト通信の使用</h1>
+  <p>カスタマーサービスインシデント管理のブロードキャスト通信を使用して、内部および外部の関係者に緊急の問題を通知します。アラート、Slack メッセージ、メール、サイトバナーによって、適切なグループに通知できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table>
+    <p>Salesforce システム管理者は、まずブロードキャスト通信種別を有効化および設定する必要があります。</p>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:25%"><col style="width:25%"><col style="width:25%"><col style="width:25%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d140518e64" style="text-align:center;vertical-align:top;" class="slds-cell-wrap" scope="col">ブロードキャスト通信種別</th>
+            <th id="d140518e67" style="text-align:center;vertical-align:top;" class="slds-cell-wrap" scope="col">内部</th>
+            <th id="d140518e70" style="text-align:center;vertical-align:top;" class="slds-cell-wrap" scope="col">外部</th>
+            <th id="d140518e73" style="text-align:center;vertical-align:top;" class="slds-cell-wrap" scope="col">通知先</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d140518e64" style="text-align:center;vertical-align:top;" class="slds-cell-wrap" data-label="ブロードキャスト通信種別">アラート</td>
+
+            <td headers="d140518e67" style="text-align:center;vertical-align:top;" class="slds-cell-wrap" data-label="内部">
+              <a name="incident_mgmt_broadcast_communications_for_incident_management__image_rkc_lty_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="チェックマーク" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/resources-global/_corporate/images/checkmark.png" id="incident_mgmt_broadcast_communications_for_incident_management__image_rkc_lty_scc" style="margin-bottom:0;"></span>
+            </td>
+
+            <td headers="d140518e70" style="text-align:center;vertical-align:top;" class="slds-cell-wrap" data-label="外部">
+              <a name="incident_mgmt_broadcast_communications_for_incident_management__image_xyr_mty_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="X" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/resources-global/_corporate/images/crossmark.png" id="incident_mgmt_broadcast_communications_for_incident_management__image_xyr_mty_scc" style="margin-bottom:0;"></span>
+            </td>
+
+            <td headers="d140518e73" style="text-align:center;vertical-align:top;" class="slds-cell-wrap" data-label="通知先">カスタマーサービス担当者、インシデントマネージャー、インシデントチーム</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d140518e64" style="text-align:center;vertical-align:top;" class="slds-cell-wrap" data-label="ブロードキャスト通信種別">メール</td>
+
+            <td headers="d140518e67" style="text-align:center;vertical-align:top;" class="slds-cell-wrap" data-label="内部">
+              <a name="incident_mgmt_broadcast_communications_for_incident_management__image_rhf_mty_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="X" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/resources-global/_corporate/images/crossmark.png" id="incident_mgmt_broadcast_communications_for_incident_management__image_rhf_mty_scc" style="margin-bottom:0;"></span>
+            </td>
+
+            <td headers="d140518e70" style="text-align:center;vertical-align:top;" class="slds-cell-wrap" data-label="外部">
+              <a name="incident_mgmt_broadcast_communications_for_incident_management__image_kyq_lty_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="チェックマーク" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/resources-global/_corporate/images/checkmark.png" id="incident_mgmt_broadcast_communications_for_incident_management__image_kyq_lty_scc" style="margin-bottom:0;"></span>
+            </td>
+
+            <td headers="d140518e73" style="text-align:center;vertical-align:top;" class="slds-cell-wrap" data-label="通知先">影響を受けた顧客または優先度の高い顧客</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d140518e64" style="text-align:center;vertical-align:top;" class="slds-cell-wrap" data-label="ブロードキャスト通信種別">サイトバナー</td>
+
+            <td headers="d140518e67" style="text-align:center;vertical-align:top;" class="slds-cell-wrap" data-label="内部">
+              <a name="incident_mgmt_broadcast_communications_for_incident_management__image_ydp_mty_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="X" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/resources-global/_corporate/images/crossmark.png" id="incident_mgmt_broadcast_communications_for_incident_management__image_ydp_mty_scc" style="margin-bottom:0;"></span>
+            </td>
+
+            <td headers="d140518e70" style="text-align:center;vertical-align:top;" class="slds-cell-wrap" data-label="外部">
+              <a name="incident_mgmt_broadcast_communications_for_incident_management__image_ufs_lty_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="チェックマーク" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/resources-global/_corporate/images/checkmark.png" id="incident_mgmt_broadcast_communications_for_incident_management__image_ufs_lty_scc" style="margin-bottom:0;"></span>
+            </td>
+
+            <td headers="d140518e73" style="text-align:center;vertical-align:top;" class="slds-cell-wrap" data-label="通知先">顧客または Web サイトユーザー</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d140518e64" style="text-align:center;vertical-align:top;" class="slds-cell-wrap" data-label="ブロードキャスト通信種別">Slack メッセージ</td>
+
+            <td headers="d140518e67" style="text-align:center;vertical-align:top;" class="slds-cell-wrap" data-label="内部">
+              <a name="incident_mgmt_broadcast_communications_for_incident_management__image_okp_lty_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="チェックマーク" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/resources-global/_corporate/images/checkmark.png" id="incident_mgmt_broadcast_communications_for_incident_management__image_okp_lty_scc" style="margin-bottom:0;"></span>
+            </td>
+
+            <td headers="d140518e70" style="text-align:center;vertical-align:top;" class="slds-cell-wrap" data-label="外部">
+              <a name="incident_mgmt_broadcast_communications_for_incident_management__image_qnq_mty_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="X" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/resources-global/_corporate/images/crossmark.png" id="incident_mgmt_broadcast_communications_for_incident_management__image_qnq_mty_scc" style="margin-bottom:0;"></span>
+            </td>
+
+            <td headers="d140518e73" style="text-align:center;vertical-align:top;" class="slds-cell-wrap" data-label="通知先">関係者とリーダーチーム</td>
+
+          </tr>
+        </tbody></table>
+    <p>インシデントが発生したときには、ブロードキャストアラートを使用してチームメンバーに通知し、チームメンバーが直接アクションを実行できるようにします。ブロードキャストアラートでは、定義済みのテンプレートが使用されます。このテンプレートは変更できません。</p>
+    <div style="text-align:left;">
+      <img alt="ブロードキャストアラートのプレビューボックス。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_broadcast_alert_preview.png">
+    </div>
+    <p>Slack メッセージを使用すると、処理中のインシデントについて簡単に報告できます。メッセージは、インシデントの項目値に基づいて自動入力されます。</p>
+    <div style="text-align:left;">
+      <img alt="ブロードキャスト Slack メッセージのプレビューボックス。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_broadcast_slack_preview.png">
+    </div>
+    <p>ブロードキャストメールを使用して、処理中のインシデントについて顧客に通知し、インシデントの処理の進行に従って最新情報を顧客に提供します。</p>
+    <div style="text-align:left;">
+      <img alt="ブロードキャストメールのプレビューボックス。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_broadcast_email_preview.png">
+    </div>
+    <p>ブロードキャストサイトバナーは、インシデントについて顧客事前に警告することで、インシデントに関連する新しいケースを回避するのに役立ちます。</p>
+    <div style="text-align:left;">
+      <img alt="サイトバナーが表示されたサンプルヘルプサイト。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_broadcast_banner_example.png">
+    </div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="incident-2.html#incident_mgmt_notify_internal_stakeholders">ブロードキャスト通信を使用した内部関係者への通知</a></strong><br>インシデントチームや内部関係者に進行中のインシデントを通知するには、ブロードキャストアラートまたは Slack メッセージを使用します。</li><li class="slds-p-bottom_small"><strong><a href="incident-2.html#incident_mgmt_notify_external_stakeholders">ブロードキャスト通信を使用した外部関係者への通知</a></strong><br>進行中のインシデントを顧客に通知するには、サイトバナーやメールなどの外部ブロードキャスト通信を使用します。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_case_vs_incident">
+<h1 class="slds-text-heading_large">ケースとインシデント</h1>
+  <p>ケースとインシデントが、サービスチームがさまざまな規模の顧客の問題を解決するのにどのように役立つかを説明します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table>
+    <div><div style="text-align:left;">
+        <img alt="多くの顧客がサポートを要求、カスタマーサービス担当者が個々のケースを解決、多くのケースがインシデントに追加される" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_incidents_and_cases.png">
+      </div></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">
+        ケースとインシデントの違い
+      </h2><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d164269e73" style="vertical-align:top;" class="slds-cell-wrap" scope="col">&nbsp;</th>
+              <th id="d164269e75" style="vertical-align:top;" class="slds-cell-wrap" scope="col">ケース</th>
+              <th id="d164269e78" style="vertical-align:top;" class="slds-cell-wrap" scope="col">インシデント</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d164269e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="">定義</td>
+
+              <td headers="d164269e75" style="vertical-align:top;" class="slds-cell-wrap" data-label="ケース">ケースとは、カスタマーサービス担当が処理する 1 回限りの顧客のフィードバックや、注文の遅延やエスカレーションなどの質問です。</td>
+
+              <td headers="d164269e78" style="vertical-align:top;" class="slds-cell-wrap" data-label="インシデント">インシデントは、多くの顧客に影響する中断です。インシデントは多くの場合、広範囲にわたる中断に関連するケースが発生することから始まります。インシデントは、チームのコラボレーションが必要となる顧客の問題を解決する場合に最適です。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d164269e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="">処理担当</td>
+
+              <td headers="d164269e75" style="vertical-align:top;" class="slds-cell-wrap" data-label="ケース">カスタマーサービス担当者</td>
+
+              <td headers="d164269e78" style="vertical-align:top;" class="slds-cell-wrap" data-label="インシデント"><ul>
+                  <li>カスタマーサービス担当者とサービス業務</li>
+
+                  <li>インシデントマネージャー</li>
+
+                  <li>IT サポート</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d164269e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="">主な違い</td>
+
+              <td headers="d164269e75" style="vertical-align:top;" class="slds-cell-wrap" data-label="ケース">ケースは、カスタマーサービス担当者が 1 対 1 の顧客対応で解決します。</td>
+
+              <td headers="d164269e78" style="vertical-align:top;" class="slds-cell-wrap" data-label="インシデント">インシデントとは、部門を越えたコラボレーションで解決される複数顧客の問題です。
+       </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d164269e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="">リレーション</td>
+
+              <td headers="d164269e75" style="vertical-align:top;" class="slds-cell-wrap" data-label="ケース">1 つのインシデントに対して多数のケース</td>
+
+              <td headers="d164269e78" style="vertical-align:top;" class="slds-cell-wrap" data-label="インシデント">多数のケースに対して 1 つのインシデント</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d164269e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="">ライフサイクル</td>
+
+              <td headers="d164269e75" style="vertical-align:top;" class="slds-cell-wrap" data-label="ケース">ケースを使用して、要求から解決に至るまで顧客の問題を追跡します。</td>
+
+              <td headers="d164269e78" style="vertical-align:top;" class="slds-cell-wrap" data-label="インシデント">サービスの中断にはインシデントを使用します。問題を診断して解決するには、問題と変更要求を使用します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d164269e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="">作成フロー</td>
+
+              <td headers="d164269e75" style="vertical-align:top;" class="slds-cell-wrap" data-label="ケース">顧客またはサポート担当者がメール、チャット、または電話でケースを作成します。</td>
+
+              <td headers="d164269e78" style="vertical-align:top;" class="slds-cell-wrap" data-label="インシデント">サポート担当者または監視システムがインシデントを直接作成するか、ケースから作成します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d164269e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="">一般的な機能</td>
+
+              <td headers="d164269e75" style="vertical-align:top;" class="slds-cell-wrap" data-label="ケース"><ul>
+                  <li>Knowledge Management</li>
+
+                  <li>SLA 管理</li>
+
+                </ul>
+</td>
+
+              <td headers="d164269e78" style="vertical-align:top;" class="slds-cell-wrap" data-label="インシデント"><ul>
+                  <li>Knowledge Management</li>
+
+                  <li>SLA 管理</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">
+        ケースのワークフロー
+      </h2><div style="text-align:left;">
+        <img alt="カスタム要求のサポート、カスタマーサービス担当者がケースを作成し、確認し、解決する" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_case_workflow.png">
+      </div></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">
+        インシデントのワークフロー
+      </h2><div style="text-align:left;">
+        <img alt="多くのケースが作成される。インシデントマネージャーが類似ケースを識別する。インシデントマネージャーがインシデントを作成する。DevOps が診断し、問題を作成する。DevOps が根本原因を特定する。DevOps が変更要求を作成する。DevOps が問題を解決する。インシデントマネージャーが顧客に通知する。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_incident_workflow.png">
+      </div></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_comms">
+<h1 class="slds-text-heading_large">ブロードキャスト通信を使用したインシデントの最新情報の共有</h1>
+  <p>インシデントが発生し、チームがコラボレーションして解決したら、ブロードキャスト通信を使用して大規模に最新情報を顧客と共有します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table>
+    <p>ブロードキャスト通信を設定したら、インシデントチームメンバーは次のブロードキャスト種別を使用できます。</p>
+    <ul>
+      <li>ブロードキャストアラート<p>進行中のインシデントに関する中断を伴うアプリケーション内アラートを関連するグループまたはキューに送信します。インシデントチームはタイムリーに通知を受信し、インシデントの進行状況を最新の状態に保ち、インシデントアラートウィジェットから直接関連ケースを添付できます。</p><div style="text-align:left;"><img alt="インシデントアラートウィジェットが強調表示された状態" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_new_broadcast_alert.png"></div></li>
+
+      <li>ブロードキャストメール<p>インシデントの最新情報を取引先責任者リストビューまたはインシデントに関連するケース取引先責任者にメールで送信します。インシデントチームは影響を受ける顧客にインシデントの進行状況や解決へのパスについての最新情報をインシデントレコードから簡単に伝えることができます。</p><div style="text-align:left;"><img alt="[ブロードキャストメールを送信] モーダル" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_new_broadcast_email.png"></div></li>
+
+      <li>ブロードキャストサイトバナー<p>インシデントが発生したときに、カスタマイズ可能なバナーを使用して LWR サイトや Aura サイトから重要な最新情報を顧客と共有します。インシデントチームは、ケースを回避するために進行中のインシデントについて大規模に顧客に通知し、進行状況の最新情報を共有し、顧客の信頼を維持できます。</p><div style="text-align:left;"><img alt="Take-Out ヘルプサイトに追加されたバナー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_site_banner_example.png"></div></li>
+
+      <li>ブロードキャスト Slack メッセージ<p>インシデントの進行状況レポートを、Slack のリーダーチームおよび関連する関係者に送信します。インシデントチームは、インシデントレコードから取得した項目を含むテンプレート化されたメッセージを送信し、インシデントが発生したときに内部チーム間で最新情報を共有できます。</p><div style="text-align:left;"><img alt="ブロードキャスト Slack メッセージの例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_slack_example.png"></div></li>
+
+    </ul>
+
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="incident-3.html#incident_mgmt_setup_broadcast_comms">ブロードキャスト通信の設定</a></strong><br>インシデント中にチームが大規模に顧客と最新情報を共有できるように、ブロードキャスト通信を設定します。</li><li class="slds-p-bottom_small"><strong><a href="#incident_mgmt_broadcast_communications_for_incident_management">ブロードキャスト通信の使用</a></strong><br>カスタマーサービスインシデント管理のブロードキャスト通信を使用して、内部および外部の関係者に緊急の問題を通知します。アラート、Slack メッセージ、メール、サイトバナーによって、適切なグループに通知できます。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_comms_limitations">
+<h1 class="slds-text-heading_large">ブロードキャスト通信に関する考慮事項</h1>
+  <p>さまざまなブロードキャスト種別を使用するときに、以下の考慮事項に留意してください。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">
+        一般的な考慮事項
+      </h2></div>
+    <div><ul>
+        <li>インシデントコミュニケーションのブロードキャストの理由を含むブロードキャストトピックは 100 個まで設定できます。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">
+        ブロードキャストアラート
+      </h2><ul>
+        <li>ブロードキャストアラートを送信するには、「フローを実行」権限をインシデントマネージャーに付与します。</li>
+
+        <li>グループにブロードキャストアラートを送信するには、ブロードキャストトピックを公開グループおよびキューにのみ割り当てます。</li>
+
+        <li>ブロードキャストトピックがキューに割り当てられている場合、ブロードキャストアラートを送信するユーザーは割り当てられたキューに属している必要があります。</li>
+
+        <li>ブロードキャストアラートは一度に最大 10,000 人のユーザーに送信できます。この制限を超えた場合、割り当てられたグループを目的のブロードキャストトピックから削除します。</li>
+
+        <li>インシデントアラートの [すべて] タブの [すべてのインシデント] のデフォルトリストビューを組織で作成するには、最大 48 時間かかる場合があります。途中でユーザーにエラーが表示されることがあります。</li>
+
+        <li>インシデントアラートの [すべて] タブに追加するカスタムリストビューはインシデントに基づいている必要があり、公開または共有である必要があります。</li>
+
+        <li>ユーザーがインシデントアラートの [すべて] タブのリストビューにカスタム項目を追加するか、インシデントオブジェクトを更新した場合、インシデントアラートユーティリティの [更新] ボタンを押しても変更は表示されません。ユーティリティからオブジェクトレベルでの変更を確認するには、ブラウザーを更新してください。</li>
+
+        <li>リストビューがインシデントアラートの [すべて] タブに追加されている場合は、削除できません。削除するには、最初に [すべて] タブのリストビューを変更します。</li>
+
+        <li>インシデントアラートの [すべて] タブのリストビューには、ブラウザーの更新時にのみリストビューの並び替え順の変更が表示されます。</li>
+
+        <li>インシデントアラートの [すべて] タブのリストビューが更新されている場合、ブラウザーを更新する必要があります。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">
+        ブロードキャストメール
+      </h2><ul>
+        <li>関連ケースまたは商品から作成された取引先責任者リストを含むブロードキャストメールの 1 日あたりの一括送信制限は、リストメールと同じです。通常、この制限は 1 日あたり 5,000 件のメール受信者です。ブロードキャストメールの送信制限を最大 10,000 人の受信者まで引き上げる場合は、Salesforce カスタマーサポートにお問い合わせください。10,000 人を超える取引先責任者にメールを送信するには、カスタム取引先責任者リストビューを作成します。</li>
+
+        <li>ブロードキャストメールを送信するには、取引先責任者への参照アクセス権が必要です。</li>
+
+        <li>関連するケース取引先責任者にブロードキャストメールを送信するには、取引先責任者が割り当てられている 1 つ以上のケースがインシデントに関連付けられている必要があります。</li>
+
+        <li>関連する商品取引先責任者にブロードキャストメールを送信するには、商品と取引先責任者または商品と主取引先責任者が設定された取引先が割り当てられている 1 つ以上のアセットがインシデントに関連付けられている必要があります。</li>
+
+        <li>関連する商品取引先責任者にブロードキャストメールを送信するには、商品が有効である必要があります。</li>
+
+        <li>商品の取引先プライマリメンバーにブロードキャストメールを送信するには、[取引先責任者を複数の取引先に関連付けることをユーザーに許可] 設定が有効になっている必要があります。</li>
+
+        <li>アセットをインシデントに関連付けたり、[関連アセット] または [商品] 関連リストを表示したりするには、少なくともアセットへの参照アクセス権が必要です。</li>
+
+        <li>商品をインシデントに関連付けたり、[関連アセット] または [商品] 関連リストを表示したりするには、少なくとも商品への参照アクセス権が必要です。</li>
+
+        <li>アセットのない商品がインシデントに関連する場合、[関連アセット] または [商品] 関連リストの [アセット] 列は空白のままになります。</li>
+
+        <li>アセットへのアクセス権がない場合、[関連アセット] または [商品] 関連リストの [アセット] 列とレコード番号は非表示になります。</li>
+
+        <li>商品へのアクセス権がない場合、[関連アセット] または [商品] 関連リストの商品列とレコード番号は非表示になります。</li>
+
+        <li>アセットが関連付けられている商品がインシデントに関連する場合、[関連アセット] または [商品] 関連リストには [商品] 列のみが入力されます。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">
+        ブロードキャスト Slack メッセージ
+      </h2><ul>
+        <li>ブロードキャスト Slack メッセージを送信するには、「フローを実行」および「カスタム通知を送信」権限をユーザーに付与します。</li>
+
+        <li>ブロードキャストトピックは一度に 1 つの Slack チャンネルにのみ割り当てることができます。ブロードキャストトピックを複数の Slack チャンネルに割り当てるには、このプロセスを繰り返します。</li>
+
+        <li>ブロードキャスト Slack メッセージを送信するには、ブロードキャストトピックを公開チャネルにのみ割り当てます。</li>
+
+        <li>ブロードキャスト Slack メッセージを送信すると、Salesforce の権限に関係なく、インシデントレコード情報がすべてのチャネルメンバーと共有されます。</li>
+
+        <li>ブロードキャスト Slack メッセージは、自分がメンバーになっているチャネルにのみ送信できます。</li>
+
+        <li>ブロードキャスト Slack メッセージは、そのメッセージを送信するユーザーの言語で送信されます。</li>
+
+        <li>ユーザーは特定の条件下でブロードキャスト Slack メッセージテンプレートを選択できます。インシデントに基づいて Service for Slack アプリケーションを使用するカスタム通知種別が少なくとも 1 つ必要です。フローを実行するユーザーには、このカスタム通知種別へのアクセス権が必要です。</li>
+
+        <li>Slack では、タイトルが 150 文字まで、本文が 3,000 文字までのブロードキャスト Slack メッセージがカスタムテンプレートでサポートされます。カスタムブロードキャスト Slack メッセージテンプレートに含まれている差し込み項目で入力されたデータがこの制限を超えていると、エラーが発生します。</li>
+
+        <li>複数の関連付けられた Slack チャンネルのいずれかでブロードキャスト Slack メッセージの更新または削除に失敗した場合は、アクションを完了できません。</li>
+
+        <li>メッセージがすでに削除されているか、以前に送信、更新、削除に失敗している場合は、ブロードキャスト Slack メッセージを削除または更新することはできません。</li>
+
+        <li>カスタムテンプレートのブロードキャスト Slack メッセージのプレビューは、Slack で最終的に送信されたメッセージと一致しないことがあります。たとえば、Slack マークダウンが異なる場合があり、プレビューメッセージにはカスタムテンプレートボタンは表示されません。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">
+        ブロードキャストサイトバナー
+      </h2><ul>
+        <li>
+          <p>ブロードキャストサイトバナーを追加するには、「フローを実行」権限をユーザーに付与します。</p>
+        </li>
+
+        <li>ブロードキャストサイトバナーを追加するには、実行ユーザーがバナーの Experience Cloud サイトのメンバーである必要があります。</li>
+
+        <li>ユーザーが Experience Cloud サイトのブロードキャストサイトバナーを確認できるようにするには、ブロードキャスト通信利用者の共有のデフォルトを [公開/参照のみ] に設定します。<a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.admin_sharing.htm&amp;language=ja&amp;type=5">「内部組織の共有設定の設定」</a>を参照してください。</li>
+
+        <li>
+          <p>サイト訪問者の Experience Cloud ユーザーライセンスでケースがサポートされている場合、ブロードキャストサイトバナーが表示されます。ブロードキャストサイトバナーの表示では、次のユーザーライセンスがサポートされます。</p>
+          <ul>
+            <li>Authenticated Website</li>
+
+            <li>Channel Account</li>
+
+            <li>Customer Community</li>
+
+            <li>Customer Community Login</li>
+
+            <li>Customer Community Plus</li>
+
+            <li>Customer Community Plus Login</li>
+
+            <li>Customer Portal Manager</li>
+
+            <li>Customer Portal Manager Custom</li>
+
+            <li>Customer Portal Manager Standard</li>
+
+            <li>Gold Partner</li>
+
+            <li>High Volume Customer Portal</li>
+
+            <li>Limited Customer Portal Manager Custom</li>
+
+            <li>Limited Customer Portal Manager Standard</li>
+
+            <li>Overage Customer Portal Manager Custom</li>
+
+            <li>Overage Customer Portal Manager Standard</li>
+
+            <li>Overage High Volume Customer Portal</li>
+
+            <li>Partner</li>
+
+            <li>Partner Community</li>
+
+            <li>Partner Community Login</li>
+
+          </ul>
+
+          <p>ブロードキャストサイトバナーの表示では、次のユーザーライセンスはサポートされていません。</p>
+          <ul>
+            <li>Bronze Partner</li>
+
+            <li>External Apps Login</li>
+
+            <li>External Apps Member</li>
+
+            <li>External Identity Login</li>
+
+            <li>Limited Customer Portal Manager Custom</li>
+
+            <li>Media Base PSL</li>
+
+            <li>Platform Portal</li>
+
+            <li>Silver Partner</li>
+
+          </ul>
+
+        </li>
+
+      </ul>
+</div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_create_broadcast_topic">
+<h1 class="slds-text-heading_large">ブロードキャストサイトバナーのブロードキャストトピックの作成</h1>
+  <p>ユーザーがブロードキャストサイトバナーを作成できるようにするには、まずブロードキャストトピックを 1 つ以上作成します。インシデントが発生すると、ユーザーはブロードキャストトピックに基づいてブロードキャストサイトバナーを Experience Cloud サイトに追加できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table><p>ブロードキャストトピックを作成する前に、次の操作を実行します。</p><ul>
+        <li>使用可能なネットワークサイトを確認または作成します。</li>
+
+        <li>
+          <a target="_blank" href="https://help.salesforce.com/s/articleView?id=slack.slack_apps_sales_create_broadcast_topic_type.htm&amp;language=ja&amp;type=5">ブロードキャストトピック種別を作成します。</a>
+        </li>
+
+      </ul>
+</div>
+    <div><p>すでにブロードキャストサイトバナーにブロードキャストトピックがある場合は、この手順をスキップして、直線ネットワークサイトへの割り当てに進むことができます。</p></div>
+    <ol><li>
+        <span>[設定] の [クイック検索] ボックスに<kbd>「カスタマーサービスインシデント管理」</kbd>と入力し、<strong class="uicontrol">[カスタマーサービスインシデント管理]</strong> をクリックします。</span>
+      </li><li>
+        <span>[ブロードキャストトピックを作成してネットワークサイトに割り当てる] で、<strong class="uicontrol">[作成して割り当て]</strong> をクリックします。</span>
+      </li><li>
+        <span>[<strong class="uicontrol">新規]</strong> を選択します。<div style="text-align:left;"><img alt="ブロードキャストトピックの作成ウィンドウ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_new_broadcast_type.png"></div></span>
+      </li><li>
+        <span>名前と説明を入力し、ブロードキャスト種別を選択します。</span>
+      </li><li>
+        <span>ブロードキャストの理由として <strong class="uicontrol">[インシデントコミュニケーション]</strong> を選択します。</span>
+      </li><li>
+        <span>変更内容を保存します。</span>
+      </li></ol>
+
+    <div><p>ブロードキャストトピックを作成したら、ネットワークサイトに割り当てます。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_create_bt_alert">
+<h1 class="slds-text-heading_large">ブロードキャストアラートのブロードキャストトピックの作成</h1>
+  <p>インシデントマネージャーがブロードキャストアラートを作成できるようにするには、まずブロードキャストトピックを 1 つ以上作成します。インシデントが発生すると、インシデントマネージャーはブロードキャストトピックに基づいてブロードキャストアラートをグループに送信できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table><p>ブロードキャストトピックを作成する前に、次の操作を実行します。</p><ol>
+        <li>
+          <a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.user_groups.htm&amp;language=ja&amp;type=5">グループを確認または作成します。</a>
+        </li>
+
+        <li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=slack.slack_apps_sales_create_broadcast_topic_type.htm&amp;language=ja&amp;type=5">ブロードキャストトピック種別を作成</a>するか、デフォルトの種別を使用します。</li>
+
+      </ol></div>
+    <div><p>すでにブロードキャストアラートのブロードキャストトピックがある場合は、この手順をスキップして、直接グループへの割り当てに進むことができます。</p></div>
+    <ol><li>
+        <span>[設定] の [クイック検索] ボックスに<kbd>「カスタマーサービスインシデント管理」</kbd>と入力し、<strong class="uicontrol">[カスタマーサービスインシデント管理]</strong> をクリックします。</span>
+      </li><li>
+        <span>[ブロードキャストトピックを作成してグループに割り当て] で、<strong class="uicontrol">[作成して割り当て]</strong> をクリックします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[新規]</strong> を選択します。</span>
+        <div>
+          <div style="text-align:left;"><img alt="ブロードキャストトピックの作成ウィンドウ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_new_broadcast_type.png"></div>
+        </div>
+      </li><li>
+        <span>名前と説明を入力し、ブロードキャスト種別を選択します。</span>
+      </li><li>
+        <span>ブロードキャストの理由として <strong class="uicontrol">[インシデントコミュニケーション]</strong> を選択します。</span>
+      </li><li>
+        <span>変更内容を保存します。</span>
+      </li></ol>
+
+    <div><p>ブロードキャストトピックを作成したら、グループに割り当てます。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_create_bt_slack">
+<h1 class="slds-text-heading_large">ブロードキャスト Slack メッセージのブロードキャストトピックの作成</h1>
+  <p>インシデントチームがブロードキャスト Slack メッセージを送信できるようにするには、まずブロードキャストトピックを 1 つ以上作成します。インシデントが発生すると、ユーザーはブロードキャストトピックに基づいてブロードキャスト Slack メッセージを Slack チャンネルに送信できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table><p>ブロードキャストトピックを作成する前に、次の操作を実行します。</p><ol>
+        <li> Slack のブロードキャストチャンネルを確認または作成します。</li>
+
+        <li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=slack.slack_apps_sales_create_broadcast_topic_type.htm&amp;language=ja&amp;type=5">ブロードキャストトピック種別を作成</a>するか、デフォルトの種別を使用します。</li>
+
+      </ol></div>
+    <div><p>すでにブロードキャスト Slack メッセージのブロードキャストトピックがある場合は、この手順をスキップして、直接 Slack チャンネルへの割り当てに進むことができます。</p></div>
+    <ol><li>
+        <span>[設定] の [クイック検索] ボックスに<kbd>「カスタマーサービスインシデント管理」</kbd>と入力し、<strong class="uicontrol">[カスタマーサービスインシデント管理]</strong> をクリックします。</span>
+      </li><li>
+        <span>[ブロードキャストトピックを作成してチャンネルに割り当て] で、<strong class="uicontrol">[作成して割り当て]</strong> をクリックします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[新規]</strong> を選択します。</span>
+        <div>
+          <div style="text-align:left;"><img alt="ブロードキャストトピックの作成ウィンドウ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_new_broadcast_type.png"></div>
+        </div>
+      </li><li>
+        <span>名前と説明を入力し、ブロードキャスト種別を選択します。</span>
+      </li><li>
+        <span>ブロードキャストの理由として <strong class="uicontrol">[インシデントコミュニケーション]</strong> を選択します。</span>
+      </li><li>
+        <span>変更内容を保存します。</span>
+      </li></ol>
+
+    <div><p>ブロードキャストトピックを作成したら、Slack チャンネルに割り当てます。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_create_change_request">
+<h1 class="slds-text-heading_large">変更要求の作成</h1>
+  <p>問題にソリューションをロールアウトし、インシデントを解決するには、変更要求を作成します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>サービスコンソールでドロップダウンをクリックし、[<strong class="uicontrol">変更要求]</strong> を選択します。<div style="text-align:left;"><img alt="ナビゲーションバーの変更要求" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_change_request_nav.png"></div></span>
+      </li><li>
+        <span>[<strong class="uicontrol">新規]</strong> を選択します。<div style="text-align:left;"><img alt="[新規変更要求] ウィンドウ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_new_change_request.png"></div></span>
+      </li><li>
+        <span>確認者名や改善プランなどの情報を入力し、変更内容を保存します。</span>
+      </li></ol>
+
+    <div><p>変更要求を作成したら、作業プランと作業ステップを使用して、インシデントの解決に必要なアクションの概要を決定できます。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_create_entitlement">
+<h1 class="slds-text-heading_large">インシデントのエンタイトルメントの作成</h1>
+  <p>エンタイトルメントを作成してエンタイトルメントプロセスにリンクし、インシデントを適切に時間どおりに解決します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>アプリケーションランチャーから、<strong class="uicontrol">[エンタイトルメント]</strong> を見つけて選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[新規]</strong> をクリックします。</span>
+      </li><li>
+        <span>エンタイトルメントプロセスと同じ名前を入力します。<div style="text-align:left;"><img alt="[新規エンタイトルメント] ウィンドウ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_new_entitlement.png"></div></span>
+      </li><li>
+        <span>取引先名を選択し、開始日を設定して、変更内容を保存します。</span>
+      </li></ol>
+
+    <div><p>サポート担当者はインシデントを作成するときに、エンタイトルメントを割り当てることができます。エンタイトルメントがインシデントに追加されると、マイルストーンカウンターが開始されます。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_create_incident">
+<h1 class="slds-text-heading_large">インシデントの作成</h1>
+  <p>インシデントレコードを作成し、多くの顧客に関与する中断を追跡して特定します。インシデントは、複数のチームがコラボレーションする必要がある広範な顧客の問題を解決する場合に最適です。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>サービスコンソールでドロップダウンをクリックし、[<strong class="uicontrol">インシデント]</strong> を選択します。<div style="text-align:left;"><img alt="ナビゲーションバーのインシデント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_nav_bar.png"></div></span>
+      </li><li>
+        <span><strong class="uicontrol">[新規]</strong> を選択します。</span>
+      </li><li>
+        <span>情報を入力し、変更を保存します。<div style="text-align:left;"><img alt="[新規インシデント] ウィンドウ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_new_incident.png"></div></span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_create_incident_channel">
+<h1 class="slds-text-heading_large">インシデントチャネルの作成</h1>
+  <p>オムニチャネルを介してインシデントをサポート担当者に転送します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d132516e54" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d132516e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">オムニチャネルを設定する</td>
+
+              <td headers="d132516e54" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>[設定] から、[クイック検索] ボックスに<kbd>「チャネル」</kbd>と入力し、<strong class="uicontrol">[サービスチャネル]</strong> を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[新規]</strong> をクリックします。</span>
+      </li><li>
+        <span>チャネル名と API 参照名を入力します。</span>
+      </li><li>
+        <span>Salesforce オブジェクトとして <strong class="uicontrol">[インシデント]</strong> を選択します。</span>
+      </li><li>
+        <span>業務量モデルを <strong class="uicontrol">[タブベース]</strong> に設定します。</span>
+      </li><li>
+        <span>変更内容を保存します。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="voice_messaging-2.html">&larr; Voice・メッセージング・チャネル（2/2）</a><a href="incident-2.html">インシデント管理・スウォーミング（2/3） &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=service.service_cloud.htm&type=5&language=ja">help.salesforce.com — Salesforce Service Cloud（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>

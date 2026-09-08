@@ -1,0 +1,3400 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>プロンプトビルダー（1/3） | Agentforce / AI ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（36）</h2>
+    <ol>
+      <li><a href="#generative_ai_trust_configure_prompt_injection_detection">プロンプトのプロンプトインジェクション検出の有効化 (ベータ)</a></li>
+      <li><a href="#generative_ai_trust_prompt_injection_detection">プロンプトインジェクション検出 (ベータ)</a></li>
+      <li><a href="#prompt_builder_about">プロンプトビルダー</a></li>
+      <li><a href="#prompt_builder_activate_deactivate_templates">プロンプトテンプレートの有効化と無効化</a></li>
+      <li><a href="#prompt_builder_add_action_prompt_template">アクションとしてのプロンプトテンプレートの追加</a></li>
+      <li><a href="#prompt_builder_add_apex_field_gen">項目生成プロンプトテンプレートへの Apex 差し込み項目の追加</a></li>
+      <li><a href="#prompt_builder_add_apex_flex">Flex プロンプトテンプレートへの Apex 差し込み項目の追加</a></li>
+      <li><a href="#prompt_builder_add_apex_sales_email">セールス メール プロンプト テンプレートへの Apex 差し込み項目の追加</a></li>
+      <li><a href="#prompt_builder_add_data_graphs_sales_email">セールスメールプロンプトテンプレートへのデータグラフの追加</a></li>
+      <li><a href="#prompt_builder_add_field_gen_to_lightning_record_page">Lightning レコード ページへの項目生成プロンプト テンプレートの追加</a></li>
+      <li><a href="#prompt_builder_add_file_flex">Flex プロンプトテンプレートへのファイル入力の追加</a></li>
+      <li><a href="#prompt_builder_add_flow_without_data_cloud_field_gen">項目生成プロンプトテンプレートへの Data Cloud オブジェクトのないフロー差し込み項目の追加</a></li>
+      <li><a href="#prompt_builder_add_flows_flex">Flex プロンプトテンプレートへのフロー差し込み項目の追加</a></li>
+      <li><a href="#prompt_builder_add_flows_with_data_cloud_field_gen">項目生成プロンプトテンプレートへの Data 360 オブジェクトを使用したフロー差し込み項目の追加</a></li>
+      <li><a href="#prompt_builder_add_flows_with_data_cloud_sales_email">セールスメールプロンプトテンプレートへの Data 360 オブジェクトを使用したフロー差し込み項目の追加</a></li>
+      <li><a href="#prompt_builder_add_flows_without_data_cloud_sales_email">セールスメールプロンプトテンプレートへの Data 360 オブジェクトのないフロー差し込み項目の追加</a></li>
+      <li><a href="#prompt_builder_add_free_text_input_flex">Flex プロンプトテンプレートへの自由テキスト入力の追加</a></li>
+      <li><a href="#prompt_builder_add_merge_fields_field_gen">項目生成プロンプトテンプレートへのレコード差し込み項目の追加</a></li>
+      <li><a href="#prompt_builder_add_merge_fields_flex">Flex プロンプトテンプレートへのレコード差し込み項目の追加</a></li>
+      <li><a href="#prompt_builder_add_merge_fields_sales_email">セールスメールプロンプトテンプレートへのレコード差し込み項目の追加</a></li>
+      <li><a href="#prompt_builder_add_new_action">プロンプトテンプレートへの新規アクションの追加</a></li>
+      <li><a href="#prompt_builder_add_new_input">既存のプロンプトテンプレートへの新しい入力の追加</a></li>
+      <li><a href="#prompt_builder_add_related_lists_file_flex">Flex プロンプトテンプレートへのファイル入力を含む関連リストの追加</a></li>
+      <li><a href="#prompt_builder_add_retriever_field_gen">項目生成プロンプトテンプレートへの取得者の追加</a></li>
+      <li><a href="#prompt_builder_add_sales_email_to_einstein">Einstein セールスメールへのセールスメールプロンプトテンプレートの追加</a></li>
+      <li><a href="#prompt_builder_answer_questions_with_knowledge">Knowledge プロンプトを使用した回答の質問テンプレートの作成</a></li>
+      <li><a href="#prompt_builder_batch_processing">プロンプトテンプレートの一括処理</a></li>
+      <li><a href="#prompt_builder_best_practices">プロンプトテンプレートを作成するためのベストプラクティス</a></li>
+      <li><a href="#prompt_builder_build_manage_lt">プロンプトテンプレートの Lightning 種別の作成および管理</a></li>
+      <li><a href="#prompt_builder_build_template">プロンプトテンプレートの作成</a></li>
+      <li><a href="#prompt_builder_changing_llm_configurations">プロンプトテンプレートでの LLM 設定の変更</a></li>
+      <li><a href="#prompt_builder_configure_action">プロンプトテンプレートでのアクションの設定</a></li>
+      <li><a href="#prompt_builder_configure_data_piping">プロンプトビルダーでのアクション間のデータの受け渡し</a></li>
+      <li><a href="#prompt_builder_configure_response">生成された応答形式の設定</a></li>
+      <li><a href="#prompt_builder_considerations">プロンプトビルダーの制限および考慮事項</a></li>
+      <li><a href="#prompt_builder_considerations_changeset">プロンプトテンプレートの変更セットに関する考慮事項</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>プロンプトビルダー（1/3）</h1>
+      <div class="meta">Salesforce AI / Agentforce ヘルプ · 36 記事 · 生成 2026-08-13</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="agentforce_general-4.html">&larr; Agentforce 全般 / セットアップ（4/4）</a><a href="prompt_builder-2.html">プロンプトビルダー（2/3） &rarr;</a></div>
+<section class="article" id="generative_ai_trust_configure_prompt_injection_detection">
+<h1 class="slds-text-heading_large">プロンプトのプロンプトインジェクション検出の有効化 (ベータ)</h1>
+  <p>Einstein Trust Layer の [設定] でプロンプト インジェクション検出を有効にして、大規模言語モデルが意図しない動作をさせようとするコンテンツを監視します。これらの設定は、Salesforce 組織レベルで適用されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Sales、Einstein for Platform、Einstein for Service、Einstein 1 Service、または Einstein GPT Service アドオンが付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition。アドオンを購入するには、Salesforce アカウントエグゼクティブにお問い合わせください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d85691e62" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d85691e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロンプトの挿入検出を有効にする</td>
+
+              <td headers="d85691e62" style="vertical-align:top;" class="slds-cell-wrap">「設定の参照」 </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d85691e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">&nbsp;</td>
+
+              <td headers="d85691e62" style="vertical-align:top;" class="slds-cell-wrap">および</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d85691e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">&nbsp;</td>
+
+              <td headers="d85691e62" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+            </tr>
+          </tbody></table><p> Einstein 生成 AI が有効になっている必要があります。</p></div>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> プロンプトの挿入検出はベータ機能です。</div></div></div>
+</div>
+    <ol><li>
+        <span>[設定] の [クイック検索] 項目に<kbd>「Einstein」</kbd>と入力し、<strong class="uicontrol">[Einstein Trust Layer]</strong> を選択します。</span>
+        <div>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> <strong class="uicontrol">[Einstein 生成 AI 設定]</strong> が見つからない場合は、使用する生成 AI 機能の前提条件を組織が満たしていることを確認してください。詳細は、Salesforce アカウントエグゼクティブ (AE) にお問い合わせください。</div></div></div>
+
+        </div>
+      </li><li>
+        <span><strong class="uicontrol">[安全とセキュリティ]</strong> をクリックします。</span>
+      </li><li>
+        <span>ベータサービス条件を確認します。プロンプトの挿入検出を有効にします。</span>
+      </li><li>
+        <span>プロンプトインジェクションが検出されたかどうかを確認するには、<a title="Salesforce組織のEinstein生成AI監査およびフィードバック データからのインサイトをチームと共有します。事前作成済みのダッシュボードとレポートを使用して、クエリを実行し、Data 360 レポートを作成します。" href="generative_misc-2.html#generative_ai_feedback_analytics">Data 360 のレポート</a>とダッシュボードを使用します。</span>
+        <div>
+          <p>
+            <a name="generative_ai_trust_configure_prompt_injection_detection__image_rwk_zs1_qcc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="現在無効になっているプロンプトの挿入をすばやく検出できる切り替えスイッチ。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/trust_layer_prompt_injection_detection_setup.png" id="generative_ai_trust_configure_prompt_injection_detection__image_rwk_zs1_qcc" style="margin-bottom:0;"></span>
+          </p>
+        </div>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="プロンプトの挿入 (「ジェイルブレイク 」とも呼ばれる) は、大規模言語モデル (LLM) の脆弱性です。プロンプトインジェクションは、LLM が意図しない動作をさせようとする試みです。ハッカーは、システムポリシーを上書きしたり、LLM を操作して意図しない動作をさせようとするプロンプトを作成できます。" href="#generative_ai_trust_prompt_injection_detection">プロンプトインジェクション検出 (ベータ)</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="generative_ai_trust_prompt_injection_detection">
+<h1 class="slds-text-heading_large">プロンプトインジェクション検出 (ベータ)</h1>
+  <p>プロンプトの挿入 (「ジェイルブレイク 」とも呼ばれる) は、大規模言語モデル (LLM) の脆弱性です。プロンプトインジェクションは、LLM が意図しない動作をさせようとする試みです。ハッカーは、システムポリシーを上書きしたり、LLM を操作して意図しない動作をさせようとするプロンプトを作成できます。 
+    </p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Sales、Einstein for Platform、Einstein for Service、Einstein 1 Service、または Einstein GPT Service アドオンが付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition。アドオンを購入するには、Salesforce アカウントエグゼクティブにお問い合わせください。</td>
+
+            </tr>
+          </tbody></table>
+    <p>プロンプトの挿入は、プロンプトテキストに直接導入されたり、プロンプトに含まれるデータソースを介して間接的に導入されたりする場合があります。</p>
+    <p>Salesforce プロンプトの挿入検出モデルでは、次の種別のプロンプトインジェクション攻撃が認識されます。</p>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d140045e66" style="vertical-align:top;" class="slds-cell-wrap" scope="col">種別</th>
+            <th id="d140045e69" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d140045e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="種別">偽装 (ロールプレイ)</td>
+
+            <td headers="d140045e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">悪意のある別のシステム人格を採用するように AI に指示し、人を欺くような表現や誤解を招く表現を使用してソーシャルエンジニアリング攻撃で操作するプロンプト</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d140045e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="種別">権限のエスカレーションまたはシステムルールの変更の試行 </td>
+
+            <td headers="d140045e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Do Anything Now (DAN) ジェイルブレイク攻撃などのセキュリティ制限に違反する攻撃を含め、システムルールを回避または変更し、言語モデルの安全トレーニングをスキップする有害なコマンドが含まれるプロンプト</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d140045e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="種別">プロンプト漏洩の試み</td>
+
+            <td headers="d140045e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">言語モデルから機密情報 (システムポリシーやナレッジドキュメントなど) を収集して未承認の情報を取得するためのプロンプト</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d140045e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="種別"> 符号化攻撃 </td>
+
+            <td headers="d140045e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">プロンプトで難読化されたメッセージや非表示のメッセージを使用して言語モデルを作成し、悪意のあるコンテンツ、整合性のないコンテンツ、有害なコンテンツを生成</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d140045e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="種別">プライバシー攻撃</td>
+
+            <td headers="d140045e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">個人情報や機密情報を取得してデータに不正アクセスしたり、情報を悪用したりするプロンプト</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d140045e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="種別">悪意のあるコードの生成</td>
+
+            <td headers="d140045e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">不正ソフトウェア、ウイルス、または詐欺やその他の悪意のある意図を実行するように設計されたツールやソフトウェアなどの有害なコンピューターコードを生成しようとするプロンプト。</td>
+
+          </tr>
+        </tbody></table>
+    <p>プロンプトインジェクションが検出されると、コンテンツが評価され、スコアが監査履歴に記録されて Data 360 に保存されます。 プロンプトインジェクションスコアは Data 360 DMO で表示できます。</p>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> プロンプトの挿入検出モデルは内部テストで有効であることが示されていますが、どのモデルも 100% の精度を保証することはできないことに注意してください。信頼を優先事項として、モデルの継続的な評価と調整に取り組んでいます。
+        </div></div></div>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Einstein Trust Layer の [設定] でプロンプト インジェクション検出を有効にして、大規模言語モデルが意図しない動作をさせようとするコンテンツを監視します。これらの設定は、Salesforce 組織レベルで適用されます。" href="#generative_ai_trust_configure_prompt_injection_detection">プロンプトのプロンプトインジェクション検出の有効化 (ベータ)</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prompt_builder_about">
+<h1 class="slds-text-heading_large">プロンプトビルダー</h1>
+  
+  
+  <p>プロンプトテンプレートを利用した生成 AI モーメントをワークフローに統合することで、ユーザーの日次タスクを簡素化します。レコード項目、フロー、関連リスト、Apex を参照する差し込み項目の CRM データを組み込んだプロンプトテンプレートを作成、テスト、修正、カスタマイズ、管理します。プロンプトビルダーを使用すると、自分とデータを LLM に安全に接続するための効果的なプロンプトを作成できます。</p>
+
+    <p>プロンプトビルダーでさまざまな種別のプロンプトテンプレートを作成します。</p>
+    <ul>
+      <li>セールスメールプロンプトテンプレートは、営業チームが取引先責任者またはリード向けにパーソナライズされたメールのドラフトを作成するのに役立ちます。</li>
+
+      <li>Field Generation プロンプト テンプレートでは、生成 AI 支援ワークフローを Lightning レコード ページ内のフィールドに取り込みます。ユーザーが LLM によって作成された概要や説明を項目に入力し、顧客とのより生産的な会話を促進できるようにします。</li>
+
+      <li>Flex プロンプトテンプレートは、さまざまなオブジェクト種別の可変数の入力を取ります。この柔軟性により、商品やキャンペーンオブジェクトに基づいてニュースレターを生成するなど、さまざまな可能性が広がります。</li>
+
+    </ul>
+
+    <p>Salesforce Platform の任意の場所で呼び出し可能なアクションを使用するか、Connect REST API または Connect in Apex を使用してプロンプトテンプレートをコールします。</p>
+    <p>プロンプトビルダーでプロンプトテンプレートを作成および管理する Salesforce システム管理者に「プロンプトテンプレートマネージャー」権限セットを割り当てます。</p>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/modules/prompt-fundamentals">Trailhead: プロンプトの基礎</a></li><li><a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/modules/prompt-studio-quick-look">Trailhead: プロンプトビルダー: クイックルック</a></li><li><a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/modules/prompt-builder-basics">Trailhead: プロンプトビルダー: 基本</a></li><li><a target="_blank" href="https://salesforce.vidyard.com/watch/kJPBHFRvvTpjJZ51Y4hj3A">動画: Get to Know プロンプトビルダー</a></li><li><a target="_blank" href="https://salesforce.vidyard.com/watch/V1G9tgorNbyeaD811SRamA">動画: How to Build a Prompt Template (プロンプトテンプレートの作成方法)</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prompt_builder_activate_deactivate_templates">
+<h1 class="slds-text-heading_large">プロンプトテンプレートの有効化と無効化</h1>
+  
+  <p>プロンプトテンプレートの有効化と無効化を使用して、ユーザーがアクセスできるバージョンを細かく制御します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Platform、Einstein または Agentforce for Sales/Service アドオン、または Agentforce Foundation が付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d132008e69" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d132008e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロンプトビルダーでプロンプトテンプレートを作成および管理する</td>
+
+              <td headers="d132008e69" style="vertical-align:top;" class="slds-cell-wrap"><p>「プロンプトテンプレートマネージャー」権限セット</p><ul>
+                  <li>プロンプトテンプレートの管理</li>
+
+                  <li>Execute Prompt Templates (プロンプトテンプレートの実行)</li>
+
+                </ul>
+<p>または</p><p style="margin-bottom:0;">「アプリケーションのカスタマイズ」権限セット</p></td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>プロンプトテンプレートの作成プロセスでは、通常、いくつかのバージョンを作成して、どのテンプレート本文、グラウンディングデータ、LLM の組み合わせが最も満足のいく応答を生成するかをテストします。この反復的なドラフト作成プロセスのため、デフォルトではプロンプトテンプレートをユーザーが使用できません。最初に有効化する必要があります。</p><p>プロンプトテンプレートを有効化すると、特定のバージョンのプロンプトテンプレートをユーザーが使用できるようになります。一度に有効化できるテンプレートのバージョンは 1 つのみです。有効なバージョンがない場合、ユーザーはテンプレートを使用できなくなります。バージョンを有効化および無効化すると、共有するテンプレートのバージョンのみを使用可能にする制御が可能になります。</p></div>
+    <ol><li>
+        <span>プロンプトビルダーのプロンプトテンプレートワークスペースから開始します。「<a title="使用事例に基づいて作成するプロンプトテンプレートの種別を選択します。テンプレート種別に基づいて、テンプレートで使用できるリソースを定義します。" href="#prompt_builder_build_template">Create a Prompt Template</a>」を参照してください。</span>
+      </li><li>
+        <span>[プロンプト] セクションでプロンプトのドラフトを作成します。作業を保存する準備ができたら、[<strong class="uicontrol">保存] を</strong>クリックします。このプロンプトは、プロンプトテンプレートワークスペースの上部に表示されるバージョン番号で示されるように、プロンプトテンプレートのバージョン 1 になりました。</span>
+      </li><li>
+        <span>テンプレートを有効化してユーザーが使用できるようにする準備ができたら、[<strong class="uicontrol">有効化]</strong> をクリックします。</span>
+        <div>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> テンプレートバージョンを有効化すると、テンプレートバージョンは不変になります。無効化された場合でも、有効になっていたバージョンは不変のままです。このようなテンプレートを編集するには、新しいバージョンとして保存します。「<a title="プロンプトビルダーで複数のバージョンのプロンプトテンプレートを作成して使用し、プロンプトの構造とその応答を比較します。" href="prompt_builder-3.html#prompt_builder_use_multiple_versions">Use Multiple Versions</a> of a Prompt Template (プロンプトテンプレートの複数バージョンの使用)」を参照してください。</div></div></div>
+
+        </div>
+      </li><li>
+        <span>有効なテンプレートバージョンを無効にするには、<strong class="uicontrol">[無効化</strong>] をクリックします。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prompt_builder_add_action_prompt_template">
+<h1 class="slds-text-heading_large">アクションとしてのプロンプトテンプレートの追加</h1>
+ <p>別のプロンプトテンプレート内にアクションとしてプロンプトテンプレートを追加してロジックを再利用し、その出力をプロンプトに組み込みます。あるプロンプトテンプレートを別のプロンプトテンプレートから呼び出して、一貫性のあるモジュラープロンプトワークフローを作成します。
+ </p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+  <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Platform、Einstein または Agentforce for Sales/Service アドオン、または Agentforce Foundation が付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d121621e68" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d121621e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロンプトビルダーでプロンプトテンプレートを作成および管理する</td>
+
+              <td headers="d121621e68" style="vertical-align:top;" class="slds-cell-wrap"><p>「プロンプトテンプレートマネージャー」権限セット</p><ul>
+                  <li>プロンプトテンプレートの管理</li>
+
+                  <li>Execute Prompt Templates (プロンプトテンプレートの実行)</li>
+
+                </ul>
+<p>または</p><p style="margin-bottom:0;">「アプリケーションのカスタマイズ」権限セット</p></td>
+
+            </tr>
+          </tbody></table><p> 開始する前に、アクションとして使用するプロンプトテンプレートが有効であり、必須入力が設定されていることを確認します。</p></div>
+  <ol><li>
+    <span>プロンプトビルダーで、既存のプロンプトテンプレートを開くか作成します。</span>
+   </li><li>
+    <span>[Resources (リソース)] パネルで、[<strong class="uicontrol">Add (追加</strong>)] をクリックします。</span>
+   </li><li>
+    <span>アクション種別として [<strong class="uicontrol">プロンプトテンプレート]</strong> を選択します。</span>
+   </li><li>
+    <span>リストから有効なプロンプトテンプレートを選択します。</span>
+   </li><li>
+    <span><strong class="uicontrol">[追加]</strong> をクリックします。プロンプトの実行時に指定された入力を使用するようにプロンプトテンプレートアクションを設定します。</span>
+   </li></ol>
+
+  
+ 
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="別のプロンプトテンプレート内にアクションとしてプロンプトテンプレートを追加して、ロジックを再利用し、応答の生成方法を標準化します。あるプロンプトテンプレートを別のプロンプトテンプレートから呼び出して、より一貫性のあるモジュール化されたプロンプトワークフローを作成します。" href="prompt_builder-3.html#prompt_builder_use_prompt_template_actions">アクションとしてのプロンプトテンプレートの使用</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prompt_builder_add_apex_field_gen">
+<h1 class="slds-text-heading_large">項目生成プロンプトテンプレートへの Apex 差し込み項目の追加</h1>
+  
+  <p>Apex を使用する項目生成プロンプトテンプレートの例を作成します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Platform、Einstein または Agentforce for Sales/Service アドオン、または Agentforce Foundation が付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d129060e69" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d129060e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロンプトビルダーでプロンプトテンプレートを作成および管理する</td>
+
+              <td headers="d129060e69" style="vertical-align:top;" class="slds-cell-wrap"><p>「プロンプトテンプレートマネージャー」権限セット</p><ul>
+                  <li>プロンプトテンプレートの管理</li>
+
+                  <li>Execute Prompt Templates (プロンプトテンプレートの実行)</li>
+
+                </ul>
+<p>または</p><p style="margin-bottom:0;">「アプリケーションのカスタマイズ」権限セット</p></td>
+
+            </tr>
+          </tbody></table><p>たとえば、顧客が電話をかける前に、特定の顧客のケースの最新の概要を会社の営業チームに提供します。フローセクションでも同じ使用事例を使用しました。</p><p>今回は、LLM で集計するケースデータを取得する Apex クラスを統合する項目生成プロンプトテンプレートを作成します。</p><p>プロンプトテンプレートのリソースとしてアクセスする Apex クラスを次に示します。</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-java">public class OpenCasesPrompt {
+    @InvocableMethod(label='Open Cases'
+        description='Find Cases for an Account'
+        CapabilityType='PromptTemplateType://einstein_gpt__fieldCompletion')
+    public static List&lt;Response&gt; getCasesPrompt(List&lt;Request&gt; requests) {
+        // Validate the expected number of requests as an input
+        if (requests.size() != 1)
+          throw new ListException('The requests list must contain one entry only');
+        Account a = requests[0].RelatedEntity;
+        ID searchAcctId = a.Id;
+        List&lt;Case&gt; cases =
+            [SELECT Id, Subject, Description
+             FROM Case
+             WHERE AccountId = :searchAcctId AND Status != 'Closed'
+             WITH USER_MODE];
+        string responseData = null;
+        if(cases.isEmpty()) {
+            responseData = 'There are no open cases.';
+        } else {
+            for(Case c : cases) {  
+                responseData =
+                   (responseData != null) ? responseData + '\n' : '';           
+                responseData += String.format('Case details: {0}, {1}.',
+                    new List&lt;Object&gt;{c.Subject, c.Description});
+            }
+        }
+       
+        List&lt;Response&gt; responses = new List&lt;Response&gt;();
+        Response res = new Response();
+        res.Prompt = responseData;
+        responses.add(res);
+        return responses;
+    }
+    
+    public class Request {
+        @InvocableVariable(required=true)
+        public Account RelatedEntity;
+    }
+    
+    public class Response {
+        @InvocableVariable
+        public String Prompt;
+    }
+}</code></pre><p>Apex クラスの要件については、「 <a title="プロンプトテンプレートで Apex 差し込み項目を使用して、SOQL クエリまたは外部 API からデータを返すことができます。形式の JSON を生成したり、プログラムでデータを絞り込んだりする場合にも効果的です。" href="prompt_builder-2.html#prompt_builder_ground_apex">Apex 差し込み項目</a>を使用したグラウンディング 」を参照してください。</p><p>テストカバー率は重要であるため、<a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.apexcode.meta/apexcode/apex_testing.htm">テストクラス</a>を追加しましょう。テストクラスは、プロンプトビルダーから送信されるデータをシミュレートします。2 つのテストケースが用意されています。1 つはイベントが見つかった場合のテストケース、もう 1 つはイベントがない場合のテストケースです。</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-java">@IsTest
+public class OpenCasesPrompt_Test {
+
+    @IsTest
+    public static void findMatchingCasesForAccount() {        
+        Account a = new Account(Name='Test Account');
+        insert a;
+        Case c1 = new Case(Subject='Test Case', Description='Important Case', 
+            Status='New', AccountId=a.id);
+        Case c2 = new Case(Subject='Test Case 2',
+            Description='Case Description', Status='In-progress', 
+            AccountId=a.id);
+        Case c3 = new Case(Subject='Test Case Closed',
+            Description='Closed Case', Status='Closed', AccountId=a.id);
+        insert new List&lt;Case&gt;{c1, c2, c3};
+
+
+        List&lt;OpenCasesPrompt.Request&gt; requestsInput
+            = new List&lt;OpenCasesPrompt.Request&gt;();
+        OpenCasesPrompt.Request request = new OpenCasesPrompt.Request();
+        request.RelatedEntity = a;
+        requestsInput.add(request);
+        
+        Test.startTest();
+        List&lt;OpenCasesPrompt.Response&gt; responses = 
+            OpenCasesPrompt.getCasesPrompt(requestsInput);
+        Test.stopTest();
+       
+        Assert.areEqual(1, responses.size());
+        OpenCasesPrompt.Response response = responses[0];
+
+        Assert.areEqual('Case details: Test Case, Important Case.\n' +
+                        'Case details: Test Case 2, Case Description.', 
+                        response.Prompt);
+    }
+
+    @IsTest
+    public static void noCasesForAccountResponse() {
+        List&lt;OpenCasesPrompt.Request&gt; requestsInput
+            = new List&lt;OpenCasesPrompt.Request&gt;();
+        OpenCasesPrompt.Request request = new OpenCasesPrompt.Request();
+        request.RelatedEntity = new Account();
+        requestsInput.add(request);
+        
+        List&lt;OpenCasesPrompt.Response&gt; responses = 
+            OpenCasesPrompt.getCasesPrompt(requestsInput);
+        Assert.areEqual(1, responses.size());
+       
+        OpenCasesPrompt.Response response = responses[0];
+        Assert.areEqual('There are no open cases.', response.Prompt);
+    }
+}
+</code></pre><p>Apex クラスの準備ができたら、プロンプトビルダーから呼び出してみましょう。これを行うには、まず取引先オブジェクトで「Open Case Summary (オープンケースの概要)」というカスタム項目を作成する必要があります。カスタム項目のデータ型は [テキストエリア (ロング)] である必要があります。<a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.adding_fields.htm&amp;language=ja&amp;type=5">「カスタム項目の作成」</a>を参照してください。プロンプトビルダーに新しいカスタム項目が表示されるように、ログアウトしてから再度ログインします。</p></div>
+    <div><p>プロンプトビルダーで、新しいプロンプトテンプレートを作成します。</p></div>
+    <ol><li>
+        <span>[プロンプトテンプレート種別] で、[<strong class="uicontrol">項目生成]</strong> を選択します。</span>
+      </li><li>
+        <span>[プロンプトテンプレート名] に「<kbd>Apex: Summarize Open Cases</kbd>」と入力します。</span>
+      </li><li>
+        <span>[オブジェクト] で、[<strong class="uicontrol">取引先]</strong> を選択します。</span>
+      </li><li>
+        <span>[オブジェクト項目] で、[<strong class="uicontrol">Open Case Summary]</strong> を選択します。</span>
+      </li><li>
+        <span>[説明] 項目を空白のままにします。</span>
+      </li><li>
+        <span>[<strong class="uicontrol">作成]</strong> をクリックすると、プロンプトテンプレートワークスペースにリダイレクトされます。</span>
+      </li><li>
+        <span><a title="このサンプルプロンプトテンプレートのライブラリでは、独自のカスタムプロンプトテンプレートを作成するための開始点を得ることができます。" href="prompt_builder-2.html#prompt_builder_example_library">サンプルプロンプトテンプレートライブラリ</a>で、項目生成プロンプトテンプレート「Summarize open cases for an account」を見つけます。このテンプレートをコピーしてプロンプトテンプレートワークスペースに貼り付けます。</span>
+      </li><li>
+                <span>プロンプトビルダーでこのテンプレートを実行する前に、[プロンプト] セクションで [<strong class="uicontrol">リソースの挿入</strong>] をクリックします。検索項目は、このオプションを初めてクリックしたときに表示されます。</span>
+                <ol>
+                    <li>
+                        <span><code>&lt;account.Id__Merge_Field&gt;</code> プレースホルダーを削除します。</span>
+                    </li>
+
+                    <li>
+                        <span>[ <strong class="uicontrol">リソース</strong>] 検索バーをクリックし、 [取引先] [ <span class="menucascade"><strong class="uicontrol">取引先</strong> | <strong class="uicontrol">ID</strong></span>] を選択します。</span>
+                    </li>
+
+                    <li>
+                        <span>&lt;Get_Open_Cases_For_Account__Prompt__Flow&gt; プレースホルダーを削除します。</span>
+                    </li>
+
+                    <li>
+                        <span><strong class="uicontrol">[Resource</strong> (リソース)] 検索バーをクリックし、[<strong class="uicontrol">Apex</strong>] を選択します。</span>
+                    </li>
+
+                    <li>
+                        <span>テンプレートに <kbd>OpenCasesPrompt</kbd> Apex クラスを追加するには、<strong class="uicontrol">「Open Cases」</strong>を選択します。Open Cases は、 <kbd>OpenCasesPrompt</kbd> Apex クラスの <kbd>@InvocableMethod</kbd> アノテーションで設定した label 属性です。</span>
+                    </li>
+
+                </ol>
+            </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prompt_builder_add_apex_flex">
+<h1 class="slds-text-heading_large">Flex プロンプトテンプレートへの Apex 差し込み項目の追加</h1>
+  
+  <p>Apex を使用する Flex プロンプトテンプレートの例を作成します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Platform、Einstein または Agentforce for Sales/Service アドオン、または Agentforce Foundation が付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d138408e69" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d138408e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロンプトビルダーでプロンプトテンプレートを作成および管理する</td>
+
+              <td headers="d138408e69" style="vertical-align:top;" class="slds-cell-wrap"><p>「プロンプトテンプレートマネージャー」権限セット</p><ul>
+                  <li>プロンプトテンプレートの管理</li>
+
+                  <li>Execute Prompt Templates (プロンプトテンプレートの実行)</li>
+
+                </ul>
+<p>または</p><p style="margin-bottom:0;">「アプリケーションのカスタマイズ」権限セット</p></td>
+
+            </tr>
+          </tbody></table><p dir="ltr">Apex 項目を追加する前に、テンプレートのリソースとして使用する Apex クラスを作成します。クラスの入力変数は、テンプレートへの入力のサブセットである必要があります。Apex クラスの API 参照名は、各文字列入力種別およびテンプレートの複数の入力に使用される sobject 入力種別のテンプレートの API 参照名と一致する必要があります。</p><p>たとえば、この例ではプロンプトに 2 つの取引先入力があります。これらを区別するには、オブジェクトの API 参照名が対応するテンプレート入力と一致する必要があります。[ケース] 種別の入力は 1 つしかないため、1 つの [ケース] 入力は一致する必要はありません。UI でプロンプトテンプレートを作成するときに、テンプレートの <code>API Name</code> 項目とその入力を作成します。</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-java">public class ApexFlexTemplateExample1 {
+ 
+    @InvocableMethod
+    public static List&lt;Response&gt; getPrompt(List&lt;Request&gt; requests) {
+        Request input = requests[0];
+        List&lt;Response&gt; responses = new List&lt;Response&gt;();
+        Response output = new Response();
+        responses.add(output);
+   
+        output.Prompt = 'generate a summary using the following info:';
+        // account_1 matches the API Name for the input
+        output.Prompt += '\nAccount 1: ' + input.account_1.Name;
+        output.Prompt += '\nAccount 2: ' + input.account_2.Name;
+        output.Prompt += '\nCase Number: ' + input.case_1.CaseNumber;
+
+        return responses;
+    }
+ 
+    // Type and API Name of all variables must match the template
+    public class Request {
+        @InvocableVariable(required=true)
+        public Account account_1;
+        @InvocableVariable(required=true)
+        public Account account_2;
+        @InvocableVariable(required=true)
+        public Case case_1;
+    }
+
+    public class Response {
+        @InvocableVariable
+        public String Prompt;
+    }
+}   </code></pre></div>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 応答クラスの出力変数は、プロンプトビルダー UI のリソースピッカーで検出されるように、常に「Prompt」という名前にする必要があります。</div></div></div>
+<p>この例では、2 つの取引先と 1 つのケースを使用する Flex テンプレートを作成します。</p></div>
+    <ol><li>
+        <span>プロンプトビルダーで、[<strong class="uicontrol">新規プロンプトテンプレート</strong>] をクリックします。</span>
+      </li><li>
+        <span>[Prompt Template Type (プロンプトテンプレート種別)] フィールドで、[<strong class="uicontrol">Flex] を</strong>選択します。</span>
+      </li><li>
+        <span>［Prompt Template Name］ フィールドに、「<kbd>Flex - Apex Example1</kbd>」と入力します。</span>
+      </li><li>
+        <span>[リソースを定義] セクションで、テンプレートで使用するオブジェクトを入力します。</span>
+        <ol>
+          <li>
+                        <span>最初の行で、[名前] フィールドに「<kbd>account 1」</kbd>と入力します。[オブジェクト] 項目で、[<strong class="uicontrol">取引先]</strong> を選択します。<strong class="uicontrol">[追加]</strong> をクリックします。</span>
+                    </li>
+
+          <li>
+                        <span>2 番目の行で、[名前] フィールドに「<kbd>account 2」</kbd>と入力します。[オブジェクト] 項目で、[<strong class="uicontrol">取引先]</strong> を選択します。<strong class="uicontrol">[追加]</strong> をクリックします。</span>
+                    </li>
+
+          <li>
+            <span>3 行目の場合、[名前] フィールドに「<kbd>case 1」</kbd>と入力します。[オブジェクト] 項目で、[<strong class="uicontrol">ケース]</strong> を選択します。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+      </li><li>
+        <span>テンプレートを再読み込みします。</span>
+      </li></ol>
+
+    <div><p>プロンプトビルダーで、<code>ApexFlexTemplateExample1</code> クラスを Flex テンプレートのリソースとして追加します。</p><p>次の例は、Flex プロンプトテンプレートの入力を Apex クラスに送信する方法を示しています。使用事例はシンプルですが、この概念は強力です。Apex を使用して、実際の使用事例のレコードを処理できます。
+      </p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prompt_builder_add_apex_sales_email">
+<h1 class="slds-text-heading_large">セールス メール プロンプト テンプレートへの Apex 差し込み項目の追加</h1>
+  
+  <p>Apex を使用するセールスメールプロンプトテンプレートの例を作成します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Platform、Einstein または Agentforce for Sales/Service アドオン、または Agentforce Foundation が付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d28626e69" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d28626e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロンプトビルダーでプロンプトテンプレートを作成および管理する</td>
+
+              <td headers="d28626e69" style="vertical-align:top;" class="slds-cell-wrap"><p>「プロンプトテンプレートマネージャー」権限セット</p><ul>
+                  <li>プロンプトテンプレートの管理</li>
+
+                  <li>Execute Prompt Templates (プロンプトテンプレートの実行)</li>
+
+                </ul>
+<p>または</p><p style="margin-bottom:0;">「アプリケーションのカスタマイズ」権限セット</p></td>
+
+            </tr>
+          </tbody></table><p>たとえば、Salesforce システム管理者が、営業チームから取引先責任者に近隣のマーケティングイベントに関するメールを送信するための簡単な方法を要求されているとします。</p><p>Apex クラスを起動するメール プロンプト テンプレートを作成し、取引先責任者と同じ市区郡および州のマーケティング イベントを取得します。Apex クラスは、LLM のイベントとその場所のリストを取得します。</p><p>プロンプトテンプレートのリソースとしてアクセスする Apex クラスを次に示します。</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-java">public class ContactEventsPrompt {
+    @InvocableMethod(label='Contact Events'
+      description='Find Events for a Contact'
+      CapabilityType='PromptTemplateType://einstein_gpt__salesEmail')
+    public static List&lt;Response&gt; getContactsPrompt(List&lt;Request&gt; requests) {
+        // validate the expected number of requests as an input
+        if (requests.size() != 1)
+            throw new ListException('The requests list must contain one entry only');
+        Contact c = requests[0].Recipient;
+        // Protect against SOQL Injection
+        string searchCity = '%' + c.MailingCity + '%';
+        string searchState = '%' + c.MailingState + '%';
+        List&lt;Event&gt; events =
+          [SELECT Id, Subject, Description, Location, StartDateTime
+           FROM Event
+           WHERE IsArchived = false AND Location LIKE :searchCity
+            AND Location LIKE :searchState WITH USER_MODE]; 
+        string responseData = '';
+
+        if(events.isEmpty()) {
+            responseData = 'No upcoming Marketing events near you.';
+        } else {
+            for(Event e : events) {
+                responseData += 'Event details: ';
+                responseData += e.Subject;
+                responseData += ', ';
+                responseData += e.Description;
+                responseData += ', ';
+                responseData += e.Location;
+                responseData += '/nStart Time: ';
+                responseData += e.StartDateTime.format();
+                responseData += '.';
+            }
+        }
+
+        List&lt;Response&gt; responses = new List&lt;Response&gt;();
+        Response res = new Response();
+        res.Prompt = responseData;
+        responses.add(res);
+        return responses;
+      }
+
+      public class Request {
+          @InvocableVariable(required=true)
+          public User Sender;
+          @InvocableVariable(required=true)
+          public Contact Recipient;
+      }
+
+      public class Response {
+          @InvocableVariable
+          public String Prompt;
+      }
+}</code></pre><p>Apex クラスの要件については、「 <a title="プロンプトテンプレートで Apex 差し込み項目を使用して、SOQL クエリまたは外部 API からデータを返すことができます。形式の JSON を生成したり、プログラムでデータを絞り込んだりする場合にも効果的です。" href="prompt_builder-2.html#prompt_builder_ground_apex">Apex 差し込み項目</a>を使用したグラウンディング 」を参照してください。</p><p>テストカバー率は重要であるため、<a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.apexcode.meta/apexcode/apex_testing.htm">テストクラス</a>を追加しましょう。テストクラスは、プロンプトビルダーから送信されるデータをシミュレートします。2 つのテストケースが用意されています。1 つはイベントが見つかった場合のテストケース、もう 1 つはイベントがない場合のテストケースです。</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-java">@IsTest
+public class ContactEventsPrompt_Test {
+  @IsTest
+  public static void noEventsForContactResponse() {
+    List&lt;ContactEventsPrompt.Request&gt; requestsInput
+     = new List&lt;ContactEventsPrompt.Request&gt;();
+    ContactEventsPrompt.Request request
+     = new ContactEventsPrompt.Request();
+    request.Recipient = new Contact();
+    requestsInput.add(request);
+    List&lt;ContactEventsPrompt.Response&gt; responses =
+      ContactEventsPrompt.getContactsPrompt(requestsInput);
+    Assert.areEqual(1, responses.size());
+    ContactEventsPrompt.Response response = responses[0];
+    Assert.areEqual('No upcoming Marketing events near you.', 
+      response.Prompt);
+  }
+  
+
+  @IsTest
+  public static void findMatchingEventsForContact() {
+    Contact c = new Contact(LastName='TestContact',
+      MailingCity='San Francisco', MailingState='CA');
+    insert c;
+    Event e = new Event(Subject='Test Event', Description='Big Event', 
+      Location='415 Mission St, San Francisco, CA 94105, USA',   
+      StartDateTime=DateTime.newInstance(2023,09,28), 
+      DurationInMinutes=5 );
+    insert e;
+    List&lt;ContactEventsPrompt.Request&gt; requestsInput
+      = new List&lt;ContactEventsPrompt.Request&gt;();
+    ContactEventsPrompt.Request request
+      = new ContactEventsPrompt.Request();
+    request.Recipient = c;
+    requestsInput.add(request);
+    
+
+    Test.startTest();
+    List&lt;ContactEventsPrompt.Response&gt; responses = 
+      ContactEventsPrompt.getContactsPrompt(requestsInput);
+    Test.stopTest();
+    Assert.areEqual(1, responses.size());
+    ContactEventsPrompt.Response response = responses[0];
+    Assert.areEqual(formatEventString(e), response.Prompt);
+  }
+
+   
+  private static String formatEventString(Event event) {
+    String formattedEventString = 'Event details: ';
+    formattedEventString += event.Subject;
+    formattedEventString += ', ';
+    formattedEventString += event.Description;
+    formattedEventString += ', ';
+    formattedEventString += event.Location;
+    formattedEventString += '/nStart Time: ';
+    formattedEventString += event.StartDateTime.format();
+    formattedEventString += '.';
+    return formattedEventString;
+  }
+}</code></pre><p>Apex クラスの準備ができたら、プロンプトビルダーから呼び出してみましょう。</p><p>プロンプトビルダーで、新しいプロンプトテンプレートを作成します。</p></div>
+    <ol><li>
+                <span>[プロンプトテンプレート種別] ドロップダウンで、[<strong class="uicontrol">セールスメール]</strong> を選択します。</span>
+            </li><li>
+                <span>[プロンプトテンプレート名] に「<kbd>Apex: Nearby Events Marketing Email</kbd>」と入力します。</span>
+            </li><li>
+                <span>[受信者種別] で、[<strong class="uicontrol">取引先責任者]</strong> を選択します。</span>
+            </li><li>
+                <span>[説明] 項目を空白のままにします。</span>
+            </li><li>
+                <span>[<strong class="uicontrol">作成]</strong> をクリックすると、プロンプトテンプレートワークスペースにリダイレクトされます。</span>
+            </li><li>
+                <span><a title="このサンプルプロンプトテンプレートのライブラリでは、独自のカスタムプロンプトテンプレートを作成するための開始点を得ることができます。" href="prompt_builder-2.html#prompt_builder_example_library">サンプルプロンプトテンプレートライブラリ</a>で、セールスメールプロンプトテンプレート「Draft an email for a contact about regional marketing events」を見つけます。このテンプレートをコピーしてプロンプトテンプレートワークスペースに貼り付けます。</span>
+            </li><li>
+                <span>プロンプトビルダーでこのテンプレートを実行する前に、[プロンプト] セクションで [<strong class="uicontrol">リソースの挿入</strong>] をクリックします。検索項目は、このオプションを初めてクリックしたときに表示されます。</span>
+            </li><li>
+                <span>検索バーを使用して、プレースホルダーを差し込み項目に置き換えます。</span>
+                <a name="prompt_builder_add_apex_sales_email__substeps_rbs_tx4_ffc" href="https://help.salesforce.com/s?language=ja"></a><ol id="prompt_builder_add_apex_sales_email__substeps_rbs_tx4_ffc">
+                    <li>
+                        <span>プロンプトテンプレートワークスペースで、 <code>&lt;Get_Events_Near_Contact__Prompt__Flow&gt;</code> プレースホルダーを削除します。</span>
+                    </li>
+
+                    <li>
+                        <span>[プロンプト] セクションで、<strong class="uicontrol">[リソース</strong>] 検索バーをクリックし、<strong class="uicontrol">Apex</strong> を選択します。</span>
+                    </li>
+
+                    <li>
+                        <span><strong class="uicontrol">[Contact Events]</strong> を選択して、<code>ContactEventsPrompt</code> Apex クラスをテンプレートに追加します。Contact Events は、<code>ContactEventsPrompt</code> Apex クラスの <code>@InvocableMethod</code> アノテーションで設定した label 属性です。</span>
+                        <div>Apex クラスは、プロンプトテンプレートに <code>Apex:ContactEventsPrompt</code> として挿入されます。</div>
+                    </li>
+
+                    <li>
+                        <span><code>&lt;sender.Name__Merge_Field&gt;</code> プレースホルダーを削除します。</span>
+                    </li>
+
+                    <li>
+                        <span><strong class="uicontrol">[リソース</strong>] 検索バーをクリックし、 [<span class="menucascade"><strong class="uicontrol">送信者</strong> | <strong class="uicontrol">氏名]</strong></span> [] を選択します。</span>
+                    </li>
+
+                    <li>
+                        <span><code>&lt;recipient.Name__Merge_Field&gt;</code> プレースホルダーを削除します。</span>
+                    </li>
+
+                    <li>
+                        <span>[<strong class="uicontrol">Resource</strong> (リソース)] 検索バーをクリックし、[<span class="menucascade"><strong class="uicontrol">Recipient</strong> | <strong class="uicontrol">Full Name</strong></span> (受信者の氏名)] を選択します。</span>
+                    </li>
+
+                    <li>
+                        <span><code>&lt;recipient.Company__Merge_Field&gt;</code> プレースホルダーを削除します。</span>
+                    </li>
+
+                    <li>
+                        <span><strong class="uicontrol">[Resource</strong> (リソース)] 検索バーをクリックし、[<span class="menucascade"><strong class="uicontrol">Current Organization</strong> | <strong class="uicontrol">Name</strong></span> (現在の組織名)] を選択します。</span>
+                    </li>
+
+                </ol>
+            </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prompt_builder_add_data_graphs_sales_email">
+<h1 class="slds-text-heading_large">セールスメールプロンプトテンプレートへのデータグラフの追加</h1>
+  <p>データグラフを使用するセールスメールプロンプトテンプレートのサンプルを作成してプレビューします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Platform、Einstein または Agentforce for Sales/Service アドオン、または Agentforce Foundation が付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d25198e68" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d25198e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロンプトビルダーでプロンプトテンプレートを作成および管理する</td>
+
+              <td headers="d25198e68" style="vertical-align:top;" class="slds-cell-wrap"><p>「プロンプトテンプレートマネージャー」権限セット</p><ul>
+                  <li>プロンプトテンプレートの管理</li>
+
+                  <li>Execute Prompt Templates (プロンプトテンプレートの実行)</li>
+
+                </ul>
+<p>または</p><p style="margin-bottom:0;">「アプリケーションのカスタマイズ」権限セット</p></td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>このトピックでは、セールスメールプロンプトテンプレートを作成およびプレビューする手順について説明します。データグラフを使用して、取引先責任者に新しい取引先所有者を紹介するメールを生成します。
+    </p></div>
+    <ol><li>
+        <span>データグラフを作成するには、まず取引先責任者オブジェクトを使用してデータストリームを確立します。<a target="_blank" href="https://help.salesforce.com/s/articleView?id=sf.c360_a_create_crm_data_stream.htm&amp;language=ja&amp;type=5">「Salesforce CRM データストリームの作成」</a>を参照してください。</span>
+      </li><li>
+        <span>データストリームがリリースされたら、取引先責任者オブジェクトを個人 DMO に対応付けます。<a target="_blank" href="https://help.salesforce.com/s/articleView?id=data.c360_a_map_custom_data_model_objects.htm&amp;language=ja&amp;type=5">「データモデルオブジェクトのマッピング」</a>を参照してください。</span>
+      </li><li>
+        <span>セールスメールテンプレートを操作するにはデータグラフを作成します。</span>
+        <ol>
+          <li>
+            <span>アプリケーションランチャーで、[<strong class="uicontrol">データグラフ</strong>] を検索して選択します。</span>
+          </li>
+
+          <li>
+            <span>[<strong class="uicontrol">新規] を</strong>クリックし、[<strong class="uicontrol">最初から開始</strong>] をクリックします。</span>
+          </li>
+
+          <li>
+            <span>ほぼリアルタイムのデータグラフまたはリアルタイムのデータグラフを選択します。</span>
+          </li>
+
+          <li>
+            <span>[データグラフ名] に「<kbd>Contact Overview」</kbd>と入力します。</span>
+          </li>
+
+          <li>
+            <span>プライマリデータモデルオブジェクトで、[<strong class="uicontrol">個人]</strong> を選択し、残りのプロパティフィールドの値を選択または入力します。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+          </li>
+
+          <li>
+            <span>取引先情報を取得するデータグラフを作成します。<a target="_blank" href="https://help.salesforce.com/s/articleView?id=data.c360_a_create_a_data_graph.htm&amp;language=ja&amp;type=5">「データグラフの作成」</a>を参照してください。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>データグラフが有効になっている場合は、差し込み項目と新しいデータグラフを使用して取引先データを紹介メールに組み込むプロンプトテンプレートのサンプルを使用しましょう。プロンプトビルダーで、プロンプトテンプレートを作成します。</span>
+        <ol>
+          <li>
+            <span>[プロンプトテンプレート種別] ドロップダウンで、<strong class="uicontrol">[セールスメール]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[プロンプトテンプレート名] として<kbd>「Introduction Email」</kbd> (紹介メール) と入力します。</span>
+          </li>
+
+          <li>
+            <span>[受信者] として <strong class="uicontrol">[取引先責任者]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[次へ]</strong> をクリックすると、プロンプトテンプレートワークスペースにリダイレクトされます。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span><a target="_blank" href="prompt_builder-2.html#prompt_builder_example_library">サンプルプロンプトテンプレートライブラリ</a>で、セールスメールプロンプトテンプレート「Draft an Introduction Email to the Account Contact (取引先責任者への紹介メールのドラフト作成)」を見つけます。このテンプレートをコピーしてプロンプトテンプレートワークスペースに貼り付けます。</span>
+      </li><li>
+        <span>作業内容を保存します。</span>
+      </li><li>
+        <span>プロンプトビルダーでこのテンプレートを実行する前に、[プロンプト] セクションで [リソース] 項目を使用してプレースホルダーを実際の差し込み項目に置き換えます。次に、作成した取引先責任者概要データグラフへの参照を追加します。</span>
+        <ol>
+          <li>
+            <span>[プロンプト] セクションで、プレースホルダー &lt;Get_Detailed_Account_Data_DataGraph を削除します。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">［Resources</strong>］ 検索バーをクリックし、［<strong class="uicontrol">Account］</strong> を選択してから ［<strong class="uicontrol">データグラフ</strong>］ を選択します。</span>
+          </li>
+
+          <li>
+            <span>データグラフをテンプレートに追加するには、<strong class="uicontrol">[Contact Overview (取引先責任者の概要)]</strong> を選択します。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>プロンプトテンプレートを実行し、LLM で生成されたメールドラフトを参照します。</span>
+        <ol>
+          <li>
+            <span>[設定をプレビュー] ボタンをクリックします。</span>
+          </li>
+
+          <li>
+            <span>[入力] の [取引先責任者] 検索バーで取引先責任者名を検索して選択します。</span>
+          </li>
+
+          <li>
+            <span>[応答と表示を設定] セクションで、テストする内容に基づいて [応答を生成]、[表示プロンプト]、および [表示解像度] が選択または選択解除されていることを確認します。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[保存 &amp; プレビュー]</strong> をクリックします。応答を確認します。</span>
+          </li>
+
+        </ol>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prompt_builder_add_field_gen_to_lightning_record_page">
+<h1 class="slds-text-heading_large">Lightning レコード ページへの項目生成プロンプト テンプレートの追加</h1>
+  
+  <p>プロンプトテンプレートを備えた生成 AI 対応項目は、ユーザーが作業をより迅速に完了できるようにするのに役立ちます。ユーザーはボタンをクリックするだけで、取引先のオープンケースの概要などの有益な情報をレコード項目にすばやく入力し、顧客とのより生産的な会話を促進できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Platform、Einstein または Agentforce for Sales/Service アドオン、または Agentforce Foundation が付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d161194e69" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d161194e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロンプトビルダー外でプロンプトテンプレートにアクセスして実行する</td>
+
+              <td headers="d161194e69" style="vertical-align:top;" class="slds-cell-wrap">「プロンプトテンプレートユーザー」権限セット</td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> ユーザーが Salesforce モバイルアプリケーションで生成 AI 対応項目にアクセスするには、まず<a target="_blank" href="https://help.salesforce.com/s/articleView?id=sf.dynamic_forms_on_mobile_beta.htm&amp;type=5&amp;language=ja">モバイルの動的フォーム</a>を有効にする必要があります。</div></div></div>
+</div>
+    <ol><li>
+        <span>[設定] から、[クイック検索] ボックスに<kbd>「アプリケーションビルダー」</kbd>と入力し、<strong class="uicontrol">[Lightning アプリケーションビルダー]</strong> を選択します。</span>
+      </li><li>
+        <span>既存の Lightning レコードページを選択するか、新規作成します。</span>
+      </li><li>
+        <span>新しいレコードページを作成する場合は、[項目セクション] コンポーネントまたは [レコード詳細] コンポーネントをキャンバスにドラッグします。</span>
+        <div>次のいずれかのオプションを使用しますが、両方を使用することはできません。</div>
+        <ul>
+          <li>[<strong class="uicontrol">Fields (フィールド</strong>)] タブをクリックし、1 つ以上の [Field Section (フィールドセクション)] コンポーネントを追加して、レコードの詳細とフィールドをゼロから作成します。次に、項目を [項目セクション] コンポーネントにドラッグします。</li>
+
+          <li>レコード詳細コンポーネントを使用してページを動的フォームに移行し、項目の単一ブロックを個々の項目コンポーネントに変換します。[レコード詳細] コンポーネントをページに追加して選択し、コンポーネントパネルで [<strong class="uicontrol">今すぐアップグレード</strong>] をクリックします。</li>
+
+        </ul>
+
+      </li><li>
+        <span>動的フォームをまだ使用していない既存のレコードページを編集している場合は、キャンバスで [<strong class="uicontrol">レコードの詳細</strong>] コンポーネントをクリックし、プロパティパネルで [<strong class="uicontrol">今すぐアップグレード</strong>] をクリックします。</span>
+      </li><li>
+        <span>キャンバスで、項目生成をサポートする項目をクリックします。</span>
+        <div>項目生成プロンプトは、書き込み可能なテキスト、テキストエリア、ロングテキストエリア、テキストエリア (リッチ) データ型に追加できます。参照のみの項目に項目生成プロンプトを追加することはできません。</div>
+        <div><span style="vertical-align:text-bottom;display:inline-block;"><img alt="Lightning アプリケーションビルダーでのフィールドの追加" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/prompt_builder_lab_add_field.png" style="margin-bottom:0;"></span></div>
+      </li><li>
+        <span>項目プロパティの [Einstein 生成 AI] セクションで、項目に割り当てる項目生成プロンプトテンプレートを選択します。</span>
+        <div>
+          <div><img alt="プロンプトテンプレートの選択" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/prompt_builder_select_field_gen_template.png" style="width:300px;"></div>
+        </div>
+      </li><li>
+        <span>ページを保存して有効化します。</span>
+      </li></ol>
+
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> プロンプトテンプレートを参照する Lightning ページを正常にパッケージ化するには、「プロンプトテンプレートの管理」権限が必要です。この権限がないと、パッケージの作成は成功しますが、プロンプトテンプレートはパッケージに含まれません。</div></div></div>
+</div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.lightning_app_builder_overview.htm&amp;type=5&amp;language=ja">Lightning アプリケーションビルダー</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.dynamic_forms_overview.htm&amp;type=5&amp;language=ja">動的フォームでレコードの詳細を分割</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prompt_builder_add_file_flex">
+<h1 class="slds-text-heading_large">Flex プロンプトテンプレートへのファイル入力の追加</h1>
+    <p>画像ファイルを含む Flex プロンプトテンプレートを作成します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+        <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Platform、Einstein または Agentforce for Sales/Service アドオン、または Agentforce Foundation が付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d85935e67" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d85935e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロンプトビルダーでプロンプトテンプレートを作成および管理する</td>
+
+              <td headers="d85935e67" style="vertical-align:top;" class="slds-cell-wrap"><p>「プロンプトテンプレートマネージャー」権限セット</p><ul>
+                  <li>プロンプトテンプレートの管理</li>
+
+                  <li>Execute Prompt Templates (プロンプトテンプレートの実行)</li>
+
+                </ul>
+<p>または</p><p style="margin-bottom:0;">「アプリケーションのカスタマイズ」権限セット</p></td>
+
+            </tr>
+          </tbody></table></div>
+        <div><p>ファイル入力を使用する Flex prompt テンプレートのシナリオ例を次に示します。たとえば、公開前に E コマース掲載商品の画像を検証するプロンプトテンプレートを設計しているとします。Flex プロンプトテンプレートでは、アップロードされた商品画像がリストの説明と比較され、色、サイズ、詳細が正確に表現されます。このプロンプト・テンプレートを使用すると、リスト間の一貫性が維持され、製品の精度とCustomer Trustが向上するため、関心がおありでしょう。
+            </p><p>使用を開始するには、プロンプトテンプレートを作成します。</p></div>
+        <ol><li>
+                <span>[Prompt Template Type (プロンプトテンプレート種別)] ドロップダウンで、[<strong class="uicontrol">Flex] を</strong>選択します。</span>
+            </li><li>
+                <span>[プロンプトテンプレート名] に「<kbd>Image Comparison」</kbd> (画像の比較) と入力します。</span>
+            </li><li>
+                <span>説明フィールドに、「<kbd>e-Commerce Product Image Verification</kbd>」 (e-コマース商品画像検証) と入力します。</span>
+            </li><li>
+                <span>3 つのリソースを定義します。最初の画像には、次のように入力します。</span>
+                <ol>
+                    <li>
+                        <span>名前: <kbd>Image1</kbd></span>
+                    </li>
+
+                    <li>
+                        <span>API 参照名: <kbd>Image1</kbd></span>
+                    </li>
+
+                    <li>
+                        <span>ソース種別: <strong class="uicontrol">オブジェクト</strong></span>
+                    </li>
+
+                    <li>
+                        <span>オブジェクト: <kbd>ファイル</kbd></span>
+                    </li>
+
+                </ol>
+            </li><li>
+                <span><strong class="uicontrol">[追加]</strong> をクリックします。</span>
+            </li><li>
+                <span>2 番目の画像には、次のように入力します。</span>
+                <ol>
+                    <li>
+                        <span>名前: <kbd>Image2</kbd></span>
+                    </li>
+
+                    <li>
+                        <span>API 参照名: <kbd>Image2</kbd></span>
+                    </li>
+
+                    <li>
+                        <span>ソース種別: <strong class="uicontrol">オブジェクト</strong></span>
+                    </li>
+
+                    <li>
+                        <span>オブジェクト: <kbd>ファイル</kbd></span>
+                    </li>
+
+                </ol>
+            </li><li>
+                <span><strong class="uicontrol">[追加]</strong> をクリックします。</span>
+            </li><li>
+                <span>商品説明に次のように入力します。</span>
+                <ol>
+                    <li>
+                        <span>名前: <kbd>説明</kbd></span>
+                    </li>
+
+                    <li>
+                        <span>API 参照名: <kbd>説明</kbd></span>
+                    </li>
+
+                    <li>
+                        <span>ソース種別: <strong class="uicontrol">オブジェクト</strong></span>
+                    </li>
+
+                    <li>
+                        <span>オブジェクト: <kbd>Product2</kbd></span>
+                    </li>
+
+                </ol>
+            </li><li>
+                <span><strong class="uicontrol">[次へ</strong>] をクリックすると、プロンプトテンプレートワークスペースにリダイレクトされます。</span>
+            </li><li>
+                <span>サンプルプロンプトテンプレートをコピーして貼り付ける</span>
+                <ol>
+                    <li>
+                        <span>このサンプルプロンプトを使用するには、<a title="次のプロンプトテンプレート例では、Flex の使用事例をいくつか取り上げます。" href="prompt_builder-2.html#prompt_builder_flex_example_templates">Flex サンプルテンプレート</a>で E-Commerce Product Image Verification プロンプトをコピーします。次に、プロンプトテンプレートワークスペースに貼り付けます。</span>
+                    </li>
+
+                    <li>
+                        <span>プロンプトビルダーでこのテンプレートを実行する前に、[プロンプト] セクションで [<strong class="uicontrol">リソースの挿入</strong>] をクリックします。</span>
+                    </li>
+
+                    <li>
+                        <span>[入力] メニューで、description プレースホルダーを実際の差し込み項目に置き換えます。</span>
+                    </li>
+
+                </ol>
+            </li><li>
+                    <span>関連リストをプロンプト テンプレートに追加し、リソース ピッカーから [<strong class="uicontrol">Product2]</strong>、[<strong class="uicontrol">メモ &amp; 添付</strong>ファイル] の順にクリックします。</span>
+            </li><li>
+                <span>[テンプレート設定] の [モデル] で、[<strong class="uicontrol">GPT 4 Omni</strong>] を選択します。</span>
+            </li><li>
+                <span>[プレビュー設定] で、[<strong class="uicontrol">入力] を</strong>クリックします。[入力] セクションに、作成した 3 つのオブジェクトが表示されます。</span>
+            </li><li>
+                <span>[<strong class="uicontrol">ファイルを選択</strong>] をクリックして、組織に保存されているファイルを選択します。既存のファイルを選択するか、新しいファイルをアップロードできます。</span>
+            </li><li>
+                <span>説明グラウンディングデータの商品を選択します。</span>
+            </li><li>
+                <span>ファイルと商品説明を追加したら、[保存 &amp; プレビュー(<strong class="uicontrol">Save &amp; Preview</strong>)] をクリックしてプロンプトテンプレートをテストします。[解決済みプロンプト] セクションで添付された画像をプレビューすることもできます。</span>
+            </li></ol>
+
+    
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prompt_builder_add_flow_without_data_cloud_field_gen">
+<h1 class="slds-text-heading_large">項目生成プロンプトテンプレートへの Data Cloud オブジェクトのないフロー差し込み項目の追加</h1>
+  
+  <p>Data Cloud オブジェクトのないフローを使用するサンプル項目生成プロンプトテンプレートを作成してプレビューします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Platform、Einstein または Agentforce for Sales/Service アドオン、または Agentforce Foundation が付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d110274e69" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d110274e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロンプトビルダーでプロンプトテンプレートを作成および管理する</td>
+
+              <td headers="d110274e69" style="vertical-align:top;" class="slds-cell-wrap"><p>「プロンプトテンプレートマネージャー」権限セット</p><ul>
+                  <li>プロンプトテンプレートの管理</li>
+
+                  <li>Execute Prompt Templates (プロンプトテンプレートの実行)</li>
+
+                </ul>
+<p>または</p><p style="margin-bottom:0;">「アプリケーションのカスタマイズ」権限セット</p></td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>たとえば、顧客が電話をかける前に、特定の顧客のケースの最新の概要を会社の営業チームに提供します。LLM が集計するケースデータを取得するフローを統合する項目生成プロンプトテンプレートを作成します。</p><p>項目生成プロンプトテンプレートを作成する前に、オープンカスタマーケースのリストを取得する [Get Open Cases for Account (取引先のオープンケースを取得)] フローを作成します。</p></div>
+    <ol><li>
+        <span>Flow Builder から Get Open Cases for Account フローを作成するには、「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.flow_concepts_trigger_prompt_template_capability_example.htm&amp;language=ja&amp;type=5">Example of Field</a> Generation Template-Triggered Prompt Flow」を参照してください。</span>
+        <div>フローの準備ができたら、新しいオープンケース概要カスタム項目を作成し、差し込み項目を使用して選択した取引先のオープンケースの概要を生成する事前設定済みのサンプルプロンプトテンプレートを使用しましょう。</div>
+      </li><li>
+        <span>取引先オブジェクトで、[オープンケースの概要] カスタム項目を作成します。</span>
+        <ol>
+          <li>
+            <span>[設定] で、<strong class="uicontrol">オブジェクトマネージャー</strong>を開きます。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">取引先</strong>の表示ラベルを選択します。</span>
+          </li>
+
+          <li>
+            <span>ページの左側で、[<strong class="uicontrol">Fields &amp; Relationships</strong> (項目とリレーション)] をクリックします。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">［New］</strong> をクリックして、フィールドを作成します。</span>
+          </li>
+
+          <li>
+            <span>[データ型] で [<strong class="uicontrol">テキストエリア (ロング)</strong>] を選択し、[<strong class="uicontrol">次へ]</strong> をクリックします。</span>
+          </li>
+
+          <li>
+            <span>[項目の表示ラベル] に「<kbd>Open Case Summary</kbd>」 (オープンケースの概要) と入力し、<strong class="uicontrol">[次へ</strong>] をクリックします。</span>
+          </li>
+
+          <li>
+            <span>[項目レベルセキュリティの設定] ページで、<strong class="uicontrol">[次へ</strong>] をクリックします。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>プロンプトビルダーで、プロンプトテンプレートを作成します。</span>
+        <ol>
+          <li>
+            <span>[プロンプトテンプレート種別] で、[<strong class="uicontrol">項目生成]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[プロンプトテンプレート名] に「<kbd>Summarize Open Cases</kbd>」と入力します。</span>
+          </li>
+
+          <li>
+            <span>[オブジェクト] で、[<strong class="uicontrol">取引先]</strong> を選択します。フローをプロンプトテンプレートに挿入するには、フローのオブジェクトがプロンプトテンプレートのフローリソースと同じデータ型である必要があります。</span>
+          </li>
+
+          <li>
+            <span>[オブジェクト項目] で、[<strong class="uicontrol">Open Case Summary]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[説明] 項目を空白のままにします。</span>
+          </li>
+
+          <li>
+            <span>[<strong class="uicontrol">作成]</strong> をクリックすると、プロンプトテンプレートワークスペースにリダイレクトされます。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span><a title="このサンプルプロンプトテンプレートのライブラリでは、独自のカスタムプロンプトテンプレートを作成するための開始点を得ることができます。" href="prompt_builder-2.html#prompt_builder_example_library">サンプルプロンプトテンプレートライブラリ</a>で、項目生成プロンプトテンプレート「Summarize open cases for an account」を見つけます。このテンプレートをコピーしてプロンプトテンプレートワークスペースに貼り付けます。</span>
+      </li><li>
+        <span>プロンプトビルダーでこのテンプレートを実行する前に、[プロンプト] セクションで [<strong class="uicontrol">リソースの挿入</strong>] をクリックします。検索項目は、このオプションを初めてクリックしたときに表示されます。</span>
+      </li><li>
+        <span>検索バーを使用して、プレースホルダーを実際の差し込み項目に置き換えます。次に、作成した [Get Open Cases for Account (取引先のオープンケースを取得)] フローへの参照を追加します。</span>
+        <a name="prompt_builder_add_flow_without_data_cloud_field_gen__substeps_dqd_tgy_2fc"></a><ol id="prompt_builder_add_flow_without_data_cloud_field_gen__substeps_dqd_tgy_2fc">
+          <li>
+            <span>このサンプルテンプレートを使用した場合は、&lt;Get_Open_Cases_For_Account__Prompt__Flow&gt; プレースホルダーを削除します。</span>
+          </li>
+
+          <li>
+            <span>[<strong class="uicontrol">Insert Resource (リソース</strong>の挿入)] をクリックし、検索バーを使用して [<strong class="uicontrol">Flows (フロー</strong>)] を選択します。</span>
+          </li>
+
+          <li>
+            <span>フローをテンプレートに追加するには、[<strong class="uicontrol">Get Open Cases for Account</strong> (取引先のオープンケースを取得)] を選択します。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>プロンプトテンプレートを実行し、LLM で生成されたオープンケースの概要を確認します。</span>
+        <a name="prompt_builder_add_flow_without_data_cloud_field_gen__substeps_eqd_tgy_2fc"></a><ol id="prompt_builder_add_flow_without_data_cloud_field_gen__substeps_eqd_tgy_2fc">
+          <li>
+            <span>[設定をプレビュー] ボタンをクリックします。</span>
+          </li>
+
+          <li>
+            <span>[入力] の [レコード] 検索バーで取引先名を検索して選択します。
+            </span>
+          </li>
+
+          <li>
+            <span>[応答と表示を設定] セクションで、テストする内容に基づいて [応答を生成]、[表示プロンプト]、および [表示解像度] が選択または選択解除されていることを確認します。</span>
+          </li>
+
+          <li>
+            <span>[<strong class="uicontrol">Save &amp; Preview</strong> (保存 &amp; プレビュー)] をクリックし、応答を確認します。</span>
+          </li>
+
+        </ol>
+      </li></ol>
+
+    <div><p>取引先のオープン ケースの概要を表示する動的な Lightning レコード ページを作成するには、「Lightning レコード ページへの項目生成プロンプト テンプレートの<a title="プロンプトテンプレートを備えた生成 AI 対応項目は、ユーザーが作業をより迅速に完了できるようにするのに役立ちます。ユーザーはボタンをクリックするだけで、取引先のオープンケースの概要などの有益な情報をレコード項目にすばやく入力し、顧客とのより生産的な会話を促進できます。" href="#prompt_builder_add_field_gen_to_lightning_record_page">追加」</a>を参照してください。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prompt_builder_add_flows_flex">
+<h1 class="slds-text-heading_large">Flex プロンプトテンプレートへのフロー差し込み項目の追加</h1>
+  
+  <p>複数のソースからの情報をコンパイルするフローを作成し、フローの差し込み項目をプロンプトテンプレートに追加します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Platform、Einstein または Agentforce for Sales/Service アドオン、または Agentforce Foundation が付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d54554e69" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d54554e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロンプトビルダーでプロンプトテンプレートを作成および管理する</td>
+
+              <td headers="d54554e69" style="vertical-align:top;" class="slds-cell-wrap"><p>「プロンプトテンプレートマネージャー」権限セット</p><ul>
+                  <li>プロンプトテンプレートの管理</li>
+
+                  <li>Execute Prompt Templates (プロンプトテンプレートの実行)</li>
+
+                </ul>
+<p>または</p><p style="margin-bottom:0;">「アプリケーションのカスタマイズ」権限セット</p></td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>Flex prompt テンプレートの例を作成してプレビューしてみましょう。たとえば、商品レコードと商品サービスキャンペーンレコードからニュースレターを生成するとします。集計する LLM のレコードデータを取得するフローを統合する Flex プロンプトテンプレートを作成します。</p></div>
+    <ol><li>
+        <span>Flow Builder で、Flex テンプレートを使用するテンプレートトリガープロンプトフローを作成します。</span>
+        <ol>
+          <li>
+            <span>[<strong class="uicontrol">新規フロー]</strong> をクリックし、[テンプレートトリガープロンプトフロー] カードを選択します。</span>
+          </li>
+
+          <li>
+            <span>新商品と現在の商品サービスキャンペーンに関する情報を取得するフローを作成します。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.flow_build.htm&amp;type=5&amp;language=ja">フローの作成</a>」を参照してください。</span>
+          </li>
+
+          <li>
+            <span>「<kbd>Get Products and Campaign</kbd>」 (商品とキャンペーンを取得) という表示ラベルでフローを保存します。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[有効化]</strong> をクリックします。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>プロンプトビルダーで、Flex プロンプトテンプレートを作成します。</span>
+        <ol>
+          <li>
+            <span>[プロンプトテンプレート種別] で、[<strong class="uicontrol">Flex] を</strong>選択します。</span>
+          </li>
+
+          <li>
+            <span>[プロンプトテンプレート名] に「<kbd>Generate a Newsletter</kbd>」 (ニュースレターを生成) と入力します。</span>
+          </li>
+
+          <li>
+            <span>[説明] 項目を空白のままにします。</span>
+          </li>
+
+          <li>
+            <span>リソースを定義します。オブジェクト: [<strong class="uicontrol">商品]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>2 番目のリソースを追加します。<strong class="uicontrol">[追加]</strong> をクリックします。新しいオブジェクトで、[<strong class="uicontrol">商品サービスキャンペーン</strong>] を選択します。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[作成]</strong> をクリックします。</span>
+            <div>プロンプトテンプレートワークスペースにリダイレクトされます。</div>
+          </li>
+
+        </ol>
+      </li><li>
+        <span><a title="このサンプルプロンプトテンプレートのライブラリでは、独自のカスタムプロンプトテンプレートを作成するための開始点を得ることができます。" href="prompt_builder-2.html#prompt_builder_example_library">サンプルプロンプトテンプレートライブラリ</a>で、Flex prompt テンプレート「Generate a Newsletter」を見つけます。このテンプレートをコピーしてプロンプトテンプレートワークスペースに貼り付けます。</span>
+      </li><li>
+        <span>作業内容を保存します。</span>
+      </li><li>
+        <span>プロンプトビルダーで、[Generate a Newsletter (ニュースレターを生成)] プロンプトテンプレートを編集して、フロープレースホルダーを有効化したフローに置き換えます。</span>
+        <ol>
+          <li>
+            <span>プロンプトテンプレートワークスペースで、<var>{!$Flow:Get_Products_and_Campaigns.Prompt}</var> プレースホルダーを削除します。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[リソース</strong>] 検索バーをクリックし、[<strong class="uicontrol">フロー] を</strong>選択します。</span>
+          </li>
+
+          <li>
+            <span>このフローをテンプレートに追加するには、[<strong class="uicontrol">Get Products and Campaigns</strong> (商品とキャンペーンを取得)] を選択します。</span>
+          </li>
+
+        </ol>
+     </li><li>
+       <span>プロンプトテンプレートを実行し、LLM で生成されたニュースレターを確認します。</span>
+       <ol>
+          <li>
+            <span>[設定をプレビュー] ボタンをクリックします。</span>
+          </li>
+
+          <li>
+            <span>[入力] の [商品] 検索バーで商品名を検索して選択します。</span>
+          </li>
+
+          <li>
+            <span>[商品サービスキャンペーン] 検索バーに商品サービスキャンペーン名を入力し、選択します。</span>
+          </li>
+
+          <li>
+            <span>[応答と表示を設定] セクションで、テストする内容に基づいて [応答を生成]、[表示プロンプト]、および [表示解像度] が選択または選択解除されていることを確認します。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[保存 &amp; プレビュー]</strong> をクリックします。応答を確認します。</span>
+          </li>
+
+        </ol>
+     </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prompt_builder_add_flows_with_data_cloud_field_gen">
+<h1 class="slds-text-heading_large">項目生成プロンプトテンプレートへの Data 360 オブジェクトを使用したフロー差し込み項目の追加</h1>
+  
+  <p>統合 Data 360 オブジェクトデータを使用して取引先の全体像を把握するフローを作成し、フローの差し込み項目をプロンプトテンプレートに追加します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Platform、Einstein または Agentforce for Sales/Service アドオン、または Agentforce Foundation が付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d144352e69" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d144352e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロンプトビルダーでプロンプトテンプレートを作成および管理する</td>
+
+              <td headers="d144352e69" style="vertical-align:top;" class="slds-cell-wrap"><p>「プロンプトテンプレートマネージャー」権限セット</p><ul>
+                  <li>プロンプトテンプレートの管理</li>
+
+                  <li>Execute Prompt Templates (プロンプトテンプレートの実行)</li>
+
+                </ul>
+<p>または</p><p style="margin-bottom:0;">「アプリケーションのカスタマイズ」権限セット</p></td>
+
+            </tr>
+          </tbody></table><p>この例では、標準 Salesforce CRM Account オブジェクトを使用して Account オブジェクトと統合 Account Data 360 オブジェクトのデータを検索するフローを作成します。統合オブジェクトでは、複数のデータソースからデータが統合されます。データ統合についての詳細は、「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=data.c360_a_identity_resolution.htm&amp;language=ja&amp;type=5">ソースプロファイルの統合</a>」を参照してください。この例では、Salesforce CRM コネクタの標準データバンドルを使用します。Data 360 の設定、オブジェクト、および項目は異なる場合があります。</p><p>項目生成プロンプトテンプレートを作成する前に、Data 360 から取引先データを取得するプロンプトテンプレートフローを作成します。 この例では、[Get Account Activity from Data Cloud (Data Cloud から取引先活動を取得)] プロンプトテンプレートフローを作成します。Flow Builder では、フローは次のようになります。</p><div style="text-align:left;">
+        <img alt="Flow Builder ビュー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/prompt_builder_add_flows_with_data_cloud_field_gen.png">
+      </div></div>
+    <ol><li>
+        <span>Einstein を有効にします。</span>
+        <ol>
+          <li>
+            <span>[設定] から、[クイック検索] ボックスに「<kbd>Einstein 設定</kbd>」と入力し、[<strong class="uicontrol">Einstein 設定]</strong> をクリックします。</span>
+          </li>
+
+          <li>
+            <span>Einstein を有効にします。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>フローを作成します。</span>
+        <ol>
+          <li>
+            <span>[設定] から、[クイック検索] ボックスに「<kbd>フロー」</kbd>と入力し、[<strong class="uicontrol">フロー] を</strong>クリックします。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[新規フロー]</strong> をクリックします。</span>
+          </li>
+
+          <li>
+            <span>Flow Builder で、[<strong class="uicontrol">Template-Triggered Prompt Flow</strong> (テンプレートトリガープロンプトフロー)] を選択し、[<strong class="uicontrol">作成] を</strong>クリックします。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>フローを設定します。</span>
+        <ol>
+          <li>
+            <span>[プロンプトテンプレート種別機能] で、[<strong class="uicontrol">Field Generation Template Capability</strong> (項目生成テンプレート機能)] を選択します。</span>
+            <div>機能を使用すると、フローとプロンプトテンプレート間でデータを渡すことができます。プロンプトビルダーでプロンプトテンプレートを作成するときに、そのプロンプトテンプレートの種類を選択します。</div>
+          </li>
+
+          <li>
+            <span>[オブジェクト] で [<strong class="uicontrol">アカウント]</strong> を選択します。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>[レコードを取得] 要素を追加します。この [レコードを取得] 要素は、取引先情報を取得します。</span>
+        <ol>
+          <li>
+            <span>[表示ラベル] に「<kbd>Get Account Info」</kbd>と入力します。</span>
+          </li>
+
+          <li>
+            <span>[データソース] で、[<strong class="uicontrol">Salesforce オブジェクト]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[オブジェクト] で [<strong class="uicontrol">アカウント]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[Condition Requirements (条件の要件)] で、[<strong class="uicontrol">None — Get All Account Records</strong> (なし — すべての取引先レコードを取得)] を選択します。</span>
+          </li>
+
+          <li>
+            <span>[保存するレコード数] で [<strong class="uicontrol">最初のレコード</strong>のみ] をクリックします。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>別の [レコードを取得] 要素を追加して設定します。この [レコードを取得] 要素は、Salesforce CRM 取引先オブジェクトに対応する Data Cloud 取引先オブジェクトを取得します。</span>
+        <ol>
+          <li>
+            <span>[表示ラベル] に「<kbd>Get Account from Data Cloud</kbd>」と入力します。</span>
+          </li>
+
+          <li>
+            <span>[データソース] で、[<strong class="uicontrol">Data Cloud オブジェクト</strong>] を選択します。</span>
+          </li>
+
+          <li>
+            <span>[データスペース] で、使用するデータスペースを選択します (例: <strong class="uicontrol">default</strong>)。</span>
+          </li>
+
+          <li>
+            <span>[オブジェクト] で、アカウントデータモデルオブジェクト (DMO) を選択します (例: <strong class="uicontrol">Account</strong>)。</span>
+          </li>
+
+          <li>
+            <span>[条件の要件] で <strong class="uicontrol">[すべての条件に一致 (AND)]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[項目] で、アカウント ID を表す項目を選択します (例: <strong class="uicontrol">ssot_Id__c</strong>)。</span>
+          </li>
+
+          <li>
+            <span>[演算子] で <strong class="uicontrol">[次の文字列と一致する]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[値] に [<strong class="uicontrol">{!Get_Account_Info.Id}]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[保存するレコード数] で [<strong class="uicontrol">最初のレコード</strong>のみ] をクリックします。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>3 つ目の [レコードを取得] 要素を追加します。この [レコードを取得] 要素は、Data Cloud アカウントオブジェクトにリンクされている統合取引先を取得します。</span>
+        <ol>
+          <li>
+            <span>[表示ラベル] に「<kbd>Get Unified Account</kbd>」と入力します。</span>
+          </li>
+
+          <li>
+            <span>[データソース] で、[<strong class="uicontrol">Data Cloud オブジェクト</strong>] を選択します。</span>
+          </li>
+
+          <li>
+            <span>[データスペース] で、前と同じデータスペースを選択します。</span>
+          </li>
+
+          <li>
+            <span>[オブジェクト] で、統合アカウント DMO (例: <strong class="uicontrol">Unified Account 0001</strong>) を選択します。</span>
+          </li>
+
+          <li>
+            <span>[条件の要件] で <strong class="uicontrol">[すべての条件に一致 (AND)]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[項目] で、アカウント名を表す項目を選択します (例: <strong class="uicontrol">ssot_Name__c</strong>)。</span>
+          </li>
+
+          <li>
+            <span>[演算子] で <strong class="uicontrol">[次の文字列と一致する]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[値] に [<strong class="uicontrol">{!Get_Account_from_Data_Cloud.ssot__Name__c}]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[保存するレコード数] で [<strong class="uicontrol">最初のレコード</strong>のみ] をクリックします。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>[プロンプトの指示を作成] 要素を追加します。</span>
+        <ol>
+          <li>
+            <span>[表示ラベル] に「Add Account Summary」 (取引先概要を追加) と入力します。</span>
+          </li>
+
+          <li>
+            <span>[プロンプト手順] に、次のように入力します。 <code>Account details: Account Name
+        is {!Get_Unified_Account.ssot__Name__c};Account Description is
+        {!Get_Unified_Account.ssot__Description__c};Account Type is
+        {!Get_Unified_Account.ssot__AccountTypeId__c};Account Last Modified Date is
+        {!Get_Unified_Account.ssot__LastModifiedDate__c}.</code></span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>作業を保存し、<strong class="uicontrol">[有効化]</strong> をクリックします。</span>
+      </li></ol>
+
+    <div><p>プロンプトテンプレートフローを、<a title="次のプロンプトテンプレートの例は、項目生成の一般的な使用事例を対象としています。" href="prompt_builder-2.html#prompt_builder_field_generation_example_templates">Field Generation Example Templates</a> から Field Generation prompt template「Summarize open cases for an account」に挿入できるようになりました。項目生成プロンプトテンプレートにフローの差し込み項目を追加する方法についての詳細は、「<a title="Data Cloud オブジェクトのないフローを使用するサンプル項目生成プロンプトテンプレートを作成してプレビューします。" href="#prompt_builder_add_flow_without_data_cloud_field_gen">Add Flows Without</a> Data 360 Objects to a Field Generation Prompt Template」を参照してください。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prompt_builder_add_flows_with_data_cloud_sales_email">
+<h1 class="slds-text-heading_large">セールスメールプロンプトテンプレートへの Data 360 オブジェクトを使用したフロー差し込み項目の追加</h1>
+  
+  <p>Data 360 オブジェクトでフローを使用するサンプルセールスメールプロンプトテンプレートを作成してプレビューします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Platform、Einstein または Agentforce for Sales/Service アドオン、または Agentforce Foundation が付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d163439e69" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d163439e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロンプトビルダーでプロンプトテンプレートを作成および管理する</td>
+
+              <td headers="d163439e69" style="vertical-align:top;" class="slds-cell-wrap"><p>「プロンプトテンプレートマネージャー」権限セット</p><ul>
+                  <li>プロンプトテンプレートの管理</li>
+
+                  <li>Execute Prompt Templates (プロンプトテンプレートの実行)</li>
+
+                </ul>
+<p>または</p><p style="margin-bottom:0;">「アプリケーションのカスタマイズ」権限セット</p></td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>たとえば、Salesforce システム管理者が、営業チームから取引先責任者に近隣のマーケティングイベントに関するメールを送信するための簡単な方法を要求されているとします。</p><p>営業チームは、Data 360 データを使用して各取引先責任者のロケーションに関する情報を取得したいと考えています。Data 360 データを使用すると、複数のデータソースで統合された情報を使用できます。この情報は、取引先責任者レコードのみよりも最新である場合があります。データ統合についての詳細は、「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=data.c360_a_identity_resolution.htm&amp;language=ja&amp;type=5">ソースプロファイルの統合</a>」を参照してください。この例では、Salesforce CRM コネクタの標準データバンドルを使用します。Data 360 の設定、オブジェクト、および項目は異なる場合があります。</p><p>取引先責任者と同じ市区郡と州のマーケティングイベントを取得するプロンプトテンプレートフローを起動するメールプロンプトテンプレートを作成します。フローを使用して、LLM のイベントとその場所のリストを取得します。Flow Builder では、フローは次のようになります。</p><div style="text-align:left;">
+        <img alt="Flow Builder ビュー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/prompt_builder_add_flows_with_data_cloud_sales_email.png">
+      </div></div>
+    <ol><li>
+        <span>Einstein を有効にします。</span>
+        <ol>
+          <li>
+            <span>[設定] から、[クイック検索] ボックスに「<kbd>Einstein 設定</kbd>」と入力し、[<strong class="uicontrol">Einstein 設定]</strong> をクリックします。</span>
+          </li>
+
+          <li>
+            <span>Einstein を有効にします。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>フローを作成します。</span>
+        <ol>
+          <li>
+            <span>[設定] から、[クイック検索] ボックスに「<kbd>フロー」</kbd>と入力し、[<strong class="uicontrol">フロー] を</strong>クリックします。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[新規フロー]</strong> をクリックします。</span>
+          </li>
+
+          <li>
+            <span>Flow Builder で、[<strong class="uicontrol">Template-Triggered Prompt Flow</strong> (テンプレートトリガープロンプトフロー)] を選択し、[<strong class="uicontrol">作成] を</strong>クリックします。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>フローを設定します。</span>
+        <ol>
+          <li>
+            <span>[プロンプトテンプレート種別機能] で、[<strong class="uicontrol">セールスメールテンプレート機能</strong>] を選択します。</span>
+            <div>機能を使用すると、フローとプロンプトテンプレート間でデータを渡すことができます。プロンプトビルダーでプロンプトテンプレートを作成するときに、そのプロンプトテンプレートの種類を選択します。</div>
+          </li>
+
+          <li>
+            <span>[受信者] で、[<strong class="uicontrol">取引先責任者]</strong> を選択します。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>[レコードを取得] 要素を追加します。この [レコードを取得] 要素は、取引先責任者情報を取得します。</span>
+        <ol>
+          <li>
+            <span>[表示ラベル] に「<kbd>Get Contact Info」</kbd>と入力します。</span>
+          </li>
+
+          <li>
+            <span>[データソース] で、[<strong class="uicontrol">Salesforce オブジェクト]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[オブジェクト] で <strong class="uicontrol">[取引先責任者]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[Condition Requirements (条件の要件)] で、[<strong class="uicontrol">None — Get All Contact Records</strong> (なし — すべての取引先責任者レコードを取得)] を選択します。</span>
+          </li>
+
+          <li>
+            <span>[保存するレコード数] で [<strong class="uicontrol">最初のレコード</strong>のみ] をクリックします。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>別の [レコードを取得] 要素を追加します。この [レコードを取得] 要素では、取引先責任者情報に一致する Data Cloud の統合個人データを検索します。</span>
+        <ol>
+          <li>
+            <span>[表示ラベル] に「<kbd>Get Unified Individual</kbd>」と入力します。</span>
+          </li>
+
+          <li>
+            <span>[データソース] で、[<strong class="uicontrol">Data Cloud オブジェクト</strong>] を選択します。</span>
+          </li>
+
+          <li>
+            <span>[データスペース] で、使用するデータスペースを選択します (例: <strong class="uicontrol">default</strong>)。</span>
+          </li>
+
+          <li>
+            <span>[オブジェクト] で、統合個人データモデルオブジェクト (DMO) を選択します (例: <strong class="uicontrol">Unified Individual 0000</strong>)。</span>
+          </li>
+
+          <li>
+            <span>[条件の要件] で <strong class="uicontrol">[すべての条件に一致 (AND)]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[項目] で、取引先責任者の名を表す項目を選択します (例: <strong class="uicontrol">ssot_FirstName__c</strong>)。</span>
+          </li>
+
+          <li>
+            <span>[演算子] で <strong class="uicontrol">[次の文字列と一致する]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[値] に [<strong class="uicontrol">{!Get_Contact_Info.FirstName}]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[条件を追加]</strong> をクリックします。</span>
+          </li>
+
+          <li>
+            <span>[項目] で、取引先責任者の姓を表す項目を選択します (例: <strong class="uicontrol">ssot_LastName__c</strong>)。</span>
+          </li>
+
+          <li>
+            <span>[演算子] で <strong class="uicontrol">[次の文字列と一致する]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[値] に [<strong class="uicontrol">{!Get_Contact_Info.LastName}]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[条件を追加]</strong> をクリックします。</span>
+          </li>
+
+          <li>
+            <span>[項目] で、取引先責任者の誕生日を表す項目を選択します (例: <strong class="uicontrol">ssot_BirthDate__c</strong>)。</span>
+          </li>
+
+          <li>
+            <span>[演算子] で <strong class="uicontrol">[次の文字列と一致する]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[値] に [<strong class="uicontrol">{!Get_Contact_Info.Birthdate}]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[保存するレコード数] で [<strong class="uicontrol">最初のレコード</strong>のみ] をクリックします。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>3 つ目の [レコードを取得] 要素を追加します。この [レコードを取得] 要素では、統合個人の連絡先情報を取得します。</span>
+        <ol>
+          <li>
+            <span>[表示ラベル] に「<kbd>Get Unified Individual Contact Address</kbd>」と入力します。</span>
+          </li>
+
+          <li>
+            <span>[データソース] で、[<strong class="uicontrol">Data Cloud オブジェクト</strong>] を選択します。</span>
+          </li>
+
+          <li>
+            <span>[データスペース] で、前と同じデータスペースを選択します。</span>
+          </li>
+
+          <li>
+            <span>[オブジェクト] で、統合個人連絡先アドレス DMO を選択します (例: <strong class="uicontrol">Unified Indv Contact Point Address 0000</strong>)。</span>
+          </li>
+
+          <li>
+            <span>[条件の要件] で <strong class="uicontrol">[すべての条件に一致 (AND)]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[項目] で、<strong class="uicontrol">ssot_Id__c</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[演算子] で <strong class="uicontrol">[次の文字列と一致する]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[値] に [<strong class="uicontrol">{!Get_Unified_Individual.ssot__Id__c}]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[保存するレコード数] で [<strong class="uicontrol">最初のレコード</strong>のみ] をクリックします。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>最後に、イベントデータを取得する 4 番目の [レコードを取得] 要素を追加します。</span>
+        <ol>
+          <li>
+            <span>[表示ラベル] に「<kbd>Get Events」</kbd>と入力します。</span>
+          </li>
+
+          <li>
+            <span>[オブジェクト] で [<strong class="uicontrol">イベント]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[条件の要件] で <strong class="uicontrol">[すべての条件に一致 (AND)]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[項目] で、[<strong class="uicontrol">IsArchived]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[演算子] で <strong class="uicontrol">[次の文字列と一致する]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[値] で、<strong class="uicontrol">$GlobalConstant.False</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[条件を追加]</strong> をクリックします。</span>
+          </li>
+
+          <li>
+            <span>[項目] で、<strong class="uicontrol">[場所]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>演算子: [次の文字列<strong class="uicontrol">を含む]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[値] に [<strong class="uicontrol">{!Get_Unified_Individual_Contact_Address.ssot__CityId__c}]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[条件を追加]</strong> をクリックします。</span>
+          </li>
+
+          <li>
+            <span>[項目] で、<strong class="uicontrol">[場所]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>演算子: [次の文字列<strong class="uicontrol">を含む]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[値] に [<strong class="uicontrol">{!Get_Unified_Individual_Contact_Address.ssot__StateProvinceId__c}]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[保存するレコード数] で [<strong class="uicontrol">すべてのレコード</strong>] をクリックします。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>決定要素を追加します。</span>
+        <ol>
+          <li>
+            <span>[表示ラベル] に「<kbd>Any Events？</kbd>」と入力します</span>
+          </li>
+
+          <li>
+            <span>[新規結果] で、[表示ラベル] に「<kbd>はい」と</kbd>入力します。</span>
+          </li>
+
+          <li>
+            <span>[結果を実行する条件の要件] で、[<strong class="uicontrol">すべての条件</strong>に一致 (AND)] を選択します。</span>
+          </li>
+
+          <li>
+            <span>[リソース] で、[<strong class="uicontrol">Events from Get_Events</strong>] を選択します。</span>
+          </li>
+
+          <li>
+            <span>[演算子] で [<strong class="uicontrol">Null です</strong>] を選択します。</span>
+          </li>
+
+          <li>
+            <span>[値] で、<strong class="uicontrol">$GlobalConstant.False</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[デフォルトの結果<strong class="uicontrol">(Default Outcome</strong>)] をクリックします。</span>
+          </li>
+
+          <li>
+            <span>[表示ラベル] で、テキストを削除し、「<kbd>いいえ」</kbd>と入力します。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>[結果なし] パスの場合、[プロンプトの指示を作成] 要素を追加します。</span>
+        <ol>
+          <li>
+            <span>[表示ラベル] に「<kbd>No Events」</kbd> (イベントなし) と入力します。</span>
+          </li>
+
+          <li>
+            <span>[プロンプトの手順] に「<kbd>No upcoming Marketing events near you</kbd>」と入力します。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>[はい] 結果パスで、[ループ] 要素を追加します。</span>
+        <ol>
+          <li>
+            <span>[表示ラベル] に「<kbd>Add Events</kbd>」 (イベントを追加) と入力します。</span>
+          </li>
+
+          <li>
+            <span>[コレクション変数] で、[<strong class="uicontrol">Events from Get Events</strong>] を選択します。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>[For Each (各)] パスで、[Prompt Instructions (プロンプトの指示)] 要素を追加します。</span>
+        <ol>
+          <li>
+            <span>[表示ラベル] に「<kbd>Add Event Details</kbd> to Prompt Template」 (プロンプトテンプレートにイベントの詳細を追加) と入力します。</span>
+          </li>
+
+          <li>
+            <span>[プロンプトの手順] に、「<kbd>Event details: {!Add_Events.Subject}, {!Add_Events.Description}, {!Add_Events.Location},&nbsp;Start Time: {!Add_Events.StartDateTime}」と入力します。</kbd></span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+      </li><li>
+        <span>[フローの表示ラベル] に「<kbd>Marketing Events Summary</kbd>」と入力します。</span>
+      </li><li>
+        <span>変更を保存し、[<strong class="uicontrol">有効化]</strong> をクリックします。</span>
+      </li></ol>
+
+    <div><p>これで、プロンプトテンプレートフローを<a title="このサンプルプロンプトテンプレートのライブラリでは、独自のカスタムプロンプトテンプレートを作成するための開始点を得ることができます。" href="prompt_builder-2.html#prompt_builder_example_library">サンプルプロンプトテンプレートライブラリ</a>からセールスメールプロンプトテンプレート「Draft an email for a contact about Regional Marketing events」に挿入できるようになりました。プロンプトテンプレートフローをセールスメールプロンプトテンプレートに追加するためのステップバイステップガイドについては、「セールスメールプロンプトテンプレートへの <a title="フローを使用するサンプルセールスメールプロンプトテンプレートを作成してプレビューします。" href="#prompt_builder_add_flows_without_data_cloud_sales_email">Add Flows Without Data</a> 360 Objects (Data 360 オブジェクトを使用しないフローの追加)」を参照してください。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prompt_builder_add_flows_without_data_cloud_sales_email">
+<h1 class="slds-text-heading_large">セールスメールプロンプトテンプレートへの Data 360 オブジェクトのないフロー差し込み項目の追加</h1><p>フローを使用するサンプルセールスメールプロンプトテンプレートを作成してプレビューします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Platform、Einstein または Agentforce for Sales/Service アドオン、または Agentforce Foundation が付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d68069e63" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d68069e63" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロンプトビルダーでプロンプトテンプレートを作成および管理する</td>
+
+              <td headers="d68069e63" style="vertical-align:top;" class="slds-cell-wrap"><p>「プロンプトテンプレートマネージャー」権限セット</p><ul>
+                  <li>プロンプトテンプレートの管理</li>
+
+                  <li>Execute Prompt Templates (プロンプトテンプレートの実行)</li>
+
+                </ul>
+<p>または</p><p style="margin-bottom:0;">「アプリケーションのカスタマイズ」権限セット</p></td>
+
+            </tr>
+          </tbody></table></div><div><p>たとえば、Salesforce システム管理者が、営業チームが取引先責任者に近隣のマーケティングイベントに関するメールを送信するための簡単な方法を要求しているとします。</p><p>各取引先責任者と同じ市区郡と州のマーケティングイベントを取得するフローを起動するメールプロンプトテンプレートを作成します。フローを使用して、LLM のイベントとその場所のリストを取得します。</p></div><ol><li><span>Flow Builder から [Get Marketing Events (マーケティングイベントを取得)] フローを作成するには、「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.flow_concepts_trigger_prompt_template_capability_sales_email_example.htm&amp;language=ja&amp;type=5">Example of Sales</a> Email Template-Triggered Prompt Flow (セールスメールテンプレートトリガープロンプトフローの例)」を参照してください。</span></li><li><span>フローの準備ができたら、差し込み項目と新しいフローを使用して、選択した取引先責任者の近隣のマーケティングイベントに関するメールを生成するプロンプトテンプレートの例を使用しましょう。</span><div>プロンプトビルダーで、プロンプトテンプレートを作成します。</div><ol><li>
+            <span>[プロンプトテンプレート種別] ドロップダウンで、<strong class="uicontrol">[セールスメール]</strong> を選択します。</span>
+          </li>
+<li><span>[プロンプトテンプレート名] に「<kbd>Nearby Events Marketing Email</kbd>」と入力します。</span></li>
+<li><span>[受信者種別] で、[<strong class="uicontrol">取引先責任者]</strong> を選択します。フローをプロンプトテンプレートに挿入するには、フローの [受信者種別] がプロンプトテンプレートのフローリソースと同じデータ型である必要があります。</span></li>
+<li><span>[説明] は空白のままにします。</span></li>
+<li><span><strong class="uicontrol">[次へ</strong>] をクリックすると、プロンプトテンプレートワークスペースにリダイレクトされます。</span></li>
+</ol></li><li><span><a title="このサンプルプロンプトテンプレートのライブラリでは、独自のカスタムプロンプトテンプレートを作成するための開始点を得ることができます。" href="prompt_builder-2.html#prompt_builder_example_library">サンプルプロンプトテンプレートライブラリ</a>で、セールスメールプロンプトテンプレート「Draft an email for a contact about regional marketing events」を見つけます。このテンプレートをコピーしてプロンプトテンプレートワークスペースに貼り付けます。</span></li><li>
+        <span>プロンプトビルダーでこのテンプレートを実行する前に、[プロンプト] セクションの [リソース] 項目を使用してプレースホルダーを実際の差し込み項目に置き換えます。次に、作成した実際のマーケティングイベント概要フローへの参照を追加します。</span>
+        <ol>
+          <li>
+            <span>プロンプトテンプレートワークスペースで、&lt;Get_Events_Near_Contact__Prompt__Flow&gt; プレースホルダーを削除します。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[リソース</strong>] 検索バーをクリックし、[<strong class="uicontrol">フロー] を</strong>選択します。</span>
+          </li>
+
+          <li>
+            <span>このフローをテンプレートに追加するには、[<strong class="uicontrol">Get Marketing Events</strong> (マーケティングイベントを取得)] を選択します。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>プロンプトテンプレートを実行し、LLM で生成されたメールドラフトを参照します。</span>
+        <ol>
+          <li>
+            <span>[設定をプレビュー] ボタンをクリックします。</span>
+          </li>
+
+          <li>
+            <span>[入力] の [受信者] 検索バーで取引先責任者名を検索し、選択します。この選択により、LLM で生成されたメールドラフトの受信者を定義します。</span>
+          </li>
+
+          <li>
+            <span>[応答と表示を設定] セクションで、テストする内容に基づいて [応答を生成]、[表示プロンプト]、および [表示解像度] が選択または選択解除されていることを確認します。</span>
+          </li>
+
+          <li>
+            <span>[<strong class="uicontrol">Save &amp; Preview</strong> (保存 &amp; プレビュー)] をクリックし、応答を確認します。</span>
+          </li>
+
+        </ol>
+      </li></ol>
+
+
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prompt_builder_add_free_text_input_flex">
+<h1 class="slds-text-heading_large">Flex プロンプトテンプレートへの自由テキスト入力の追加</h1>
+  
+  <p>自由テキスト入力を含む Flex プロンプトテンプレートを作成します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Platform、Einstein または Agentforce for Sales/Service アドオン、または Agentforce Foundation が付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d40606e69" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d40606e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロンプトビルダーでプロンプトテンプレートを作成および管理する</td>
+
+              <td headers="d40606e69" style="vertical-align:top;" class="slds-cell-wrap"><p>「プロンプトテンプレートマネージャー」権限セット</p><ul>
+                  <li>プロンプトテンプレートの管理</li>
+
+                  <li>Execute Prompt Templates (プロンプトテンプレートの実行)</li>
+
+                </ul>
+<p>または</p><p style="margin-bottom:0;">「アプリケーションのカスタマイズ」権限セット</p></td>
+
+            </tr>
+          </tbody></table><p>フリーテキスト入力は、テキストのみで構成される非レコードタイプの入力項目です。Flex プロンプトテンプレートには、リソースピッカーから差し込み項目や他のリソースを含める場合と同じように、自由テキスト入力項目を含めることができます。この機能により、プロンプトテンプレートでフリーテキストを入力として受け取るシナリオを処理できます。たとえば、フォーム項目で質問を送信する顧客、ファイルを参照してプロンプトにコンテンツを送信する顧客、プロンプトビルダーで Flex プロンプトテンプレートに任意のテキストを送信する状況を処理する顧客などです。</p></div>
+    <div><p>自分がプロンプト管理者で、Web サイトの特定の商品に関する顧客の質問に回答するプロンプトを設計したいと考えているとします。自由テキスト入力を処理する Flex プロンプトテンプレートは、このような一般的な状況に適したエレガントなソリューションです。商談を使用して、現在実行中のプロモーションについて顧客に知らせることもできます。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> ユーザー入力機能は Flex テンプレートでのみ使用でき、最大 127,000 文字までサポートされます。</div></div></div>
+<p>使用を開始するには、プロンプトテンプレートを作成します。</p></div>
+    <ol><li>
+                <span>[Prompt Template Type (プロンプトテンプレート種別)] ドロップダウンで、[<strong class="uicontrol">Flex] を</strong>選択します。</span>
+            </li><li>
+                <span>[プロンプトテンプレート名] に「<kbd>Product Question Response and Promotion</kbd>」 (商品質問への回答とプロモーション) と入力します。</span>
+            </li><li>
+                <span>[ソースを定義] セクションで、3 つのソースを定義します。</span>
+                <ol>
+                    <li>
+                        <span>最初の行で、[名前] フィールドに「<kbd>Product」と</kbd>入力します。ソース種別として [<strong class="uicontrol">オブジェクト]</strong> を選択します。[オブジェクト] 項目で、[<kbd>商品]</kbd> を選択します。この行は、顧客が質問している商品を表します。</span>
+                    </li>
+
+                    <li>
+                        <span>2 番目の行で、[名前] フィールドに「<kbd>User Question」</kbd> (ユーザーの質問) と入力します。ソース種別として [<strong class="uicontrol">フリーテキスト]</strong> を選択します。この行は、顧客が質問形式で入力するテキストを表します。</span>
+                    </li>
+
+                    <li>
+                        <span>3 行目で、[名前] フィールドに「<kbd>Promotion」</kbd> (プロモーション) と入力します。ソース種別として [<strong class="uicontrol">オブジェクト]</strong> を選択します。[オブジェクト] 項目で、[<kbd>商品サービスキャンペーン</kbd>] を選択します。この行は、顧客に伝えるプロモーションを表します。</span>
+                    </li>
+
+                </ol>
+            </li><li>
+                <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+                <div>プロンプトテンプレートワークスペースにリダイレクトされます。</div>
+            </li><li>
+                <span>プロンプトテンプレートを最初から記述するか、サンプルテンプレートをコピーして貼り付けます。</span>
+                <a name="prompt_builder_add_free_text_input_flex__substeps_jgz_33y_2fc" href="https://help.salesforce.com/s?language=ja"></a><ol id="prompt_builder_add_free_text_input_flex__substeps_jgz_33y_2fc">
+                    <li>
+                        <span>この例で使用されているテンプレートに基づいてプロンプトテンプレートを作成する場合は、ページの下部に表示されているサンプルテンプレートテキストをコピーして貼り付け、編集します。</span>
+                    </li>
+
+                    <li>
+                        <span>プロンプトビルダーでテンプレートを実行する前に、[プロンプト] セクションで [<strong class="uicontrol">リソースの挿入</strong>] をクリックし、検索バーを使用してプレースホルダーを実際の差し込み項目に置き換えます。検索項目は、このオプションを初めてクリックしたときに表示されます。</span>
+                    </li>
+
+                    <li>
+                        <span>テンプレートがプロンプトに解決されると、差し込み項目が実際のデータに置き換えられ、[解決済みプロンプト] セクションに表示されます。</span>
+                    </li>
+
+                </ol>
+            </li><li>
+                <span>[プレビュー設定] パネルで、[商品] 項目の商品を選択し、[ユーザー質問] 項目にサンプル質問を入力して、[プロモーション] 項目のプロモーションを選択します。</span>
+            </li><li>
+                <span>[保存 &amp; プレビュー<strong class="uicontrol">(Save &amp; Preview</strong>)] をクリックして、LLM で生成された応答を確認します。</span>
+            </li></ol>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> 
+      <p>例からのテキスト:</p>
+      <pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>
+    A customer on our site is asking the following question about {!$Input:Product.Name}. Do your best to answer the customer's question.
+    '''
+    {!$Input:User_Question}
+    '''
+    In addition to answering their question, be sure to mention {!$Input:Promotion.ProductServiceCampaignName} to the customer.
+   </code></pre>
+    </div></div></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prompt_builder_add_merge_fields_field_gen">
+<h1 class="slds-text-heading_large">項目生成プロンプトテンプレートへのレコード差し込み項目の追加</h1>
+  
+  <p>Salesforce オブジェクトの特定の情報を使用するテンプレートを使用して、ケースサマリーなどを大規模に作成し、時間を節約します。項目生成プロンプトテンプレートで差し込み項目を使用して、LLM で最新のデータを使用してコンテンツを作成します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Platform、Einstein または Agentforce for Sales/Service アドオン、または Agentforce Foundation が付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d122533e69" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d122533e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロンプトビルダーでプロンプトテンプレートを作成および管理する</td>
+
+              <td headers="d122533e69" style="vertical-align:top;" class="slds-cell-wrap"><p>「プロンプトテンプレートマネージャー」権限セット</p><ul>
+                  <li>プロンプトテンプレートの管理</li>
+
+                  <li>Execute Prompt Templates (プロンプトテンプレートの実行)</li>
+
+                </ul>
+<p>または</p><p style="margin-bottom:0;">「アプリケーションのカスタマイズ」権限セット</p></td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>差し込み項目を使用して取引先の説明を作成する項目生成プロンプトテンプレートを見てみましょう。これは、LLM と最新データを使用してコンテンツを作成する方法の簡単な例です。</p></div>
+    <ol><li>
+        <span>[Prompt Template Type (プロンプトテンプレート種別)] ドロップダウンで、[<strong class="uicontrol">Field Generation (</strong>フィールド生成)] を選択します。</span>
+      </li><li>
+        <span>[プロンプトテンプレート名] に「<kbd>Draft an Account Description</kbd>」 (アカウントの説明のドラフト) と入力します。</span>
+      </li><li>
+        <span>[オブジェクト] で、[<strong class="uicontrol">取引先]</strong> を選択します。</span>
+      </li><li>
+        <span>[オブジェクト項目] で、[<strong class="uicontrol">取引先の説明</strong>] を選択します。</span>
+      </li><li>
+        <span>[説明] 項目を空白のままにします。</span>
+      </li><li>
+        <span>[<strong class="uicontrol">作成]</strong> をクリックすると、プロンプトテンプレートワークスペースにリダイレクトされます。</span>
+      </li><li>
+        <span>[<a title="次のプロンプトテンプレートの例は、項目生成の一般的な使用事例を対象としています。" href="prompt_builder-2.html#prompt_builder_field_generation_example_templates">Field Generation Example Templates</a> (項目生成サンプルテンプレート)] で、[Draft an Account Description (アカウントの説明のドラフト作成)] というプロンプトテンプレートを見つけます。このテンプレートをコピーしてプロンプトテンプレートワークスペースに貼り付けます。</span>
+        <div>この例では、プロンプトテンプレートリソースのプレースホルダーテキストが含まれています。プロンプトビルダーでこのテンプレートを実行する前に、[プロンプト] セクションの [リソースの挿入] セレクターを使用してプレースホルダーを実際の差し込み項目に置き換えます。テンプレートがプロンプトに解決されると、差し込み項目は実際のデータに置き換えられます。</div>
+      </li><li>
+        <span>プロンプトテンプレートを実行し、LLM で生成されたアカウントの説明を確認します。</span>
+        <ol>
+          <li>
+            <span>[設定をプレビュー] ボタンをクリックします。</span>
+          </li>
+
+          <li>
+            <span>[入力] の [レコード] 検索バーにアカウント名を入力し、アカウント名を選択します。
+            </span>
+          </li>
+
+          <li>
+            <span>[応答と表示を設定] セクションで、テストする内容に基づいて [応答を生成]、[表示プロンプト]、および [表示解像度] が選択または選択解除されていることを確認します。</span>
+          </li>
+
+          <li>
+            <span>[<strong class="uicontrol">Save &amp; Preview</strong> (保存 &amp; プレビュー)] をクリックし、応答を確認します。</span>
+          </li>
+
+        </ol>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prompt_builder_add_merge_fields_flex">
+<h1 class="slds-text-heading_large">Flex プロンプトテンプレートへのレコード差し込み項目の追加</h1>
+  
+  <p>Salesforce オブジェクトの特定の情報を使用するテンプレートを使用して、ユニークで詳細な商品説明やカスタムテキストメッセージなどを大規模に作成し、時間を節約します。Flex テンプレートの差し込み項目を使用して、LLM で最新のデータに基づいてコンテンツを作成します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Platform、Einstein または Agentforce for Sales/Service アドオン、または Agentforce Foundation が付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d146735e69" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d146735e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロンプトビルダーでプロンプトテンプレートを作成および管理する</td>
+
+              <td headers="d146735e69" style="vertical-align:top;" class="slds-cell-wrap"><p>「プロンプトテンプレートマネージャー」権限セット</p><ul>
+                  <li>プロンプトテンプレートの管理</li>
+
+                  <li>Execute Prompt Templates (プロンプトテンプレートの実行)</li>
+
+                </ul>
+<p>または</p><p style="margin-bottom:0;">「アプリケーションのカスタマイズ」権限セット</p></td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>差し込み項目を使用する Flex プロンプトテンプレートを見てみましょう。たとえば、テキストメッセージで新しいプロモーションについて定期的に顧客に知らせる会社で働いているとします。カスタマーサービスチームは、すべてのプロモーションでこれらのテキストを最初から作成するために多くの時間を費やしています。LLM を使用してこれらのプロモーションを記述することで、このプロセスをより効率的かつ動的にすることができます。</p></div>
+    <ol><li>
+        <span>[Prompt Template Type (プロンプトテンプレート種別)] ドロップダウンで、[<strong class="uicontrol">Flex] を</strong>選択します。</span>
+      </li><li>
+        <span>[プロンプトテンプレート名] に「<kbd>Ask about a Case</kbd>」と入力します。</span>
+      </li><li>
+        <span>[説明] 項目を空白のままにします。</span>
+      </li><li>
+        <span>リソースを定義します。[オブジェクト] で、[<strong class="uicontrol">ケース] を</strong>選択します。[名前] に「<kbd>Customer Case」</kbd> (顧客ケース) と入力します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[次へ</strong>] をクリックすると、プロンプトテンプレートワークスペースにリダイレクトされます。</span>
+      </li><li>
+        <span>プロンプトテンプレートを最初から記述するか、サンプルテンプレートをコピーして貼り付けます。</span>
+        <ol>
+          <li>
+            <span>サンプルプロンプトを使用するには、<a title="次のプロンプトテンプレート例では、Flex の使用事例をいくつか取り上げます。" href="prompt_builder-2.html#prompt_builder_flex_example_templates">Flex Example Templates</a> からサンプルの 1 つをコピーして、[プロンプト] セクションに貼り付けます。</span>
+          </li>
+
+          <li>
+            <span>プロンプトビルダーでこのテンプレートを実行する前に、[プロンプト] セクションで [<strong class="uicontrol">リソースの挿入</strong>] をクリックしてプレースホルダーを実際の差し込み項目に置き換えます。検索項目は、このオプションを初めてクリックしたときに表示されます。</span>
+          </li>
+
+          <li>
+            <span>テンプレートがプロンプトに解決されると、差し込み項目が実際のデータに置き換えられ、[解決済みプロンプト] セクションに表示されます。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>プロンプトテンプレートを実行し、LLM で生成されたテキストメッセージを確認します。</span>
+        <ol>
+          <li>
+            <span>[設定をプレビュー] ボタンをクリックします。</span>
+          </li>
+
+          <li>
+            <span>[入力] のケース検索バーでケースを検索して選択します。</span>
+          </li>
+
+          <li>
+            <span>[応答と表示を設定] セクションで、テストする内容に基づいて [応答を生成]、[表示プロンプト]、および [表示解像度] が選択または選択解除されていることを確認します。</span>
+          </li>
+
+          <li>
+            <span>[<strong class="uicontrol">Save &amp; Preview</strong> (保存 &amp; プレビュー)] をクリックし、応答を確認します。</span>
+          </li>
+
+        </ol>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prompt_builder_add_merge_fields_sales_email">
+<h1 class="slds-text-heading_large">セールスメールプロンプトテンプレートへのレコード差し込み項目の追加</h1>
+  
+  <p>差し込み項目は、複数の顧客や商品に対応するセールスメールプロンプトテンプレートを拡張するために重要です。プロンプトテンプレートは、セールスレコードやサービスレコードなどの Salesforce レコード項目に接続されます。プロンプトテンプレートでは、差し込み項目はプレースホルダーのように機能します。テンプレートを実行すると、LLM によって差し込み項目が実際のデータに置き換えられます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Platform、Einstein または Agentforce for Sales/Service アドオン、または Agentforce Foundation が付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d113416e69" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d113416e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロンプトビルダーでプロンプトテンプレートを作成および管理する</td>
+
+              <td headers="d113416e69" style="vertical-align:top;" class="slds-cell-wrap"><p>「プロンプトテンプレートマネージャー」権限セット</p><ul>
+                  <li>プロンプトテンプレートの管理</li>
+
+                  <li>Execute Prompt Templates (プロンプトテンプレートの実行)</li>
+
+                </ul>
+<p>または</p><p style="margin-bottom:0;">「アプリケーションのカスタマイズ」権限セット</p></td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>プロンプトビルダーでプロンプトテンプレートに差し込み項目を追加するには、[<strong class="uicontrol">Insert Resource (リソース</strong>の挿入)] セレクターをクリックし、CRM データのプレースホルダー値のドロップダウンメニューからリソースを選択します。</p><p>差し込み項目を使用するセールスメールプロンプトテンプレートを見てみましょう。たとえば、営業チームがリードや取引先責任者の紹介メールを最初から作成するのに多大な時間を費やしているとします。</p><p>LLM を使用してこれらの説明を記述する方が効率的で、LLM は最新データを使用してコンテンツを作成できます。使用を開始するには、プロンプトテンプレートを作成します。&nbsp;</p></div>
+    <ol><li>
+        <span>[プロンプトテンプレート種別] ドロップダウンで、[<strong class="uicontrol">セールスメール]</strong> を選択します。</span>
+      </li><li>
+        <span>[プロンプトテンプレート名] に「<kbd>Draft an Introduction Email</kbd>」 (導入メールのドラフト作成) と入力します。</span>
+      </li><li>
+        <span>[受信者種別] で、[<strong class="uicontrol">取引先責任者]</strong> を選択します。</span>
+      </li><li>
+        <span>[テンプレートの説明] 項目と [オブジェクト] 項目は空のままにします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>[<a title="このサンプルプロンプトテンプレートのライブラリでは、独自のカスタムプロンプトテンプレートを作成するための開始点を得ることができます。" href="prompt_builder-2.html#prompt_builder_example_library">Example Prompt Template Library</a> (サンプルプロンプトテンプレートライブラリ)] で、[Draft an introduction email for a new lead or contact (新規リードまたは取引先責任者の紹介メールのドラフトを作成)] というタイトルのセールスメールプロンプトテンプレートを見つけます。このテンプレートをコピーしてプロンプトテンプレートワークスペースに貼り付けます。</span>
+      </li><li>
+        <span>この例では、プロンプトテンプレートリソースのプレースホルダーテキストが含まれています。プロンプトビルダーでこのテンプレートを実行する前に、[プロンプト] セクションで [<strong class="uicontrol">リソースの挿入</strong>] をクリックします。検索項目は、このオプションを初めてクリックしたときに表示されます。
+        </span>
+      </li><li>
+        <span> 検索バーを使用して、プレースホルダーを実際の差し込み項目に置き換えます。テンプレートがプロンプトに解決されると、差し込み項目は実際のメール送信者の名前と受信者の名前および会社に置き換えられます。</span>
+      </li><li>
+        <span>プロンプトテンプレートを実行し、LLM で生成されたメールドラフトを参照する</span>
+        <ol>
+          <li>
+            <span>[設定をプレビュー] ボタンをクリックします。</span>
+          </li>
+
+          <li>
+            <span>[入力] の [受信者] 検索バーに取引先責任者名を入力して選択します。この選択により、LLM で生成されたメールドラフトの受信者を定義します。</span>
+          </li>
+
+          <li>
+            <span>[応答と表示を設定] セクションで、テストする内容に基づいて [応答を生成]、[表示プロンプト]、および [表示解像度] が選択または選択解除されていることを確認します。</span>
+          </li>
+
+          <li>
+            <span>[保存 &amp; プレビュー<strong class="uicontrol">(Save &amp; Preview</strong>)] をクリックし、解決されたプロンプトと応答を確認します。</span>
+          </li>
+
+        </ol>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prompt_builder_add_new_action">
+<h1 class="slds-text-heading_large">プロンプトテンプレートへの新規アクションの追加</h1>
+    <p>フロー、Apex、取得などの新しいアクションをプロンプトテンプレートに追加します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+        <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Platform、Einstein または Agentforce for Sales/Service アドオン、または Agentforce Foundation が付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d139301e72" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d139301e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロンプトビルダーでプロンプトテンプレートを作成および管理する</td>
+
+              <td headers="d139301e72" style="vertical-align:top;" class="slds-cell-wrap"><p>「プロンプトテンプレートマネージャー」権限セット</p><ul>
+                  <li>プロンプトテンプレートの管理</li>
+
+                  <li>Execute Prompt Templates (プロンプトテンプレートの実行)</li>
+
+                </ul>
+<p>または</p><p style="margin-bottom:0;">「アプリケーションのカスタマイズ」権限セット</p></td>
+
+            </tr>
+          </tbody></table></div>
+        <div><p>プロンプトテンプレートに新しいアクションを追加する</p></div>
+        <ol><li>
+                <span>プロンプトビルダーのキャンバスで、@ と入力して [<strong class="uicontrol">Insert Resource (リソース</strong>の挿入)] をクリックするか、[テンプレートの設定] で [<strong class="uicontrol">リソース] を</strong>選択します。</span>
+            </li><li>
+                <span>アクション種別を選択します。</span>
+            </li><li>
+                <span>特定のアクションを選択します。</span>
+            </li></ol>
+
+    
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prompt_builder_add_new_input">
+<h1 class="slds-text-heading_large">既存のプロンプトテンプレートへの新しい入力の追加</h1>
+  <p>新しいオブジェクト、自由テキスト入力、またはデータモデルオブジェクトを既存のプロンプトテンプレートに追加します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Platform、Einstein または Agentforce for Sales/Service アドオン、または Agentforce Foundation が付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d132211e68" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d132211e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロンプトビルダーでプロンプトテンプレートを作成および管理する</td>
+
+              <td headers="d132211e68" style="vertical-align:top;" class="slds-cell-wrap"><p>「プロンプトテンプレートマネージャー」権限セット</p><ul>
+                  <li>プロンプトテンプレートの管理</li>
+
+                  <li>Execute Prompt Templates (プロンプトテンプレートの実行)</li>
+
+                </ul>
+<p>または</p><p style="margin-bottom:0;">「アプリケーションのカスタマイズ」権限セット</p></td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>既存のプロンプトテンプレートに新しい入力を追加します。</p></div>
+    <ol><li>
+        <span>プロンプトビルダーのキャンバスで、<strong class="uicontrol">[プロパティ]</strong> [<span style="vertical-align:text-bottom;display:inline-block;"><img alt="[追加] アイコン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/prompt_builder_properties_icon.png" style="width:30px;margin-bottom:0;"></span>] をクリックします。</span>
+      </li><li>
+        <span>[<strong class="uicontrol">Resources (リソース</strong>)]、[<span style="vertical-align:text-bottom;display:inline-block;"><img alt="[追加] アイコン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/prompt_builder_add_icon.png" style="width:30px;margin-bottom:0;"></span>] アイコンの順にクリックします。</span>
+      </li><li>
+        <span>作成する入力種別と、入力に関連するすべての詳細を選択します。</span>
+      </li><li>
+        <span>[テンプレートの<strong class="uicontrol">実行時に</strong>必須] チェックボックスをオフにして、入力を省略可能にします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。[リソース] の [入力] セクションから新しい入力をプロンプトテンプレートに追加します。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prompt_builder_add_related_lists_file_flex">
+<h1 class="slds-text-heading_large">Flex プロンプトテンプレートへのファイル入力を含む関連リストの追加</h1>
+    <p>ファイル入力を含む関連リストを含む Flex プロンプトテンプレートを作成します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+        <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Platform、Einstein または Agentforce for Sales/Service アドオン、または Agentforce Foundation が付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d99278e67" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d99278e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロンプトビルダーでプロンプトテンプレートを作成および管理する</td>
+
+              <td headers="d99278e67" style="vertical-align:top;" class="slds-cell-wrap"><p>「プロンプトテンプレートマネージャー」権限セット</p><ul>
+                  <li>プロンプトテンプレートの管理</li>
+
+                  <li>Execute Prompt Templates (プロンプトテンプレートの実行)</li>
+
+                </ul>
+<p>または</p><p style="margin-bottom:0;">「アプリケーションのカスタマイズ」権限セット</p></td>
+
+            </tr>
+          </tbody></table></div>
+        <div><p>たとえば、クライアントの潜在的なサービスプロバイダーを評価するビジネスアナリストとします。チームはプロバイダーごとに複数のファイルや画像を確認し、それらがクライアントのニーズを満たしているかどうかを判断するために多くの時間を費やしています。ファイル入力を処理できる LLM を使用することで、これらの詳細の分析と概要を自動化できます。これにより、クライアント固有の問題に対して会社が適切かどうかをすばやく判断できます。 
+            </p><p>使用を開始するには、プロンプトテンプレートを作成します。</p></div>
+        <ol><li>
+                <span>[Prompt Template Type (プロンプトテンプレート種別)] ドロップダウンで、[<strong class="uicontrol">Flex] を</strong>選択します。</span>
+            </li><li>
+                <span>[プロンプトテンプレート名] に「<kbd>Analyze Account」</kbd>と入力します。</span>
+            </li><li>
+                <span>説明フィールドに「<kbd>Summaryize a company description」と入力し、ファイルを使用してその関連性を確認します。</kbd></span>
+            </li><li><span>リソースを定義します。</span>
+                <ol>
+                    <li>
+                        <span>名前: <kbd>取引先</kbd></span>
+                    </li>
+
+                    <li>
+                        <span>API 参照名: <kbd>Account</kbd></span>
+                    </li>
+
+                    <li>
+                        <span>ソース種別: <strong class="uicontrol">オブジェクト</strong></span>
+                    </li>
+
+                    <li>
+                        <span>オブジェクト: <strong class="uicontrol">取引先</strong></span>
+                    </li>
+
+                </ol> 
+            </li><li>
+                <span><strong class="uicontrol">[次へ</strong>] をクリックすると、プロンプトテンプレートワークスペースにリダイレクトされます。</span>
+            </li><li>
+                <span>サンプルプロンプトテンプレートをコピーして貼り付ける</span>
+                <ol>
+                    <li>
+                        <span>この例のプロンプトを使用するには、<a title="次のプロンプトテンプレート例では、Flex の使用事例をいくつか取り上げます。" href="prompt_builder-2.html#prompt_builder_flex_example_templates">Flex サンプルテンプレート</a>の Image Verification for Account Relevance プロンプトをコピーします。次に、プロンプトテンプレートワークスペースに貼り付けます。</span>
+                    </li>
+
+                    <li>
+                        <span>プロンプトビルダーでこのテンプレートを実行する前に、[プロンプト] セクションで [<strong class="uicontrol">リソースの挿入</strong>] をクリックします。検索項目は、このオプションを初めてクリックしたときに表示されます。</span>
+                    </li>
+
+                    <li>
+                        <span>[リソース] 項目を使用して、description プレースホルダーを実際の差し込み項目に置き換えます。関連リストをプロンプト テンプレートに追加し、[リソース] ピッカーから [<strong class="uicontrol">アカウント]</strong> をクリックし、[メモ &amp; 添付<strong class="uicontrol">ファイル] を</strong>クリックします。</span>
+                    </li>
+
+                </ol>
+            </li><li>
+                <span>[テンプレートのプロパティ] の [モデル] で、[<strong class="uicontrol">GPT 4 Omni</strong>] を選択します。</span>
+            </li><li>
+                <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+            </li><li>
+                <span>プロンプトテンプレートをテストするアカウントを選択します。</span>
+            </li><li>
+                <span>[<strong class="uicontrol">プレビュー]</strong> をクリックして、プロンプトテンプレートをテストします。[解像度] では、添付された画像をプレビューすることもできます。</span>
+            </li></ol>
+
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="他のテンプレート種別でカバーされていない使用事例では、Flex prompt テンプレート種別が最適です。AI を使用して独自のビジネスケースのコンテンツを生成する Flex プロンプトテンプレートを作成します。" href="prompt_builder-2.html#prompt_builder_create_flex_prompt_template">Flex プロンプトテンプレートの作成</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prompt_builder_add_retriever_field_gen">
+<h1 class="slds-text-heading_large">項目生成プロンプトテンプレートへの取得者の追加</h1>
+  
+  <p>[リソース] 項目から取得者を選択して、項目生成プロンプトテンプレートに追加します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Platform、Einstein または Agentforce for Sales/Service アドオン、または Agentforce Foundation が付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d39000e69" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d39000e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロンプトビルダーでプロンプトテンプレートを作成および管理する</td>
+
+              <td headers="d39000e69" style="vertical-align:top;" class="slds-cell-wrap"><p>「プロンプトテンプレートマネージャー」権限セット</p><ul>
+                  <li>プロンプトテンプレートの管理</li>
+
+                  <li>Execute Prompt Templates (プロンプトテンプレートの実行)</li>
+
+                </ul>
+<p>または</p><p style="margin-bottom:0;">「アプリケーションのカスタマイズ」権限セット</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d39000e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">取得者を作成および管理する</td>
+
+              <td headers="d39000e69" style="vertical-align:top;" class="slds-cell-wrap">Data Cloud 権限セット</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d39000e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Einstein Search でプロンプトを実行する</td>
+
+              <td headers="d39000e69" style="vertical-align:top;" class="slds-cell-wrap">「Data Cloud ユーザー」権限セット</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>このトピックでは、Einstein Search レトリーバーを使用して取引先の説明を作成するプロンプトテンプレートを作成およびプレビューする手順について説明します。プロンプトテンプレートで使用する前に、AI モデル (旧 Einstein Studio) で取得者を作成する必要があります。詳細は、「<a target="_blank" href="generative_misc-1.html#data_library_custom_retriever">カスタム取得機能</a>の使用」を参照してください。この例では、ESearchAccountDescription という名前のカスタム取得を使用して、非構造化データとして保存されている取引先の説明情報の内部 Knowledge Store を検索します。</p></div>
+    <ol><li>
+                <span>プロンプトビルダーで、プロンプトテンプレートを作成し、[プロンプトテンプレートの種類] ドロップダウンから [<strong class="uicontrol">項目生成]</strong> を選択します。</span>
+            </li><li>
+                <span>プロンプトテンプレートの名前と説明を入力します。</span>
+            </li><li>
+                <span>リソースを定義します。この例では、オブジェクトに<strong class="uicontrol">「Account」</strong>を選択し、オブジェクト項目に「<strong class="uicontrol">Account Description」</strong>を選択します。</span>
+            </li><li>
+                <span><strong class="uicontrol">[次へ</strong>] をクリックして、プロンプトテンプレートワークスペースに移動します。</span>
+            </li><li>
+                <span>[<a title="プロンプトビルダーの使用を開始するには、ライブラリのサンプルプロンプトテンプレートのいずれかをカスタマイズします。" href="prompt_builder-3.html#prompt_builder_use_example_library">Example Prompt Template Library</a> (サンプルプロンプトテンプレートライブラリ)] で、[Field Generation (項目生成)] プロンプトテンプレートの [Draft an Account Description (アカウントの説明のドラフトを作成)] を見つけます。このテンプレートをコピーしてプロンプトテンプレートワークスペースに貼り付けます。</span>
+                <div>指示に「 <kbd>Use the following information that's related to the account (</kbd>取引先に関連する次の情報を使用します)」というテキストを追加します。</div>
+            </li><li>
+                <span>[プロンプト] セクションで、「<strong class="uicontrol">@」と</strong>入力するか、[<strong class="uicontrol">リソースの挿入</strong>] をクリックして [<strong class="uicontrol">Retrievers]</strong> をクリックし、[<strong class="uicontrol">Configure Retrievers +</strong>] をクリックします。</span>
+            </li><li>
+                <span>プロンプトテンプレートに追加する取得者を選択します。</span>
+            </li><li>
+                <span>必要に応じて、[テンプレート設定] サイドパネルで取得者設定を変更します。</span>
+                <a name="prompt_builder_add_retriever_field_gen__substeps_i33_2k4_33c" href="https://help.salesforce.com/s?language=ja"></a><ol id="prompt_builder_add_retriever_field_gen__substeps_i33_2k4_33c">
+                    <li>
+                        <span><strong class="uicontrol">記述子</strong>: プロンプトテンプレートでこの取得者の [<strong class="uicontrol">表示ラベル]</strong> と [<strong class="uicontrol">説明]</strong> を変更します。</span>
+                    </li>
+
+                    <li>
+                        <span><strong class="uicontrol">検索テキスト</strong>: 追加の条件を指定して検索を絞り込みます。リソースを選択するか、検索テキストを指定します。</span>
+                    </li>
+
+                    <li>
+                        <span><strong class="uicontrol">出力フィールド</strong>: 選択した取得者で使用可能な場合、プロンプトをグラウンディングする 1 つ以上の返されたデータフィールドを選択します。</span>
+                    </li>
+
+                    <li>
+                        <span><strong class="uicontrol">Number of Results</strong> (結果数): 選択した取得者で使用可能な場合、取得する結果の最大数を指定します。</span>
+                    </li>
+
+                </ol>
+            </li><li>
+                <span>［<strong class="uicontrol">Apply and Insert］</strong> をクリックします。</span>
+                <div>取得者をプロンプトテンプレートに追加したら、[プレビュー設定] パネルで検索パラメーターをカスタマイズできます。</div>
+            </li><li>
+                <span>[プレビュー設定] パネルで、[検索テキスト] 項目をクリックし、クエリを入力または選択します。</span>
+                <div>
+                    <p>この例では、検索テキストに「<code>account name:</code>」と入力します。次に、検索項目で [取引先名] リソースを見つけて選択します。次に、検索テキストに「<code>account industry:</code>」と入力し、検索フィールドで「Account Industry」を見つけて選択します。</p>
+                    <p>最終的な検索テキストは次のようになります。</p>
+                    <p>取引先名: Input.Account.Name</p>
+                    <p>account industry: Input.Account.Industry</p>
+                </div>
+            </li><li>
+                <span>[結果の数] を選択します。この例では、<kbd>10 を</kbd>使用します。</span>
+            </li><li>
+                <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+            </li><li>
+                <span>プロンプトテンプレートを実行し、LLM で生成された説明を確認します。</span>
+                <ol>
+                    <li>
+                        <span>[設定をプレビュー] ボタンをクリックします。</span>
+                    </li>
+
+                    <li>
+                        <span>[入力] の [取引先] 検索バーで取引先を検索して選択します。</span>
+                    </li>
+
+                    <li>
+                        <span>[応答と表示を設定] セクションで、テストする内容に基づいて [応答を生成]、[表示プロンプト]、および [表示解像度] が選択または選択解除されていることを確認します。</span>
+                    </li>
+
+                    <li>
+                        <span><strong class="uicontrol">[プレビュー]</strong> をクリックします。応答を確認します。</span>
+                    </li>
+
+                </ol>
+            </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/modules/retrieval-augmented-generation-quick-look">Trailhead: 取得、拡張生成、クイックルック</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prompt_builder_add_sales_email_to_einstein">
+<h1 class="slds-text-heading_large">Einstein セールスメールへのセールスメールプロンプトテンプレートの追加</h1>
+  <p>プロンプトビルダーから営業チームのツールボックスにセールスメールプロンプトテンプレートを追加する準備を整えます。[設定] でセールスメールを有効にしてから、権限セットを営業担当に割り当てます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Platform、Einstein または Agentforce for Sales/Service アドオン、または Agentforce Foundation が付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d50356e66" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d50356e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロンプトビルダー外でプロンプトテンプレートにアクセスして実行する</td>
+
+            <td headers="d50356e66" style="vertical-align:top;" class="slds-cell-wrap">「プロンプトテンプレートユーザー」権限セット</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d50356e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Einstein for Sales を使用してセールス メール機能にアクセスしてメールを作成する手順は、次のとおりです。</td>
+
+            <td headers="d50356e66" style="vertical-align:top;" class="slds-cell-wrap">Einstein セールスメール権限セット</td>
+
+          </tr>
+        </tbody></table>
+    <p>Einstein for Sales 権限セットの割り当てについては、「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=ai.einstein_sales_emails_setup.htm&amp;language=ja&amp;type=5">セールス メールの</a>設定」を参照してください。</p>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="顧客リレーション履歴とインサイトを活用したメールを使用して顧客とつながります。パーソナライズされた対象を絞ったメールを大規模に生成するには、セールスメールプロンプトテンプレートを設計します。テンプレートはさまざまな商品や顧客で再利用できるため、LLM を取得してメールを作成すると、時間が節約され、メールワークフローが容易になります。" href="prompt_builder-2.html#prompt_builder_create_sales_email_template">セールスメールプロンプトテンプレートの作成</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prompt_builder_answer_questions_with_knowledge">
+<h1 class="slds-text-heading_large">Knowledge プロンプトを使用した回答の質問テンプレートの作成</h1>
+  <p>プロンプトビルダーで [Answer Questions with Knowledge (ナレッジを使用して質問に回答)] プロンプトテンプレートを使用してエージェントが質問に回答できるようにします。Einstein で含める情報を指定するか、ビジネスニーズに合わせて回答が表示されるように話し方や口調を調整します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">Einstein生成AIはLightning Experienceで使用できます。Einstein 生成 AI の設定は Lightning Experience で使用できます。</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table>
+    <p>プロンプトビルダーを使用するには、最初に <a target="_blank" href="https://help.salesforce.com/s/articleView?id=data.c360_a_product_considerations.htm&amp;type=5&amp;language=ja">Data 360</a> と<a target="_blank" href="prompt_builder-2.html#prompt_builder_enable">プロンプトビルダー</a>を有効にしてプロビジョニングする必要があります。Answer Questions with Knowledge プロンプト テンプレートを作成およびカスタマイズするには、最初に <a target="_blank" href="generative_misc-1.html#data_library_parent">Agentforce データ ライブラリ</a>を作成する必要があります。</p>
+    <p>[ナレッジを使用して質問に回答] テンプレートをカスタマイズするには、標準プロンプトテンプレートをコピーして編集することをお勧めします。標準プロンプトテンプレートには、LLM、データリソース、およびユーザークエリなどの関連入力を含む、成功プロンプトの主要な要素が追加されました。[ナレッジを使用して質問に回答] 標準プロンプトテンプレートをコピーしても、独自の手順を追加してテストできます。</p>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prompt_builder_batch_processing">
+<h1 class="slds-text-heading_large">プロンプトテンプレートの一括処理
+  </h1>
+  <p>フローと Apex を使用して、多数のプロンプト応答を非同期で生成します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Platform、Einstein または Agentforce for Sales/Service アドオン、または Agentforce Foundation が付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d159435e66" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d159435e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">フローまたは Apex でプロンプト テンプレートを実行する</td>
+
+            <td headers="d159435e66" style="vertical-align:top;" class="slds-cell-wrap"><p>「プロンプトテンプレートユーザー」権限セット</p><ul>
+                <li>Execute Prompt Templates (プロンプトテンプレートの実行)</li>
+
+              </ul>
+<p>または</p><p style="margin-bottom:0;">「アプリケーションのカスタマイズ」権限</p></td>
+
+          </tr>
+        </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">概要</h2><p>一括処理では、1 つの要求で多数のプロンプト応答が非同期に生成されます。この方法により、LLM レート制限に達することを回避し、大量のコンテンツの生成を効率的に処理できます。</p><p>一括処理ジョブがキューに入れられ、すべての項目が処理され、結果が保存されます。ジョブの進行状況を監視し、準備ができたら完了した応答を取得できます。実際の完了時間はモデルプロバイダーによって異なり、異なる場合があります。</p><p>一般的な使用事例を次に示します。</p><ul>
+        <li>何千もの顧客向けにパーソナライズされたメールキャンペーンを作成する。</li>
+
+        <li>カタログデータから商品説明を生成する。</li>
+
+        <li>大量のケースメモや顧客からのフィードバックの集計。</li>
+
+        <li>複数のレコードでコンテンツを翻訳する。</li>
+
+        <li>スケジュールまたはレコードの変更によって一括コンテンツ生成をトリガーする。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">実装オプション</h2><p>Salesforce では、一括処理を実装するために主に次の 2 つの方法を提供しています。</p><p><strong>フロー</strong></p><p>このアプローチはほとんどの使用事例で機能し、ノーコードソリューションを構築する Salesforce システム管理者に最適です。スケジュールトリガーフローまたはレコードトリガーフローで [プロンプトテンプレート (一括生成)] アクションを使用して、自動的に実行される一括処理ジョブを作成します。これらのフローには [完了] パスと [タイムアウト] パスが含まれており、正常な完了シナリオとタイムアウトシナリオを異なる方法で処理できます。</p><p>制限:</p><ul>
+        <li>通常、フロー一括処理ジョブは送信から 2 時間以内に処理を開始します。</li>
+
+        <li>標準モデルでは 1 日あたり最大 10,000 世代。</li>
+
+        <li>ネイティブのバッチ処理をサポートするモデルを使用している場合、1 日あたり最大 50,000 世代。</li>
+
+        <li>WebSearch Retrievers を使用する場合、1 時間あたり最大 1,000 件の項目。</li>
+
+      </ul>
+<p><strong>Apex</strong></p><p>このアプローチでは、カスタムインテグレーションと自動化の柔軟性を最大限に高めることができます。AiJobRun および AiJobRunItem オブジェクトを使用して、プログラムで一括処理ジョブを作成および管理します。Apex は、次の場合にお勧めします。</p><ul>
+        <li>カスタム UI を作成します。例: ジョブを開始するボタン、一括処理ジョブをリストするダッシュボード。</li>
+
+        <li>バッチサイズを動的に制御する (件数または時間のしきい値に達するまで項目を累積し、しきい値を超えると開始)。</li>
+
+        <li>レコードトリガーまたはスケジュールベースではない外部イベントからトリガーします。</li>
+
+      </ul>
+<p>制限:</p><ul>
+        <li>AiJobRun ごとに最大 1,000 個の AiJobRunItem。</li>
+
+        <li>ネイティブ一括処理をサポートするモデルを使用している場合、各 AiJobRun には 10,000 AiJobRunItem の制限があります。</li>
+
+        <li>WebSearch Retrievers を使用する場合、1 時間あたり最大 1,000 件の項目。</li>
+
+        <li>24 時間あたり最大 5 個の AiJobRun オブジェクト。要求が 1 日の制限を超えた場合、制限がリセットされるまでキュー状況になります。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">ベストプラクティス</h2><p>適切なモデルを選択します。</p><ul>
+        <li>プロンプトビルダーで「バッチのサポート: はい」という表示ラベルのモデルを使用して、最も速く処理します。</li>
+
+        <li>バッチ用のミニモデルは動作が顕著に遅くなるため、避けてください。</li>
+
+      </ul>
+<p>バッチのサイズ:</p><ul>
+        <li>大きい方がいい制限要素はジョブの数であり、それらのジョブの項目数ではありません。200 と 2,000 のバッチはほぼ同じ時間で終了します。</li>
+
+        <li>1 つ以上の失敗した項目によって残りのバッチがブロックされることはありません。</li>
+
+      </ul>
+<p>適切な実装を選択します: フローと Apex:</p><ul>
+        <li>ジョブ、動的バッチサイズ、またはレコード以外のトリガーとスケジュール以外のトリガーを開始するカスタム UI が必要な場合を除き、フローを使用します。</li>
+
+      </ul>
+<p>フローを設計します。</p><ul>
+        <li>フローごとに 1 つの一括処理アクションのみを実行します。チェーン化された一括処理アクションはキューに入れられ、ランタイムが大幅に増加します。</li>
+
+        <li>可能な場合は、プロンプトを 1 つのテンプレートにまとめます。</li>
+
+        <li>タイムアウトを 1 日に設定します。</li>
+
+      </ul>
+<p>ジョブの進行状況を監視します。</p><ul>
+        <li>AiJobRun と AiJobRunItem に状況、項目数、エラー、応答を照会します。</li>
+
+        <li>イベント駆動型ワークフローの AiJobRunStatusEvent に登録します。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">制限と考慮事項 </h2><p>前提条件</p><ul>
+        <li>指定されたプロンプトテンプレートには有効なバージョンが必要です。</li>
+
+        <li>フローの場合: [プロセスの自動化設定] でデフォルトのワークフローユーザーを設定する必要があります。</li>
+
+      </ul>
+<p>処理動作</p><ul>
+        <li>ジョブは作成日に基づいて時系列で処理されます。</li>
+
+        <li>数秒以内に作成されたジョブは、厳密な順序に従わない場合があります。</li>
+
+        <li>処理が開始されると、入力値と特定の項目は不変になります。</li>
+
+        <li>ジョブ状況の変更はシステムで管理され、手動で変更することはできません。</li>
+
+        <li>完了時間はモデルプロバイダーによって異なり、異なる場合があります。</li>
+
+      </ul>
+<p>プラットフォームに関する考慮事項</p><ul>
+        <li>バッチ処理は非同期であり、結果はすぐには返されません。</li>
+
+        <li>適切なタイムアウトの長さを設定します。フロー一括処理ジョブでは 1 日をお勧めします。</li>
+
+        <li>プラットフォームイベントまたはジョブレコードを照会して、ジョブの状況を監視します。</li>
+
+        <li>時間的制約のあるワークフローを設計するときは、処理時間を考慮して計画します。</li>
+
+        <li>バッチ内の失敗した項目のフォールバック処理を考慮します。</li>
+
+      </ul>
+</div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.flow_ref_elements_actions_generate_prompt_response.htm&amp;language=ja">https://help.salesforce.com/s/articleView?id=platform.flow_ref_elements_actions_generate_prompt_response.htm</a></li><li><a target="_blank" href="https://developer.salesforce.com/docs/ai/agentforce/guide/prompt-template-batch-job.html">https://developer.salesforce.com/docs/ai/Agentforce/guide/prompt-template-batch-job.html</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prompt_builder_best_practices">
+<h1 class="slds-text-heading_large">プロンプトテンプレートを作成するためのベストプラクティス</h1>
+  <p>効果的なプロンプトテンプレートを作成するためのベストプラクティスについて説明します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Platform、Einstein または Agentforce for Sales/Service アドオン、または Agentforce Foundation が付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table>
+    <ul>
+      <li>プロンプトテンプレートは簡潔でわかりやすくしてください。業界の専門用語や専門用語は使用しないでください。代わりに、自然言語と<a target="_blank" href="https://help.salesforce.com/s/articleView?id=service.bots_service_best_practice.htm&amp;language=ja&amp;type=5">会話設計のベストプラクティス</a>を使用します。</li>
+
+      <li>LLM により多くのコンテキスト情報を提供するには、営業担当やサポート担当者などのキャラクターとしてロールプレイを依頼します。次に、キャラクターの目標を定義します。たとえば、「あなたは大手顧客をライブイベントに招待したいマーケティングエグゼクティブです」などの表現を含めます。</li>
+
+      <li>プロンプトテンプレートで反復処理します。さまざまなテンプレートを使用して同じ目標を達成し、パーツがモデルの応答にどのように影響するかを確認します。エンドユーザーのフィードバックを取得して、プロンプトテンプレートで目的の応答がどの程度適切に生成されるかを確認します。</li>
+
+      <li>スタイルを選択して、それに従います。プロンプトテンプレートで一貫した書き方を使用すると、LLM で一貫した応答が生成されます。書き方は、単語の選択、強調、絵文字、句読点によって決まります。</li>
+
+      <li>LLM でコンテキストと命令を区別できるようにするには、プロンプトテンプレートで命令セクションを作成します。別の行に「Instructions:」 (指示:) と入力し、指示を三重引用符 ("") で囲みます。</li>
+
+      <li>LLM が予期されるタイプのコンテンツのみを生成するように直接指示します。たとえば、LLM でメールのドラフトを作成する場合、「この指示に厳密に従って、顧客に送信するメッセージのみを生成します」などの指示を追加します。この手順により、LLM は目的のコンテンツを生成するだけでなく、コンテンツの作成プロセスに関する応答を生成できなくなります。</li>
+
+      <li><a title="このサンプルプロンプトテンプレートのライブラリでは、独自のカスタムプロンプトテンプレートを作成するための開始点を得ることができます。" href="prompt_builder-2.html#prompt_builder_example_library">サンプルプロンプトテンプレートライブラリ</a>のテンプレートのいずれかから開始し、特定のニーズに合わせてカスタマイズします。テンプレートで使用される言語、特に書き方に関連するテキストを調べます。独自のテンプレートで同様の言い回しを使用できます。</li>
+
+    </ul>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Build Your Own プロンプト テンプレートの作成を開始すると、威圧感を感じることがあります。すべての新しいスキルと同様に、優れたプロンプトを設計するには、いくつかの実験と練習が必要です。プロンプト設計の指針として、まず有効なプロンプトテンプレートの主要なコンポーネントについて説明します。優れたレシピと同様に、これらの「材料」は連携して大規模言語モデル (LLM) が正確かつ一貫した応答を生成するのに役立ちます。" href="prompt_builder-3.html#prompt_builder_template_ingredients">プロンプトテンプレートの材料</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prompt_builder_build_manage_lt">
+<h1 class="slds-text-heading_large">プロンプトテンプレートの Lightning 種別の作成および管理</h1>
+  <p>Lightning 種別を使用して、プロンプトテンプレートの構造化された出力スキーマを定義および管理します。Lightning 種別は、応答構造を適用するためにプロンプトビルダーで実行時に参照される再利用可能な定義です。
+  </p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Platform、Einstein または Agentforce for Sales/Service アドオン、または Agentforce Foundation が付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#prompt_builder_configure_response">生成された応答形式の設定</a></strong><br>生成される応答の形式を制御するには、[JSON] または [HTML] を選択します。</li><li class="slds-p-bottom_small"><strong><a href="prompt_builder-2.html#prompt_builder_create_apex_based_lt">Apex ベースの Lightning タイプの作成</a></strong><br>Apex でスキーマを定義する場合は、Apex ベースの Lightning タイプを作成します。</li><li class="slds-p-bottom_small"><strong><a href="prompt_builder-2.html#prompt_builder_create_object_based_lt">オブジェクトベースの Lightning タイプの作成</a></strong><br>プロンプトテンプレート出力用の新しいスキーマが必要な場合は、オブジェクトベースの Lightning 種別を作成します。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prompt_builder_build_template">
+<h1 class="slds-text-heading_large">プロンプトテンプレートの作成</h1>
+  
+  <p>使用事例に基づいて作成するプロンプトテンプレートの種別を選択します。テンプレート種別に基づいて、テンプレートで使用できるリソースを定義します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Platform、Einstein または Agentforce for Sales/Service アドオン、または Agentforce Foundation が付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d101600e69" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d101600e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロンプトビルダーでプロンプトテンプレートを作成および管理する</td>
+
+              <td headers="d101600e69" style="vertical-align:top;" class="slds-cell-wrap"><p>「プロンプトテンプレートマネージャー」権限セット</p><ul>
+                  <li>プロンプトテンプレートの管理</li>
+
+                  <li>Execute Prompt Templates (プロンプトテンプレートの実行)</li>
+
+                </ul>
+<p>または</p><p style="margin-bottom:0;">「アプリケーションのカスタマイズ」権限セット</p></td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>プロンプトテンプレートを作成する</p></div>
+    <ol><li>
+        <span>[設定] からプロンプトビルダーを開くには、[クイック検索] ボックスに「<kbd>プロンプトビルダー</kbd>」と入力し、[<strong class="uicontrol">プロンプトビルダー</strong>] を選択します。</span>
+      </li><li>
+        <span>[新規プロンプトテンプレート<strong class="uicontrol">(New Prompt Template</strong>)] をクリックします。</span>
+      </li><li>
+        <span>使用事例に合わせて [プロンプトテンプレート種別] を選択します。詳細は、「<a title="プロンプトビルダーで使用できるプロンプトテンプレートの種類について説明します。" href="prompt_builder-3.html#prompt_builder_standard_template_types">プロンプトテンプレート種別</a>」を参照してください。</span>
+      </li><li>
+        <span>プロンプトテンプレート名を入力します。</span>
+      </li><li>
+        <span>必要に応じて、[テンプレートの説明] を入力します。この説明はプロンプトテンプレートのリストに表示され、プロンプトテンプレートを追加するときに区別するのに役立ちます。</span>
+      </li><li>
+        <span>ページの残りの項目は、選択したプロンプトテンプレートの種類によって異なります。</span>
+      </li><li>
+        <span><strong class="uicontrol">[次へ</strong>] をクリックすると、プロンプトテンプレートワークスペースにリダイレクトされます。プロンプトテンプレートワークスペースでは、プロンプトテンプレートの詳細を追加します。テンプレートを最初から作成することも、サンプルテンプレートをコピーして貼り付けることもできます。</span>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="顧客リレーション履歴とインサイトを活用したメールを使用して顧客とつながります。パーソナライズされた対象を絞ったメールを大規模に生成するには、セールスメールプロンプトテンプレートを設計します。テンプレートはさまざまな商品や顧客で再利用できるため、LLM を取得してメールを作成すると、時間が節約され、メールワークフローが容易になります。" href="prompt_builder-2.html#prompt_builder_create_sales_email_template">セールスメールプロンプトテンプレートの作成</a></li><li><a title="Field Generation プロンプト テンプレートでは、生成 AI 支援ワークフローを Lightning レコード ページ内のフィールドに取り込みます。ユーザーが LLM によって作成された概要や説明を項目に入力し、顧客とのより生産的な会話を促進できるようにします。" href="prompt_builder-2.html#prompt_builder_create_field_gen_prompt_template">項目生成プロンプトテンプレートの作成</a></li><li><a title="他のテンプレート種別でカバーされていない使用事例では、Flex prompt テンプレート種別が最適です。AI を使用して独自のビジネスケースのコンテンツを生成する Flex プロンプトテンプレートを作成します。" href="prompt_builder-2.html#prompt_builder_create_flex_prompt_template">Flex プロンプトテンプレートの作成</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prompt_builder_changing_llm_configurations">
+<h1 class="slds-text-heading_large">プロンプトテンプレートでの LLM 設定の変更</h1>
+  <p>プロンプトビルダーで出力を生成するための LLM 設定を選択し、必要に応じて変更します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Platform、Einstein または Agentforce for Sales/Service アドオン、または Agentforce Foundation が付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table>
+    <p>プロンプトビルダーの最も強力な機能の 1 つは、数回クリックするだけで LLM 設定を変更できることです。</p>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">標準および顧客の LLM 設定</h2><p>プロンプトビルダーの LLM 設定は、標準またはカスタムに分類されます。プロンプトビルダーには標準設定が含まれています。カスタム設定は BYO-LLM を介して取り込まれます。また、標準設定を変更すると、変更された設定がカスタム設定として保存されます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">バージョンと LLM 設定</h2><p>プロンプトテンプレートのバージョンごとに異なるモデル設定を含めることができます。有効化されたバージョンの設定モデルのみが使用されます。</p></div>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> テンプレートバージョンを有効化すると、テンプレートバージョンは不変になります。無効化された場合でも、有効になっていたバージョンは不変のままです。このようなテンプレートを編集するには、新しいバージョンとして保存します。「<a title="プロンプトビルダーで複数のバージョンのプロンプトテンプレートを作成して使用し、プロンプトの構造とその応答を比較します。" href="prompt_builder-3.html#prompt_builder_use_multiple_versions">Use Multiple Versions</a> of a Prompt Template (プロンプトテンプレートの複数バージョンの使用)」を参照してください。</div></div></div>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">モデルの表示</h2><p>[テンプレート設定] パネルの [モデル] セクションにある [<strong class="uicontrol">このモデルを表示</strong>] リンクをクリックすると、選択したモデルの AI モデル (旧 Einstein Studio) モデルページが開きます。このページでは、プロンプトビルダーでプロンプトテンプレートのドラフトを作成する前にモデルを変更します。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> ユーザーが [テンプレート設定] パネルで [<strong class="uicontrol">このモデル</strong>を表示] リンクを表示および使用するには、Data Cloud 管理者権限が必要です。これらの権限がないと、ユーザーは AI モデル内のモデル設定にアクセスできません。</div></div></div>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">非表示モデルの置き換え</h2><p>LLM 設定は AI モデルで非表示にできます。非表示モデルを使用するプロンプトテンプレートは、これまでどおり実行されます。ただし、非表示モデルを使用可能なモデルに置き換えることをお勧めします。使用できないモデルを使用するプロンプト テンプレートを開くと、プロンプトビルダーで [モデル] 項目に別のモデルを選択してから、変更を新しいバージョンとして保存できます。</p></div>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="プロンプトビルダーなどの組み込み機能について、複数のプロバイダーでサポートされている大規模言語モデル(LLM)について説明します。すぐに使用できる Salesforce 管理モデルを特定します。AIモデル(旧称Einstein Studio)を使用して独自のモデル(BYOLLM)を導入する方法について説明します。" href="generative_misc-2.html#generative_ai_large_language_model_support">大規模言語モデルのサポート</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prompt_builder_configure_action">
+<h1 class="slds-text-heading_large">プロンプトテンプレートでのアクションの設定</h1>
+    <p>プロンプトビルダーの既存のアクション (フロー、Apex、取得など) を変更して、プロンプトに直接追加します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+        <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Platform、Einstein または Agentforce for Sales/Service アドオン、または Agentforce Foundation が付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d86421e72" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d86421e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロンプトビルダーでプロンプトテンプレートを作成および管理する</td>
+
+              <td headers="d86421e72" style="vertical-align:top;" class="slds-cell-wrap"><p>「プロンプトテンプレートマネージャー」権限セット</p><ul>
+                  <li>プロンプトテンプレートの管理</li>
+
+                  <li>Execute Prompt Templates (プロンプトテンプレートの実行)</li>
+
+                </ul>
+<p>または</p><p style="margin-bottom:0;">「アプリケーションのカスタマイズ」権限セット</p></td>
+
+            </tr>
+          </tbody></table></div>
+        <div><p>新しいアクションを設定する</p></div>
+        <ol><li>
+                <span>プロンプトビルダーのキャンバスで、「@」と入力して [<strong class="uicontrol">アクションを設定</strong>] を選択するか、<strong class="uicontrol">[テンプレート設定</strong>] で [<strong class="uicontrol">リソース</strong>] タブに移動し、[アクション] セクションのプラス記号を選択して新しいアクションを設定します。</span>
+            </li><li>
+                <span>設定するアクション種別を選択します。</span>
+            </li><li>
+                <span>アクションのメタデータを表示するように設定する特定のアクションを選択します。</span>
+                <div>リソースピッカーでは、取得者は自動的に表示されません。使用可能な取得者を見つけるには、[<strong class="uicontrol">Configure Search +</strong> (検索を設定 +)] をクリックし、その取得者を選択して設定します。</div>
+            </li><li>
+                <span>[記述子] セクションで、必要に応じてアクションの表示ラベルまたは説明を更新します。</span>
+            </li><li>
+                <span>[入力] セクションで、アクションに関連する入力を入力または更新します。</span>
+            </li><li>
+                <span>変更を行った場合は、[<strong class="uicontrol">適用して挿入</strong>] をクリックして、新規または更新された入力でアクションを更新します。</span>
+            </li></ol>
+
+    
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prompt_builder_configure_data_piping">
+<h1 class="slds-text-heading_large">プロンプトビルダーでのアクション間のデータの受け渡し</h1>
+ <p>プロンプトビルダーのアクション間でデータを渡し、動的で柔軟なプロンプトワークフローを作成します。あるアクションの出力を別のアクションへの入力として使用し、より状況に応じた関連性の高い応答を生成します。
+ </p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+  <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Platform、Einstein または Agentforce for Sales/Service アドオン、または Agentforce Foundation が付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d83281e68" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d83281e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロンプトビルダーでプロンプトテンプレートを作成および管理する</td>
+
+              <td headers="d83281e68" style="vertical-align:top;" class="slds-cell-wrap"><p>「プロンプトテンプレートマネージャー」権限セット</p><ul>
+                  <li>プロンプトテンプレートの管理</li>
+
+                  <li>Execute Prompt Templates (プロンプトテンプレートの実行)</li>
+
+                </ul>
+<p>または</p><p style="margin-bottom:0;">「アプリケーションのカスタマイズ」権限セット</p></td>
+
+            </tr>
+          </tbody></table></div>
+  <div><p>その前に、すべてのアクションが適切に設定されていることを確認します。ソースアクションで必要な出力が生成されることを確認します。</p></div>
+  <ol><li>
+    <span>プロンプトビルダーで、プロンプトテンプレートを開きます。</span>
+   </li><li>
+    <span>必要なアクション (プロンプトテンプレートや取得者など) を追加します。
+    </span>
+   </li><li>
+    <span>出力を生成する最初のアクションを設定します。
+    </span>
+   </li><li>
+    <span>2 番目のアクションを選択します。</span>
+   </li><li>
+    <span>入力項目 ([検索パラメーター] など) で、最初のアクションの出力を参照します。</span>
+   </li></ol>
+
+  <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> <pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>Can you answer this question? {!$PromptTemplate:Generate_Stack_Overflow_Query.promptResponse}</code></pre>
+   <p>プロンプトが実行されると、最初のアクション (プロンプトテンプレート) で出力が生成されます。2 番目のアクションでは、その出力を入力として使用します。最終応答には、両方のアクションの結果が含まれます。</p>
+   <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> パフォーマンスを分析するには、[パフォーマンスインサイト] パネルを開き、応答時間やトークンの使用状況などの総計値を確認します。各アクションは個別のステップとして表示されます。
+   </div></div></div>
+</div></div></div>
+ 
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prompt_builder_configure_response">
+<h1 class="slds-text-heading_large">生成された応答形式の設定</h1>
+  <p>生成される応答の形式を制御するには、[JSON] または [HTML] を選択します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Platform、Einstein または Agentforce for Sales/Service アドオン、または Agentforce Foundation が付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d137389e68" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d137389e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロンプトビルダーでプロンプトテンプレートを作成および管理する</td>
+
+              <td headers="d137389e68" style="vertical-align:top;" class="slds-cell-wrap"><p>「プロンプトテンプレートマネージャー」権限セット</p><ul>
+                  <li>プロンプトテンプレートの管理</li>
+
+                  <li>Execute Prompt Templates (プロンプトテンプレートの実行)</li>
+
+                </ul>
+<p>または</p><p style="margin-bottom:0;">「アプリケーションのカスタマイズ」権限セット</p></td>
+
+            </tr>
+          </tbody></table></div>
+  <ol><li>
+        <span>差し込み項目を含むプロンプトテンプレートを作成します。</span>
+      </li><li>
+        <span>[<strong class="uicontrol">Template Settings</strong> (テンプレート設定)] をクリックします。</span>
+      </li><li>
+        <span>[応答] セクションで、生成される応答の形式を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[保存 &amp; プレビュー]</strong> をクリックします。</span>
+      </li></ol>
+<div><p>[プレビュー] をクリックするたびに、LLM は選択した形式で新しい応答を生成します。</p></div></div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prompt_builder_considerations">
+<h1 class="slds-text-heading_large">プロンプトビルダーの制限および考慮事項</h1>
+    <p>プロンプトテンプレートを設計、管理、実行するときは、使用制限と考慮事項を考慮してください。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+        <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Platform、Einstein または Agentforce for Sales/Service アドオン、または Agentforce Foundation が付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table>
+        
+    
+<ul><li class="slds-p-bottom_small"><strong><a href="prompt_builder-3.html#prompt_builder_limits">プロンプトビルダーの制限</a></strong><br>プロンプトテンプレートの数値制限について説明します。</li><li class="slds-p-bottom_small"><strong><a href="prompt_builder-3.html#prompt_builder_limitations">プロンプトビルダーの制限</a></strong><br>特定の動作と結果に影響するプロンプトテンプレートの機能制限について説明します。</li><li class="slds-p-bottom_small"><strong><a href="#prompt_builder_considerations_changeset">プロンプトテンプレートの変更セットに関する考慮事項</a></strong><br>変更セットを使用してプロンプトテンプレートをリリースする前に、コンポーネントの連動関係とリリースに関連する制限と動作を理解します。</li><li class="slds-p-bottom_small"><strong><a href="prompt_builder-2.html#prompt_builder_considerations_cli">プロンプトテンプレートに関する Salesforce CLI の考慮事項</a></strong><br>プロンプトテンプレートで Salesforce CLI を使用する場合のメタデータコンポーネントの連動関係とリリースに関連する制限と動作について説明します。</li><li class="slds-p-bottom_small"><strong><a href="prompt_builder-2.html#prompt_builder_considerations_deployment">プロンプトテンプレートのリリースに関する考慮事項</a></strong><br>プロンプトテンプレートを管理パッケージ、未管理パッケージ、ロック解除済みパッケージに含めます。プロンプトテンプレートを含むパッケージをリリースする前に、変更セットまたは CLI で制限と動作を理解します。</li><li class="slds-p-bottom_small"><strong><a href="prompt_builder-2.html#prompt_builder_considerations_packaging">プロンプトテンプレートのパッケージ化に関する考慮事項</a></strong><br>プロンプトテンプレートを管理パッケージ、未管理パッケージ、ロック解除済みパッケージに含めます。プロンプトテンプレートを含むパッケージを作成、更新、またはリリースする前に、パッケージの制限と動作を理解します。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prompt_builder_considerations_changeset">
+<h1 class="slds-text-heading_large">プロンプトテンプレートの変更セットに関する考慮事項</h1>
+    <p>変更セットを使用してプロンプトテンプレートをリリースする前に、コンポーネントの連動関係とリリースに関連する制限と動作を理解します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+        
+        <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Platform、Einstein または Agentforce for Sales/Service アドオン、または Agentforce Foundation が付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition</td>
+
+            </tr>
+          </tbody></table>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">有効化と無効化 </h2><ul>
+                <li>プロンプトテンプレートを有効にすると、バージョン状況が [ドラフト] から [公開済み] に変更されます。バージョンが公開されたら、ドラフトに変更することはできません。</li>
+
+                <li>プロンプトテンプレートバージョンは有効化または無効化できます。</li>
+
+                <li>対象組織で「プロンプトテンプレートのリリース」権限が有効になっていない限り、バージョンは複数の組織間のリリース中に自動的に有効化されません。この権限は変更セットにのみ適用され、Einstein の [設定] の [設定] にあります。</li>
+
+                <li>プロンプトテンプレートが使用されている場合、別のバージョンが有効でない限り、そのバージョンを無効にすることはできません。</li>
+
+                <li>プロンプトテンプレートが使用されている場合、有効なバージョンは削除できません。</li>
+
+                <li>フローがプロンプトテンプレートで参照され、リリースされている場合、フローは自動的に有効化されません。自動有効化のフローガイドラインに従います。無効なフローでプロンプトテンプレートを実行すると、実行時にエラーが発生します。</li>
+
+            </ul>
+</div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">その他の考慮事項</h2><ul>
+                <li>公開されたプロンプトテンプレートバージョンは変更できず、リリースされるとスキップされます。</li>
+
+                <li>テンプレートが上書きされた場合、ユーザーは変更セット、Command-ine Interface (CLI)、または Connect API を使用してテンプレートを再度上書きすることはできません。</li>
+
+                <li>プロンプトテンプレートは変更セットでは削除できません。</li>
+
+                <li>カスタム大規模言語モデル (LLM) 設定を使用してテンプレートをリリースする場合、対象組織に同じ名前のモデルがあることを確認します。モデル名が一致しない場合、リリースは失敗します。</li>
+
+                <li>変更セットを使用してテンプレートをリリースすると、すべてのバージョン (有効または無効) がリリースに含まれます。</li>
+
+                <li>変更セットにすべてのリソースを追加し、連動関係を追加します。</li>
+
+            </ul>
+</div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.changesets_outbound_dependencies.htm&amp;language=ja">連動コンポーネントの表示と変更セットへの追加</a></li></ul></div>
+</div></div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="agentforce_general-4.html">&larr; Agentforce 全般 / セットアップ（4/4）</a><a href="prompt_builder-2.html">プロンプトビルダー（2/3） &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=ai.copilot_intro.htm&type=5&language=ja">help.salesforce.com — Salesforce AI / Agentforce（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>

@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>ネットワーク・IP制限・信頼済みURL | セキュリティ（組織を保護する）ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（12）</h2>
+    <ol>
+      <li><a href="#configuring_remoteproxy">リモートサイトの設定</a></li>
+      <li><a href="#login_ip_ranges">プロファイルでのログイン IP アドレスの制限</a></li>
+      <li><a href="#security_access_ip_domains">IP およびドメインアクセス</a></li>
+      <li><a href="#security_networkaccess">組織の信頼済み IP 範囲の設定</a></li>
+      <li><a href="#security_trusted_urls_csp_directives_updated">更新された CSP ディレクティブによる組織の保護</a></li>
+      <li><a href="#security_trusted_urls_csp_violations">信頼済み URL およびブラウザーポリシー違反の管理</a></li>
+      <li><a href="#security_trusted_urls_external_redirections_orgs">リダイレクトを許可する組織間 URL の特定</a></li>
+      <li><a href="#security_trusted_urls_external_redirections_secure">Salesforce のハイパーリンクからの外部リダイレクトの保護</a></li>
+      <li><a href="#security_trusted_urls_external_redirections_specify">リダイレクトの信頼済み URL の指定</a></li>
+      <li><a href="#security_trusted_urls_external_redirections_test">外部リダイレクトのテスト</a></li>
+      <li><a href="#security_trusted_urls_external_redirections_understand">Salesforce での外部リダイレクトの制限</a></li>
+      <li><a href="#security_trusted_urls_manage">信頼済み URL の管理</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>ネットワーク・IP制限・信頼済みURL</h1>
+      <div class="meta">Salesforce セキュリティ（組織を保護する）ヘルプ · 12 記事 · 生成 2026-08-13</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="named_credentials.html">&larr; 指定ログイン情報 / 外部認証情報</a><a href="browser_session.html">ブラウザ・セッション・クリックジャック &rarr;</a></div>
+<section class="article" id="configuring_remoteproxy">
+<h1 class="slds-text-heading_large">リモートサイトの設定</h1>
+  <p>リモートサイトの設定を定義します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic と Lightning Experience の両方</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><p>使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、<strong>Developer</strong> Edition、および <strong>Database.com</strong> Edition</p><p style="margin-bottom:0;">Visualforce および Sコントロールは、<strong>Database.com</strong> Edition では利用できません。</p></td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d37080e78" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d37080e78" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">リモート設定を定義する</td>
+
+              <td headers="d37080e78" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」または「すべてのデータの編集」</td>
+
+            </tr>
+          </tbody></table><p id="configuring_remoteproxy__why_ajax_proxy"><a name="configuring_remoteproxy__why_ajax_proxy" href="https://help.salesforce.com/s?language=ja"></a>
+        <span id="configuring_remoteproxy__ajax_proxy_ph"><a name="configuring_remoteproxy__ajax_proxy_ph" href="https://help.salesforce.com/s?language=ja"></a>Sコントロールやカスタムボタンで XmlHttpRequest を使用して、Visualforce ページ、Apex 呼び出し、または JavaScript コードで外部サイトを呼び出せるようにするには、事前に [リモートサイトの設定] ページにそのサイトを登録しておく必要があります。登録していないと、呼び出しは失敗します。</span>
+      </p><p>ページにアクセスするには、[設定] から <samp class="parmname">[クイック検索]</samp> ボックスに<kbd>「リモートサイトの設定」</kbd>と入力し、<strong class="uicontrol">[リモートサイトの設定]</strong> を選択します。このページには、すでに登録済みのリモートサイトの一覧が表示され、リモートサイト名や URL など、各サイトの付加情報があります。</p><p id="configuring_remoteproxy__port_restrictions_p"><a name="configuring_remoteproxy__port_restrictions_p" href="https://help.salesforce.com/s?language=ja"></a>セキュリティ上の理由から、Salesforce では、指定できる送信ポートを、次のいずれかに制限します。</p><a name="configuring_remoteproxy__port_restriction_li" href="https://help.salesforce.com/s?language=ja"></a><ul id="configuring_remoteproxy__port_restriction_li">
+        <li>80: このポートは、HTTP 接続のみを受け付けます。</li>
+
+        <li>443: このポートは、HTTPS 接続のみを受け付けます。</li>
+
+        <li>1024 ～ 65535 (1024 と 65535 も含む): これらのポートは、HTTP 接続または HTTPS 接続を受け付けます。</li>
+
+      </ul>
+<p>新しいサイトを登録する手順は、次のとおりです。</p><ol>
+        <li>
+          <span id="configuring_remoteproxy__create_new_site"><a name="configuring_remoteproxy__create_new_site" href="https://help.salesforce.com/s?language=ja"></a><strong class="uicontrol">[New Remote Site (新規リモートサイト)]</strong> をクリックします。</span>
+        </li>
+
+        <li>
+          <span id="configuring_remoteproxy__enter_site_name"><a name="configuring_remoteproxy__enter_site_name" href="https://help.salesforce.com/s?language=ja"></a><samp class="parmname">[リモートサイト名]</samp> には、分かりやすい名前を入力してください。</span>
+        </li>
+
+        <li>
+          <span id="configuring_remoteproxy__enter_url"><a name="configuring_remoteproxy__enter_url" href="https://help.salesforce.com/s?language=ja"></a>リモートサイトの URL を入力します。</span>
+        </li>
+
+        <li>ユーザーの接続が HTTP 経由か HTTPS 経由かに関係なく、リモートサイトにアクセスできるようにするには、<samp class="parmname">[プロトコルセキュリティの無効化]</samp> チェックボックスをオンにします。これがオンになっていると、Salesforce は HTTPS セッションから HTTP セッションに、またその逆方向にもデータを渡せます。このチェックボックスは、セキュリティについて理解した上でオンにしてください。</li>
+
+        <li>
+          <span id="configuring_remoteproxy__enter_description"><a name="configuring_remoteproxy__enter_description" href="https://help.salesforce.com/s?language=ja"></a>必要に応じて、サイトの説明を入力します。</span>
+        </li>
+
+        <li><strong class="uicontrol">[保存]</strong> をクリックして終了するか、<strong class="uicontrol">[保存 &amp; 新規]</strong> をクリックして作業内容を保存し、サイトの追加登録を開始します。</li>
+
+      </ol><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> 最良のパフォーマンスを得るため、リモート HTTPS 暗号化サイトで OCSP (Online Certificate Status Protocol) Stapling がオンになっていることを確認してください。</div></div></div>
+</div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="ユーザーやネットワークとのやりとりを信頼する URL を指定します。コンテンツセキュリティポリシー (CSP) ディレクティブを使用して、Lightning コンポーネント、サードパーティ API、WebSocket 接続で各信頼済み URL から読み込むことができるリソースの種別を制御します。[セッションの設定] で Permissions-Policy HTTP ヘッダーを有効にしている場合は、Salesforce からブラウザー機能にアクセスできる URL も制御できます。" href="#security_trusted_urls_manage">信頼済み URL の管理</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="login_ip_ranges">
+<h1 class="slds-text-heading_large">プロファイルでのログイン IP アドレスの制限</h1>
+  <p>ユーザーレベルでログインアクセスを制御するには、ユーザーのプロファイルで許可される IP アドレスの範囲を指定します。プロファイルに IP アドレス制限を定義すると、その他のすべての IP アドレスからのログインは拒否されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic および Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: すべてのエディション</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d36672e57" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d36672e57" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">ログイン IP アドレスの制限を参照する</td>
+
+              <td headers="d36672e57" style="vertical-align:top;" class="slds-cell-wrap">「設定・定義の参照」</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d36672e57" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">ログイン IP アドレス範囲の制限を編集および削除する</td>
+
+              <td headers="d36672e57" style="vertical-align:top;" class="slds-cell-wrap">「プロファイルと権限セットの管理」</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>Salesforce エディションによって、プロファイルに有効な IP アドレス範囲を制限する方法が異なります。</p><ul>
+        <li>Enterprise Edition、Performance Edition、Unlimited Edition、または Developer Edition では、プロファイルで有効な IP アドレスを管理します。</li>
+
+        <li>Group Edition または Personal Edition では、[設定] から、[セッションの設定] ページで有効な IP アドレスを管理します。</li>
+
+        <li>Professional Edition では、IP 範囲の場所は「プロファイルとページレイアウトの編集」がアドオン機能として有効になっているかどうかによって異なります。この機能を使用すると、個々のプロファイルのログイン IP アドレスの範囲を指定できます。「プロファイルとページレイアウトの編集」機能を使用しない場合、信頼済み IP 範囲は [ネットワークアクセスの設定] ページで組織レベルでのみ定義できます。</li>
+
+      </ul>
+<p>また、これらのログイン制限は Experience Delivery でホストされるサイトには適用されません。代わりに、エクスペリエンス配信でホストされるサイトの有効な IP アドレスを<a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.community_builder_cdn_custom_firewall_rules.htm&amp;language=ja&amp;type=5">カスタムファイアウォールルール式</a>で管理します。</p><p>Winter '26 以降、Salesforce では特定のプロファイルのログイン IP アドレスの制限が適用されます。この制限は、IP アドレス種別 (IPv4 または IPv6) によって異なります。 IP 範囲種別の制限を超えるログイン IP アドレス範囲を追加することはできません。この変更の前に信頼済み IP 範囲がすでに制限を超えている場合、Salesforce は、ユーザーがプロファイルのログイン IP 範囲内であってもデバイスの有効化を要求できます。ユーザーが範囲外の場合、Salesforce はログインを完全にブロックします。詳細については、「<a title="普段見かけないログイン試行に追加の検証を追加することで、デバイスの有効化は、組織や Experience Cloud サイトのセキュリティを維持します。" href="overview_misc.html#security_overview_identity_verification">デバイスの有効化</a>」を参照してください。</p><p>IPv4 アドレスと IPv6 アドレスの制限を次に示します。IPv4 マッピング IPv6 アドレスを使用する場合、IPv4 制限が適用されます。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d36672e128" style="vertical-align:top;" class="slds-cell-wrap" scope="col">IP アドレス種別</th>
+              <th id="d36672e131" style="vertical-align:top;" class="slds-cell-wrap" scope="col">制限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d36672e128" style="vertical-align:top;" class="slds-cell-wrap" data-label="IP アドレス種別">IPv4</td>
+
+              <td headers="d36672e131" style="vertical-align:top;" class="slds-cell-wrap" data-label="制限">16,777,216</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d36672e128" style="vertical-align:top;" class="slds-cell-wrap" data-label="IP アドレス種別">IPv6</td>
+
+              <td headers="d36672e131" style="vertical-align:top;" class="slds-cell-wrap" data-label="制限">2^99 (2 の 99 乗)</td>
+
+            </tr>
+          </tbody></table><p>IP アドレスの合計数を計算する場合、Salesforce は<code>10.0.0.0</code>から<code>10.255.255.255</code>までのプライベート IP アドレスを考慮しません。プライベート IP アドレスの詳細については、Internet Engineering Task Force の <a target="_blank" href="https://datatracker.ietf.org/doc/html/rfc1918#section-3">RFC 1918</a> を参照してください。プライベート IP アドレスを除外するには、個別の範囲エントリとして追加します。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Spring '26 より前にすでに制限を超えている場合、非公開 IP 範囲を含めるように範囲を編集することはできません。</div></div></div>
+</div>
+  
+  <div id="add_profile_ip_restrictions" aria-labelledby="ariaid-title2" class="nested1"><a name="add_profile_ip_restrictions" href="https://help.salesforce.com/s?language=ja"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">プロファイルでのログイン IP アドレスの制限</h2>
+    
+    <p>IP 範囲に基づいてユーザーログインを制限するには、プロファイルごとに少なくとも 1 つの許可 IP アドレス範囲を指定します。プロファイルに 1 つ以上のログイン IP アドレス範囲が存在する場合、他の IP アドレスからのログインは拒否されます。</p>
+
+      <ol><li>
+          <span>[設定] の [クイック検索] ボックスに<kbd>「プロファイル」</kbd>と入力し、<strong class="uicontrol">[プロファイル]</strong> を選択します。</span>
+        </li><li>
+          <span>このプロファイルの IP アドレスを制限するには、許可される IP 範囲を追加します。</span>
+          <ol>
+            <li>
+              <span>許可される IP 範囲を追加します。</span>
+              <div>
+                <ul>
+                  <li>拡張プロファイルユーザーインターフェースで <strong class="uicontrol">[ログイン IP アドレスの制限]</strong> をクリックして、<strong class="uicontrol">[IP 範囲の追加]</strong> をクリックします。</li>
+
+                  <li>元のプロファイルユーザーインターフェースで [ログイン IP アドレスの制限] 関連リストまで下にスクロールし、<strong class="uicontrol">[新規]</strong> をクリックします。</li>
+
+                </ul>
+
+                <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> パートナーユーザープロファイルの IP アドレスは 5 個に制限されています。この制限を緩和するには、Salesforce にお問い合わせください。</div></div></div>
+
+              </div>
+            </li>
+
+            <li>
+              <span>プロファイルで許可されるログイン IP アドレスを指定します。</span>
+              <div>
+                <p>有効な IP アドレスを [<samp class="parmname">IP 開始アドレス</samp>] フィールドに入力し、それと同等以上の番号の IP アドレスを [<samp class="parmname">IP 終了アドレス</samp>] フィールドに入力します。</p>
+                <p>1 つの IP アドレスからのログインを許可するには、両方の項目に同じアドレスを入力します。</p>
+                <p>範囲には、IPv4、IPv4 マッピング IPv6 アドレス、または IPv6 アドレスを含めることができます。IP アドレス範囲に複数のアドレス種別を含めることはできません。たとえば、<code>255.255.255.255</code> から <code>::1:0:0:0</code>、<code>::</code> から <code>::1:0:0:0</code> などの範囲は許可されません。</p>
+                <ul>
+                  <li>IPv4 アドレスの範囲は <code>0.0.0.0</code> ~ <code>255.255.255.255</code> です。</li>
+
+                  <li>公開されている IPv6 アドレスの範囲は、<code>::1:0:0:0</code> から <code>ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff</code> です。</li>
+
+                  <li>IPv4 マッピング IPv6 アドレスを使用すると、IPv6 対応アプリケーションは IPv4 専用デバイスと通信できます。この設定を行うには、IPv4 アドレスが IPv6 アドレス形式に埋め込まれます。これらのアドレスは、Salesforce ユーザーインターフェースおよび API では IPv4 アドレスとして表されます。<p>IPv4 マッピング IPv6 アドレスの構文は <code>::ffff:a.b.c.d</code> です。ここで、 <code>a.b.c.d</code> は IPv4 アドレスの 10 進数表現です。たとえば、<code>192.0.2.128</code> の IPv4 マッピング IPv6 アドレスは <code>::ffff:192.0.2.128</code> です。そのため、IPv4 マッピング IPv6 アドレスの範囲は <code>::ffff:0.0.0.0</code> から <code>::ffff:255.255.255.255</code> になります。</p></li>
+
+                </ul>
+
+                <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> ユーザーアクセスの問題を回避するには、IPv4 アドレスを含むログイン IP アドレス範囲が少なくとも 1 つあるプロファイルにのみ IPv6 アドレスを含むログイン IP アドレス範囲を追加します。 </div></div></div>
+
+              </div>
+            </li>
+
+            <li>
+              <span>必要に応じて、範囲の説明を入力します。</span>
+              <div>複数の範囲を管理する場合、説明項目を使用して、ネットワークのどの部分がこの範囲に対応するかなど、詳細を入力します。</div>
+            </li>
+
+            <li>
+              <span>このプロファイルを持つユーザーがより多くの IP アドレスからログインできるようにするには、別の範囲を追加します。</span>
+            </li>
+
+            <li>
+              <span>変更内容を保存します。</span>
+            </li>
+
+          </ol>
+        </li><li>
+          <span>ログイン IP アドレス範囲を削除するには、<strong class="uicontrol">［Delete］</strong> をクリックします。</span>
+          <div>ユーザーのグループが任意の IP アドレスからログインできるようにするには、ユーザーのプロファイルのすべてのログイン IP アドレス範囲を削除します。</div>
+        </li></ol>
+
+      <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 静的リソースのキャッシュ設定は、IP 範囲またはログイン時間に基づく制限があるゲストユーザープロファイルを使用して Salesforce サイトからアクセスすると、非公開に設定されます。ゲストユーザープロファイル制限のあるサイトでは、ブラウザー内でのみ静的リソースをキャッシュします。また、以前は無制限であったサイトに制限が設定されると、Salesforce キャッシュおよび中間キャッシュから静的リソースが解放されるまでに最大 45 日かかる場合があります。</div></div></div>
+</div>
+    
+  </div>
+
+  <div id="remove_profile_ip_restrictions" aria-labelledby="ariaid-title3" class="nested1"><a name="remove_profile_ip_restrictions" href="https://help.salesforce.com/s?language=ja"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">ページ要求へのプロファイルログイン IP 制限の適用</h2>
+    
+      <div><p>プロファイルログイン IP アドレス範囲を使用して、Salesforce へのアクセスをさらに制限できます。このオプションを使用すると、これらのログイン IP アドレスの制限が、クライアントアプリケーションからの要求を含む各ページ要求に適用されます。それ以外の場合、ログイン IP アドレスの制限はユーザーがログインしたときにのみ適用されます。</p></div>
+      <ol><li>
+          <span>[設定] の [クイック検索] ボックスに「<kbd>セッション設定」</kbd>と入力し、[<strong class="uicontrol">セッション設定]</strong> を選択します。</span>
+        </li><li>
+          <span>[<strong class="uicontrol">Enforce login IP ranges</strong> on every request (すべての要求でログイン IP アドレスの制限を適用)] を選択し、変更を保存します。</span>
+          <div>この設定は、ログイン IP アドレスが制限されているユーザープロファイルにのみ影響します。</div>
+        </li></ol>
+
+    
+  </div>
+
+  <div id="ipv6_prepare_profiles" aria-labelledby="ariaid-title4" class="nested1"><a name="ipv6_prepare_profiles" href="https://help.salesforce.com/s?language=ja"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">プロファイルログイン IP アドレスの制限に対する IPv6 サポートの準備</h2>
+    
+    <p>現在、IPv6 は Experience Cloud サイトの Salesforce コンテンツ配信ネットワーク (CDN) でのみサポートされています。ただし、Salesforce は IPv6 を完全にサポートするためにバックグラウンドで作業しています。IPv6 を完全にサポートするための具体的な目標日はありません。Salesforce では、IPv6 サポートを段階的にロールアウトする予定です。各フェーズの具体的なタイミングに関する発表については、リリースノートを参照してください。</p>
+
+      <div><p>Salesforce で組織の IPv6 がサポートされている場合、IPv4 許可リストは有効なままになり、ユーザーはプロファイルで許可されている IPv4 または IPv6 アドレスを介してのみログインできます。ユーザーのアクセスが中断されないようにするには、IPv4 アドレスを含むログイン IP アドレス範囲を持つプロファイルごとに、それらのユーザーの IPv6 アドレスを含む 1 つ以上のログイン IP アドレス範囲を追加します。</p><p>IPv6 許可リストをプロファイルに追加するときの考慮事項を次に示します。</p><ul>
+          <li>プロファイルにログイン IP アドレス範囲が存在しない場合、そのプロファイルを持つユーザーは任意の IP アドレスから Salesforce にログインできます。プロファイルログインの IP アドレス範囲は必須ではありません。ただし、1 つ以上のログイン IP アドレス範囲を持つプロファイルでは、IPv6 の更新が必要になる場合があります。</li>
+
+          <li>現在、IPv6 アドレスを使用してログイン IP アドレス範囲を追加できますが、これらのアドレスを使用したログインは、Salesforce で IPv6 がサポートされている場合にのみ許可されます。</li>
+
+          <li>IPv6 アドレスと IPv4 アドレスの間には相関関係はありません。ユーザーの IPv6 アドレスを確認するには、ネットワークチームと協力します。</li>
+
+          <li>Salesforce で IPv6 が完全にサポートされるまで、プロファイルにログイン IP アドレスの制限が含まれている場合は、プロファイルに少なくとも 1 つの IPv4 範囲が存在することを確認します。プロファイルに 1 つ以上のログイン IP アドレス範囲が存在する場合、他の IP アドレスからのログインは拒否されます。そのため、プロファイルのログイン IP アドレス範囲に IPv6 アドレスのみが含まれている場合、そのプロファイルを持つユーザーは、ユーザーがアクセスしている機能で IPv6 が組織でサポートされるまで Salesforce にアクセスできません。</li>
+
+        </ul>
+<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span>  Hyperforce で IP 許可リストを使用する場合は、mTLS の実装やドメインの許可など、<a target="_blank" href="https://help.salesforce.com/s/articleView?id=000394078&amp;language=ja&amp;type=1">推奨の代替</a>策を検討してください。</div></div></div>
+</div>
+    
+  <div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="必要なドメインをネットワーク許可リストに追加し、Salesforce で IP 許可リストを設定します。" href="#security_access_ip_domains">IP およびドメインアクセス</a></li><li><a title="Salesforce データを不正アクセスから保護するには、ユーザーが ID 検証チャレンジを受けることなくログインできる IP アドレスのリストを指定します。" href="#security_networkaccess">組織の信頼済み IP 範囲の設定</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.login_hours.htm&amp;language=ja&amp;type=5">プロファイルでのログイン時間帯の制限の表示と編集</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.users_profiles_using_enhanced_ui.htm&amp;language=ja&amp;type=5">プロファイルでのデフォルト設定の定義</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=000394078&amp;language=ja&amp;type=1">Knowledge Article: Preferred Alternatives to IP Allowlisting on Hyperforce (Hyperforce での IP 許可リストへの推奨の代替方法)</a></li></ul></div>
+</div>
+
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="security_access_ip_domains">
+<h1 class="slds-text-heading_large">IP およびドメインアクセス</h1>
+  <p>必要なドメインをネットワーク許可リストに追加し、Salesforce で IP 許可リストを設定します。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="overview_misc.html#setup_domains">必要なドメインを許可</a></strong><br>ユーザーが Salesforce にアクセスできるようにするには、標準 Salesforce ドメインを許可済みドメインのリストに追加する必要があります。</li><li class="slds-p-bottom_small"><strong><a href="#security_networkaccess">組織の信頼済み IP 範囲の設定</a></strong><br>Salesforce データを不正アクセスから保護するには、ユーザーが ID 検証チャレンジを受けることなくログインできる IP アドレスのリストを指定します。</li><li class="slds-p-bottom_small"><strong><a href="#login_ip_ranges">プロファイルでのログイン IP アドレスの制限</a></strong><br>ユーザーレベルでログインアクセスを制御するには、ユーザーのプロファイルで許可される IP アドレスの範囲を指定します。プロファイルに IP アドレス制限を定義すると、その他のすべての IP アドレスからのログインは拒否されます。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="security_networkaccess">
+<h1 class="slds-text-heading_large">組織の信頼済み IP 範囲の設定</h1>
+  <p>Salesforce データを不正アクセスから保護するには、ユーザーが ID 検証チャレンジを受けることなくログインできる IP アドレスのリストを指定します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic および Lightning Experience の両方</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: すべてのエディション</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d25197e57" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d25197e57" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">ネットワークアクセスを変更する</td>
+
+              <td headers="d25197e57" style="vertical-align:top;" class="slds-cell-wrap">「IP アドレスの管理」</td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 
+        <p>Hyperforce で IP 許可リストを使用する場合は、mTLS の実装やドメインの許可など、<a target="_blank" href="https://help.salesforce.com/s/articleView?id=000394078&amp;language=ja&amp;type=1">推奨の代替</a>策を検討してください。</p>
+      </div></div></div>
+</div>
+    <div><p>信頼済み IP アドレス範囲では、ユーザーが信頼できない IP アドレスからログインしようとすると、Salesforce は ID の検証を要求します。</p><p>Winter '26 以降、Salesforce では信頼済み IP 範囲の制限が適用されます。この制限を超える IP 範囲は追加できません。この変更の前に信頼済み IP アドレス範囲がすでに制限を超えている場合、Salesforce はユーザーが組織の範囲内であってもデバイスの有効化を要求できます。詳細については、「<a title="普段見かけないログイン試行に追加の検証を追加することで、デバイスの有効化は、組織や Experience Cloud サイトのセキュリティを維持します。" href="overview_misc.html#security_overview_identity_verification">デバイスの有効化</a>」を参照してください。</p><p>IPv4 アドレスと IPv6 アドレスの制限を次に示します。IPv4 マッピング IPv6 アドレスを使用する場合、IPv4 制限が適用されます。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> これらの制限は、<a title="ユーザーレベルでログインアクセスを制御するには、ユーザーのプロファイルで許可される IP アドレスの範囲を指定します。プロファイルに IP アドレス制限を定義すると、その他のすべての IP アドレスからのログインは拒否されます。" href="#login_ip_ranges">Restrict Login IP Addresses in Profiles</a> にも適用されます。</div></div></div>
+<table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d25197e121" style="vertical-align:top;" class="slds-cell-wrap" scope="col">IP アドレス種別</th>
+              <th id="d25197e124" style="vertical-align:top;" class="slds-cell-wrap" scope="col">制限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d25197e121" style="vertical-align:top;" class="slds-cell-wrap" data-label="IP アドレス種別">IPv4</td>
+
+              <td headers="d25197e124" style="vertical-align:top;" class="slds-cell-wrap" data-label="制限">16,777,216</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d25197e121" style="vertical-align:top;" class="slds-cell-wrap" data-label="IP アドレス種別">IPv6</td>
+
+              <td headers="d25197e124" style="vertical-align:top;" class="slds-cell-wrap" data-label="制限">2^99 (2 の 99 乗)</td>
+
+            </tr>
+          </tbody></table><p>IP アドレスの合計数を計算する場合、Salesforce は<code>10.0.0.0</code>から<code>10.255.255.255</code>までのプライベート IP アドレスを考慮しません。プライベート IP アドレスの詳細については、Internet Engineering Task Force の <a target="_blank" href="https://datatracker.ietf.org/doc/html/rfc1918#section-3">RFC 1918</a> を参照してください。プライベート IP アドレスを除外するには、個別の範囲エントリとして追加します。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Spring '26 より前にすでに制限を超えている場合、非公開 IP 範囲を含めるように範囲を編集することはできません。</div></div></div>
+<p>ユーザーの ID を検証するために、Salesforce は使用可能な最も優先度の高い ID 検証方法を使用します。Salesforce が検証方法に従う順序を次に示します。</p><ol>
+        <li>ユーザーアカウントに登録された組み込み Authenticator (Touch ID や Windows Hello など)</li>
+
+        <li>ユーザーのアカウントに登録された U2F セキュリティキー</li>
+
+        <li>ユーザーのアカウントに接続された Salesforce Authenticator モバイルアプリケーションによるプッシュ通知またはロケーションベースの自動検証</li>
+
+        <li>ユーザーのアカウントに接続されたモバイル認証アプリケーションによって生成される時間ベースのワンタイムパスワード (TOTP) (Google Authenticator™ など)</li>
+
+        <li>ユーザーの検証済みモバイルデバイスに SMS で送信されるワンタイムパスワード (OTP)</li>
+
+        <li>ユーザーの登録済みメールアドレスにメールで送信される OTP</li>
+
+      </ol></div>
+  
+  <div id="trustedip_ranges_manage" aria-labelledby="ariaid-title2" class="nested1"><a name="trustedip_ranges_manage" href="https://help.salesforce.com/s?language=ja"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">信頼済み IP 範囲の管理</h2>
+    
+      <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 信頼済み IP 範囲外のユーザーは引き続き組織にログインできます。通常、ユーザーはモバイルデバイスまたはメールアドレスに送信されるコードを入力することで、ログインチャレンジを完了できます。<p>ユーザーが信頼できない IP アドレスから Salesforce にログインできないようにするには、プロファイルレベルでユーザーに許可する IP 範囲を指定します。プロファイルに IP アドレス制限を定義すると、その他のすべての IP アドレスからのログインは拒否されます。「<a title="ユーザーレベルでログインアクセスを制御するには、ユーザーのプロファイルで許可される IP アドレスの範囲を指定します。プロファイルに IP アドレス制限を定義すると、その他のすべての IP アドレスからのログインは拒否されます。" href="#login_ip_ranges">プロファイルのログイン IP</a> アドレスの制限」を参照してください。</p></div></div></div>
+</div>
+      <ol><li>
+          <span>[設定] の [クイック検索] ボックスに<kbd>「ネットワークアクセス」</kbd>と入力し、<strong class="uicontrol">[ネットワークアクセス]</strong> を選択します。</span>
+          <div>2007 年 12 月に Salesforce でこの機能が導入される前に組織が有効化されていた場合、この機能が導入された 2007 年 12 月に組織の信頼済み IP アドレスリストが入力されます。このプロセスでは、信頼済みユーザーが過去 6 か月間にすでに Salesforce にアクセスしていた IP アドレスが追加されます。</div>
+        </li><li>
+          <span><strong class="uicontrol">[新規]</strong> をクリックします。</span>
+        </li><li>
+          <span>有効な IP アドレスを [<samp class="parmname">Start IP Address</samp>] フィールドに入力し、それより上位の有効な IP アドレスを [<samp class="parmname">End IP Address</samp>] フィールドに入力します。</span>
+          <div>
+            <p>開始アドレスと終了アドレスで、ユーザーのログインを許可する IP アドレスの範囲 (開始値と終了値を含む) を定義します。1 つの IP アドレスからのログインを許可するには、両方の項目に同じアドレスを入力します。</p>
+            <p>範囲には、IPv4、IPv4 マッピング IPv6 アドレス、または IPv6 アドレスを含めることができます。IP アドレス範囲に複数のアドレス種別を含めることはできません。たとえば、<code>255.255.255.255</code> から <code>::1:0:0:0</code>、<code>::</code> から <code>::1:0:0:0</code> などの範囲は許可されません。</p>
+          </div>
+          <ul>
+            <li>IPv4 アドレスの範囲は <code>0.0.0.0</code> ~ <code>255.255.255.255</code> です。</li>
+
+            <li>公開されている IPv6 アドレスの範囲は、<code>::1:0:0:0</code> から <code>ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff</code> です。</li>
+
+            <li>IPv4 マッピング IPv6 アドレスを使用すると、IPv6 対応アプリケーションは IPv4 専用デバイスと通信できます。このために、IPv4 アドレスは IPv6 アドレス形式に埋め込まれます。これらのアドレスは、Salesforce ユーザーインターフェースおよび API では IPv4 アドレスとして表されます。<p>IPv4 マッピング IPv6 アドレスの構文は <code>::ffff:a.b.c.d</code> です。ここで、 <code>a.b.c.d</code> は IPv4 アドレスの 10 進数表現です。たとえば、<code>192.0.2.128</code> の IPv4 マッピング IPv6 アドレスは <code>::ffff:192.0.2.128</code> です。そのため、IPv4 マッピング IPv6 アドレスの範囲は <code>::ffff:0.0.0.0</code> から <code>::ffff:255.255.255.255</code> になります。</p></li>
+
+          </ul>
+
+        </li><li>
+          <span>必要に応じて、範囲の説明を入力します。たとえば、複数の範囲を管理している場合、ネットワークのこの範囲に対応する部分の詳細を入力します。</span>
+        </li><li>
+          <span>変更内容を保存します。</span>
+        </li><li>
+          <span>[信頼済み IP] 範囲を削除するには、[削除] <strong class="uicontrol">を</strong>クリックします。</span>
+          <div>[ネットワークアクセスの設定] ページからすべての信頼済み IP 範囲を削除すると、組織にアクセスできるすべてのユーザーにデバイスの有効化要求が送信されます。</div>
+        </li></ol>
+
+      <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> Warren は、機密度の高い顧客データを処理するビジネスの IT システムスペシャリストです。セキュリティセンターアプリケーションを使用して、複数の Salesforce テナントのセキュリティ体制を監視します。Warren は、セキュリティセンターアプリケーションから信頼済み IP 範囲を定義し、選択した組織にリリースできます。詳細は、<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.security_center_deploy_policies.htm&amp;language=ja&amp;type=5">「セキュリティポリシーの定義とリリース」</a>を参照してください。</div></div></div>
+    
+  <div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="必要なドメインをネットワーク許可リストに追加し、Salesforce で IP 許可リストを設定します。" href="#security_access_ip_domains">IP およびドメインアクセス</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=000394078&amp;language=ja&amp;type=1">Knowledge Article: Preferred Alternatives to IP Allowlisting on Hyperforce (Hyperforce での IP 許可リストへの推奨の代替方法)</a></li></ul></div>
+</div>
+
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="security_trusted_urls_csp_directives_updated">
+<h1 class="slds-text-heading_large">更新された CSP ディレクティブによる組織の保護</h1>
+  
+  <p>クロスサイトスクリプティングやその他のコードインジェクション攻撃から組織を保護するために、SalesforceはSummer '24でLightningページに配信されるコンテンツセキュリティポリシー(CSP)ディレクティブを更新しました。 本番組織が2024年6月より前に作成されている場合は、最新のディレクティブを採用する設定を有効にしてください。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d124767e71" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d124767e71" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">セキュリティ設定を変更する</td>
+
+              <td headers="d124767e71" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d124767e71" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">CSP 違反イベント種別オブジェクトにアクセスする</td>
+
+              <td headers="d124767e71" style="vertical-align:top;" class="slds-cell-wrap"><p>「イベントログファイルを参照」および「API の有効化」</p><p>または</p><p style="margin-bottom:0;">「すべてのデータの参照」</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d124767e71" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">信頼済み URL を作成、参照、更新、削除する</td>
+
+              <td headers="d124767e71" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」および「すべてのデータの編集」</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-error"><img alt="警告" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_warning.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">警告</span> 本番でこの設定を有効にする前に、Sandbox でこの変更をテストすることを強くお勧めします。</div></div></div>
+<p>更新された CSP ディレクティブにより、外部でホストされるフォントや画像が Lightning ページに読み込まれなくなる可能性があります。この変更により、Lightning ページの iframe 内に外部 Web サイトを読み込むこともできなくなります。</p><p>この変更はすべてのお客様に影響する可能性がありますが、[私のドメイン] のログイン URL が <samp class="filepath">.my-salesforce.com</samp> で終わる組織と Government Cloud — Defense 組織で最も大きな影響を及ぼす可能性があります。</p></div>
+    <ol><li>
+        <span>この変更でブロックされたリソース要求を確認するには、CSP 違反イベント種別オブジェクトを使用します。</span>
+        <div>
+          <p>このイベント種別では、CSP 設定に基づいて、ブロックされたリソースとブロックされる可能性のあるリソースがすべて取得されます。この変更の影響を受けるリソース要求のイベントログの <samp class="parmname">DISPOSITION</samp> は <code>report</code> です。<cite>『Salesforce プラットフォームのオブジェクトリファレンス』</cite>の<a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.object_reference.meta/object_reference/sforce_api_objects_eventlogfile_cspviolation.htm">「CSP 違反イベント種別」</a>を参照してください。</p>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> CSP 違反イベントはすべてのお客様が無料で使用でき、データは 24 時間保持されます。このイベントは API で使用できますが、Event Monitoring Analytics アプリケーションでは使用できません。複数日の CSP 違反の詳細を収集するには、REST API を使用して [ブロックされたリダイレクト] イベント種別の日次クエリをスケジュールします。</div></div></div>
+
+        </div>
+      </li><li>
+        <span>新しい CSP ディレクティブを有効にします。</span>
+        <div>Summer '24 以降で作成された組織では、この設定はデフォルトで有効になっています。</div>
+        <ol>
+          <li>
+            <span>[設定] で、[クイック検索] ボックスに<kbd>「セッションの設定」</kbd>と入力して、<strong class="uicontrol">[セッションの設定]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[<strong class="uicontrol">Adopt updated CSP directives</strong> (更新された CSP ディレクティブを採用)] を選択し、変更を保存します。</span>
+          </li>
+
+        </ol>
+        <div>この設定は、組織の信頼済み URL や関連する CSP ディレクティブには影響しません。変更は、配信された Salesforce コード内で行われます。</div>
+      </li><li>
+        <span>Lightningページの問題を修正するには、信頼済みURLを更新します。<a title="ユーザーやネットワークとのやりとりを信頼する URL を指定します。コンテンツセキュリティポリシー (CSP) ディレクティブを使用して、Lightning コンポーネント、サードパーティ API、WebSocket 接続で各信頼済み URL から読み込むことができるリソースの種別を制御します。[セッションの設定] で Permissions-Policy HTTP ヘッダーを有効にしている場合は、Salesforce からブラウザー機能にアクセスできる URL も制御できます。" href="#security_trusted_urls_manage">「信頼済み URL の管理」</a>を参照してください。</span>
+        <ol>
+          <li>
+            <span>ブロックされた画像を許可するには、信頼済み URL を追加または更新し、img-src (画像) CSP ディレクティブを有効にします。</span>
+          </li>
+
+          <li>
+            <span>ブロックされたフロントを許可するには、信頼済み URL を追加または更新し、font-src (fonts) CSP ディレクティブを有効にします。</span>
+          </li>
+
+          <li>
+            <span>外部 Web サイトのフレーム化を許可するには、[信頼済み URL] を追加または更新し、frame-src (iframe content) CSP ディレクティブを有効にします。</span>
+          </li>
+
+        </ol>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="ユーザーを保護するために、2 つの許可リストで Salesforce のリソースを読み込むための Trust URL とリダイレクト用の Trust URL を指定します。ブロックされたリダイレクトと、コンテンツセキュリティポリシー (CSP) ディレクティブでブロックされたリソース要求を確認します。次に、必要なリソースを許可するために、信頼済み URL を更新します。" href="#security_trusted_urls_csp_violations">信頼済み URL およびブラウザーポリシー違反の管理</a></li><li><a title="ユーザーやネットワークとのやりとりを信頼する URL を指定します。コンテンツセキュリティポリシー (CSP) ディレクティブを使用して、Lightning コンポーネント、サードパーティ API、WebSocket 接続で各信頼済み URL から読み込むことができるリソースの種別を制御します。[セッションの設定] で Permissions-Policy HTTP ヘッダーを有効にしている場合は、Salesforce からブラウザー機能にアクセスできる URL も制御できます。" href="#security_trusted_urls_manage">信頼済み URL の管理</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="security_trusted_urls_csp_violations">
+<h1 class="slds-text-heading_large">信頼済み URL およびブラウザーポリシー違反の管理</h1>
+  <p>ユーザーを保護するために、2 つの許可リストで Salesforce のリソースを読み込むための Trust URL とリダイレクト用の Trust URL を指定します。ブロックされたリダイレクトと、コンテンツセキュリティポリシー (CSP) ディレクティブでブロックされたリソース要求を確認します。次に、必要なリソースを許可するために、信頼済み URL を更新します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic および Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Developer</strong> Edition、および <strong>Unlimited</strong> Edition</td>
+</tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d35322e68" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+          </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d35322e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">信頼済み URL およびブラウザーポリシー違反を表示、絞り込み、削除する</td>
+
+              <td headers="d35322e68" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」および「すべてのデータの編集」</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d35322e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">信頼済み URL を作成、参照、更新、削除する</td>
+
+              <td headers="d35322e68" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」および「すべてのデータの編集」</td>
+</tr>
+            <tr class="">
+              <td headers="d35322e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">セッション設定を編集する</td>
+
+              <td headers="d35322e68" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d35322e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">ブロックされたリダイレクトまたは CSP 違反イベント種別オブジェクトにアクセスします。</td>
+
+              <td headers="d35322e68" style="vertical-align:top;" class="slds-cell-wrap"><p>「イベントログファイルを参照」および「API の有効化」</p><p>または</p><p style="margin-bottom:0;">「すべてのデータの参照」</p></td>
+
+            </tr>
+          </tbody></table></div>
+  
+  <div id="task_wts_sp5_wdc" aria-labelledby="ariaid-title2" class="nested1"><a name="task_wts_sp5_wdc"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">信頼済み URL およびブラウザーポリシー違反リストの操作</h2>
+    
+    <p>ブロックされたリダイレクトと CSP 違反を管理するには、[設定] の [信頼済み URL とブラウザーポリシー違反リスト] を使用します。</p>
+
+      <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> パフォーマンスを維持するために、組織が短期間に大量の CSP 違反またはブロックされたリダイレクトを生成した場合、それらのイベントの一部が [信頼済み URL とブラウザーポリシー違反の管理] リストで取得できない可能性があります。</div></div></div>
+</div>
+      <ol><li>
+          <span>[設定] で、<strong class="uicontrol">[信頼済み URL とブラウザーポリシー違反]</strong> を見つけて選択します。</span>
+          <div>
+            <p>[信頼済み URL およびブラウザーポリシー違反] リストには、過去 7 日間に発生した一意の違反ごとにエントリが含まれます。たとえば、Salesforce が https://www.example.com へのリダイレクトをブロックし、その後 Salesforce が https://www.example.com を iframe に読み込む試みをブロックして記録した場合、それらのイベントはそれぞれリストに 1 つのエントリを取得します。ただし、ユーザーを https://www.example.com にリダイレクトする試行は 1 回のみ違反として記録されます。</p>
+            <div style="text-align:left;">
+              <img alt="違反リストと違反例。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/security/images/session/trusted_urls_violations_list.png" style="width:800px;">
+            </div>
+            <p>リストには次の列が含まれます。</p>
+            <dl>
+              
+                <dt id="task_wts_sp5_wdc__untrusted-url-column" style="font-weight:bold;padding-top:.25rem;"><a name="task_wts_sp5_wdc__untrusted-url-column"></a>信頼できない URL</dt>
+
+                <dd style="padding-left:1.5rem;padding-bottom:.5rem;">要求に関連付けられた URL。ブロックされたリダイレクトの場合、この項目にはパスが含まれます。たとえば、<code>https://downloads.example.com/42AX58Q91.pdf</code> です。CSP 違反の場合、パスは含まれません。たとえば、要求されたリソース (URL <samp class="filepath">https://www.example.com/images/image1.png</samp> の画像) がブロックされる場合、[CSP 違反] リストの URL は <samp class="filepath">https://www.example.com</samp> になります。</dd>
+              
+              
+                <dt id="task_wts_sp5_wdc__violation-type-column" style="font-weight:bold;padding-top:.25rem;"><a name="task_wts_sp5_wdc__violation-type-column"></a>違反種別</dt>
+
+                <dd style="padding-left:1.5rem;padding-bottom:.5rem;">列名: 違反種別。違反種別。可能な値は次のとおりです。<ul style="margin-bottom:0;">
+                    <li>ブロックされたリダイレクト — ブロックされた URL が [信頼されたリダイレクトの URL] 許可リストにないため、この URL へのリダイレクトが少なくとも 1 つブロックされました。</li>
+
+                    <li>img-src (image) — 信頼できない URL が img-src CSP ディレクティブの [信頼済み URL] 許可リストにないため、URL から画像ファイルを読み込む要求が少なくとも 1 つブロックされました。</li>
+
+                    <li>font-src (fonts) — 信頼できない URL が font-src CSP ディレクティブの [信頼済み URL] 許可リストにないため、URL からフォントを読み込む要求が少なくとも 1 つブロックされました。</li>
+
+                    <li>frame-src (iframe content) — 信頼できない URL が frame-src CSP ディレクティブの [信頼済み URL] 許可リストにないため、URL から作成された iframe にコンテンツを読み込む要求が少なくとも 1 つブロックされました。</li>
+
+                    <li>不正な形式の URL — 対象 URL が構文チェックに失敗したため、この URL へのリダイレクトが少なくとも 1 つブロックされました。構文チェックに失敗する不正な形式の URL の例としては、<samp class="filepath">https://malformed^url.example.com</samp> や <samp class="filepath">https://mydomain.lightning.force.com/$test61'3</samp> などがあります。</li>
+
+                  </ul>
+                </dd>
+              
+              
+                <dt id="task_wts_sp5_wdc__csp-context-column" style="font-weight:bold;padding-top:.25rem;"><a name="task_wts_sp5_wdc__csp-context-column"></a>CSP コンテキスト</dt>
+
+                <dd style="padding-left:1.5rem;padding-bottom:.5rem;">要求の CSP コンテキスト。コンテキストにより、この信頼済み URL からコンテンツを読み込むことができるページが制御されます。<p style="margin-bottom:0;">リストの CSP 違反は常に Lightning Experience ページに関連します。これらの違反の CSP コンテキストは <code>Lightning</code> です。ブロックされたリダイレクトの場合、CSP コンテキストは常に [<code>Not Applicable</code>] になります。</p>
+                </dd>
+              
+              
+                <dt id="task_wts_sp5_wdc__impact-column" style="font-weight:bold;padding-top:.25rem;"><a name="task_wts_sp5_wdc__impact-column"></a>インパクト</dt>
+
+                <dd style="padding-left:1.5rem;padding-bottom:.5rem;">Salesforce では、より厳格な CSP 設定を採用する場合に潜在的な違反を特定するために、<code>Content-Security-Policy-Report-Only</code> ヘッダーを有効にすることがあります。これらの条件付き違反は、より厳格なポリシーが有効になるまでレポートのみとして記録されます。</dd>
+                <dd style="padding-left:1.5rem;padding-bottom:.5rem;">影響項目を使用して、適用された違反と報告された違反を区別します。<ul style="margin-bottom:0;">
+                    <li>ブロック済み — ポリシーが適用され、リソースが読み込まれませんでした。[ブロック済み] 影響のリダイレクトと不正な形式の URL は常にブロックされます。</li>
+
+                    <li>報告済み — リソース要求は、より厳格な CSP 設定が設定されている場合にのみブロックされます。たとえば、frame-src (iframe content)、font-src (fonts)、img-src (image) 違反種別に関連付けられた一部のリソース要求は、[セッションの設定] で [更新された CSP ディレクティブを採用] 設定が有効になっていない限りブロックされません。</li>
+
+                  </ul></dd>
+                <dd style="padding-left:1.5rem;padding-bottom:.5rem;">Spring '26 以降に作成された組織では、[影響] 項目はデフォルトでリストビューに表示されます。Spring '26 より前に作成された組織では、項目をリストビューに追加します。</dd>
+              
+              
+                <dt id="task_wts_sp5_wdc__last-violation-date-column" style="font-weight:bold;padding-top:.25rem;"><a name="task_wts_sp5_wdc__last-violation-date-column"></a>最終違反日</dt>
+
+                <dd style="padding-left:1.5rem;padding-bottom:.5rem;">この信頼できない URL、違反種別、および CSP コンテキストの違反が最後に記録された日付。<p style="margin-bottom:0;">この項目は毎日更新されます。</p>
+                </dd>
+              
+            </dl>
+
+          </div>
+        </li><li>
+          <span>[Trusted URLs and Browser Policy Violations (信頼済み URL とブラウザーポリシー違反)] リストから項目を削除するには、[<span style="vertical-align:text-bottom;display:inline-block;"><img alt="ドロップダウン矢印" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/resources-global/_corporate/images/dropdown.png" style="width:20px;margin-bottom:0;"></span>] をクリックし、[<strong class="uicontrol">削除] を</strong>選択します。
+          </span>
+          <div>
+            <p>[信頼済み URL およびブラウザーポリシー違反] リストから項目を削除しても、信頼済み URL 許可リストに変更は加えられません。記録されたイベントのみが削除されます。許可リストで引き続きこれらの要求またはリダイレクトがブロックされている場合、次回一致する要求が発生したときに新しいエントリが違反リストに表示されます。</p>
+            <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> リストを管理しやすくするために、日次プロセスでは過去 7 日間に発生していない違反が削除されます。経時的に違反を追跡するには、[ブロックされたリダイレクト] および [CSP 違反] イベント種別の日次クエリをスケジュールしてください。</div></div></div>
+
+          </div>
+        </li><li>
+          <span>すべての URL のログに記録された違反をクリアするには、[<strong class="uicontrol">Clear Violations Log</strong> (違反ログをクリア)] をクリックし、決定を確認します。</span>
+        </li></ol>
+
+    
+  </div>
+
+  <div id="task_nv1_tp5_wdc" aria-labelledby="ariaid-title3" class="nested1"><a name="task_nv1_tp5_wdc"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">CSP 違反の管理</h2>
+    
+    <p>コンテンツセキュリティポリシー (CSP) ディレクティブは、Lightning コンポーネント、サードパーティ API、WebSocket 接続で各信頼済み URL から読み込むことができるリソースの種別を制御します。CSP 違反は、信頼済み URL の CSP ディレクティブに基づいて Lightning Experience ページからのリソース要求がブロックされた場合に発生します。</p>
+
+      <ol><li>
+          <span>コンテンツセキュリティポリシー (CSP) 違反のみを表示するには、違反種別でリストを絞り込みます。</span>
+          <div>
+            <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> すばやくアクセスするには、この検索条件を使用してカスタムリストビューを作成します。</div></div></div>
+
+          </div>
+          <ol>
+            <li>
+              <span>[設定] で、<strong class="uicontrol">[信頼済み URL とブラウザーポリシー違反]</strong> を見つけて選択します。</span>
+            </li>
+
+            <li>
+              <span>リストを絞り込みます。</span>
+            </li>
+
+            <li>
+              <span>[項目] で、[<strong class="uicontrol">違反種別]</strong> を選択します。</span>
+            </li>
+
+            <li>
+              <span>[演算子] で [次の文字列<strong class="uicontrol">と一致する</strong>] を選択します。</span>
+            </li>
+
+            <li>
+              <span>[値] フィールドで、<strong class="uicontrol">img-src (画像)</strong>、<strong class="uicontrol">frame-src (iframe content)</strong>、および <strong class="uicontrol">font-src (フォント)</strong> を選択します。</span>
+            </li>
+
+            <li>
+              <span>[<strong class="uicontrol">完了]</strong> をクリックし、フィルタを保存します。</span>
+            </li>
+
+          </ol>
+        </li><li>
+          <span>コンテンツセキュリティポリシーに基づいて Lightning Experience ページからすべてのブロックされたリソース要求に関する情報を取得するには、CSP 違反イベント種別オブジェクトを使用します。</span>
+          <div>
+            <p>CSP 違反イベント種別は、CSP 設定に基づいて、ブロックされたリソースとブロックされる可能性のあるリソースをすべて取得します。このイベント種別では、[信頼済み URL およびブラウザーポリシー違反] リストに表示されない CSP ディレクティブの違反も取得されます。たとえば、<code>media-src</code> (音声およびビデオ) および <code>style-src</code> (スタイルシート) ディレクティブの違反です。</p>
+            <p><cite>『Salesforce プラットフォームのオブジェクトリファレンス』</cite>の<a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.object_reference.meta/object_reference/sforce_api_objects_eventlogfile_cspviolation.htm">「CSP 違反イベント種別」</a>を参照してください。</p>
+            <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> CSP 違反イベントは、データ保持期間が 24 時間のすべてのお客様が追加費用なしで利用できます。このイベントは API で使用できますが、Event Monitoring Analytics アプリケーションでは使用できません。複数日の CSP 違反の詳細を収集するには、REST API を使用して [CSP 違反] イベント種別の日次クエリをスケジュールします。</div></div></div>
+
+          </div>
+        </li><li>
+          <span>URL の CSP ディレクティブを許可するには、信頼できない URL を [信頼済み URL] 許可リストに追加します。</span>
+          <ol>
+            <li>
+              <span>[信頼済み URL およびブラウザーポリシー違反] リストで、信頼できない URL、違反種別、CSP コンテキストをメモします。</span>
+              <div>違反種別は CSP ディレクティブです。</div>
+            </li>
+
+            <li>
+              <span>[設定] の [クイック検索] ボックスに<kbd>「信頼済み URL」</kbd>と入力し、<strong class="uicontrol">[信頼済み URL]</strong> を選択します。</span>
+            </li>
+
+            <li>
+              <span>[信頼済み URL] 設定ページで、URL とコンテキストの既存のエントリを確認します。</span>
+            </li>
+
+            <li>
+              <span>既存の信頼済み URL を編集するか、新しい信頼済み URL を追加して、許可する CSP ディレクティブを選択します。</span>
+              <div><a title="ユーザーやネットワークとのやりとりを信頼する URL を指定します。コンテンツセキュリティポリシー (CSP) ディレクティブを使用して、Lightning コンポーネント、サードパーティ API、WebSocket 接続で各信頼済み URL から読み込むことができるリソースの種別を制御します。[セッションの設定] で Permissions-Policy HTTP ヘッダーを有効にしている場合は、Salesforce からブラウザー機能にアクセスできる URL も制御できます。" href="#security_trusted_urls_manage">「信頼済み URL の管理」</a>を参照してください。</div>
+            </li>
+
+            <li>
+              <span>変更を確認するには、フォント、画像、またはフレーム化されたコンテンツを読み込む Lightning ページをテストします。または、以前にブロックされたリソースを新しく信頼された URL から読み込むテスト Lightning ページを設定します。</span>
+            </li>
+
+          </ol>
+        </li><li>
+          <span>Salesforce が作成したコードで提供される最新の CSP ディレクティブを使用するには、セッション設定を有効にします。</span>
+          <div>
+            <p>frame-src (iframe content)、font-src (fonts)、または img-src (image) 種別の信頼済み URL 違反に関連付けられた一部のリソース要求は、セッション設定が有効になっていない限りブロックされません。</p>
+            <p>Summer '24 以降で作成された組織では、この設定はデフォルトで有効になっています。</p>
+          </div>
+          <ol>
+            <li>
+              <span>この変更でブロックされたリソース要求を確認するには、[報告済み] の影響がある違反を探します。</span>
+              <div>
+                <p>CSP 違反イベント タイプのクエリを複数日にわたって収集するようにスケジュールした場合、この変更の影響を受けるリソース要求のイベント ログには<code>report</code>の<samp class="parmname">破棄</samp>が含まれます。<cite>『Salesforce プラットフォームのオブジェクトリファレンス』</cite>の<a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.object_reference.meta/object_reference/sforce_api_objects_eventlogfile_cspviolation.htm">「CSP 違反イベント種別」</a>を参照してください。</p>
+              </div>
+            </li>
+
+            <li>
+              <span>これらの違反に関連付けられたリソース要求をブロックするには、[設定] で <strong class="uicontrol">[セッション設定]</strong> を見つけて選択します。<strong class="uicontrol">[Adopt updated CSP directives (更新された CSP ディレクティブを採用)]</strong> を選択し、変更を保存します。</span>
+            </li>
+
+          </ol>
+        </li></ol>
+
+    
+  </div>
+
+  <div id="task_ycj_tp5_wdc" aria-labelledby="ariaid-title4" class="nested1"><a name="task_ycj_tp5_wdc"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">ブロックされたリダイレクトの管理</h2>
+      <div><p>違反リストでは、Salesforce から信頼できない URL や不正な形式の URL へのブロックされたリダイレクトを取得します。ただし、すべてのブロックされたリダイレクトが記録されるわけではありません。ブロックおよび記録されるリダイレクトについては、「<a title="Salesforce でのリダイレクトの対象、リダイレクトがブロックされる状況、およびリダイレクトを許可および制限するオプションについて説明します。" href="#security_trusted_urls_external_redirections_understand">Salesforce の外部</a>リダイレクトの制限」を参照してください。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> すばやくアクセスできるように、推奨検索条件のカスタムリストビューを作成します。</div></div></div>
+</div>
+      <ol><li>
+          <span>有効な URL へのブロックされたリダイレクトのみを表示するには、リストビューを絞り込みます。</span>
+          <ol>
+            <li>
+              <span>[設定] で、<strong class="uicontrol">[信頼済み URL とブラウザーポリシー違反]</strong> を見つけて選択します。</span>
+            </li>
+
+            <li>
+              <span>リストを絞り込みます。</span>
+            </li>
+
+            <li>
+              <span>[項目] で、[<strong class="uicontrol">違反種別]</strong> を選択します。</span>
+            </li>
+
+            <li>
+              <span>[演算子] で [次の文字列<strong class="uicontrol">と一致する</strong>] を選択します。</span>
+            </li>
+
+            <li>
+              <span>[値] で、<strong class="uicontrol">[ブロック済みリダイレクト]</strong> を選択します。</span>
+            </li>
+
+          </ol>
+        </li><li>
+          <span>不正な形式の URL へのブロックされたリダイレクトのみを表示するには、リストビューを絞り込みます。</span>
+          <div>構文チェックに失敗する不正な形式の URL の例としては、<samp class="filepath">https://malformed^url.example.com</samp> や <samp class="filepath">https://mydomain.lightning.force.com/$test61'3</samp> などがあります。
+          </div>
+          <ol>
+            <li>
+              <span>リストを絞り込みます。</span>
+            </li>
+
+            <li>
+              <span>[項目] で、[<strong class="uicontrol">違反種別]</strong> を選択します。</span>
+            </li>
+
+            <li>
+              <span>[演算子] で [次の文字列<strong class="uicontrol">と一致する</strong>] を選択します。</span>
+            </li>
+
+            <li>
+              <span>[値] で、<strong class="uicontrol">[不正な URL]</strong> を選択します。</span>
+            </li>
+
+          </ol>
+        </li><li>
+          <span>リダイレクトの発生元など、ブロックされたリダイレクトに関する詳細情報を取得するには、ブロックされたリダイレクトイベント種別オブジェクトを使用します。</span>
+          <ol>
+            <li>
+              <span>ブロックされたリダイレクトの発生元を特定するには、<samp class="parmname">ORIGIN</samp> 項目を使用します。</span>
+              <div>
+                <p>たとえば、Experience Cloud Visualforce サイト ページのフォームが <code>saveURL</code> パラメータを使用してユーザーを信頼できない URL にリダイレクトする場合、<samp class="parmname">ORIGIN</samp> にはそのサイトのベース URL が含まれます。</p>
+              </div>
+            </li>
+
+          </ol>
+          <div>
+            <p><cite>『Salesforce プラットフォームのオブジェクトリファレンス』</cite>の<a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.object_reference.meta/object_reference/sforce_api_objects_eventlogfile_blockedredirect.htm">「Blocked Redirect Event Type ([ブロックされたリダイレクト] イベント種別)」</a>を参照してください。</p>
+            <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> ブロックされたリダイレクトイベントは、データ保持期間が 24 時間のすべてのユーザーが追加費用なしで使用できます。このイベントは API で使用できますが、Event Monitoring Analytics アプリケーションでは使用できません。複数日のブロックされたリダイレクトの詳細を収集するには、REST API を使用して [ブロックされたリダイレクト] イベント種別の日次クエリをスケジュールします。</div></div></div>
+
+          </div>
+        </li><li>
+          <span>他の Salesforce 組織へのブロックされたリダイレクトを検索するには、次の最上位ドメインの [次の文字列を含む] 演算子とカンマ区切りリストを使用して [信頼できない URL] 項目に検索条件を適用します。</span>
+          <div>
+            <p>別の Salesforce 組織へのリダイレクトがブロックされた例としては、本番 URL へのリダイレクトを含む Sandbox のリンクをユーザーがクリックした場合などがあります。</p>
+          </div>
+          <ol>
+            <li>
+              <span>リストを絞り込みます。</span>
+            </li>
+
+            <li>
+              <span>[項目] で、<strong class="uicontrol">[信頼されない URL]</strong> を選択します。</span>
+            </li>
+
+            <li>
+              <span>演算子で、<strong class="uicontrol">[次の文字列を含む]</strong> を選択します。</span>
+            </li>
+
+            <li>
+              <span>[値] に、<strong class="uicontrol">「.force.com」、「.forceusercontent.com」、「.force-user-content.com」、「.salesforce.com」、「.salesforceliveagent.com」、「.salesforce-experience.com」、「.salesforce-hub.com」、「.salesforce-scrt.com」、「.salesforce-setup.com」、「.salesforce-sites.com」、「.sfdcopens.com」、「.site.com」、「.trailhead.com」</strong>と入力します。</span>
+            </li>
+
+          </ol>
+          <div>これらの各ドメインが使用されている場所については、<a title="ユーザーが Salesforce にアクセスできるようにするには、標準 Salesforce ドメインを許可済みドメインのリストに追加する必要があります。" href="overview_misc.html#setup_domains">「必要なドメインを許可」</a>を参照してください。</div>
+        </li><li>
+          <span>従来の Salesforce ホスト名へのリダイレクトを検索するには、次の最上位ドメインの [次の文字列を含む] 演算子とカンマ区切りリストを使用して [信頼できない URL] 項目に検索条件を適用します。</span>
+          <div>
+            <p>従来のホスト名は、拡張ドメインのない組織で使用されていました。組織が 2022 年 7 月以降に作成されている場合、デフォルトで拡張ドメインが設定されています。詳細は、<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.domain_name_redirections_non_enhanced.htm&amp;language=ja">「非拡張ドメインのリダイレクトの終了への準備」</a>を参照してください。</p>
+          </div>
+          <ol>
+            <li>
+              <span>リストを絞り込みます。</span>
+            </li>
+
+            <li>
+              <span>[項目] で、<strong class="uicontrol">[信頼されない URL]</strong> を選択します。</span>
+            </li>
+
+            <li>
+              <span>演算子で、<strong class="uicontrol">[次の文字列を含む]</strong> を選択します。</span>
+            </li>
+
+            <li>
+              <span>[値] に<strong class="uicontrol">「documentforce.com」、「.Lightning.com」、「.salesforce-communities.com」、「.sfdc.sh.visualforce.com」</strong>と入力します。</span>
+            </li>
+
+          </ol>
+          <div>これらの各ドメインが使用されている場所については、<a title="ユーザーが Salesforce にアクセスできるようにするには、標準 Salesforce ドメインを許可済みドメインのリストに追加する必要があります。" href="overview_misc.html#setup_domains">「必要なドメインを許可」</a>を参照してください。</div>
+        </li><li>
+          <span>ブロックされたリダイレクトを許可するには、信頼できない URL を [信頼されたリダイレクトの URL] 許可リストに追加します。</span>
+          <ol>
+            <li>
+              <span>ブロックされたリダイレクトを許可する前に、URL を確認して検証します。</span><div><p>[ブロックされたリダイレクト] 違反種別には、不正な形式の URL へのリダイレクト試行が含まれます。不正な形式の URL の例としては、パスに無効な文字が含まれる <samp class="filepath">https://mydomain.lightning.force.com/&amp;/'"teste-efx-15</samp> や、リダイレクトの一部として cookie を設定する有効な方法ではない <samp class="filepath">Set-Cookie:cookie1=cookie1</samp> などがあります。</p>
+              </div>
+            </li>
+
+            <li>
+              <span>[信頼済み URL とブラウザーポリシー違反] リストで、信頼されていない URL をメモします。</span>
+            </li>
+
+            <li>
+              <span>[設定] の [クイック検索] ボックスに「<kbd>信頼された</kbd>リダイレクトの URL」と入力し、[信頼されたリダイレクトの <strong class="uicontrol">URL]</strong> を選択します。</span>
+            </li>
+
+            <li>
+              <span><strong class="uicontrol">[新規 URL]</strong> をクリックします。</span>
+            </li>
+
+            <li>
+              <span>URL を入力し、変更を保存します。</span>
+            </li>
+
+            <li>
+              <span>変更をテストします。<a title="[信頼されたリダイレクトの URL] 許可リストを更新したら、対応するリダイレクトが許可されていることを確認します。" href="#security_trusted_urls_external_redirections_test">「外部リダイレクトのテスト」</a>を参照してください。</span>
+            </li>
+
+          </ol>
+        </li></ol>
+
+    
+  <div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.customviews_edit_filters_parent.htm&amp;type=5&amp;language=ja">リストビュー検索条件の編集</a></li><li><a title="ユーザーやネットワークとのやりとりを信頼する URL を指定します。コンテンツセキュリティポリシー (CSP) ディレクティブを使用して、Lightning コンポーネント、サードパーティ API、WebSocket 接続で各信頼済み URL から読み込むことができるリソースの種別を制御します。[セッションの設定] で Permissions-Policy HTTP ヘッダーを有効にしている場合は、Salesforce からブラウザー機能にアクセスできる URL も制御できます。" href="#security_trusted_urls_manage">信頼済み URL の管理</a></li><li><a title="Salesforce から離れる信頼できない外部リダイレクトからユーザーを保護します。まず、自動的に制限されるリダイレクトの種別と、Salesforce のハイパーリンクの制限オプションを確認します。信頼する外部 URL を許可リストに追加します。次に、ユーザーが Salesforce 組織外に移動するハイパーリンクをクリックしたときの動作を指定します。" href="browser_session.html#security_external_redirects">外部 URL へのリダイレクトの管理</a></li><li><a title="潜在的な攻撃からユーザーを保護するために、URL が信頼されない限り、ユーザーは Salesforce 組織とは異なる Salesforce 組織にリダイレクトされません。この制限には、2 番目の組織の公開されているページとコンテンツへのリダイレクトが含まれます。所有する別の Salesforce 組織にユーザーをリダイレクトするリンク、アクション、またはプロセスを許可するには、対象 URL を [信頼されたリダイレクトの URL] 許可リストに追加します。" href="#security_trusted_urls_external_redirections_orgs">リダイレクトを許可する組織間 URL の特定</a></li></ul></div>
+</div>
+
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="security_trusted_urls_external_redirections_orgs">
+<h1 class="slds-text-heading_large">リダイレクトを許可する組織間 URL の特定</h1>
+ 
+ <p>潜在的な攻撃からユーザーを保護するために、URL が信頼されない限り、ユーザーは Salesforce 組織とは異なる Salesforce 組織にリダイレクトされません。この制限には、2 番目の組織の公開されているページとコンテンツへのリダイレクトが含まれます。所有する別の Salesforce 組織にユーザーをリダイレクトするリンク、アクション、またはプロセスを許可するには、対象 URL を [信頼されたリダイレクトの URL] 許可リストに追加します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+  <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: すべてのエディション</td>
+
+      </tr>
+     </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d40610e53" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d40610e53" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">信頼済み URL およびブラウザーポリシー違反を表示、絞り込み、削除する</td>
+
+       <td headers="d40610e53" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」および「すべてのデータの編集」</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d40610e53" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">ブロックされたリダイレクトイベント種別オブジェクトにアクセスする</td>
+
+       <td headers="d40610e53" style="vertical-align:top;" class="slds-cell-wrap"><p>「イベントログファイルを参照」および「API の有効化」</p><p>または</p><p style="margin-bottom:0;">「すべてのデータの参照」</p></td>
+
+      </tr>
+     </tbody></table></div>
+ 
+ <div id="ext_redirections_org_review" aria-labelledby="ariaid-title2" class="nested1"><a name="ext_redirections_org_review" href="https://help.salesforce.com/s?language=ja"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">リダイレクトが制限されるタイミングの確認</h2>
+  
+   <div><p>別の Salesforce 組織へのすべての URL で [信頼されたリダイレクトの URL] 許可リストにエントリが必要なわけではありません。許可リストが適用される場所については、「<a title="Salesforce でのリダイレクトの対象、リダイレクトがブロックされる状況、およびリダイレクトを許可および制限するオプションについて説明します。" href="#security_trusted_urls_external_redirections_understand">Salesforce の外部リダイレクト</a>の制限」を参照してください。</p></div>
+  
+ </div>
+
+ <div id="ext_redirections_org_qualify" aria-labelledby="ariaid-title3" class="nested1"><a name="ext_redirections_org_qualify" href="https://help.salesforce.com/s?language=ja"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">組織間リダイレクトの対象となるもの</h2>
+  
+  <p>組織間リダイレクトは、ユーザーが Salesforce 組織間でリダイレクトされるときに発生する特殊なリダイレクトです。たとえば、ユーザーが本番から Sandbox にリダイレクトされる場合などがあります。</p>
+
+   <div><p>一部の組織間リダイレクトはクロスオリジンリダイレクトでもあり、別のドメインを参照します。たとえば、<code><var>MyDomainName</var>--UAT.sandbox.lightning.force.com</code> から <code><var>MyDomainName</var>.my.salesforce.com</code> などの場合があります。また、同じルート ドメインを参照する場合もあります (<code><var>MyDomainName</var>--UAT.lightning.force.com</code> から <code><var>MyDomainName</var>--UAT.sandbox.lightning.force.com</code> へのリダイレクトにおける <samp class="filepath">force.com</samp> の参照など)。いずれの場合も、ユーザーは元の組織から別の Salesforce 組織にリダイレクトされます。</p></div>
+  
+ </div>
+
+ <div id="ext_redirections_orgs_determine" lang="ja-jp" aria-labelledby="ariaid-title4" class="nested1"><a name="ext_redirections_orgs_determine" href="https://help.salesforce.com/s?language=ja"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">信頼する特定の組織間 URL の決定</h2>
+  
+  <p>組織間リダイレクトとリダイレクトがブロックされるタイミングを理解したら、組織からのリダイレクトを許可する組織間 URL を見つけます。</p>
+
+   <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-error"><img alt="警告" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_warning.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">警告</span> ユーザーを保護するために、<samp class="filepath">*.salesforce.com</samp>、<samp class="filepath">*.force.com</samp>、またはこの場合の <samp class="filepath">*.file.force.com</samp> などの最上位の Salesforce ドメインを [信頼されたリダイレクトの URL] 許可リストに追加することはお勧めしません。</div></div></div>
+</div>
+   <ol><li>
+     <span>ブロックされた組織間リダイレクトを特定するには、[設定] の [信頼済み URL とブラウザーポリシー違反] リストを絞り込みます。</span>
+     <ol>
+      <li>
+       <span>[設定] で、<strong class="uicontrol">[信頼済み URL とブラウザーポリシー違反]</strong> を見つけて選択します。</span>
+      </li>
+
+      <li>
+       <span>リストを絞り込みます。</span>
+      </li>
+
+      <li>
+       <span>[項目] で、<strong class="uicontrol">[信頼されない URL]</strong> を選択します。</span>
+      </li>
+
+      <li>
+       <span>演算子で、<strong class="uicontrol">[次の文字列を含む]</strong> を選択します。</span>
+      </li>
+
+      <li>
+       <span>[値] に、<strong class="uicontrol">「.force.com」、「.forceusercontent.com」、「.force-user-content.com」、「.salesforce.com」、「.salesforceliveagent.com」、「.salesforce-experience.com」、「.salesforce-hub.com」、「.salesforce-scrt.com」、「.salesforce-setup.com」、「.salesforce-sites.com」、「.sfdcopens.com」、「.site.com」、「.trailhead.com」</strong>と入力します。</span>
+       <div>
+        <p>または、ブロックされたリダイレクトイベント種別の <samp class="parmname">BLOCKED_URI_DOMAIN</samp> 項目でこれらの各ドメインを検索することもできます。</p>
+       </div>
+      </li>
+
+     </ol>
+     <div>
+      <p>これらの各ドメインが使用されている場所については、<a title="ユーザーが Salesforce にアクセスできるようにするには、標準 Salesforce ドメインを許可済みドメインのリストに追加する必要があります。" href="overview_misc.html#setup_domains">「必要なドメインを許可」</a>を参照してください。</p>
+      <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> [信頼済み URL およびブラウザーポリシー違反] リストには、過去 7 日以内にブロックされたリダイレクトが含まれます。ブロックされたリダイレクトを経時的に追跡するには、[ブロックされたリダイレクト] イベント種別の日次クエリをスケジュールします。Salesforce が追跡するブロックされたリダイレクトについては、「<a title="Salesforce でのリダイレクトの対象、リダイレクトがブロックされる状況、およびリダイレクトを許可および制限するオプションについて説明します。" href="#security_trusted_urls_external_redirections_understand">外部リダイレクトの Salesforce</a> の制限」を参照してください。</div></div></div>
+
+     </div>
+    </li><li>
+     <span>ブロックされたリダイレクト元を判別するには、ブロックされたリダイレクトイベント種別オブジェクトで <samp class="parmname">ORIGIN</samp> 項目を使用します。</span>
+     <div>
+      <p>たとえば、Experience Cloud Visualforce サイトページのフォームで <code>saveURL</code> パラメーターを使用してユーザーが信頼されない URL にリダイレクトされる場合、<samp class="parmname">ORIGIN</samp> にはそのサイトのベース URL が含まれます。この情報は、[設定] の [信頼済み URL およびブラウザーポリシー違反] リストでは取得できません。</p>
+      <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> ブロックされたリダイレクトイベントはすべてのお客様が無料で使用でき、データは 24 時間保持されます。このイベントは API で使用できますが、Event Monitoring Analytics アプリケーションでは使用できません。複数日のブロックされたリダイレクトの詳細を収集するには、REST API を使用して [ブロックされたリダイレクト] イベント種別の日次クエリをスケジュールします。</div></div></div>
+
+      <p><cite>『Salesforce プラットフォームのオブジェクトリファレンス』</cite>の<a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.object_reference.meta/object_reference/sforce_api_objects_eventlogfile_blockedredirect.htm">「Blocked Redirect Event Type ([ブロックされたリダイレクト] イベント種別)」</a>を参照してください。</p>
+     </div>
+    </li><li>
+     <span>不要なリダイレクトを回避するには、誤ったリンクを更新します。</span>
+     <div>ハードコードされたリンクを使用する場合、そのリンクが本番環境から Sandbox にコピーされ、URL が不正確になる可能性があります。たとえば、Sandbox の Visualforce ページで、本番環境に存在するファイルへのリンクを見つけたとします。代わりに Sandbox 内のファイルにリンクするには、対応する Sandbox URL を使用するようにリンクを更新します。可能な場合は、相対 URL または動的に生成された URL を使用してください。</div>
+    </li><li>
+     <span>[セッションの設定] の [信頼されていない外部 URL へのリダイレクトを許可] 項目を [しない] に設定する場合は、他の Salesforce 組織のすべての URL を許可リストに登録することを検討してください。</span>
+     <div>この設定では、Salesforce の [URL] 項目と [ロングテキストエリア] 項目のハイパーリンクからのリダイレクトは、対象 URL が [信頼されたリダイレクトの URL] 許可リストに含まれていない限りブロックされます。また、ブロックされたリダイレクトは [信頼済み URL およびブラウザーポリシー違反] リストでは取得されません。他の Salesforce 組織のすべての URL を許可リストに登録すると、エンドユーザーのストレスを軽減し、機能が破損する可能性を減らすことができます。</div>
+    </li><li>
+     <span>許可する URL のリストにカスタムドメインを含めます。</span>
+     <div>カスタムドメインとは、Experience Cloud サイトまたは Salesforce サイトのコンテンツを提供する、所有するドメインです (<samp class="filepath">https://www.example.com</samp> など)。カスタムドメインは [設定] の [ドメイン] ページにあります。</div>
+    </li><li>
+     <span>許可する組織間 URL のリストを収集します。</span>
+     <div>
+      <p>[信頼されたリダイレクトの URL] 許可リストでは、<samp class="filepath">example.com</samp>、<samp class="filepath">*.example.com</samp>、および <samp class="filepath">https://example.com</samp> の形式を使用できます。</p>
+      <p>ワイルドカードを使用して他の Salesforce 組織へのリダイレクトを許可する場合は、ワイルドカードの後の値が信頼する組織に固有であることを確認してください。通常、このアプローチでは、信頼済み組織の [私のドメイン] の名前が含まれている信頼済み URL を使用する必要があります。たとえば、<code>https://<var>MyDomainName</var>.file.force.com</code> を信頼するには、完全な URL または <code>*.<var>MyDomainName</var>.file.force.com</code> を信頼します。</p>
+     </div>
+    </li></ol>
+
+  
+ <div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Salesforce から離れる信頼できない外部リダイレクトからユーザーを保護します。まず、自動的に制限されるリダイレクトの種別と、Salesforce のハイパーリンクの制限オプションを確認します。信頼する外部 URL を許可リストに追加します。次に、ユーザーが Salesforce 組織外に移動するハイパーリンクをクリックしたときの動作を指定します。" href="browser_session.html#security_external_redirects">外部 URL へのリダイレクトの管理</a></li><li><a title="ユーザーを保護するために、2 つの許可リストで Salesforce のリソースを読み込むための Trust URL とリダイレクト用の Trust URL を指定します。ブロックされたリダイレクトと、コンテンツセキュリティポリシー (CSP) ディレクティブでブロックされたリソース要求を確認します。次に、必要なリソースを許可するために、信頼済み URL を更新します。" href="#security_trusted_urls_csp_violations">信頼済み URL およびブラウザーポリシー違反の管理</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.domain_mgmt.htm&amp;language=ja&amp;type=5">カスタムドメイン</a></li></ul></div>
+</div>
+
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="security_trusted_urls_external_redirections_secure">
+<h1 class="slds-text-heading_large">Salesforce のハイパーリンクからの外部リダイレクトの保護</h1>
+  
+  <p>[信頼されたリダイレクトの URL] 許可リストに入力したら、信頼できない URL へのリダイレクトからユーザーを保護します。Salesforce のハイパーリンクから実行されるリダイレクトを警告してブロックしたり、リダイレクト時にユーザーに警告したりできます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody><tr class=""><td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: すべてのエディション</td>
+</tr></tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps"><tr class=""><th id="d60817e35" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th></tr></thead><tbody><tr class=""><td headers="d60817e35" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">セッション設定を変更する</td>
+<td headers="d60817e35" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+</tr></tbody></table></div><div><p>これらの設定は、対象 URL が [信頼されたリダイレクトの URL] 許可リストにないときにユーザーがハイパーリンクをクリックした場合に適用されます。この機能の可用性と動作は、ユーザーが Lightning Experience または Salesforce Classic のどちらを使用して Salesforce にアクセスするかによって異なります。</p><p>これらの設定に関係なく、対象 URL が構文チェックに失敗した場合、リダイレクトはブロックされます。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Lightning Experience の信頼できない URL への安全なリダイレクトは、パイロットまたはベータサービスです。このサービスには、お客様が実行した場合は <a target="_blank" href="https://www.salesforce.com/company/legal/agreements/">Agreements - Salesforce.com</a> のベータサービス規約、書面による<a target="_blank" href="https://ptd.salesforce.com/?_ga=2.247987783.1372150065.1709219475-629000709.1639001992">統合パイロット契約</a>、および製品規約ディレクトリの適用条件が適用されます。このパイロットサービスまたはベータサービスは、お客様ご自身の裁量でご利用ください。</div></div></div>
+</div>
+    <ol><li>
+        <span>この機能をイネーブルにする前に、外部リダイレクトの Trust URL <a title="ユーザーがリダイレクトを介して外部 URL や組織間 URL にアクセスできるようにします。信頼済み URL を [信頼されたリダイレクトの URL] 許可リストに追加します。許可リスト内の Salesforce から URL へのリダイレクトは、常に警告なしで許可されます。" href="#security_trusted_urls_external_redirections_specify">を指定</a>します。</span>
+      </li><li>
+        <span>Lightning Experience を使用して Salesforce にアクセスするユーザーのリダイレクトを保護するには、[設定] から [信頼されたリダイレクトの URL<strong class="uicontrol">] を</strong>見つけて選択します。次に、[信頼されていない URL へのリダイレクト (ベータ)] でオプションを選択します。</span>
+        <ul>
+          <li>
+            <p>これらのユーザーがリダイレクトされる前に現在のページから離れることを確認する警告メッセージを表示するには、[<strong class="uicontrol">ユーザーの権限</strong>あり] を選択します。</p>
+            <div style="text-align:left;"><img alt="信頼できない URL へのリダイレクトに関する警告メッセージ。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/security/images/session/redirection_warning.png" style="width:575px;"></div>
+          </li>
+
+          <li>
+            <p>これらのユーザーの信頼できない外部 URL へのリダイレクトをブロックするには、[<strong class="uicontrol">なし] を</strong>選択します。</p>
+            <p>外部サイトが信頼されていないためにページにアクセスできないことがメッセージで通知されます。</p>
+            
+          </li>
+
+        </ul>
+
+      </li><li>
+        <span>Salesforce Classic を使用するユーザーのリダイレクトを保護するには、[設定] から [<strong class="uicontrol">セッション設定]</strong> を見つけて選択します。[外部リダイレクト] で、[信頼されていない外部 URL へのリダイレクトを許可] 項目のオプションを選択します。</span>
+        <div>Salesforce Classic では、メッセージは新しいブラウザ タブで開きます。</div>
+        <ul>
+          <li>
+            <p>これらのユーザーがリダイレクトされる前に現在のページから離れることを確認する警告メッセージを表示するには、[<strong class="uicontrol">ユーザーの権限</strong>あり] を選択します。</p>
+            <p>Salesforce Classic を使用して Salesforce にアクセスするユーザーの場合、警告メッセージには、今後ユーザーが URL を Trust するためのオプションが含まれます。</p>
+            <div style="text-align:left;">
+              <img alt="信頼できない URL へのリダイレクトに関する Salesforce Classic 警告メッセージ。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/security/images/session/redirection_warning_classic.png" style="width:400px;">
+            </div>
+          </li>
+
+          <li>
+            <p>これらのユーザーの信頼できない外部 URL へのリダイレクトをブロックするには、[<strong class="uicontrol">なし] を</strong>選択します。</p>
+            <p>外部サイトが信頼されていないためにページにアクセスできないことがメッセージで通知されます。</p>
+            
+          </li>
+
+        </ul>
+
+      </li></ol>
+
+    <div><p>どちらの設定でも [<strong class="uicontrol">なし] を</strong>選択した場合、エンドユーザーのストレスや機能停止の可能性を軽減するために、他の Salesforce 組織とカスタムドメインのすべての URL を許可リストに登録することを検討してください。「<a title="潜在的な攻撃からユーザーを保護するために、URL が信頼されない限り、ユーザーは Salesforce 組織とは異なる Salesforce 組織にリダイレクトされません。この制限には、2 番目の組織の公開されているページとコンテンツへのリダイレクトが含まれます。所有する別の Salesforce 組織にユーザーをリダイレクトするリンク、アクション、またはプロセスを許可するには、対象 URL を [信頼されたリダイレクトの URL] 許可リストに追加します。" href="#security_trusted_urls_external_redirections_orgs">Identify Cross-Org Urls to Allow for Redirections</a>」を参照してください。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-error"><img alt="警告" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_warning.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">警告</span> [常に] オプションは、警告なしで信頼できない外部 URL へのリダイレクトを許可するため、これらの設定にはお勧めしません。</div></div></div>
+</div>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Salesforce から離れる信頼できない外部リダイレクトからユーザーを保護します。まず、自動的に制限されるリダイレクトの種別と、Salesforce のハイパーリンクの制限オプションを確認します。信頼する外部 URL を許可リストに追加します。次に、ユーザーが Salesforce 組織外に移動するハイパーリンクをクリックしたときの動作を指定します。" href="browser_session.html#security_external_redirects">外部 URL へのリダイレクトの管理</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="security_trusted_urls_external_redirections_specify">
+<h1 class="slds-text-heading_large">リダイレクトの信頼済み URL の指定</h1>
+ 
+ <p>ユーザーがリダイレクトを介して外部 URL や組織間 URL にアクセスできるようにします。信頼済み URL を [信頼されたリダイレクトの URL] 許可リストに追加します。許可リスト内の Salesforce から URL へのリダイレクトは、常に警告なしで許可されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+  <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: すべてのエディション</td>
+
+      </tr>
+     </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d92955e53" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d92955e53" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">リダイレクトの信頼済み URL を設定する</td>
+
+       <td headers="d92955e53" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」および「すべてのデータの編集」</td>
+
+      </tr>
+     </tbody></table></div>
+ 
+ <div id="ext_redirections_specify_determine" aria-labelledby="ariaid-title2" class="nested1"><a name="ext_redirections_specify_determine" href="https://help.salesforce.com/s?language=ja"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">リダイレクトの有効な外部 URL の決定</h2>
+  
+   <div><p>この許可リストが使用される場所とタイミングについては、「<a title="Salesforce でのリダイレクトの対象、リダイレクトがブロックされる状況、およびリダイレクトを許可および制限するオプションについて説明します。" href="#security_trusted_urls_external_redirections_understand">Salesforce の外部リダイレクト</a>の制限」を参照してください。</p><p>信頼する URL を決定するには、ユーザーが日常業務の実行にアクセスするサイトを考慮します。たとえば、会社の Web サイト、信頼できるパートナー、インターネットでホストされているツールなどです。また、<a title="潜在的な攻撃からユーザーを保護するために、URL が信頼されない限り、ユーザーは Salesforce 組織とは異なる Salesforce 組織にリダイレクトされません。この制限には、2 番目の組織の公開されているページとコンテンツへのリダイレクトが含まれます。所有する別の Salesforce 組織にユーザーをリダイレクトするリンク、アクション、またはプロセスを許可するには、対象 URL を [信頼されたリダイレクトの URL] 許可リストに追加します。" href="#security_trusted_urls_external_redirections_orgs">許可する組織間 URL</a> も指定します。</p><p>Salesforce Classic で構築されたコンポーネントおよびページからのブロックされたリダイレクトを特定するには、[設定] の [信頼済み URL とブラウザーポリシー違反] リストを使用します。「 <a title="ユーザーを保護するために、2 つの許可リストで Salesforce のリソースを読み込むための Trust URL とリダイレクト用の Trust URL を指定します。ブロックされたリダイレクトと、コンテンツセキュリティポリシー (CSP) ディレクティブでブロックされたリソース要求を確認します。次に、必要なリソースを許可するために、信頼済み URL を更新します。" href="#security_trusted_urls_csp_violations">信頼済み URL およびブラウザーポリシー違反の管理</a>」を参照してください。</p><p>ブロックされたリダイレクトに関する詳細を取得するには、[ブロックされたリダイレクト] イベント種別オブジェクトを使用します。ブロックされたリダイレクトイベントはすべてのお客様が無料で使用でき、データは 24 時間保持されます。このイベントは API で使用できますが、Event Monitoring Analytics アプリケーションでは使用できません。複数日のブロックされたリダイレクトの詳細を収集するには、REST API を使用して [ブロックされたリダイレクト] イベント種別の日次クエリをスケジュールします。<cite>『Salesforce プラットフォームのオブジェクトリファレンス』</cite>の<a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.object_reference.meta/object_reference/sforce_api_objects_eventlogfile_blockedredirect.htm">「Blocked Redirect Event Type ([ブロックされたリダイレクト] イベント種別)」</a>を参照してください。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-error"><img alt="警告" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_warning.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">警告</span> ユーザーを保護するために、<samp class="filepath">*.salesforce.com</samp>、<samp class="filepath">*.force.com</samp>、または <samp class="filepath">*.file.force.com</samp> などの最上位の Salesforce ドメインを [信頼されたリダイレクトの URL] 許可リストに追加することはお勧めしません。</div></div></div>
+</div>
+  
+ </div>
+
+ <div id="ext_redirections_specify_allowlist" lang="ja-jp" aria-labelledby="ariaid-title3" class="nested1"><a name="ext_redirections_specify_allowlist" href="https://help.salesforce.com/s?language=ja"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">[信頼されたリダイレクトの URL] 許可リストの更新</h2>
+  
+  <p>この許可リスト内の Salesforce から URL へのリダイレクトは、常に警告なしで許可されます。</p>
+
+   <ol><li>
+     <span>[設定] で、<strong class="uicontrol">[信頼されたリダイレクトの URL]</strong> を見つけて選択します。</span>
+    </li><li>
+     <span><strong class="uicontrol">[新規 URL]</strong> をクリックします。</span>
+    </li><li>
+     <span>URL を入力し、変更を保存します。</span>
+     <div><samp class="filepath">example.com</samp>、<samp class="filepath">*.example.com</samp>、<samp class="filepath">https://example.com</samp> の形式が使用できます。<p>URL のホストセクションには、ワイルドカードとしてアスタリスク (<code>*</code>) を含めることができます。それ以外の場合、URL の形式を不正にすることはできません。構文の確認に失敗する不正な形式の URL の例として、<samp class="filepath">malformed^url.example.com</samp>、<samp class="filepath">https://{subdomain}.example.com</samp> などがあります。</p></div>
+    </li></ol>
+
+  
+ <div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Salesforce から離れる信頼できない外部リダイレクトからユーザーを保護します。まず、自動的に制限されるリダイレクトの種別と、Salesforce のハイパーリンクの制限オプションを確認します。信頼する外部 URL を許可リストに追加します。次に、ユーザーが Salesforce 組織外に移動するハイパーリンクをクリックしたときの動作を指定します。" href="browser_session.html#security_external_redirects">外部 URL へのリダイレクトの管理</a></li></ul></div>
+</div>
+
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="security_trusted_urls_external_redirections_test">
+<h1 class="slds-text-heading_large">外部リダイレクトのテスト</h1>
+  
+  <p>[信頼されたリダイレクトの URL] 許可リストを更新したら、対応するリダイレクトが許可されていることを確認します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: すべてのエディション</td>
+
+            </tr>
+          </tbody></table><p>Salesforce が [信頼されたリダイレクトの URL] 許可リストに基づいてリダイレクトを制限する場所とタイミングについては、「<a title="Salesforce でのリダイレクトの対象、リダイレクトがブロックされる状況、およびリダイレクトを許可および制限するオプションについて説明します。" href="#security_trusted_urls_external_redirections_understand">Salesforce の外部</a>リダイレクトの制限」を参照してください。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> ベース URL を [信頼されたリダイレクトの URL] 許可リストに追加した後にリダイレクトに失敗した場合は、ブロックされた URL 文字列に誤字などの問題がないか確認します。</div></div></div>
+</div>
+    <ol><li>
+        <span>ユーザーを許可 URL にリダイレクトするアクションまたはリンクがわかっている場合は、Salesforce 内からリダイレクトを開始します。</span>
+      </li><li>
+        <span>複数の URL を連続してテストするには、ブラウザーからリダイレクトをテストします。</span>
+        <ol>
+          <li>
+            <span>Salesforce にログインします。</span>
+          </li>
+
+          <li>
+            <span>ブラウザーのアドレスバーで、URL パス (最初のスラッシュ (/) の後の文字) を削除します。</span>
+          </li>
+
+          <li>
+            <span><code>?startURL=<var>targetUrl</var></code> という文字列を入力して、パスを置き換えます。</span>
+          </li>
+
+        </ol>
+        <div>
+          <p>リダイレクトが許可されている場合は、<var>targetUrl</var> にリダイレクトされます。リダイレクトがブロックされると、「無効なページリダイレクト」エラーが表示されます。</p>
+          <p>[無効なページリダイレクト] エラーの例を次に示します。</p>
+          <div style="text-align:left;">
+            <img alt="無効なページリダイレクトエラー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/security/images/session/invalid_page_redirection.png" style="width:600px;">
+          </div>
+        </div>
+      </li></ol>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="テストの例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">テストの例</span> 
+      
+      <p>本番から Sandbox のサイトへのリダイレクトを許可するために、本番の [信頼されたリダイレクトの URL] 許可リストに <samp class="filepath">https://mycompany--uat.sandbox.my.site.com</samp> を追加しました。また、本番組織から次の URL でホストされている Sandbox 内のファイルへのリダイレクトも許可しないことを決定しました: <samp class="filepath">https://mycompany--uat.sandbox.file.force.com</samp></p>
+      <p>本番組織にログインすると、ブラウザのアドレスバーに <samp class="filepath">https://mycompany.Lightning.force.com/Lightning/page/home</samp> という URL が表示されます。</p>
+      <p>許可された Sandbox サイトの URL へのリダイレクトをテストするには、ブラウザ バーの URL から <samp class="filepath">Lightning/page/home</samp> を削除し、<samp class="filepath">?startURL=https://mycompany--uat.sandbox.my.site.com</samp> に置き換えます。新しい URL は <samp class="filepath">https://mycompany.lightning.force.com/?startURL=https://mycompany--uat.sandbox.my.site.com</samp> です。対象 URL は許可リストにあるため、Enter キーを押すと Sandbox サイトにリダイレクトされます。</p>
+      <p>ブロックされた Sandbox コンテンツ URL へのリダイレクトをテストするには、ブラウザのアドレスバーの URL を <samp class="filepath">https://mycompany.lightning.force.com/?startURL=https://mycompany--uat.sandbox.file.force.com</samp> に変更します。対象 URL が許可リストにないため、Enter キーを押すと「Invalid Page Redirection (無効なページリダイレクト)」エラーが表示されます。</p>
+    </div></div></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Salesforce から離れる信頼できない外部リダイレクトからユーザーを保護します。まず、自動的に制限されるリダイレクトの種別と、Salesforce のハイパーリンクの制限オプションを確認します。信頼する外部 URL を許可リストに追加します。次に、ユーザーが Salesforce 組織外に移動するハイパーリンクをクリックしたときの動作を指定します。" href="browser_session.html#security_external_redirects">外部 URL へのリダイレクトの管理</a></li><li><a title="ユーザーを保護するために、2 つの許可リストで Salesforce のリソースを読み込むための Trust URL とリダイレクト用の Trust URL を指定します。ブロックされたリダイレクトと、コンテンツセキュリティポリシー (CSP) ディレクティブでブロックされたリソース要求を確認します。次に、必要なリソースを許可するために、信頼済み URL を更新します。" href="#security_trusted_urls_csp_violations">信頼済み URL およびブラウザーポリシー違反の管理</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="security_trusted_urls_external_redirections_understand">
+<h1 class="slds-text-heading_large">Salesforce での外部リダイレクトの制限</h1>
+  <p>Salesforce でのリダイレクトの対象、リダイレクトがブロックされる状況、およびリダイレクトを許可および制限するオプションについて説明します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: すべてのエディション</td>
+
+          </tr>
+        </tbody></table>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 適格なリダイレクトの場合、Salesforce では、Salesforce 外部の最初のリダイレクトを [信頼されたリダイレクトの URL] 許可リストに対して検証します。ただし、後続のリダイレクトを検証することはできません。たとえば、Visualforce ページのリンクでユーザーを https://www.example.com にリダイレクトする場合、Salesforce では、https://www.example.com へのリダイレクトが許可されていることを検証します。その後、この URL でユーザーを https://spam.example.com にリダイレクトしている場合、リダイレクトが Salesforce 外部で発生しているため Salesforce ではそのリダイレクトを確認できません。</div></div></div>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">リダイレクトの信頼済み URL</h2><p>Salesforce は、リダイレクトの対象 URL が許可されているかどうかを確認するたびに、[信頼されたリダイレクトの URL] 許可リストを使用します。</p><p>Salesforce はその許可リストを使用して、ページおよびコンポーネント内のリダイレクトを検証します。また、Salesforce Classic を使用して Salesforce にアクセスするユーザーの場合、その許可リストに対して Salesforce のハイパーリンクを確認することを選択できます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">コンポーネントおよびページ内のリダイレクト</h2><p>ページおよびコンポーネント内では、外部 URL への有効な直接アンカーリンクが常に許可されます。直接アンカーリンクの例として、<code>&lt;a
+          href="targetUrl"&gt;linkText&lt;/a&gt;</code> があります。</p><p>ダイレクトアンカーリンクの場合、対象 URL が構文チェックに合格しないと、ユーザーはエラーを受信しますが、[設定] の [信頼済み URL] および [ブラウザーポリシー違反] リストではリダイレクトは取得されません。構文チェックに失敗する不正な形式の URL の例としては、<samp class="filepath">https://malformed^url.example.com</samp> や <samp class="filepath">https://mydomain.lightning.force.com/$test61'3</samp> などがあります。</p><p>Salesforce は、ページおよびコンポーネント内で、これらの種別のリダイレクトの対象 URL を [信頼されたリダイレクトの URL] 許可リストと照合します。</p><ul>
+        <li>リダイレクトを含むアンカーリンク。たとえば、<code>&lt;a
+            href="/?startURL=targetUrl"&gt;linkText&lt;/a&gt;</code> には <code>startURL</code> パラメータによるリダイレクトが含まれます。</li>
+
+        <li>ユーザーをリダイレクトするパラメーター。たとえば、次のフォームアクションは、<code>saveURL</code> パラメーター <code>&lt;form
+            action="/xyz?saveURL=targetURL"&gt;</code> を使用してユーザーをリダイレクトします。</li>
+
+      </ul>
+<p>これらのリダイレクトでは、対象 URL が許可リストにない場合、リダイレクトがブロックされ、ユーザーにエラーが表示されます。この検証は、Salesforce Classic と Lightning Experience の両方で Salesforce にアクセスするユーザーに適用されます。このような場合に Salesforce がリダイレクトをブロックすると、ブロックされたリダイレクトは [設定] の [信頼済み URL およびブラウザーポリシー違反] リストに取得されます。リダイレクト先 URL が構文チェックに失敗したためにリダイレクトがブロックされた場合、不正な形式の URL が違反リストに取得されます。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> パフォーマンスを維持するために、組織から発信される大量のリダイレクトが短期間にブロックされると、ブロックされたリダイレクトの一部が [信頼済み URL] および [ブラウザーポリシー違反] リストで取得できない可能性があります。</div></div></div>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Salesforce のハイパーリンクからのリダイレクトの制限</h2><p>[信頼されたリダイレクトの URL] 許可リストにないリダイレクト先 URL を使用してユーザーがハイパーリンクをクリックしたときの動作を指定できます。この機能を使用できるかどうかは、ハイパーリンクが含まれるデータ型によって異なります。</p><ul>
+        <li>URL フィールド タイプでは、Lightning Experience または Salesforce Classic を使用して Salesforce にアクセスするユーザのハイパーリンクからのリダイレクトを制限できます。[取引先] ページの Web サイト項目は URL 項目です。</li>
+
+        <li>[ロングテキストエリア] 項目の種別では、Salesforce Classic を使用して Salesforce にアクセスするユーザーのみハイパーリンクからのリダイレクトを制限できます。[取引先] ページの説明項目は、[ロングテキストエリア] 項目の一例です。</li>
+
+      </ul>
+<p>Salesforce では、これらのリダイレクト中にユーザーに警告することをお勧めします。Salesforce Classic を使用して Salesforce にアクセスするユーザーの場合、警告メッセージには、今後ユーザーが URL を Trust するためのオプションが含まれます。</p><p>これらのリダイレクトをブロックすることもできます。Salesforce Classic から発信されたブロックされたリダイレクトのみが、[設定] の [信頼済み URL およびブラウザーポリシー違反] リストで取得されます。</p><p>「<a title="[信頼されたリダイレクトの URL] 許可リストに入力したら、信頼できない URL へのリダイレクトからユーザーを保護します。Salesforce のハイパーリンクから実行されるリダイレクトを警告してブロックしたり、リダイレクト時にユーザーに警告したりできます。" href="#security_trusted_urls_external_redirections_secure">Secure External Redirections from Hyperlinks in Salesforce</a> (Salesforce でのハイパーリンクからの外部リダイレクトの保護)」を参照してください。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Lightning Experience の信頼できない URL への安全なリダイレクトは、パイロットまたはベータサービスです。このサービスには、お客様が実行した場合は <a target="_blank" href="https://www.salesforce.com/company/legal/agreements/">Agreements - Salesforce.com</a> のベータサービス規約、書面による<a target="_blank" href="https://ptd.salesforce.com/?_ga=2.247987783.1372150065.1709219475-629000709.1639001992">統合パイロット契約</a>、および製品規約ディレクトリの適用条件が適用されます。このパイロットサービスまたはベータサービスは、お客様ご自身の裁量でご利用ください。</div></div></div>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">組織内のクロスオリジン URL へのリダイレクト</h2><p>最後の特別なケースがあります。Salesforce では Salesforce 組織に対して複数の URL を提供しており、それらの URL のすべてがドメインを共有しているわけではありません。通常、別のドメインへのリダイレクトは、対象ドメインが [信頼されたリダイレクトの URL] 許可リストに登録されている場合にのみ許可されます。ただし、Salesforce では、同じ組織内の次のクロスオリジンリダイレクトが許可されます。</p><p>たとえば、<code><var>MyDomainName</var>--c.vf.force.com</code>で提供される Visualforce ページには、<code><var>MyDomainName</var>.my.site.com</code>で同じ組織によって提供されるサイトページへのリンクを含めることができます。また、[私のドメイン] の名前を変更して以前の [私のドメイン] からのリダイレクトが有効化されている場合、以前の [私のドメイン] の URL からのクロスオリジンリダイレクトも許可されます。たとえば、<code><var>oldMyDomainName</var>.my.salesforce.com</code> から <var>newMyDomainName</var>.lightning.force.com へのリダイレクトは許可されます。これは、それらの URL が同じ組織に属するためです。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">ブロックされたリダイレクトに関する情報の取得</h2><p>Salesforce が追跡するブロックされたリダイレクトを管理するには、[設定] の [信頼済み URL およびブラウザーポリシー違反] リストを使用します。この違反リストには、過去 7 日間に発生したブロックされたリダイレクトが含まれます。</p><p>リダイレクト元のページなど、ブロックされたリダイレクトに関する詳細情報を取得するには、ブロックされたリダイレクトイベント種別を使用します。経時的な違反を追跡するには、そのイベント種別の日次クエリをスケジュールします。<cite>『Salesforce プラットフォームのオブジェクトリファレンス』</cite>の<a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.object_reference.meta/object_reference/sforce_api_objects_eventlogfile_blockedredirect.htm">「Blocked Redirect Event Type ([ブロックされたリダイレクト] イベント種別)」</a>を参照してください。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Salesforce から離れる信頼できない外部リダイレクトからユーザーを保護します。まず、自動的に制限されるリダイレクトの種別と、Salesforce のハイパーリンクの制限オプションを確認します。信頼する外部 URL を許可リストに追加します。次に、ユーザーが Salesforce 組織外に移動するハイパーリンクをクリックしたときの動作を指定します。" href="browser_session.html#security_external_redirects">外部 URL へのリダイレクトの管理</a></li><li><a title="潜在的な攻撃からユーザーを保護するために、URL が信頼されない限り、ユーザーは Salesforce 組織とは異なる Salesforce 組織にリダイレクトされません。この制限には、2 番目の組織の公開されているページとコンテンツへのリダイレクトが含まれます。所有する別の Salesforce 組織にユーザーをリダイレクトするリンク、アクション、またはプロセスを許可するには、対象 URL を [信頼されたリダイレクトの URL] 許可リストに追加します。" href="#security_trusted_urls_external_redirections_orgs">リダイレクトを許可する組織間 URL の特定</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="security_trusted_urls_manage">
+<h1 class="slds-text-heading_large">信頼済み URL の管理</h1>
+ 
+ <p>ユーザーやネットワークとのやりとりを信頼する URL を指定します。コンテンツセキュリティポリシー (CSP) ディレクティブを使用して、Lightning コンポーネント、サードパーティ API、WebSocket 接続で各信頼済み URL から読み込むことができるリソースの種別を制御します。[セッションの設定] で Permissions-Policy HTTP ヘッダーを有効にしている場合は、Salesforce からブラウザー機能にアクセスできる URL も制御できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+  <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic および Lightning Experience</td>
+
+      </tr>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Developer</strong> Edition、および <strong>Unlimited</strong> Edition</td>
+
+      </tr>
+     </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d61188e71" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d61188e71" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">信頼済み URL を作成、参照、更新、削除する</td>
+
+       <td headers="d61188e71" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」および「すべてのデータの編集」</td>
+
+      </tr>
+     </tbody></table><p>[設定] で、信頼済み URL ごとに CSP ディレクティブと Permissions-Policy ディレクティブを指定できます。Salesforce からユーザーをリダイレクトできる外部 URL を指定するには、<a title="Salesforce から離れる信頼できない外部リダイレクトからユーザーを保護します。まず、自動的に制限されるリダイレクトの種別と、Salesforce のハイパーリンクの制限オプションを確認します。信頼する外部 URL を許可リストに追加します。次に、ユーザーが Salesforce 組織外に移動するハイパーリンクをクリックしたときの動作を指定します。" href="browser_session.html#security_external_redirects">「外部 URL へのリダイレクトの管理」</a>を参照してください。外部サイトで Visualforce ページまたはアンケートをインラインフレーム (iframe) で読み込むことができるようにするには、<a title="外部サイトで Visualforce ページまたはアンケートをインラインフレーム (iframe) で読み込むことができるようにするには、ドメインを [セッションの設定] の許可リストに追加します。" href="browser_session.html#security_clickjack_specify_iframe_trusted_domains">「インラインフレームの信頼済みドメインの指定」</a>を参照してください。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Salesforce 製品全体でのインテグレーションをサポートするため、信頼済み URL として定義されていない URL でも、各 CSP ディレクティブに URL が含まれます。Salesforce は最新の要件に基づいてこれらの URL を定期的に更新します。</div></div></div>
+<p>信頼済み URL を更新するたびに、関連ページの CSP ヘッダーサイズを確認します。インフラストラクチャによっては、HTTP ヘッダーの最大サイズが制限されます。組織で提供されるコンテンツを複数のドメインでフレーム化できるようにする場合は、CSP ヘッダーのサイズを 12 KB 未満に抑えます。ヘッダーサイズが 16 KB に近づくと Salesforce のお客様から問題が報告され、サードパーティが処理中にヘッダーを追加することがよくあります。</p></div>
+ 
+ <div id="id_lm5_wzq_jgc" aria-labelledby="ariaid-title2" class="nested1"><a name="id_lm5_wzq_jgc" href="https://help.salesforce.com/s?language=ja"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">信頼済み URL の追加または編集</h2>
+  
+  <p>[設定] で、信頼済み URL ごとにコンテンツセキュリティポリシー (CSP) ディレクティブと Permissions-Policy ディレクティブを指定できます。</p>
+
+   <ol><li>
+     <span>[設定] の [クイック検索] ボックスに<kbd>「信頼済み URL」</kbd>と入力し、<strong class="uicontrol">[信頼済み URL]</strong> を選択します。</span>
+     <div>
+      <div style="text-align:left;">
+       <img alt="[信頼済み URL] の [設定] ページ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/security/images/session/trusted_urls.png" style="width:800px;">
+      </div>
+     </div>
+    </li><li>
+     <span>新しい信頼済み URL を追加するには、<strong class="uicontrol">[新規信頼済み URL]</strong> をクリックします。</span>
+    </li><li>
+     <span>既存の信頼済み URL を編集するには、<strong class="uicontrol">[編集]</strong> をクリックします。</span>
+    </li><li>
+     <span>信頼済み URL を追加する場合、API 参照名を入力します。</span>
+     <div>
+      <p>アンダースコアと英数字のみを入力してください。名前が一意であること、最初は文字であること、空白は使用しない、最後にアンダースコアを使用しない、2 つ続けてアンダースコアを使用しないという制約があります。</p>
+      <p>既存の信頼済み URL の API 参照名を編集する場合は、コードを確認し、以前の API 参照名への参照を更新します。</p>
+     </div>
+    </li><li>
+     <span>URL を編集または入力します。</span>
+     <div>
+      <p>信頼済み URL にはドメイン名を含める必要があり、ポートを含めることもできます。例: https://example.com または https://example.com:8080。</p>
+      <p>反復作業を削減するため、ワイルドカード文字 * (アスタリスク) を使用できます。例: *.example.com。</p>
+      <p>サードパーティ API の場合は、URL を https:// で開始しなければなりません。例: https://example.com。</p>
+      <p>WebSocket 接続の場合は、URL を wss:// で開始しなければなりません。例: wss://example.com。</p>
+      <p>URL のホストセクションには、ワイルドカードとしてアスタリスク (<code>*</code>) を含めることができます。それ以外の場合、URL の形式を不正にすることはできません。構文の確認に失敗する不正な形式の URL の例として、<samp class="filepath">malformed^url.example.com</samp>、<samp class="filepath">https://{subdomain}.example.com</samp> などがあります。</p>
+      <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 2025 年 2 月より前は、不正な形式の URL を保存できました。不正な形式の URL は、生成された CSP HTTP ヘッダーから除外されます。[信頼済み URL] リストを正確に保つには、不正な形式のエントリを削除します。Apex クラスを使用すると、不正な形式の URL をすべて見つけることができます。Knowledge 記事「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=005317938&amp;language=ja&amp;type=1">Identify Malformed Trusted URLs</a>」を参照してください。</div></div></div>
+
+     </div>
+    </li><li>
+     <span>必要に応じて、信頼済み URL の説明を入力または編集します。</span>
+    </li><li>
+     <span>必要に応じて、この信頼済み URL を一時的に無効にするには、<strong class="uicontrol">[有効]</strong> を選択解除します。</span>
+    </li><li>
+     <span>信頼済み URL の CSP ディレクティブまたは権限ポリシーディレクティブを少なくとも 1 つ指定して、変更を保存します。</span>
+    </li></ol>
+
+  
+ </div>
+
+ <div id="trusted_urls_specify_directives" aria-labelledby="ariaid-title3" class="nested1"><a name="trusted_urls_specify_directives" href="https://help.salesforce.com/s?language=ja"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">信頼済み URL の CSP ディレクティブの指定</h2>
+  
+  <p>クロスサイトスクリプティング (XSS) や他のコードインジェクション攻撃を防止するために、Lightning コンポーネントフレームワークはコンテンツセキュリティポリシー (CSP) を使用してコンテンツに制約を適用します。デフォルトでは、フレームワークのヘッダーに読み込むことができるコンテンツは安全な (HTTPS) URL からのみで、JavaScript からの XHR 要求は禁止されています。外部 (Salesforce 以外の) サーバーに対する要求を実行するサードパーティ API や、WebSocket 接続を使用するには、信頼済み URL としてサーバーを追加します。</p>
+
+   <div><p>Apex での対応するアクセス権を有効にするには、リモートサイトを作成します。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> すべてのブラウザーで CSP が適用されるわけではありません。CSP が適用されるブラウザーのリストについては、<a target="_blank" href="http://caniuse.com/contentsecuritypolicy"><samp class="filepath">caniuse.com</samp></a> を参照してください</div></div></div>
+</div>
+   <ol><li>
+     <span>[設定] の [クイック検索] ボックスに<kbd>「信頼済み URL」</kbd>と入力し、<strong class="uicontrol">[信頼済み URL]</strong> を選択します。</span>
+     <div>
+      <p>[信頼済み URL] ページの [コンテンツセキュリティポリシー (CSP) 設定] セクションで CSP コンテキストとディレクティブを定義します。</p>
+      <div style="text-align:left;">
+       <img alt="[信頼済み URL] ページの [CSP 設定] セクション。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/security/images/session/trusted_url_csp_settings.png" style="width:800px;">
+      </div>
+     </div>
+    </li><li>
+     <span>この信頼済み URL からコンテンツを読み込むことができるページを制御するには、CSP コンテキストを選択します。</span>
+     <ol>
+      <li>
+       <span>サポートされているすべてのコンテキスト種別に CSP ディレクティブを適用するには、<strong class="uicontrol">[すべて]</strong> を選択します。このコンテキストがデフォルトです。</span>
+      </li>
+
+      <li>
+       <span>CSP ディレクティブを Experience Cloud サイトにのみ適用するには、<strong class="uicontrol">[エクスペリエンスビルダーサイト]</strong> を選択します。</span>
+      </li>
+
+      <li>
+       <span>CSP ディレクティブを Lightning Experience ページにのみ適用するには、<strong class="uicontrol">[Lightning Experience ページ]</strong> を選択します。</span>
+      </li>
+
+      <li>
+       <span>CSP ディレクティブをカスタム Visualforce ページにのみ適用するには、<strong class="uicontrol">[Visualforce ページ]</strong> を選択します。</span>
+      </li>
+
+     </ol>
+     <div>
+      <p>カスタム Visualforce ページでは、ページの <code>cspHeader</code> 属性が <code>true</code> に設定されている場合にのみコンテンツが CSP 信頼済みサイトに制限されます。</p>
+      <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> 3 つの CSP コンテキストのうち 2 つを使用して 1 つの URL の CSP ディレクティブを指定するには、API 参照名が異なる 2 つの信頼済み URL レコードを作成します。</div></div></div>
+
+     </div>
+    </li><li>
+     <span>この信頼済み URL の CSP ディレクティブを選択します。各 CSP ディレクティブは、リソース種別へのアクセスを制御します。Lightning コンポーネントは、Lightning 内、または CSP で保護された <a target="_blank" href="https://help.salesforce.com/s/articleView?id=experience.exp_cloud_basics_glossary.htm&amp;language=ja&amp;type=5">Aura または LWR</a> サイト内でリソースを読み込むことができます。</span>
+     <div>
+      <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> エクスペリエンスビルダーサイトコンテキストの CSP HTTP ヘッダーサイズは 512,000 文字を超えることはできません。Lightning Experience ページ コンテキストにも同じ制限が適用されます。</div></div></div>
+
+     </div>
+     <ol>
+      <li>
+       <span>Lightning コンポーネント、サードパーティ API、WebSocket 接続でこの信頼済み URL からのスクリプトインターフェースを使用する URL を読み込むことができるようにするには、<strong class="uicontrol">[connect-src (スクリプト)]</strong> を選択します。</span>
+       <div>
+        <p>信頼済み URL 内から Salesforce コンソールインテグレーションツールキットを使用するには、<a target="_blank" href="https://help.salesforce.com/s/articleView?id=experience.exp_cloud_basics_glossary.htm&amp;language=ja&amp;type=5">Visualforce サイト</a>のエクスペリエンスビルダーの [セキュリティ] 設定にも信頼済み URL を追加します。そうしないと、サードパーティからは、信頼済み URL であっても JavaScript リソースを読み込むことはできません。</p>
+        <p>サードパーティの JavaScript ライブラリを使用するには、そのライブラリを<a target="_blank" href="https://developer.salesforce.com/docs/platform/lwc/guide/create-resources.html">静的リソース</a>に追加し、静的リソースをコンポーネントに追加します。</p>
+       </div>
+      </li>
+
+      <li>
+       <span>Lightning コンポーネント、サードパーティ API、WebSocket 接続でこの信頼済み URL からフォントを読み込むことができるようにするには、<strong class="uicontrol">[font-src (フォント)]</strong> を選択します。</span>
+      </li>
+
+      <li>
+       <span>Lightning コンポーネント、サードパーティ API、WebSocket 接続でこの信頼済み URL から <code>&lt;iframe&gt;</code> 要素に含まれるリソースを読み込むことができるようにするには、<strong class="uicontrol">[frame-src (iframe コンテンツ)]</strong> を選択します。</span>
+      </li>
+
+      <li>
+       <span>Lightning コンポーネント、サードパーティ API、WebSocket 接続でこの信頼済み URL から画像を読み込むことができるようにするには、<strong class="uicontrol">[img-src (画像)]</strong> を選択します。このオプションはデフォルトで有効になっています。</span>
+      </li>
+
+      <li>
+       <span>Lightning コンポーネント、サードパーティ API、WebSocket 接続でこの信頼済み URL から音声と動画を読み込むことができるようにするには、<strong class="uicontrol">[media-src (音声と動画)]</strong> を選択します。</span>
+      </li>
+
+      <li>
+       <span>Lightning コンポーネント、サードパーティ API、WebSocket 接続でこの信頼済み URL からスタイルシートを読み込むことができるようにするには、<strong class="uicontrol">[style-src (スタイルシート)]</strong> を選択します。</span>
+      </li>
+
+     </ol>
+    </li></ol>
+
+  
+ </div>
+
+ <div id="trusted_url_browser_features" aria-labelledby="ariaid-title4" class="nested1"><a name="trusted_url_browser_features" href="https://help.salesforce.com/s?language=ja"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">ブラウザー機能への信頼済み URL アクセス権の付与</h2>
+  
+  <p>信頼済み URL の権限ポリシーディレクティブを選択します。各ディレクティブは、ブラウザー機能に信頼済み URL アクセス権を付与します。</p>
+
+   <div><p>この機能を使用するには、[セッションの設定] で Permissions-Policy ヘッダーを有効にします。[セッションの設定] で対応する機能のアクセス権が [信頼済み URL のみ] に設定されている場合にのみ、信頼済み URL レベルでブラウザー機能へのアクセス権を制御できます。</p></div>
+   <ol><li>
+     <span>信頼済み URL を追加または編集します。</span>
+     <div>
+      <p>[信頼済み URL] ページの [権限ポリシーディレクティブ] セクションで、ブラウザー機能にアクセス権を付与します。</p>
+      <div style="text-align:left;">
+       <img alt="[信頼済み URL] ページの [権限ポリシーディレクティブ] セクション。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/security/images/session/trusted_url_permissions_policy.png" style="width:800px;">
+      </div>
+     </div>
+    </li><li>
+     <span>この信頼済み URL 権限でユーザーのカメラへのアクセス権を付与するには、<strong class="uicontrol">[カメラ]</strong> を選択します。</span>
+    </li><li>
+     <span>この信頼済み URL 権限でユーザーのマイクロフォンへのアクセス権を付与するには、<strong class="uicontrol">[マイクロフォン]</strong> を選択します。</span>
+    </li></ol>
+
+  
+ <div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="コネクテッドな世界では、外部 Web サイトとオリジンとのやりとりが不可欠です。ネットワークとデータを保護するには、許可リストを設定し、Salesforce と外部オリジンのやりとりの方法を制限する設定を有効にします。また、Salesforce から発生するリダイレクトを信頼できる URL に制限します。" href="browser_session.html#security_external_interactions">外部 URL とオリジンとのやりとりの制限</a></li><li><a title="リモートサイトの設定を定義します。" href="#configuring_remoteproxy">リモートサイトの設定</a></li><li><a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.secure_coding_guide.meta/secure_coding_guide/secure_coding_websockets.htm">Secure Coding Guide (セキュアなコーディングガイド): Secure Coding WebSockets (WebSocket のセキュアなコーディング)</a></li><li><a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.lightning.meta/lightning/security_csp.htm">Lightning Aura コンポーネント開発者ガイド: Content Security Policy Overview (コンテンツセキュリティポリシーの概要)</a></li><li><a title="外部 (Salesforce 以外の) サーバーまたは URL への要求がユーザーのカメラとマイクロフォンにアクセスできるかどうかを制御するには、Permissions-Policy HTTP ヘッダーを有効にします。その後、次の各ブラウザー機能へのアクセスを許可するタイミングを選択します。" href="browser_session.html#security_browser_features">ブラウザー機能へのアクセス権の制御</a></li></ul></div>
+</div>
+
+</div></div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="named_credentials.html">&larr; 指定ログイン情報 / 外部認証情報</a><a href="browser_session.html">ブラウザ・セッション・クリックジャック &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_secure_your_org.htm&type=5&language=ja">help.salesforce.com — 組織を保護する（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>

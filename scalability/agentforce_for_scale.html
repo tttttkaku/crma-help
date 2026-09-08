@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Agentforce for Scale | スケーラビリティ ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（2）</h2>
+    <ol>
+      <li><a href="#agentforce_for_scale_overview">Agentforce for Scale</a></li>
+      <li><a href="#agentforce_for_scale_set_up">Set Up Agentforce for Scale</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>Agentforce for Scale</h1>
+      <div class="meta">Salesforce スケーラビリティ ヘルプ · 2 記事 · 生成 2026-08-17</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="insights.html">&larr; インサイト（Lightning／レポート／検索／DB／デプロイ／Apex）</a><a href="apexguru_core.html">ApexGuru（概要・ワークフロー・FAQ） &rarr;</a></div>
+<section class="article" id="agentforce_for_scale_overview">
+<h1 class="slds-text-heading_large">Agentforce for Scale</h1>
+ 
+ <p>Use conversational AI to monitor org performance and analyze results directly in Scale
+  Test, Scale Center, and ApexGuru.</p>
+
+  <p>Agentforce for Scale is an Agentforce agent built for the Salesforce Scalability suite. It
+   centralizes performance insights and automates diagnostic workflows, letting you identify issues
+   and act on them without leaving the product.</p>
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">Main Topics</h2><dl>
+    
+     <dt style="font-weight:bold;padding-top:.25rem;">Org Performance Analysis</dt>
+
+     <dd style="padding-left:1.5rem;padding-bottom:.5rem;">Retrieves org-wide performance metrics and generates diagnostic investigations, including
+      Row Lock, Apex Summary, and Governor Limit analysis.</dd>
+    
+    
+     <dt style="font-weight:bold;padding-top:.25rem;">Live Scale Test Monitoring</dt>
+
+     <dd style="padding-left:1.5rem;padding-bottom:.5rem;">Analyzes Requests Per Second (RPS) data and generates health reports for active scale test
+      sessions.</dd>
+    
+    
+     <dt style="font-weight:bold;padding-top:.25rem;">Default Topic for Scale Products</dt>
+
+     <dd style="padding-left:1.5rem;padding-bottom:.5rem;">Answers general questions about Scale Test, Scale Center, ApexGuru, and related
+      functionality by using product documentation.</dd>
+    
+   </dl>
+</div>
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">Considerations</h2><ul>
+    <li>Agentforce for Scale requires a Scale Center or Scale Test license, the
+      <strong class="uicontrol">PlatformAiAppDevAddOn</strong> SKU, and Salesforce Foundations with the
+      <strong class="uicontrol">Flex Credits Add-on</strong> SKU.</li>
+
+    <li>Deploy Agent for Setup before activating Agentforce for Scale. Agent for Setup enables the
+     Agentforce button in performance-related setup pages.</li>
+
+    <li>Agentforce for Scale uses the <strong class="uicontrol">Agentforce for Scale</strong> template
+     configured with actions specific to Scale Test, Scale Center, and ApexGuru.</li>
+
+   </ul>
+</div>
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">Explore Agentforce for Scale</h2></div>
+ 
+<ul><li class="slds-p-bottom_small"><strong><a href="#agentforce_for_scale_set_up">Set Up Agentforce for Scale</a></strong><br>Configure and activate Agentforce for Scale to use AI-powered performance analysis in   Scale Test, Scale Center, and ApexGuru.</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">See Also</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.setup_agentforce_overview.htm&amp;language=en_US&amp;type=5">Setup with Agentforce (Beta)</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agentforce_for_scale_set_up">
+<h1 class="slds-text-heading_large">Set Up Agentforce for Scale</h1>
+ 
+ <p>Configure and activate Agentforce for Scale to use AI-powered performance analysis in
+  Scale Test, Scale Center, and ApexGuru.</p>
+
+  <div><p>Before setting up Agentforce for Scale, confirm that your org has:</p><ul>
+    <li>A Scale Center or Scale Test license</li>
+
+    <li>The <strong class="uicontrol">PlatformAiAppDevAddOn</strong> SKU, which includes the AgentforceScale org
+     and user permissions</li>
+
+    <li>The Foundations add-on, which enables Agentforce Platform features</li>
+
+   </ul>
+</div>
+  <ol><li>
+    <span>Turn on Einstein.</span>
+    <ol>
+     <li>
+      <span>From Setup, in the Quick Find box, search for and select <strong class="uicontrol">Einstein
+        Setup</strong>.</span>
+     </li>
+
+     <li>
+      <span>Set the <strong class="uicontrol">Turn on Einstein</strong> toggle to
+       <strong class="uicontrol">On</strong>.</span>
+     </li>
+
+    </ol>
+   </li><li>
+    <span>Turn on Agentforce.</span>
+    <ol>
+     <li>
+      <span>From Setup, in the Quick Find box, search for and select <strong class="uicontrol">Agentforce
+        Agents</strong>.</span>
+     </li>
+
+     <li>
+      <span>Set the global <strong class="uicontrol">Agentforce</strong> toggle in the top-right corner to
+        <strong class="uicontrol">On</strong>.</span>
+     </li>
+
+    </ol>
+   </li><li>
+    <span>Assign the required permission set license and permission set to each user.</span>
+    <ol>
+     <li>
+      <span>From Setup, go to <strong class="uicontrol">Users</strong>, then click
+       <strong class="uicontrol">Users</strong>.</span>
+     </li>
+
+     <li>
+      <span>Select a user, then click <strong class="uicontrol">Permission Set License Assignments</strong> and
+       add <strong class="uicontrol">Agentforce Platform Developer and Admin</strong>.</span>
+     </li>
+
+     <li>
+      <span>For the same user, click <strong class="uicontrol">Permission Sets</strong> and add
+        <strong class="uicontrol">Agentforce Developer and Admin Tools</strong>.</span>
+     </li>
+
+    </ol>
+   </li><li>
+    <span>Deploy Agent for Setup.</span>
+    <div>
+     <p>Agent for Setup enables the Agentforce button on performance-related setup pages, including
+      Scale Center and Scale Test.</p>
+    </div>
+    <ol>
+     <li>
+      <span>From the <strong class="uicontrol">Agentforce Agents</strong> page, click <strong class="uicontrol">New
+        Agent</strong>.</span>
+     </li>
+
+     <li>
+      <span>Select the <strong class="uicontrol">Agent for Setup</strong> template and click
+        <strong class="uicontrol">Create</strong>.</span>
+     </li>
+
+     <li>
+      <span>In Agentforce Builder, click <strong class="uicontrol">Activate</strong>.</span>
+     </li>
+
+    </ol>
+   </li><li>
+    <span>Create and configure Agentforce for Scale.</span>
+    <ol>
+     <li>
+      <span>Return to the <strong class="uicontrol">Agentforce Agents</strong> page and click <strong class="uicontrol">New
+        Agent</strong>.</span>
+     </li>
+
+     <li>
+      <span>Select the <strong class="uicontrol">Agentforce for Scale</strong> template and click
+        <strong class="uicontrol">Create</strong>.</span>
+     </li>
+
+     <li>
+      <span>Define the agent's profile with these values:</span>
+      <div>
+       <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:33.33333333333333%"><col style="width:66.66666666666666%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+           <th id="d1668e250" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Field</th>
+           <th id="d1668e253" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Value</th>
+          </tr>
+         </thead><tbody>
+          <tr class="">
+           <td headers="d1668e250" style="vertical-align:top;" class="slds-cell-wrap" data-label="Field">Name</td>
+
+           <td headers="d1668e253" style="vertical-align:top;" class="slds-cell-wrap" data-label="Value">Agentforce for Scale</td>
+
+          </tr>
+          <tr class="">
+           <td headers="d1668e250" style="vertical-align:top;" class="slds-cell-wrap" data-label="Field">API Name</td>
+
+           <td headers="d1668e253" style="vertical-align:top;" class="slds-cell-wrap" data-label="Value">Agentforce_for_Scale</td>
+
+          </tr>
+          <tr class="">
+           <td headers="d1668e250" style="vertical-align:top;" class="slds-cell-wrap" data-label="Field">Role</td>
+
+           <td headers="d1668e253" style="vertical-align:top;" class="slds-cell-wrap" data-label="Value">Provide actionable recommendations and performance analysis using the Salesforce
+            Scalability suite.</td>
+
+          </tr>
+          <tr class="">
+           <td headers="d1668e250" style="vertical-align:top;" class="slds-cell-wrap" data-label="Field">Company</td>
+
+           <td headers="d1668e253" style="vertical-align:top;" class="slds-cell-wrap" data-label="Value">Your company name</td>
+
+          </tr>
+          <tr class="">
+           <td headers="d1668e250" style="vertical-align:top;" class="slds-cell-wrap" data-label="Field">Tone</td>
+
+           <td headers="d1668e253" style="vertical-align:top;" class="slds-cell-wrap" data-label="Value">Casual</td>
+
+          </tr>
+         </tbody></table>
+      </div>
+     </li>
+
+     <li>
+      <span>Click <strong class="uicontrol">Activate</strong> in the top-right corner of Agentforce
+       Builder.</span>
+      <div>
+       <p>If activation warnings appear, click <strong class="uicontrol">Ignore and Activate</strong> to
+        complete deployment.</p>
+      </div>
+     </li>
+
+    </ol>
+   </li><li>
+    <span>Manage employee agent access.</span>
+    <div>
+     <p>To give users access to an Agentforce Employee agent created in Agentforce Builder, add the
+      agent to a permission set or profile in Setup.</p>
+    </div>
+    <ol>
+     <li>
+      <span>From Setup, in the Quick Find box, enter <strong class="uicontrol">Permission Sets</strong>, and
+       then select <strong class="uicontrol">Permission Sets</strong>. Or, enter
+        <strong class="uicontrol">Profiles</strong>, and then select <strong class="uicontrol">Profiles</strong>.</span>
+     </li>
+
+     <li>
+      <span>Select a permission set or profile.</span>
+     </li>
+
+     <li>
+      <span>Edit the <strong class="uicontrol">Enabled Agent Access</strong> settings.</span>
+     </li>
+
+     <li>
+      <span>Select the Agentforce Employee agents that you want to give users access to, and then
+       click <strong class="uicontrol">Save</strong>.</span>
+     </li>
+
+    </ol>
+   </li></ol>
+
+ 
+</div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="insights.html">&larr; インサイト（Lightning／レポート／検索／DB／デプロイ／Apex）</a><a href="apexguru_core.html">ApexGuru（概要・ワークフロー・FAQ） &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.scalability_overview.htm&type=5&language=ja">help.salesforce.com — Salesforce スケーラビリティ（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>

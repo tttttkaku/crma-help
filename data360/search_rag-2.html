@@ -1,0 +1,1949 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>検索・検索インデックス・RAG・ハイブリッド検索（2/2） | Data 360 ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（23）</h2>
+    <ol>
+      <li><a href="#c360_a_process_content_search_index">Data 360 検索インデックス</a></li>
+      <li><a href="#c360_a_retrieval_response_enriched_index">拡張検索インデックスを使用した取得応答</a></li>
+      <li><a href="#c360_a_retriever_filter_reference">Retriever Filters Reference (取得者検索条件のリファレンス)</a></li>
+      <li><a href="#c360_a_search_index_chunk_citations">コンテンツチャンクの引用</a></li>
+      <li><a href="#c360_a_search_index_create_index_config_data_kit">データキットからの検索インデックス設定の作成</a></li>
+      <li><a href="#c360_a_search_index_create_vector_index_config">高度な設定を使用したベクトル検索インデックスの作成</a></li>
+      <li><a href="#c360_a_search_index_delete_index_config">検索インデックス設定の削除</a></li>
+      <li><a href="#c360_a_search_index_edit_search_index">検索インデックス設定の編集</a></li>
+      <li><a href="#c360_a_search_index_enriched_index">コンテンツチャンクの強化されたインデックス付け</a></li>
+      <li><a href="#c360_a_search_index_ground_ai">AI、自動化、分析の検索の使用</a></li>
+      <li><a href="#c360_a_search_index_grounding">チャンクデータ</a></li>
+      <li><a href="#c360_a_search_index_in_data_kit">データ キットへの検索インデックス設定の追加</a></li>
+      <li><a href="#c360_a_search_index_manage">検索インデックスの管理</a></li>
+      <li><a href="#c360_a_search_index_max_token_setting">最大トークン設定がチャンクに与える影響</a></li>
+      <li><a href="#c360_a_search_index_optimize">検索インデックスの最適化: 項目の選択とチャンク</a></li>
+      <li><a href="#c360_a_search_index_rebuild_search_index">検索インデックス設定の再構築</a></li>
+      <li><a href="#c360_a_search_index_reference">検索インデックス参照</a></li>
+      <li><a href="#c360_a_search_index_retrieve_content">ベクトル検索を使用したコンテンツの取得</a></li>
+      <li><a href="#c360_a_search_index_sfr_v2_small">SFR-v2-small 組み込みモデルリファレンス</a></li>
+      <li><a href="#c360_a_search_index_supported_chunking_strategies">チャンク戦略</a></li>
+      <li><a href="#c360_a_search_index_vector_index">ベクトル検索</a></li>
+      <li><a href="#c360_a_search_index_vector_search_analytics">Tableau でのベクトル検索を使用したデータ分析の強化</a></li>
+      <li><a href="#c360_a_search_index_view_search_index">検索インデックス状況およびプロセス履歴の表示</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>検索・検索インデックス・RAG・ハイブリッド検索（2/2）</h1>
+      <div class="meta">Data 360（旧 Data Cloud）ヘルプ · 23 記事 · 生成 2026-08-12</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="search_rag-1.html">&larr; 検索・検索インデックス・RAG・ハイブリッド検索（1/2）</a><a href="ai_models-1.html">AI・予測モデル・Model Builder・Einstein（1/2） &rarr;</a></div>
+<section class="article" id="c360_a_process_content_search_index">
+<h1 class="slds-text-heading_large">Data 360 検索インデックス</h1>
+  <p><span>Data 360</span>では、検索インデックスを使用して、構造化コンテンツと非構造化コンテンツを検索に最適化された方法で管理します。検索インデックス設定を作成して、コンテンツをチャンク化してベクトル化します。チャンクでは、元のコンテンツ (文章や段落など) の文章を反映して、テキストを小さな単位に分割します。ベクトル化では、チャンクがテキストの数値表現に変換され、セマンティックの類似性が取得されます。</p>
+
+    <p> <span>Data 360</span>では、データとクエリのニーズに応じてベクトル検索インデックスまたはハイブリッド検索インデックスを作成できます。</p>
+    <p>ベクトル検索は、データソースと検索クエリで、大規模なデータセット内のセマンティック認識一致のメリットが大きい場合に使用します。たとえば、「What is Acme famous for? (Acme の有名ユーザー)」などのクエリを送信すると、LLM は検索クエリとのセマンティック一致に最も近いベクトル検索スコアを持つチャンクを取得します。</p>
+    <p>データソースクエリと検索クエリでセマンティックアウェアなベクトル検索とキーワード検索の精度の両方の利点を得られる場合は、ハイブリッド検索を使用します。たとえば、「Does Acme motor XYZ123 uses hydraulic pumps? (Acme motor XYZ123 は油圧ポンプを使用していますか?)」というクエリでは、キーワード検索の追加により、関連性の高いコンテンツの順位が上がり、結果のグラウンディングが向上します。</p>
+    <p>Data Cloud 検索インデックスについて説明します。</p>
+    <ul>
+      <li><a target="_blank" href="#c360_a_search_index_vector_index">ベクトル検索</a></li>
+
+      <li><a target="_blank" href="search_rag-1.html#c360_a_hybridsearch_index">ハイブリッド検索</a></li>
+
+      <li><a target="_blank" href="#c360_a_search_index_reference">検索インデックス参照</a></li>
+
+      <li><a target="_blank" href="#c360_a_search_index_manage">検索インデックスの管理</a></li>
+
+    </ul>
+
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_retrieval_response_enriched_index">
+<h1 class="slds-text-heading_large">拡張検索インデックスを使用した取得応答</h1>
+  <p>強化されたインデックス付けにより、質問とKnowledgeベースの最良の回答を照合することで、取得応答が向上します。<span>Data 360</span>ハイブリッド検索では、セマンティック対応ベクトル検索の強みがキーワード検索の精度と速度と組み合わされますが、強化されたインデックス付けでは、ユーザーの質問に最も近いチャンクを見つけることで、ギャップをさらに埋めます。</p>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">強化されたインデックス付けと取得の拡張生成 (RAG)</h2><p>強化されたインデックス付けでは、2 つの方法でギャップが埋められます。まず、元のプレーンチャンク (質問チャンク) に基づいて質問が生成されるため、ベクトル検索ではユーザー質問のほぼ完全な代替質問が検出されます。次に、元のプレーンチャンク (タイトル、概要、キーワード、名前付きエンティティ、トピックカテゴリ) ごとにリッチメタデータチャンクを抽出します。<span>Data 360</span>ではメタデータ チャンクがベクトルとして埋め込まれるため、ベクトル検索スコアとキーワード検索スコアの両方が向上します。絞り込まれた概念豊富なテキストにより、ベクトル検索のセマンティック一致が向上し、明示的なキーワードによりキーワードの一致が容易になります。派生チャンクは両方とも、取得時のソースとして元のプレーンチャンクを参照します。</p><p>検索でプレーンチャンクが複数回取得された場合、取得プロセスではプレーンチャンクのインスタンスが 1 つだけ保持されます。この重複は、複数の強化チャンクがソースチャンクと同じプレーンチャンクを参照している場合に発生します。</p><div style="text-align:left;">
+        <img alt="強化されたインデックスの取得プロセスがグラフィカルな図で示されています。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/ER_Retrieval_Response.png" style="width:500px;">
+      </div></div>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span>  「パスワードをリセットする方法は?」というユーザークエリについて考えてみます。<p><strong>回答</strong>: 知識ベースに適切な回答の記事が含まれています。記事には、手順として「復旧ページに移動してメールアドレスを入力してください」というセクションがあります。
+          </p><p><strong>ギャップ</strong>: 手順として記述された文章は、質問とは異なる意味を持ちます。Data 360は、Knowledge記事を取り込んでインデックスを作成します。取得プロセス中に、このチャンクのスコアがこのギャップにより予想より大幅に低くなる可能性があります。その結果、取得でこの一節が除外される場合があります。</p><p>大規模言語モデル (LLM) を使用して強化インデックスを有効にすると、Data 360 によって、この手順のコンテンツが含まれる元のプレーンチャンクのメタデータチャンクと質問チャンクが作成されます。</p><p>メタデータチャンクには、プレーンチャンクに関する次のようなリッチメタデータが含まれます。</p><p><strong>タイトル:</strong> <em>"Password recovery"</em></p><p><strong>概要:</strong><em> 「回復ページでログイン情報をリセットする手順</em>」。</p><p><strong>キーワード:</strong><em>回復、ログイン</em>情報、リセットリンク、メール</p><p><strong>エンティティ:</strong><em> 復旧ページ、登録済みメール (通路の名前付き Thing)</em></p><p><strong>トピック：</strong><em>アカウント管理、認証</em></p><p>質問チャンクには、プレーンチャンクで回答される次のような自然言語の質問が含まれます。</p><p>「パスワードをリセットする方法は?」</p><p>「ログインを忘れた場合はどうすればよいですか?」</p><p>「パスワードリセットリンクの有効期間は?」</p><p>「アカウントアクセスを回復するには、どこに行けばいいですか?」</p><p>3 つのチャンクはすべて同じインデックスに含まれます。そのため、応答を検索するときに、どのチャンク種別でも一致させることができます。この例では、元のクエリは質問チャンクと一致します。Data 360 検索インデックスでは、元のプレーン チャンク、実際のドキュメント テキストが返され、派生の強化チャンクは返されません。正解を含む元のプレーンチャンクのスコアが他の一致よりも高くなります。</p></div></div></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_retriever_filter_reference">
+<h1 class="slds-text-heading_large">Retriever Filters Reference (取得者検索条件のリファレンス)</h1>
+  <p>AIモデル(旧称Einstein Studio)で取得者を作成またはテストするときに、取得精度の検索条件を設定します。検索条件を使用して、検索クエリで取得したレコードを絞り込みます。個々の取得者には最大 10 個の検索条件を設定できます。</p>
+
+    <div id="c360_a_retriever_filter_reference__section_filter_operators"><a name="c360_a_retriever_filter_reference__section_filter_operators"></a><h2 class="slds-text-heading_medium slds-p-top_small">検索条件でサポートされる演算子</h2><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d131893e38" style="vertical-align:top;" class="slds-cell-wrap" scope="col">演算子</th>
+              <th id="d131893e41" style="vertical-align:top;" class="slds-cell-wrap" scope="col">例 [項目]{演算子}[値]</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d131893e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="演算子">次の値と等しい </td>
+
+              <td headers="d131893e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="例 [項目]{演算子}[値]">Make <strong>Equal To</strong> Honda.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d131893e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="演算子">次の値と等しくない</td>
+
+              <td headers="d131893e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="例 [項目]{演算子}[値]">Trim <strong>Not Equal To</strong> High-End (次の文字列と等しくないハイエンドを切り捨てる)</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d131893e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="演算子">より大きい </td>
+
+              <td headers="d131893e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="例 [項目]{演算子}[値]">ModelYear <strong>Greater Than</strong> 2000 (2000 より大きいモデル年)</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d131893e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="演算子">未満 </td>
+
+              <td headers="d131893e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="例 [項目]{演算子}[値]">ModelYear <strong>Less Than</strong> 2025</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d131893e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="演算子">いいね!</td>
+
+              <td headers="d131893e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="例 [項目]{演算子}[値]">ModelName <strong>Like</strong> Civic</td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 
+        <p>Like 演算子を使用して取得者の検索条件を定義する場合、値の照合のために末尾に % を追加しないでください。末尾の % は、内部で値を照合するために追加されます。プロンプトビルダーや Flow Builder などの他のアプリケーションでは、部分一致を含めるために末尾に% を追加する必要があります。たとえば、[いいね!] 演算子を使用する動的検索条件を持つ取得者には、プロンプトテンプレートの末尾に % が必要です。</p>
+      </div></div></div>
+<p>サポートされる検索条件項目のデータ型については、次のガイドラインを参照してください。</p><ul>
+        <li>テキスト: 最大 255 文字、いいね! 演算子を使用した場合は最大 254 文字です。</li>
+
+        <li>Boolean: True または False の値をサポートします。</li>
+
+        <li>数値: 最大 255 文字、いいね! 演算子を使用した場合は 254 文字です。</li>
+
+        <li>日付: 2024 年 12 月 31 日の形式で日付を入力します。</li>
+
+        <li>ArrayOfTexts: サポートされていません</li>
+
+      </ul>
+<p>項目値に一重引用符を含めることはできません。</p></div>
+    <div id="c360_a_retriever_filter_reference__file-formats"><a name="c360_a_retriever_filter_reference__file-formats"></a><h2 class="slds-text-heading_medium slds-p-top_small">検索条件ロジック</h2><p>検索条件を条件ロジックと組み合わせて、取得したレコードを絞り込みます。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d131893e159" style="vertical-align:top;" class="slds-cell-wrap" scope="col">検索条件の使用条件</th>
+              <th id="d131893e162" style="vertical-align:top;" class="slds-cell-wrap" scope="col">条件付きロジック</th>
+              <th id="d131893e165" style="vertical-align:top;" class="slds-cell-wrap" scope="col">例</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d131893e159" style="vertical-align:top;" class="slds-cell-wrap" data-label="検索条件の使用条件">すべての条件に一致 </td>
+
+              <td headers="d131893e162" style="vertical-align:top;" class="slds-cell-wrap" data-label="条件付きロジック">および</td>
+
+              <td headers="d131893e165" style="vertical-align:top;" class="slds-cell-wrap" data-label="例">ModelType <strong>Equal To</strong> Sedan AND ModelYear <strong>Greater Than</strong> 2000 (セダンと等しい ModelType と 2000 より大きい ModelYear)</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d131893e159" style="vertical-align:top;" class="slds-cell-wrap" data-label="検索条件の使用条件">いずれかの条件に一致</td>
+
+              <td headers="d131893e162" style="vertical-align:top;" class="slds-cell-wrap" data-label="条件付きロジック">または</td>
+
+              <td headers="d131893e165" style="vertical-align:top;" class="slds-cell-wrap" data-label="例">ModelType <strong>Equal To</strong> Sedan OR ModelType <strong>Equal To</strong> Hatchback (セダンと等しい ModelType またはハッチバックと等しい ModelType)</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d131893e159" style="vertical-align:top;" class="slds-cell-wrap" data-label="検索条件の使用条件">カスタム条件に一致</td>
+
+              <td headers="d131893e162" style="vertical-align:top;" class="slds-cell-wrap" data-label="条件付きロジック"><p>条件は、カスタムロジックを使用して、番号付き検索条件から作成されます。</p><p style="margin-bottom:0;">カスタム条件には、有効な形式で定義されたすべての検索条件が含まれます。たとえば、3 つの検索条件がある場合、有効な形式は 1 AND (2 OR 3) または (1 OR 2) AND (NOT 3) になります。</p></td>
+
+              <td headers="d131893e165" style="vertical-align:top;" class="slds-cell-wrap" data-label="例"><p>ModelName <strong>Equal To</strong> Civic AND (ModelType <strong>Equal To</strong> Sedan OR ModelType <strong>Equal To</strong> Hatchback)</p><p style="margin-bottom:0;">(モデル<strong>が「</strong>Civic」または「Model <strong>Equal To</strong> ODY」) AND (「Trim <strong>Equal To</strong> A-Spec (A-spec のトリミングなし)」)</p></td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">動的検索条件</h2><p>動的検索条件では、実行時に値を使用できます。最大 10 個の動的検索条件を設定し、実行時に取得者のプレイグラウンドまたはプロンプトテンプレートで取得者をテストするときに値を指定します。</p><p> プレースホルダー値を入力することも、AI モデルにデフォルトで変数を含めることもできます。たとえば、<code>Itemname Equal To {!$ItemName}</code> です。有効なプレースホルダー値については、次のガイドラインを確認してください。</p><ul>
+        <li>英数字と連続しないアンダースコアのみを含む</li>
+
+        <li>文字で始まる</li>
+
+        <li>スペースを含めない</li>
+
+        <li>末尾をアンダースコアにしない</li>
+
+        <li>最大文字数は 40 文字です。</li>
+
+        <li>すべての事前検索条件項目で一意である</li>
+
+      </ul>
+</div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_search_index_chunk_citations">
+<h1 class="slds-text-heading_large">コンテンツチャンクの引用</h1>
+  <p> コンテンツチャンクのインライン引用を使用して、非構造化データに基づく AI 応答の精度を確認します。Data Cloud で検索インデックスを作成すると、インデックスによって各チャンクの引用が作成されます。</p>
+
+    <p>Data Cloud では、非構造化データに対して次の引用が追加されます。</p>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d196309e38" style="vertical-align:top;" class="slds-cell-wrap" scope="col">ファイルの種類</th>
+            <th id="d196309e41" style="vertical-align:top;" class="slds-cell-wrap" scope="col">引用</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d196309e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="ファイルの種類">PDF</td>
+
+            <td headers="d196309e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="引用">ページ番号、ファイルの種類</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d196309e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="ファイルの種類">Excel</td>
+
+            <td headers="d196309e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="引用">ページ番号、ページ名、ファイルの種類</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d196309e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="ファイルの種類">PowerPoint</td>
+
+            <td headers="d196309e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="引用">ページ番号、ファイルの種類</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d196309e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="ファイルの種類">音声および動画ファイル</td>
+
+            <td headers="d196309e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="引用">開始および終了タイムスタンプ、ファイルの種類</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d196309e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="ファイルの種類">その他のファイル形式</td>
+
+            <td headers="d196309e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="引用">ファイルの種類</td>
+
+          </tr>
+        </tbody></table>
+    <p>引用では次の JSON 構造が使用されます。</p>
+    <ul>
+      <li>PDF<pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-json">{
+  type: pdf,
+  page_number: 1
+}
+</code></pre></li>
+
+      <li>Excel<pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-json">{
+  type: xlxs,
+  page_number: 1,
+  page_name: Sheet1
+}
+</code></pre></li>
+
+      <li>音声および動画ファイル<pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-json">{
+  type: mp4,
+  start_time: 0.0,
+  end_time: 10.4
+}
+</code></pre></li>
+
+    </ul>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 既存の検索インデックスがある場合は、Data Cloud 用に<a title="Data 360 検索インデックスが適切に処理されない場合、検索インデックス リスト ページまたはオブジェクト レコード ビューからインデックスのフル再構築をトリガーできます。" href="#c360_a_search_index_rebuild_search_index">インデックスを再構築</a>して、<code>citation__c</code> フィールドをチャンク DMO に追加し、引用を入力します。</div></div></div>
+
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_search_index_create_index_config_data_kit">
+<h1 class="slds-text-heading_large">データキットからの検索インデックス設定の作成</h1>
+  
+  <p>Data 360 にデータキットをリリースしたら、含まれるインデックスから新しい検索インデックス設定を作成できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d189692e61" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d189692e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">検索インデックス設定を作成する</td>
+
+              <td headers="d189692e61" style="vertical-align:top;" class="slds-cell-wrap"><p>権限セット</p><ul>
+                  <li>Data Cloud アーキテクト</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>データ キットで参照されるオブジェクト API 参照名が検索インデックスを作成する組織で使用可能な場合、そのオブジェクトが自動的に選択されます。そのオブジェクト API 参照名に一致するものがない場合、オブジェクトは選択されません。この選択内容を変更して、別のオブジェクトを選択できます。</p></div>
+    <ol><li>
+        <span>アプリケーションランチャーで、[<strong class="uicontrol">Data Cloud]</strong> を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">検索インデックス</strong>&gt; <strong class="uicontrol">[新規]</strong> をクリックします。</span>
+      </li><li>
+        <span>[<strong class="uicontrol">Data Kit Setup</strong> (データキット設定)] をクリックします。</span>
+      </li><li>
+        <span>データ キットから検索インデックスを選択します。</span>
+      </li><li>
+        <span>[ソース DMO を選択] ページで、データスペースとオブジェクトを選択します。</span>
+        <div>選択したオブジェクトごとに検索インデックス設定が作成されます。1 つ以上の外部データレイクオブジェクトからマッピングがあるオブジェクトを選択することはできません。</div>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>検索インデックスが DMO 上にある場合は、[チャンク] ページでチャンクするフィールドとチャンク戦略を選択します。</span>
+        <ol>
+          <li>
+            <span>フィールドを追加または削除するには、&nbsp;<strong class="uicontrol">「フィールドの管理</strong>」&nbsp;をクリックして作業を保存します。</span>
+          </li>
+
+          <li>
+            <span>(省略可能) チャンク戦略を更新し、設定を変更します。</span>
+          </li>
+
+          <li>
+            <span>[<strong class="uicontrol">次へ</strong>] をクリックします。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>検索インデックスが UDMO 上にある場合は、[チャンク] ページでファイル拡張子を追加するか、ファイル タイプに基づいてチャンク戦略を設定します。</span>
+        <ol>
+          <li>
+            <span>新しいファイル形式のファイル拡張子を追加するには、&nbsp;[<strong class="uicontrol">Add File Extension</strong>] をクリックします。</span>
+          </li>
+
+          <li>
+            <span>(省略可能) チャンク戦略を更新し、既存のファイルの種類の設定を変更します。</span>
+          </li>
+
+          <li>
+            <span>[<strong class="uicontrol">次へ</strong>] をクリックします。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>[Vectorization (ベクトル化)] ページで、ドロップダウンリストから埋め込みモデルを選択し、[<strong class="uicontrol">次へ]</strong> をクリックします。</span>
+        <div>このモデルでは、検索結果を作成するときに、Data 360 で非構造化データオブジェクトの意味的な関連性をどのように測定するかを決定します。</div>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>[絞り込みの項目] ページで、必要に応じてソースオブジェクトまたは関連オブジェクトの項目を追加して、検索を絞り込む方法を増やします。最大 10 個の検索条件項目を選択できます。</span>
+        <div>
+          <p>Data 360 では、ベクトル埋め込みを生成するときに事前検索条件項目が選択されます。これらの事前絞り込み項目の値を変更すると、ベクトル埋め込みを生成または更新するときに Data 360 によって値が選択されます。取得元オブジェクトと関連オブジェクト間のオブジェクトリレーションのカーディナリティは、1:1 または N:1 である必要があります。</p>
+          <p>たとえば、インデックス付けされた非構造化データにケースの会話トランスクリプトが含まれている場合、ケースオブジェクトの [状況] 項目で絞り込むと、会話トランスクリプトを検索するときのセマンティック検索結果の関連性を改善できます。</p>
+        </div>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>設定と対象データモデルオブジェクトを確認し、[<strong class="uicontrol">保存] を</strong>クリックします</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_search_index_create_vector_index_config">
+<h1 class="slds-text-heading_large">高度な設定を使用したベクトル検索インデックスの作成</h1>
+  <p>データ モデル オブジェクトのベクトル検索インデックス設定を作成すると、Data 360によって参照されるデータが意味的に関連するチャンクに分解され、検索可能なベクトルが生成されます。RAG ワークフローとエージェントワークフローでは、クエリを実行するときにこれらのベクトルを使用して、セマンティックに類似する項目を見つけて返します。検索インデックス設定をより詳細に制御するには、プロセスの各ステップをガイドする高度な設定を使用します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d15618e60" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d15618e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">検索インデックス設定を作成する</td>
+
+              <td headers="d15618e60" style="vertical-align:top;" class="slds-cell-wrap"><p>権限セット</p><ul>
+                  <li>Data Cloud アーキテクト</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table><p>検索インデックスを作成する前に、「<a title="Data 360の検索では、非構造化データ、モデルの埋め込み、検索結果の事前絞り込み操作など、さまざまなファイル形式がサポートされます。" href="#c360_a_search_index_reference">検索リファレンス」</a>で検索インデックスの考慮事項を確認してください
+      </p></div>
+  <div id="nh1_mqm_khc" aria-labelledby="ariaid-title2" class="nested1"><a name="nh1_mqm_khc"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">生成 AI 機能の Agentforce の有効化 (省略可能)</h2>
+    
+      <div><p>検索インデックスの一部の機能 (画像処理、強化インデックス、LLM ベースのコンテンツ処理および解析など) では、Agentforce で使用できる生成 AI 機能が必要です。これらの機能を使用する場合は、組織で <a target="_blank" href="https://help.salesforce.com/s/articleView?id=ai.agent_setup_enable.htm&amp;language=ja&amp;type=5">Agentforce を有効</a>にするようにシステム管理者にお問い合わせください。Einstein 設定で Amazon Bedrock Models (Amazon および Anthropic) を有効にして、強化されたインデックスを使用します。</p></div>
+    
+  </div>
+
+  <div id="gfr_kc3_2fc" aria-labelledby="ariaid-title3" class="nested1"><a name="gfr_kc3_2fc"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">検索種別とソースオブジェクトの選択</h2>
+    
+    <p> 開始するには、実行する検索の種類を指定し、ソース DMO を選択します。</p>
+
+      <ol><li>
+          <span>アプリケーションランチャーで、[<strong class="uicontrol">Data Cloud]</strong> を選択します。</span>
+        </li><li>
+          <span><strong class="uicontrol">検索インデックス</strong>&gt; <strong class="uicontrol">[新規]</strong> をクリックします。</span>
+        </li><li>
+          <span>[<strong class="uicontrol">高度な設定</strong>]&gt; [<strong class="uicontrol">次へ]</strong> をクリックします。</span>
+        </li><li>
+          <span>[<strong class="uicontrol">検索種別]</strong> で [ベクトル検索] を選択します。</span>
+        </li><li>
+          <span>データスペースとソースオブジェクトを選択します。</span>
+          <div>
+            <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div id="gfr_kc3_2fc__note_whq_jsf_dgc" style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><a name="gfr_kc3_2fc__note_whq_jsf_dgc"></a><span class="slds-text-title_caps">メモ</span>  1 つ以上の外部 DLO からのマッピングがある DMO は、それらのすべての外部 DLO でキャッシュが有効になっている場合にのみデータソースとして使用できます。詳細は、「<a target="_blank" href="model_mapping-1.html#c360_a_accelerated_data_lake_objects">データフェデレーションのキャッシュ</a>」を参照してください。</div></div></div>
+
+          </div>
+        </li><li>
+          <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+        </li></ol>
+
+    
+  </div>
+
+  <div id="kgq_4qm_khc" aria-labelledby="ariaid-title4" class="nested1"><a name="kgq_4qm_khc"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">解析とビジュアルデータの前処理の設定</h2>
+    
+    <p>次に、非構造化ドキュメントからチャンク用のテキスト、メタデータ、テーブル、画像を抽出して準備します。</p>
+
+      <div><p>LLM ベースの解析および前処理オプションは、UDMO の PDF、HTML、DOCX、PPTX ファイルの種類と DMO レコードに添付されたファイルで使用できます。これらのオプションは、DMO レコードでは使用できません。</p><p>1 つの検索インデックスに LLM ベースの解析オプションと LLM ベースのビジュアル データ前処理オプションの両方を選択することはできません。これらのオプションの詳細については、「<a title="LLM ベースの解析と前処理を使用して、非構造化ドキュメントからテキスト、メタデータ、テーブル、画像を抽出し、チャンク用に準備します。" href="transform_prep-2.html#c360_a_llm_parsing_preprocessing">LLM ベースの解析</a>および前処理」を参照してください。</p><p> LLM ベースの解析と LLM ベースのビジュアルデータ前処理を使用すると、デフォルトの GPT-4o モデルを上書きして、ビジネスニーズとコンテンツに最も適したサポート対象の LLM を使用できます。システム管理者が使用を承認した LLM のみを選択できます。組織管理者が現在使用中のモデルを無効にしても、以前に処理したコンテンツは引き続きアクセスできます。ただし、検索インデックスはそれ以降のコンテンツの処理に失敗します。サポートされるモデルの詳細については、「<a target="_blank" href="#c360_a_search_index_reference">検索インデックス リファレンス</a>」を参照してください。</p></div>
+      <ol><li>
+          <span>[解析] ページで、次のいずれかのオプションを選択します。</span>
+          <table class="slds-table slds-table_bordered slds-m-bottom_small"><tbody><tr class="">
+              <th id="d15618e252" headers="d15618e248-option" style="vertical-align:top;">デフォルトパーサー</th>
+
+              <td headers="d15618e248-desc d15618e252" style="vertical-align:top;">組み込み設定でテキストを抽出します。</td>
+
+            </tr><tr class="">
+              <th id="d15618e261" headers="d15618e248-option" style="vertical-align:top;">LLM ベースのパーサー</th>
+
+              <td headers="d15618e248-desc d15618e261" style="vertical-align:top;">LLM を使用して、すべてのテキスト、画像、その他の視覚要素を抽出します。</td>
+
+            </tr><tr class="">
+              <th id="d15618e270" headers="d15618e248-option" style="vertical-align:top;">Docling Parser</th>
+
+              <td headers="d15618e248-desc d15618e270" style="vertical-align:top;">Docling Parser を使用して、画像、テーブル、ドキュメントレイアウトからテキストを抽出します。</td>
+
+            </tr></tbody></table>
+        </li><li>
+          <span>[Default Parser (デフォルトパーサー)] を選択した場合は、[<strong class="uicontrol">Next (次</strong>へ)] をクリックします
+          </span>
+        </li><li>
+          <span>LLM を使用して文書を解析する場合は、次の手順を実行します。</span>
+          <ol>
+            <li>
+              <span>ドロップダウンリストから、適切なモデルを選択します。</span>
+            </li>
+
+            <li>
+              <span>デフォルトのプロンプトをそのまま使用するか、特定の使用事例に合わせて編集します。</span>
+              <div>使用事例とドキュメントに合わせてプロンプトをカスタマイズすることを強くお勧めします。</div>
+            </li>
+
+            <li>
+              <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+            </li>
+
+          </ol>
+        </li><li>
+          <span>Docling パーサーを選択する場合は、<strong class="uicontrol">[次へ</strong>] をクリックします。</span>
+          <div>デフォルトでは、追加の前処理は無効になっています。必要に応じて、画像や複雑なテーブルを解析するチャンク戦略を設定するときに、画像処理を有効にします。</div>
+        </li><li>
+          <span>デフォルトのパーサーを選択した場合は、[前処理] ページで次のいずれかのオプションを選択します。</span>
+          <table class="slds-table slds-table_bordered slds-m-bottom_small"><tbody><tr class="">
+              <th id="d15618e341" headers="d15618e337-option" style="vertical-align:top;">前処理なし</th>
+
+              <td headers="d15618e337-desc d15618e341" style="vertical-align:top;">解析されたテキストおよびビジュアルデータをそのまま使用します。</td>
+
+            </tr><tr class="">
+              <th id="d15618e350" headers="d15618e337-option" style="vertical-align:top;">LLM ベースのビジュアルデータ前処理</th>
+
+              <td headers="d15618e337-desc d15618e350" style="vertical-align:top;">LLM を使用してビジュアルデータからコンテキストを取得します。(前のステップでデフォルトのパーサーを選択した場合のみ使用可能)。</td>
+
+            </tr></tbody></table>
+        </li><li>
+          <span>[前処理なし] を選択した場合は、<strong class="uicontrol">[次へ</strong>] をクリックします。</span>
+        </li><li>
+          <span>LLM を使用してドキュメントを前処理する場合は、次の手順を実行します。</span>
+          <ol>
+            <li>
+              <span>ドロップダウンリストから、適切なモデルを選択します。</span>
+            </li>
+
+            <li>
+              <span>デフォルトのプロンプトをそのまま使用するか、特定の使用事例に合わせて編集します。</span>
+              <div>使用事例とドキュメントに合わせてプロンプトをカスタマイズすることを強くお勧めします。</div>
+            </li>
+
+            <li>
+              <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+            </li>
+
+          </ol>
+        </li></ol>
+
+    
+  </div>
+
+  <div id="uby_g23_2fc" aria-labelledby="ariaid-title5" class="nested1"><a name="uby_g23_2fc"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">チャンクとベクトル化の設定</h2>
+    
+    <p> 次に、データのチャンクを設定し、埋め込みモデルを選択して各チャンクの検索可能なベクトルを作成します。</p>
+
+      <ol><li>
+          <span> 検索インデックスが DMO 上にある場合は、[チャンク] ページでチャンクするフィールドと<a title="Data 360 では、いくつかのチャンク戦略がサポートされています。Data 360 では、使用しているコンテンツタイプに基づいて最適なチャンク戦略が自動的に選択されます。" href="#c360_a_search_index_supported_chunking_strategies">チャンク戦略</a>を選択します。</span>
+          <ol>
+            <li>
+              <span> フィールドを追加または削除するには、[<strong class="uicontrol">フィールドの管理</strong>] をクリックして作業を保存します。</span>
+              <div>検索インデックスでは、チャンクの日付項目と日時項目はサポートされていません。チャンクデータに使用できるのは、数値項目とテキスト項目のみです。</div>
+            </li>
+
+            <li>
+              <span>(省略可能) チャンク戦略を更新し、設定を変更します。</span>
+            </li>
+
+            <li>
+              <span> 検索インデックスに含める添付ファイルがある Salesforce オブジェクトの DMO 上にある場合は、[<strong class="uicontrol">Include Attachments</strong> (添付ファイルを含める)] をクリックして ContentDocumentVersion UDMO を選択します。</span>
+            </li>
+
+            <li>
+              <span> ファイル拡張子を追加するか、ファイルの種類に基づいてチャンク戦略を設定します。新しいファイル タイプのファイル拡張子を追加するには、[<strong class="uicontrol">Add File Extension</strong> (ファイル拡張子の追加)] をクリックし、必要に応じてチャンク戦略を更新し、既存のファイル タイプの設定を変更します。</span>
+            </li>
+
+            <li>
+              <span> (省略可能) チャンクにフィールドを追加するには、[各チャンクの先頭にフィールドを追加] 切り替え<strong class="uicontrol">ボタン</strong>をオンにして、リストからフィールドを選択します。最大 2 つの項目を追加できます。</span>
+            </li>
+
+            <li>
+              <span>生成されたチャンクを追加のメタデータで強化するには、[<strong class="uicontrol">コンテンツチャンクを強化</strong>] 切り替えを有効にします。</span>
+            </li>
+
+            <li>
+              <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+            </li>
+
+          </ol>
+        </li><li>
+          <span> 検索インデックスが UDMO 上にある場合は、ファイル拡張子を追加するか、ファイル タイプに基づいて<a title="Data 360 では、いくつかのチャンク戦略がサポートされています。Data 360 では、使用しているコンテンツタイプに基づいて最適なチャンク戦略が自動的に選択されます。" href="#c360_a_search_index_supported_chunking_strategies">チャンク戦略</a>を設定します。</span>
+          <ol>
+            <li>
+              <span>新しいファイル形式のファイル拡張子を追加するには、[<strong class="uicontrol">Add File Extension</strong> (ファイル拡張子を追加)] をクリックします。処理する画像がある場合は、JPEG、JPG、PNG ファイル拡張子を追加します。</span>
+            </li>
+
+            <li>
+              <span>(省略可能) チャンク戦略を更新し、既存のファイルの種類の設定を変更します。</span>
+              <div><p>JPEG、JPG、PNG などの拡張子を持つファイルの場合、画像処理はデフォルトで有効になっています。PDF ファイルの画像処理を含めるには、画像処理を有効にします。</p> 前のステップで [LLM ベースの解析] または [LLM ベースのビジュアルデータ前処理] を選択した場合、有効にしても画像処理は適用されません。</div>
+            </li>
+
+            <li>
+              <span> (省略可能) チャンクにフィールドを追加するには、[各チャンクの先頭にフィールドを追加] 切り替え<strong class="uicontrol">ボタン</strong>をオンにして、リストからフィールドを選択します。最大 2 つの項目を追加できます。</span>
+            </li>
+
+            <li>
+              <span>生成されたチャンクを追加のメタデータで強化するには、[<strong class="uicontrol">コンテンツチャンクを強化</strong>] 切り替えを有効にします。</span>
+            </li>
+
+            <li>
+              <span> Docling パーサーを選択した場合、必要に応じて LLM ベースの画像処理をオンにして、LLM を使用して画像や複雑なテーブルを解析できます。テーブルを使用したデータ抽出を改善するには、[セクション対応チャンク] を選択します。セクション対応チャンクでは、テーブルチャンク間でヘッダー情報を保持するなど、テーブルを最適に処理します。サポートされるファイル形式の詳細については、「<a target="_blank" href="data360_general-1.html#c360_a_docling_parser">Docling Parser」</a>を参照してください。</span>
+            </li>
+
+          </ol>
+        </li><li>
+          <span>文字起こしするオーディオまたはビデオ ファイルがある場合は、[設定(<strong class="uicontrol">Configure)]</strong> をクリックし、文字起こしウィンドウで次を選択します。</span>
+          <ol>
+            <li>
+              <span>ドロップダウンからデフォルトの文字起こしモデルを選択します。</span>
+            </li>
+
+            <li>
+              <span> タイムスタンプを各話者エントリに追加するには、[タイムスタンプを<strong class="uicontrol">含める] を</strong>選択します。</span>
+            </li>
+
+          </ol>
+        </li><li>
+          <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+        </li><li>
+          <span> [ベクトル化] ページのドロップダウンリストから埋め込みモデルを選択し、[<strong class="uicontrol">次へ]</strong> をクリックします。検索インデックスに処理する画像が含まれている場合は、<a href="#c360_a_search_index_reference">適切な埋め込みモデル</a> (ベータ) を選択します。</span>
+          <div>
+            <p> このモデルでは、検索結果を作成するときに、Data 360 で非構造化データオブジェクトの意味的な関連性をどのように測定するかを決定します。</p>
+          </div>
+        </li></ol>
+
+    
+  </div>
+
+  <div id="configure_fields_filtering" aria-labelledby="ariaid-title6" class="nested1"><a name="configure_fields_filtering"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">絞り込み用の項目の設定</h2>
+    
+    <p> 検索結果の精度と関連性を高めるために、ユーザーが検索を絞り込むために使用できる項目を指定します。</p>
+
+      <ol><li>
+          <span> [絞り込みの項目] ページで、必要に応じてソースオブジェクトまたは関連オブジェクトの項目を追加して、検索を絞り込む方法を増やします。最大 10 個の検索条件項目を選択できます。</span>
+          <div>
+            <p> Data 360 では、ベクトル埋め込みを生成するときに事前検索条件項目が選択されます。これらの事前絞り込み項目の値を変更すると、ベクトル埋め込みを生成または更新するときに Data 360 によって値が選択されます。取得元オブジェクトと関連オブジェクト間のオブジェクトリレーションのカーディナリティは、1:1 または N:1 である必要があります。</p>
+            <p> たとえば、インデックス付けされた非構造化データにケースの会話トランスクリプトが含まれている場合、ケースオブジェクトの [状況] 項目で絞り込むと、会話トランスクリプトを検索するときのセマンティック検索結果の関連性を改善できます。</p>
+          </div>
+        </li><li>
+          <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+        </li></ol>
+
+    
+  </div>
+
+  <div id="review_build_index" aria-labelledby="ariaid-title7" class="nested1"><a name="review_build_index"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">インデックスの確認と作成</h2>
+    
+      <ol><li>
+          <span> 設定と対象データモデルオブジェクトを確認します。</span>
+        </li><li>
+          <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+        </li></ol>
+
+      <div><p>検索インデックスを作成すると、<span>Data 360</span>によってデータのハイブリッド検索インデックスが作成されます。次に、[<strong class="uicontrol">AI Models</strong> (AI モデル)] タブで取得者を作成します。Agentforce エージェントは、プロンプトテンプレートで取得者と共に検索インデックスを使用できます。</p></div>
+    
+  <div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Data 360の検索では、非構造化データ、モデルの埋め込み、検索結果の事前絞り込み操作など、さまざまなファイル形式がサポートされます。" href="#c360_a_search_index_reference">検索インデックス参照</a></li><li><a title="検索インデックス設定を作成、表示、編集、削除する。" href="#c360_a_search_index_manage">検索インデックスの管理</a></li><li><a title="Data 360 では、いくつかのチャンク戦略がサポートされています。Data 360 では、使用しているコンテンツタイプに基づいて最適なチャンク戦略が自動的に選択されます。" href="#c360_a_search_index_supported_chunking_strategies">チャンク戦略</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=ai.prompt_builder_ground_rag.htm&amp;language=ja&amp;type=5">Salesforce ヘルプ: Retriever Augmented Generation (RAG) を使用したグラウンディング</a></li></ul></div>
+</div>
+
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_search_index_delete_index_config">
+<h1 class="slds-text-heading_large">検索インデックス設定の削除</h1>
+  
+  <p>Data 360 検索インデックス設定は、リストビューおよびオブジェクトレコードビューから削除できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d190493e61" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d190493e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">検索インデックス設定を削除するには</td>
+
+              <td headers="d190493e61" style="vertical-align:top;" class="slds-cell-wrap"><p>権限セット</p><ul>
+                  <li>Data Cloud アーキテクト</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>検索インデックス設定を削除すると、関連付けられたインデックス DMO をベクトル検索に使用できなくなります。</p><p>検索インデックス設定を参照する取得者がいる場合は削除できません。まず、AI モデル (旧 Einstein Studio) の連動取得をすべて削除してから、検索インデックス設定を削除する必要があります。</p></div>
+  
+  <div id="task_ehf_fcq_vdc" aria-labelledby="ariaid-title2" class="nested1"><a name="task_ehf_fcq_vdc"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">リストビューから削除</h2>
+    
+      <ol><li>
+          <span>アプリケーションランチャーで、[<strong class="uicontrol">Data Cloud]</strong> を選択します。</span>
+        </li><li>
+          <span><strong class="uicontrol">検索インデックス</strong>をクリックし、削除する設定のドロップダウン矢印をクリックして、[<strong class="uicontrol">削除]</strong> を選択します。</span>
+        </li><li>
+          <span>設定の連動関係を確認し、[<strong class="uicontrol">削除] を</strong>クリックします</span>
+        </li></ol>
+
+    
+  </div>
+
+  <div id="task_fnr_fcq_vdc" aria-labelledby="ariaid-title3" class="nested1"><a name="task_fnr_fcq_vdc"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">オブジェクトビューから削除</h2>
+    
+      <ol><li>
+          <span>アプリケーションランチャーで、[<strong class="uicontrol">Data Cloud]</strong> を選択します。</span>
+        </li><li>
+          <span><strong class="uicontrol">検索インデックス</strong>をクリックし、リストビューから削除する設定を選択します。</span>
+        </li><li>
+          <span>オブジェクトビューで、[<strong class="uicontrol">削除] を</strong>クリックします。</span>
+        </li><li>
+          <span>設定の連動関係を確認し、[<strong class="uicontrol">削除] を</strong>クリックします。</span>
+        </li></ol>
+
+    
+  </div>
+
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_search_index_edit_search_index">
+<h1 class="slds-text-heading_large">検索インデックス設定の編集</h1>
+  <p>必要に応じて、Data 360 検索インデックス設定を編集して、チャンク用の項目またはファイル拡張子を追加できます。他の既存の設定は参照できますが、変更できません。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d126406e60" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d126406e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">検索インデックス設定を編集するには：</td>
+
+              <td headers="d126406e60" style="vertical-align:top;" class="slds-cell-wrap"><p>権限セット</p><ul>
+                  <li>Data Cloud アーキテクト</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>アプリケーションランチャーで、[<strong class="uicontrol">Data Cloud]</strong> を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">検索インデックス</strong>&gt; [<strong class="uicontrol">編集] を</strong>クリックします。</span>
+      </li><li>
+        <span>[Guided Setup (ガイド付き設定)] ナビゲーションから、[<strong class="uicontrol">Chunking (チャンク</strong>)] をクリックします。</span>
+        <ul>
+          <li>非構造化データ モデル オブジェクトから作成された検索インデックスにファイル拡張子を追加するには、[<strong class="uicontrol">Add File Extension</strong> (ファイル拡張子の追加)] をクリックします。</li>
+
+          <li>データモデルオブジェクトから作成された検索インデックスにフィールドを追加するには、[<strong class="uicontrol">フィールドの管理</strong>] をクリックし、必要に応じて 1 つ以上のフィールドを選択します。</li>
+
+        </ul>
+
+      </li><li>
+        <span>[Guided Setup (ガイド付き設定)] ナビゲーションから、[<strong class="uicontrol">Review and Build</strong> (確認して構築)] をクリックし、[<strong class="uicontrol">Save (保存</strong>)] をクリックします。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_search_index_enriched_index">
+<h1 class="slds-text-heading_large">コンテンツチャンクの強化されたインデックス付け</h1>
+  <p>Data 360の非構造化データからベクトル検索インデックスまたはハイブリッド検索インデックスを作成する場合、コンテンツからメタデータを抽出して、生成されたコンテンツ チャンクを強化できます。抽出されたメタデータには、キーワード、エンティティ、トピックの概要、コンテンツによって回答された質問、コンテンツの概要が含まれます。</p>
+
+    <p>チャンク強化により、特に先頭項目 (UDMO パスなど) や質問と回答エージェントアクションを使用できない場合に取得精度が大幅に向上します。LLM で生成されたコンテンツは適切なチャンクの識別を改善するのに役立つため、コンテンツチャンクの強化により、集約的なコンテンツの選定に代わるものが得られます。</p>
+    <p>拡張コンテンツ チャンクを使用するには、まず検索インデックスを作成し、拡張コンテンツ チャンクを有効にします。AI モデルで、新しいカスタム取得者を作成します。検索インデックスの入力を求められたら、[チャンクを強化] オプションを使用して作成された検索インデックスを選択します。</p>
+    <p>強化インデックスから最大限の値を取得するには、取得元からアクセスします。メタデータチャンクを使用するには、取得者が追加ロジック (ランク付けやインテントアライメントなど) を適用します。検索 API を使用してインデックスを直接コールすると、取得がスキップされ、標準のベクトル検索またはハイブリッド検索に近い取得動作になります。取得機能を導入すると遅延が生じることがありますが、クエリを回答可能な関連コンテンツに対応付ける方法を改善することで、取得精度を高めることができます。</p>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 
+      <p>Data Cloud でこの機能を使用すると、Flex Credits が消費されます。詳細については、「<a title="強化されたインデックス付けにより、エンティティ、概要、トピック、回答可能な質問などの生成されたインテリジェンスでチャンクが強化され、インテント駆動型検索が改善されます。このプロセスにより、AI アシスタントの検出可能性とグラウンディングが向上しますが、すべてのチャンクで追加の埋め込みとメタデータチャンクが生成されるため、インデックス作成コストが増加します。" href="getstarted-2.html#c360_a_enriched_index_billing_considerations">Billing Considerations for Enriched Index</a> (拡張インデックスの請求に関する考慮事項)」を参照してください。詳細は、アカウントエグゼクティブにお問い合わせください。</p>
+    </div></div></div>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">強化チャンクの内容</h2><p>ベクトル検索インデックスまたはハイブリッド検索インデックスで強化コンテンツを有効にすると、Data 360 によって 3 つのチャンクが生成されます。1 つは元のチャンク テキストが含まれるチャンク、1 つはメタデータ テキストが含まれるチャンク、もう 1 つは回答可能な質問が含まれるチャンクです。取得者はこれらのチャンクにアクセスして、RAG および AI エージェントワークフローで使用します。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 生成されるメタデータには、個人識別情報 (PII) は含まれません。</div></div></div>
+<table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d118907e70" style="vertical-align:top;" class="slds-cell-wrap" scope="col">チャンク種別</th>
+              <th id="d118907e73" style="vertical-align:top;" class="slds-cell-wrap" scope="col">メタデータ型</th>
+              <th id="d118907e76" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d118907e70" style="vertical-align:top;" rowspan="5" class="slds-cell-wrap" data-label="チャンク種別">メタデータ</td>
+
+              <td headers="d118907e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="メタデータ型">キーワード</td>
+
+              <td headers="d118907e76" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p style="margin-bottom:0;">コンテンツを一意に識別するキーワードを抽出します。</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d118907e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="メタデータ型">エンティティ</td>
+
+              <td headers="d118907e76" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>次のいずれかを逐次的に特定してリストします。</p><ul>
+                  <li>ロケーション</li>
+
+                  <li>組織</li>
+
+                  <li>日付</li>
+
+                  <li>時間</li>
+
+                  <li>通貨</li>
+
+                  <li>金額</li>
+
+                  <li>パーセント</li>
+
+                  <li>商品</li>
+
+                  <li>言及されているプラットフォーム</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d118907e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="メタデータ型">トピック</td>
+
+              <td headers="d118907e76" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p style="margin-bottom:0;">チャンクで議論されている主要なトピックを抽出します。トピック名に重要なエンティティとキーワードを含めます。</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d118907e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="メタデータ型">タイトル</td>
+
+              <td headers="d118907e76" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p style="margin-bottom:0;">コンテンツを要約した簡潔で有益なタイトルを生成します。</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d118907e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="メタデータ型">サマリー</td>
+
+              <td headers="d118907e76" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">主要なトピックとエンティティが強調されたコンテンツの概要が表示されます。可能な場合は、100 語以上、250 語以下にします。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d118907e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="チャンク種別">質問</td>
+
+              <td headers="d118907e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="メタデータ型">質問</td>
+
+              <td headers="d118907e76" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">該当する場合は、テキストチャンクのコンテンツが回答できる詳細な質問の包括的なセットをまとめます。</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">強化されたインデックス付けのデータ処理</h2><p>拡張インデックスは、<span>Data 360</span>を使用可能なすべての地域でサポートされます。強化されたインデックスのデータは、次の地域の Amazon Bedrock マネージドサービスを介して処理されます。</p><ul>
+        <li>us-west-2: 米国西部 (オレゴン)</li>
+
+        <li>us-east-1: 米国東部 (バージニア)</li>
+
+        <li>eu-central-1: ヨーロッパ (フランクフルト)</li>
+
+        <li>eu-central-2 ヨーロッパ (チューリッヒ)</li>
+
+        <li>eu-west-3: ヨーロッパ (パリ)</li>
+
+      </ul>
+<p>Einstein 設定で Amazon Bedrock Models (Amazon および Anthropic) を有効にして、強化されたインデックスを使用します。詳細については、<a target="_blank" href="https://docs.aws.amazon.com/bedrock/latest/userguide/batch-inference-supported.html"><u>Amazon Bedrock のドキュメント</u></a>を参照してください。</p></div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="getstarted-2.html#c360_a_enriched_index_billing_considerations">強化されたインデックスコストの理解</a></strong><br>強化されたインデックス付けにより、エンティティ、概要、トピック、回答可能な質問などの生成されたインテリジェンスでチャンクが強化され、インテント駆動型検索が改善されます。このプロセスにより、AI アシスタントの検出可能性とグラウンディングが向上しますが、すべてのチャンクで追加の埋め込みとメタデータチャンクが生成されるため、インデックス作成コストが増加します。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_retrieval_response_enriched_index">拡張検索インデックスを使用した取得応答</a></strong><br>強化されたインデックス付けにより、質問とKnowledgeベースの最良の回答を照合することで、取得応答が向上します。<span>Data 360</span>ハイブリッド検索では、セマンティック対応ベクトル検索の強みがキーワード検索の精度と速度と組み合わされますが、強化されたインデックス付けでは、ユーザーの質問に最も近いチャンクを見つけることで、ギャップをさらに埋めます。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="DMO(データ モデル オブジェクト)またはUDMO(非構造化データ モデル オブジェクト)のハイブリッド検索インデックスを設定して、生成AIアプリケーションに関連情報を提供します。Data 360 は、参照されるデータをセマンティックに関連するチャンクに分割して検索可能なベクトルを生成し、ベクトルインデックスとキーワードインデックスを生成します。" href="search_rag-1.html#c360_a_hybridsearch_index_create">高度な設定を使用したハイブリッド検索インデックスの作成</a></li><li><a title="データ モデル オブジェクトのベクトル検索インデックス設定を作成すると、Data 360によって参照されるデータが意味的に関連するチャンクに分解され、検索可能なベクトルが生成されます。RAG ワークフローとエージェントワークフローでは、クエリを実行するときにこれらのベクトルを使用して、セマンティックに類似する項目を見つけて返します。検索インデックス設定をより詳細に制御するには、プロセスの各ステップをガイドする高度な設定を使用します。" href="#c360_a_search_index_create_vector_index_config">高度な設定を使用したベクトル検索インデックスの作成</a></li><li><a title="非構造化データと検索インデックス設定を使用する場合、データは Data 360 に保存および処理されます。Data 360で非構造化データと検索インデックスを使用すると、次の使用量タイプのクレジットの消費に影響します。" href="https://help.salesforce.com/s/articleView?id=data.c360_a_unstructured_data_billing_considerations.htm&amp;language=ja&amp;type=5">非構造化データと検索インデックスの請求に関する考慮事項</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=ai.data_library_parent.htm&amp;language=ja&amp;type=5">Agentforce データライブラリ</a></li><li><a target="_blank" href="getstarted-2.html#c360_a_limits_and_guidelines">Data Cloud の制限とガイドライン</a></li><li><a title="強化されたインデックス付けにより、エンティティ、概要、トピック、回答可能な質問などの生成されたインテリジェンスでチャンクが強化され、インテント駆動型検索が改善されます。このプロセスにより、AI アシスタントの検出可能性とグラウンディングが向上しますが、すべてのチャンクで追加の埋め込みとメタデータチャンクが生成されるため、インデックス作成コストが増加します。" href="getstarted-2.html#c360_a_enriched_index_billing_considerations">強化されたインデックスコストの理解</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_search_index_ground_ai">
+<h1 class="slds-text-heading_large">AI、自動化、分析の検索の使用</h1>
+  <p>非構造化データと構造化データに対する<span>Data 360の</span>グラウンディング検索により、Salesforce全体で生成AI、分析、自動化ツールを使用できるようになります。グラウンディングにより、さまざまな形式の非構造化データ (テキスト ドキュメント、マルチメディア ファイル、ソーシャルメディア コンテンツ、Web コンテンツ、チャット ログ、センサー データ、顧客のフィードバックなど) を含む顧客固有のデータが Agentforce、Tableau、Flow Builder などのアプリケーションに取り込まれます。この連携により、AI で生成されたコンテンツの精度と関連性が向上し、分析からのインサイトがより深くなり、チームと顧客の自動化ワークフローが効率化されます。</p>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 
+        <p>2025 年 10 月 14 日以降、Data Cloud は Data 360 にブランド変更されました。 この移行中に、アプリケーションやドキュメントで Data Cloud への参照が見られることがあります。名前は新しくなりますが、機能とコンテンツに変更はありません。</p>
+      </div></div></div>
+
+    <div><p><span>Data 360</span>では、データとクエリのニーズに応じてベクトル検索インデックスまたはハイブリッド検索インデックスを作成できます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">ベクトル検索</h2><p><span>Data 360</span>では、非構造化データと構造化データから検索可能なベクトル埋め込みを作成できます。ベクトル埋め込みは、テキスト (記事またはより大きな文書の文章) の単位を数値で表し、その意味を把握します。大規模言語モデル (LLM) では、生成 AI アプリケーションでリレーションとコンテキストの関連性を効率的に解釈できるように、意味が類似する埋め込みがグループ化されます。</p><p>ベクトル検索は、データソースと検索クエリで、大規模なデータセット内のセマンティック認識一致のメリットが大きい場合に使用します。たとえば、「What is Acme famous for? (Acme の有名ユーザー)」などのクエリを送信すると、LLM は検索クエリとのセマンティック一致に最も近いベクトル検索スコアを持つチャンクを取得します。</p><p>ベクトル検索インデックスを作成する前に、DMO(データ モデル オブジェクト)またはUDMO(非構造化データ モデル オブジェクト)に保存されている非構造化データは、管理可能で意味的な単位にチャンクされます。これらの単位は、チャンクデータモデルオブジェクト (CDMO) とインデックスデータモデルオブジェクト (IDMO) の <a target="_blank" href="model_mapping-2.html#c360_a_search_index_chunk_index_dmo">2 つの</a>オブジェクトに保存されます。CDMO は実際のコンテンツ チャンクを保存する <span>Data 360</span> オブジェクトで、IDMO はベクトル埋め込みを保存します。</p><p>プロンプトビルダー、AI エージェント、Tableau などのアプリケーションからそのデータに対してベクトル検索を実行できます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">ハイブリッド検索</h2><p>生成 AI アプリケーションで関連性の高い正確な応答を提供するために、大規模言語モデル (LLM) ではベクトル検索とキーワード検索の両方が必要になることがよくあります。ベクトル検索はセマンティックな類似性の把握には優れていますが、特定のドメインの語彙では精度が欠ける可能性があります。一方、キーワード検索は語彙一致には優れていますが、セマンティック類似性は理解されません。<span>Data 360</span> のハイブリッド検索では、コンテキストを理解するためのセマンティック対応ベクトル検索と、正確な語彙照合のためのキーワード検索を使用して、これらの方法を組み合わせます。</p><p>データソースクエリと検索クエリでセマンティックアウェアなベクトル検索とキーワード検索の精度の両方の利点を得られる場合は、ハイブリッド検索を使用します。たとえば、「Does Acme motor XYZ123 uses hydraulic pumps? (Acme motor XYZ123 は油圧ポンプを使用していますか?)」というクエリでは、キーワード検索の追加により、関連性の高いコンテンツの順位が上がり、結果のグラウンディングが向上します。</p><p>DMO または UDMO でハイブリッド検索インデックスを作成すると、<span>Data 360 で</span>ベクトル検索インデックスとキーワード検索インデックスのコンテンツ チャンクとベクトル埋め込みが生成されます。ハイブリッド検索では、ベクトル検索インデックスを照会してセマンティックの類似性に基づいて情報を取得し、キーワード検索インデックスを照会して辞書の類似性に基づいて情報を取得します。ハイブリッド検索では、両方の種別の検索で提供された結果がマージされてランク付けされ、最適な応答が生成されます。また、返される検索結果に影響を与えるために、レコードの最近性や人気度などの追加のランキング要素を設定することもできます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Data 360 Search の主な使用事例</h2><p><span>Data 360</span> 検索の主な使用事例を次に示します。</p><ul>
+        <li>RAG(拡張生成の取得): <span>Data 360</span>検索は、関連する非構造化データにAI応答をグラウンディングするRAGの基本です。これにより、特定のKnowledgeベースに基づくより正確でコンテキストに適した AI 出力に直接つながります。</li>
+
+        <li>Service Cloudの場合:AIエージェントは検索を使用して、Knowledge記事、メール、サポート チケット、チャット ログ内の正確な情報を照会します。これにより、より正確な回答を提供したり、より適切な回答を作成したり、顧客の問題に積極的に解決策を提案したりできます。</li>
+
+        <li>Sales Cloud: AI エージェントは、メール、通話記録、メモなどの非構造化セールスデータを照会して、関連性の高いミーティングブリーフィングや概要を生成できます。このインサイトにより、パーソナライズされたコンテンツと新しいメールの顧客固有のおすすめも促進され、顧客エンゲージメントと営業チームの生産性が大幅に向上します。</li>
+
+        <li>自動化フロー: AI エージェントは、説明に基づいて、ケースなどのセマンティックに類似するレコードを自動的に識別できます。この機能は、重複にフラグを設定し、解決時間を短縮し、類似する履歴例を見つけてレコードを正確に分類するために不可欠です。</li>
+
+        <li>分析:Tableau内の<span>Data 360</span>検索では、特に高度なトピック分類によって、非構造化データからより深いインサイトを得ることができます。これにより、従来の方法では見落としがちなパターンやテーマが明らかになり、データ分析が強化されます。</li>
+
+      </ul>
+</div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#c360_a_search_index_grounding">チャンクデータ</a></strong><br>Data 360 の検索インデックスにデータを追加するには、最初にチャンクする必要があります。チャンクを使用すると、データが意味のあるチャンクに分割され、Data 360 はそのチャンクを機械で読み取り可能なベクトル埋め込みに変換します。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_search_index_vector_index">ベクトル検索</a></strong><br>Data 360 では、非構造化データと構造化データから検索可能なセマンティックベクトル埋め込みを作成できます。ベクトル検索は、生成 AI、自動化、分析アプリケーションで埋め込み間のセマンティック類似性とコンテキストを理解するのに役立ちます。</li><li class="slds-p-bottom_small"><strong><a href="search_rag-1.html#c360_a_hybridsearch_index">ハイブリッド検索</a></strong><br>gen AI アプリケーションを使用して LLM に関連情報を提供し、正しい応答を生成するには、ベクトル検索とキーワード検索の両方が必要です。ベクトル検索ではセマンティックの類似点とコンテキストは理解されますが、特定のドメインの語彙はありません。キーワード検索は語彙的類似性では優れていますが、意味的類似性では優れていません。Data 360 では、ハイブリッド検索はセマンティックアウェアなベクトル検索の強みとキーワード検索の精度と速度を兼ね備えています。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_search_index_manage">検索インデックスの管理</a></strong><br>検索インデックス設定を作成、表示、編集、削除する。     </li><li class="slds-p-bottom_small"><strong><a href="#c360_a_search_index_optimize">検索インデックスの最適化: 項目の選択とチャンク</a></strong><br>高度なビルダーで検索インデックスを作成するときは、使用する項目の選択とチャンク戦略に注意して、より正確な結果を提供するように検索インデックスを最適化できます。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_search_index_reference">検索インデックス参照</a></strong><br><span>Data 360の</span>検索では、非構造化データ、モデルの埋め込み、検索結果の事前絞り込み操作など、さまざまなファイル形式がサポートされます。</li><li class="slds-p-bottom_small"><strong><a href="getstarted-2.html#c360_a_rag_overview">取得拡張生成の使用</a></strong><br>Data 360 の取得拡張生成 (RAG) は、大規模言語モデル (LLM) プロンプトをグラウンディングするためのフレームワークです。RAG は、プロンプトに正確で最新の関連情報を追加することで、ユーザーにとっての LLM 応答の関連性と価値を向上させます。</li><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=data.c360_a_unstructured_data_billing_considerations.htm&amp;language=ja&amp;type=5">非構造化データと検索インデックスの請求に関する考慮事項</a></strong><br>非構造化データと検索インデックス設定を使用する場合、データは <span>Data 360</span> に保存および処理されます。<span>Data 360</span>で非構造化データと検索インデックスを使用すると、次の使用量タイプのクレジットの消費に影響します。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Data 360に非構造化データを取り込むことで、Agentforceエージェント、生成AI、分析、自動化の使用事例をビジネス固有のデータでグラウンディングし、ユーザーと顧客に深いインサイトを提供できます。" href="https://help.salesforce.com/s/articleView?id=data.c360_a_unstructured_data_about.htm&amp;language=ja&amp;type=5">Data 360 の非構造化データ</a></li><li><a title="ガイドラインでは、Data 360 の採用を最適化して最高のパフォーマンスを実現するためのベストプラクティスの推奨事項を定義します。制限は、それを超えると機能が利用不可になったり、パフォーマンスが調整されたり、使用量の請求料金が適用されたりする境界線です。Data 360 は拡張性を備えているため、ビジネスニーズに合わせていくつかの制限を調整できます。アカウントエグゼクティブと協力して目標を満たすソリューションを見つけてください。" href="getstarted-2.html#c360_a_limits_and_guidelines">Data 360 の制限およびガイドライン</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.security_pe_enable_pe_for_data_cloud.htm&amp;language=ja&amp;type=5">Salesforce ヘルプ: 顧客が管理するルート鍵を使用した Data 360 の暗号化</a></li><li><a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/modules/search-index-types-data-cloud-quick-look">Trailhead: Data 360 での検索インデックス種別について</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_search_index_grounding">
+<h1 class="slds-text-heading_large">チャンクデータ</h1>
+  <p>Data 360 の検索インデックスにデータを追加するには、最初にチャンクする必要があります。チャンクを使用すると、データが意味のあるチャンクに分割され、Data 360 はそのチャンクを機械で読み取り可能なベクトル埋め込みに変換します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+          </tr>
+        </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#c360_a_search_index_supported_chunking_strategies">チャンク戦略</a></strong><br>Data 360 では、いくつかのチャンク戦略がサポートされています。Data 360 では、使用しているコンテンツタイプに基づいて最適なチャンク戦略が自動的に選択されます。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_search_index_max_token_setting">最大トークン設定がチャンクに与える影響</a></strong><br>検索インデックス設定でチャンク戦略を設定する場合、最大トークン制限を設定してチャンクに含めるテキスト量を制御します。Data 360 では、トークンの最大数はデフォルトで 512 に設定されています。</li><li class="slds-p-bottom_small"><strong><a href="model_mapping-2.html#c360_a_search_index_chunk_index_dmo">データモデルオブジェクトのチャンクとインデックス付け</a></strong><br>検索インデックス設定を作成すると、Data 360 によってチャンク データ モデル オブジェクトとインデックス データ モデル オブジェクトの 2 つの追加データ モデル オブジェクトが作成されます。これらのオブジェクトには、Data 360 の対応するデータと生成された埋め込みが保存されます。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_search_index_enriched_index">コンテンツチャンクの強化されたインデックス付け</a></strong><br>Data 360の非構造化データからベクトル検索インデックスまたはハイブリッド検索インデックスを作成する場合、コンテンツからメタデータを抽出して、生成されたコンテンツ チャンクを強化できます。抽出されたメタデータには、キーワード、エンティティ、トピックの概要、コンテンツによって回答された質問、コンテンツの概要が含まれます。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_search_index_chunk_citations">コンテンツチャンクの引用</a></strong><br> コンテンツチャンクのインライン引用を使用して、非構造化データに基づく AI 応答の精度を確認します。Data Cloud で検索インデックスを作成すると、インデックスによって各チャンクの引用が作成されます。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_search_index_in_data_kit">
+<h1 class="slds-text-heading_large">データ キットへの検索インデックス設定の追加</h1>
+  
+  <p>Data 360で、検索インデックス設定をデータ キットに追加して、ユーザーや環境間で機能を共有します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><p><a title="Data 360 のデータキットを使用して、パッケージの作成とインストールを合理化します。データキットでパッケージ化可能なすべての Data 360 機能を管理できます。データストリームバンドルを作成できます。データモデルのカスタマイズとリレーションも含まれています。" href="sharing_dev.html#c360_a_data_package_kits">データキットを</a>使用して、データストリームバンドル、データモデルのカスタマイズ、リレーションなど、パッケージの作成とインストールを合理化します。</p><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d34592e75" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d34592e75" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">データ キットに検索インデックス設定を追加するには</td>
+
+              <td headers="d34592e75" style="vertical-align:top;" class="slds-cell-wrap"><p>権限セット</p><ul>
+                  <li>Data Cloud アーキテクト</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div><ol><li><span>Data Cloud の [設定] に移動します。</span></li><li><span>[ツール] で、[<strong class="uicontrol">データキット]</strong> をクリックし、[<strong class="uicontrol">新規]</strong> をクリックします。</span></li><li><span>データキットに名前を付け、必要に応じて説明 (含まれる内容など) を追加します。</span></li><li><span><strong class="uicontrol">[保存]</strong> をクリックします。</span></li><li><span>検索インデックスで、[<strong class="uicontrol">追加] を</strong>クリックします。</span></li><li><span>[検索インデックスを追加] ページから、データ キットに追加する検索インデックス設定を選択し、<strong class="uicontrol">[次へ</strong>] をクリックします。</span></li><li><span><strong class="uicontrol">[保存]</strong> をクリックします。</span></li><li><span><strong class="uicontrol">[公開]</strong> をクリックします。</span><div>データキットが作成されます。これで、パッケージマネージャーで公開できます。</div></li></ol>
+
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_search_index_manage">
+<h1 class="slds-text-heading_large">検索インデックスの管理</h1>
+  <p>検索インデックス設定を作成、表示、編集、削除する。
+    </p>
+<ul><li class="slds-p-bottom_small"><strong><a href="setup_admin-2.html#c360_a_search_index_easy_setup_search_index">簡単な設定を使用した検索インデックス設定の作成</a></strong><br>いくつかの自動化された手順に従って、DMO(データ モデル オブジェクト)またはUDMO(非構造化データ モデル オブジェクト)のハイブリッド検索インデックス設定を作成します。Data 360 では、チャンクおよびベクトル化戦略のデフォルトが自動的に適用され、チャンクおよびインデックスモデルオブジェクトが作成されます。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_search_index_view_search_index">検索インデックス状況およびプロセス履歴の表示</a></strong><br>[検索インデックス] リストビューとオブジェクトレコードビューから検索インデックス設定の詳細を表示し、インデックス付けプロセスを監視します。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_search_index_edit_search_index">検索インデックス設定の編集</a></strong><br>必要に応じて、Data 360 検索インデックス設定を編集して、チャンク用の項目またはファイル拡張子を追加できます。他の既存の設定は参照できますが、変更できません。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_search_index_rebuild_search_index">検索インデックス設定の再構築</a></strong><br><span>Data 360</span> 検索インデックスが適切に処理されない場合、検索インデックス リスト ページまたはオブジェクト レコード ビューからインデックスのフル再構築をトリガーできます。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_search_index_delete_index_config">検索インデックス設定の削除</a></strong><br>Data 360 検索インデックス設定は、リストビューおよびオブジェクトレコードビューから削除できます。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_search_index_in_data_kit">データ キットへの検索インデックス設定の追加</a></strong><br>Data 360で、検索インデックス設定をデータ キットに追加して、ユーザーや環境間で機能を共有します。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_search_index_create_index_config_data_kit">データキットからの検索インデックス設定の作成</a></strong><br>Data 360 にデータキットをリリースしたら、含まれるインデックスから新しい検索インデックス設定を作成できます。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_search_index_max_token_setting">
+<h1 class="slds-text-heading_large">最大トークン設定がチャンクに与える影響</h1>
+  <p>検索インデックス設定でチャンク戦略を設定する場合、最大トークン制限を設定してチャンクに含めるテキスト量を制御します。Data 360 では、トークンの最大数はデフォルトで 512 に設定されています。</p>
+
+    <p>エンベディングモデルでは、テキストからトークンが作成され、最大トークン制限を超えるテキストは無視されます。ただし、 「 トークン」の概念は言語やエンベディングモデルによって異なるため、テキストから直接チャンクを数えることは信頼性がありません。</p>
+    <p>検索インデックスを作成すると、トークンの作成は次のように機能します。Data 360 はコンテンツ内の文を分割した後、指定された最大トークン設定に基づいて文をチャンクにマージします。最後に、エンベディングアルゴリズムによって各チャンクがベクトルに変換されます。</p>
+    <p>文章をチャンクにマージするときのトークン数を概算するために、Data 360 ではラテン語ベースの言語では単語数、非ラテン語ベース言語 (日本語など) では句読点数を使用します。ラテン語ベースの言語では 1 つの単語は約 1 トークンですが、非ラテン語ベースの言語では文字とトークンの関係はそれほど明確ではありません。この点を考慮して、通常、ラテン語ベースの言語チャンクの 512 語は 512 トークンの制限内です。ただし、非ラテン文字ベースの言語では、エンベディングアルゴリズムのしくみにより、512 個の句読点は 512 トークンを超える可能性があります。このような場合、チャンクに含まれるすべてのテキストがエンベディングに含まれるわけではなく、検索結果の関連性に影響する可能性があります。このタイプのコンテンツでは、512 未満の最大トークン制限を使用します。</p>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_search_index_optimize">
+<h1 class="slds-text-heading_large">検索インデックスの最適化: 項目の選択とチャンク</h1>
+  <p>高度なビルダーで検索インデックスを作成するときは、使用する項目の選択とチャンク戦略に注意して、より正確な結果を提供するように検索インデックスを最適化できます。</p>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">テキスト項目のインデックス付け</h2><p>検索インデックスの作成時にテキストフィールドを追加する場合は、より長いフリーテキストコンテンツのテキストフィールドを選択します。DMO から複数のテキストフィールドにインデックスを付けることもできます。たとえば、DMO から [<code>Description</code>]、[<code>Summary</code>]、[<code>Content</code>]、および [<code>Resolution</code>] 項目を選択した場合、Data 360 では対応するすべてのベクトルが同じ検索インデックスに保存されます。</p><p>ベクトルは、<a target="_blank" href="model_mapping-2.html#c360_a_search_index_index_dmo">インデックス DMO</a> の<code>DataSource__c</code>項目に基づいて分離できます。<code>DataSource__c</code> フィールドには、元のフィールド名が含まれます。この項目はインデックス DMO にあるため、取得者の事前項目で使用できます。たとえば、<code>Description</code> ではなく <code>Resolution</code> など、特定の文字列との意味的な類似性のみに基づいてクエリを評価するように取得元を設定できます。</p><p>類似する項目や冗長な項目 (<code>Summary</code>、<code>Title</code>、<code>Description</code> など) を選択しすぎないようにします。これを行うと、取得者に<code>DataSource__c</code>の事前条件がない場合、リコールが減る可能性があります。これらの項目にはすべて同じまたはよく似た情報が含まれている可能性があるため、同じ文書の少なくとも 3 つのチャンク (各項目に 1 つのチャンク) がクエリ結果で上位に表示される可能性があります。これらは LLM に同じ情報をもたらし、たとえば 9 件の結果を取得するように取得者を設定すると、3 件のドキュメントのみが結果に表示されます。これにより、検索結果のバリエーションが減り、ドキュメントが欠落する可能性があります。</p><p>2 つ以上の項目が同じコンテンツを表し、異なる形式である場合は、<code>Description</code> など、テキストが最も長い項目を選択することをお勧めします。<code>Title</code> などの短くて凝縮されたバージョンをこの項目の先頭に追加することを検討してください。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> インデックス項目としてカテゴリ列を選択しないでください。カテゴリデータは、Salesforce の選択リストに対応付けられる 1 語または 2 語の記述子です。有益な結果を作成するには、セマンティック検索でより長いテキスト範囲とより多くのコンテキストが必要です。</div></div></div>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">先頭に追加する項目の使用</h2><p><a title="Data 360 では、いくつかのチャンク戦略がサポートされています。Data 360 では、使用しているコンテンツタイプに基づいて最適なチャンク戦略が自動的に選択されます。" href="#c360_a_search_index_supported_chunking_strategies">チャンク戦略</a>を最適化する 1 つの方法は、チャンクにコンテキストを追加して識別しやすくするために先頭にフィールドを追加することです。たとえば、一連のトラブルシューティング手順が含まれるチャンクがあるとします。チャンクの先頭に「How to Fix Device X When It Shows Behaviour Y」というテキストを含む <code>Title</code> 項目を追加すると、そのコンテンツをユーザーの質問に関連するものとして識別しやすくなります。<code>Title</code> や <code>Product Name</code> などの保留中の項目は、これらの値をチャンクに追加し、プロンプト追加または Data 360 クエリエディターで表示できるようにします。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">チャンクサイズの調整</h2><p>チャンクを最適化するもう 1 つの方法は、チャンクサイズを調整することです。</p><p>デフォルトの検索インデックスを作成すると、Data 360 ではセマンティック ベースのパッセージ抽出マーカーを使用して、コンテンツをできるだけ小さいサイズに分割します。その後、Data Cloud は、指定したチャンクサイズまたはデフォルトの最大チャンクサイズ (512 トークン) に達するまでチャンクをまとめます。</p><p>最適なチャンクサイズと戦略は RAG またはエージェントの実装によって異なるため、これにはいくつかの実験が必要です。</p><p>詳細は、「 <a target="_blank" href="#c360_a_search_index_max_token_setting"><u>How the Max Token Setting Affects Chunking</u></a> 」を参照してください。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">取得のためのチャンクの最適化</h2><p>取得するチャンクのサイズを計画するときは、チャンクにするコンテンツの情報密度と組織構造を考慮してください。1 つのチャンクが 1 つのベクトルになります。チャンク内のすべてのコンテンツがこの 1 つのベクトルで表されます。チャンクの意味を適切に理解するために必要な単語数を検討します。400 ～ 500 ワードで動作しますか?または、より少ない単語で、自己完結型の情報 (先頭への追加やチャンク強化によって強化される可能性がある) を適切に捉えることができますか?このような質問は、計画で出てくるはずです。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">プロンプト増強のためのチャンクの最適化</h2><p>プロンプト増強の観点からチャンクすることも検討する必要があります。LLM が満足して使用できる応答を生成するために必要なチャンクの数は?小さな個々のファクトイドで十分ですか? それとも LLM により多くのコンテキストが必要ですか?</p><p>UDMO ベースの検索インデックスの場合、通常、コンテンツの追加はチャンクサイズに依存します。この場合、チャンクを大きくして追加のコンテキストを含める必要があります。</p><p>DMO ベースのインデックスでは、追加項目を使用して追加できるため、より多くのオプションを使用できます。プロンプトを 1 つのチャンクではなく元のドキュメント (Knowledge 記事など) を使用して追加することもできます。これにより、プロンプト解決の解像度が高まるため、選択した結果数に関連する LLM のコンテキストウィンドウを検討します。ただし、このようなプロンプトでは応答生成のコストが増加します。つまり、プロンプトと応答サイズを増やすと、消費する Einstein Request の数も増えます。</p></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_search_index_rebuild_search_index">
+<h1 class="slds-text-heading_large">検索インデックス設定の再構築</h1>
+  <p><span>Data 360</span> 検索インデックスが適切に処理されない場合、検索インデックス リスト ページまたはオブジェクト レコード ビューからインデックスのフル再構築をトリガーできます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d34736e62" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d34736e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">検索インデックス設定を再構築する</td>
+
+              <td headers="d34736e62" style="vertical-align:top;" class="slds-cell-wrap"><p>権限セット</p><ul>
+                  <li>Data Cloud アーキテクト</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>検索インデックスの再構築にかかる時間は、処理する必要があるデータ量によって異なります。データモデルオブジェクトのコンテンツ量が変更されるため、再構築時間が最初のビルドと異なる場合があります。</p></div>
+    <ol><li>
+        <span>アプリケーションランチャーで、[<strong class="uicontrol">Data Cloud]</strong> を選択します。</span>
+      </li><li>
+        <span>再構築する検索インデックス設定をクリックします。</span>
+      </li><li>
+        <span>詳細ページで、[<strong class="uicontrol">再構築]</strong> を選択します。</span>
+        <div>再構築プロセスはバックグラウンドで実行されます。この間も中断することなく検索インデックスのクエリを続行できます。新しいバージョンのインデックスが正常に構築されると、現在のバージョンのインデックスがシームレスに置き換えられます。状況の説明については、「<a title="[検索インデックス] リストビューとオブジェクトレコードビューから検索インデックス設定の詳細を表示し、インデックス付けプロセスを監視します。" href="#c360_a_search_index_view_search_index">検索インデックス状況およびプロセス履歴</a>の表示」を参照してください。</div>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_search_index_reference">
+<h1 class="slds-text-heading_large">検索インデックス参照</h1>
+  <p><span>Data 360の</span>検索では、非構造化データ、モデルの埋め込み、検索結果の事前絞り込み操作など、さまざまなファイル形式がサポートされます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table>
+    <div id="c360_a_search_index_reference__section_o34_jqz_wcc"><a name="c360_a_search_index_reference__section_o34_jqz_wcc"></a><h2 class="slds-text-heading_medium slds-p-top_small">サポートされる埋め込みモデル</h2><p><span>Data 360</span> では、次の埋め込みモデルがサポートされています。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d75533e72" style="vertical-align:top;" class="slds-cell-wrap" scope="col">モデル</th>
+              <th id="d75533e75" style="vertical-align:top;" class="slds-cell-wrap" scope="col">モダリティ</th>
+              <th id="d75533e78" style="vertical-align:top;" class="slds-cell-wrap" scope="col">最大シーケンス/入力長</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d75533e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="モデル"><a target="_blank" href="https://huggingface.co/intfloat/e5-large-v2">E5-large-v2</a>
+              </td>
+
+              <td headers="d75533e75" style="vertical-align:top;" class="slds-cell-wrap" data-label="モダリティ">テキスト</td>
+
+              <td headers="d75533e78" style="vertical-align:top;" class="slds-cell-wrap" data-label="最大シーケンス/入力長">512 トークン</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d75533e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="モデル"><a target="_blank" href="https://huggingface.co/intfloat/multilingual-e5-large">Multilingual-E5-large</a></td>
+
+              <td headers="d75533e75" style="vertical-align:top;" class="slds-cell-wrap" data-label="モダリティ">テキスト</td>
+
+              <td headers="d75533e78" style="vertical-align:top;" class="slds-cell-wrap" data-label="最大シーケンス/入力長">512 トークン</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d75533e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="モデル"><a title="SFR-v2-small 組み込みモデルでは、8,000 トークンの拡張コンテキストウィンドウが提供され、ユーザーエクスペリエンスとモデル機能が大幅に向上します。" href="#c360_a_search_index_sfr_v2_small">SFR-v2-small</a>
+              </td>
+
+              <td headers="d75533e75" style="vertical-align:top;" class="slds-cell-wrap" data-label="モダリティ">テキスト</td>
+
+              <td headers="d75533e78" style="vertical-align:top;" class="slds-cell-wrap" data-label="最大シーケンス/入力長">8,000 トークン</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">サポートされる大規模言語モデル</h2><p>LLM ベースの解析と LLM ベースのビジュアルデータ前処理を使用すると、デフォルトの GPT-4o モデルを上書きして、ビジネスニーズとコンテンツに最も適したサポート対象の LLM を使用できます。システム管理者が使用を承認した LLM のみを選択できます。システム管理者が現在使用中のモデルを無効にしても、以前に処理したコンテンツは引き続きアクセスできます。Data 360 では、次の大規模言語モデル (LLM) がサポートされています。</p><ul>
+        <li>GPT 4.o</li>
+
+        <li>GPT 5.4</li>
+
+        <li>クロード・オプス 4.5</li>
+
+        <li>クロード・ソネット 4.6</li>
+
+        <li>Gemini 2.5 Pro</li>
+
+        <li>Gemini 3.0 フラッシュ</li>
+
+      </ul>
+</div>
+    <div id="c360_a_search_index_reference__file-formats"><a name="c360_a_search_index_reference__file-formats"></a><h2 class="slds-text-heading_medium slds-p-top_small">非構造化データでサポートされるファイル形式</h2><p><span>Data 360で</span>は、非構造化データと検索インデックスの構成でいくつかのファイル形式がサポートされています。詳細は、「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=data.c360_a_unstructured_data_connect.htm&amp;language=ja&amp;type=5">非構造化データファイル</a>の形式とコネクタ」を参照してください。</p></div>
+    <div id="c360_a_search_index_reference__section_ult_q5b_xcc"><a name="c360_a_search_index_reference__section_ult_q5b_xcc"></a><h2 class="slds-text-heading_medium slds-p-top_small">サポートされている演算子</h2><p>事前絞り込み項目を使用して検索クエリを強化します。論理演算子を使用し、項目名と値の大文字と小文字を区別して管理することで、正確なデータ取得を実現します。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d75533e202" style="vertical-align:top;" class="slds-cell-wrap" scope="col">データ型</th>
+              <th id="d75533e205" style="vertical-align:top;" class="slds-cell-wrap" scope="col">サポートされている演算子</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d75533e202" style="vertical-align:top;" class="slds-cell-wrap" data-label="データ型">数値とパーセント</td>
+
+              <td headers="d75533e205" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている演算子"><a name="c360_a_search_index_reference__ul_wlt_q5b_xcc"></a><ul id="c360_a_search_index_reference__ul_wlt_q5b_xcc">
+                  <li>&lt;&nbsp; (未満)</li>
+
+                  <li>&lt;= (次の値以下)</li>
+
+                  <li>=&nbsp; (次の値と等しい)</li>
+
+                  <li>&gt; (より大きい)</li>
+
+                  <li>&gt;= (次の値以上)</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d75533e202" style="vertical-align:top;" class="slds-cell-wrap" data-label="データ型">日付と日時</td>
+
+              <td headers="d75533e205" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている演算子"><a name="c360_a_search_index_reference__ul_o5j_b3d_rdc"></a><ul id="c360_a_search_index_reference__ul_o5j_b3d_rdc">
+                  <li>&lt;&nbsp; (未満)</li>
+
+                  <li>&lt;= (次の値以下)</li>
+
+                  <li>=&nbsp; (次の値と等しい)</li>
+
+                  <li>&gt; (より大きい)</li>
+
+                  <li>&gt;= (次の値以上)</li>
+
+                </ul>
+<p>例:</p><a name="c360_a_search_index_reference__ul_xlt_q5b_xcc"></a><ul id="c360_a_search_index_reference__ul_xlt_q5b_xcc">
+                  <li>DateTimeField=''2024-05-21T00:00:00.000Z''</li>
+
+                  <li>DateField=''2024-05-21''</li>
+
+                </ul>
+<p style="margin-bottom:0;">タイムゾーンは、UTC、PST、EST などの任意の標準タイムゾーンか、+05:30 や -08:00 などのオフセットです。 タイムゾーンを指定しない場合、システムは UTC と見なします。</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d75533e202" style="vertical-align:top;" class="slds-cell-wrap" data-label="データ型">テキスト、URL、メール、電話</td>
+
+              <td headers="d75533e205" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている演算子"><a name="c360_a_search_index_reference__ul_ylt_q5b_xcc"></a><ul id="c360_a_search_index_reference__ul_ylt_q5b_xcc">
+                  <li>=&nbsp; (次の値と等しい)</li>
+
+                  <li>!= (次の文字列と一致しない)</li>
+
+                  <li>in (‘option1’, ‘option2’, ‘option3’) -&gt; リストされているオプションのいずれかと一致させます。最大 10 個のオプションを指定できます。</li>
+
+                  <li>not in (‘option1’, ‘option2’, ‘option3’) -&gt; リストされているどのオプションにも一致しない場合。最大 10 個のオプションを指定できます。</li>
+
+                  <li>LIKE (例: LIKE ‘d/%’)</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d75533e202" style="vertical-align:top;" class="slds-cell-wrap" data-label="データ型">Boolean</td>
+
+              <td headers="d75533e205" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている演算子"><p>= (次の値と等しい)</p><p style="margin-bottom:0;">例: <code>&lt;BooleanField&gt;=true</code></p></td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">検索インデックスの考慮事項</h2><p>検索インデックスを使用するときは、次の制限に注意してください。</p><ul>
+        <li>検索インデックスでは UTF-8 エンコードのみがサポートされます。マルチ言語コンテンツでは UTF-8 エンコードを使用する必要があります。</li>
+
+        <li>Developer Edition 組織では、名前空間が有効になっている場合、検索インデックスはサポートされません。</li>
+
+        <li>外部 Blob ストアから Data 360 に接続した非構造化データの検索インデックスを作成する場合は、Blob ストアでファイル通知パイプラインが設定されていることを確認します。</li>
+
+        <li>1 つ以上の外部 DLO からのマッピングがある DMO は、それらのすべての外部 DLO でキャッシュが有効になっている場合にのみデータソースとして使用できます。詳細については、「<a target="_blank" href="model_mapping-1.html#c360_a_accelerated_data_lake_objects">データ統合のキャッシュ</a>」を参照してください</li>
+
+        <li>検索インデックスでは、チャンクの日付項目と日時項目はサポートされていません。チャンクデータに使用できるのはテキストデータ型項目のみです。</li>
+
+        <li>関連付けられたデータ モデル オブジェクト （DMO） で検索インデックスを作成した後にデータ レイク オブジェクト （DLO） のデータ スペース フィルタを変更しても、検索インデックスは自動的に更新されません。インデックスでは、古い検索条件では、そのデータが対象でなくなってもインデックスが付けられます。検索条件の変更後にシステムで処理される新規または変更されたレコードにのみ、更新された条件が反映されます。検索インデックスに現在のデータスペース検索条件を正確に反映させるには、インデックスを再構築します。更新された検索条件ですべてのレコードを再処理するには、検索インデックスの詳細ページで [再構築] をクリックします。</li>
+
+      </ul>
+</div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#c360_a_search_index_sfr_v2_small">SFR-v2-small 組み込みモデルリファレンス</a></strong><br>SFR-v2-small 組み込みモデルでは、8,000 トークンの拡張コンテキストウィンドウが提供され、ユーザーエクスペリエンスとモデル機能が大幅に向上します。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_search_index_retrieve_content">
+<h1 class="slds-text-heading_large">ベクトル検索を使用したコンテンツの取得</h1>
+  <p>ベクトル検索と AI エージェントクエリを使用すると、クエリを取得し、構造化および非構造化データソースを検索し、効率性と精度を向上させる集計された応答を受信できます。</p>
+
+    <p>これらのサンプル ワークフローでは、データアウェア スペシャリストは Salesforce に Knowledge 記事、Azure Blob ストアにその他の PDF ファイルを保存しています。データアウェアスペシャリストは、Salesforce ユーザーが自然言語検索を使用して、AI エージェントで使用可能なコンテンツから回答の要約を取得できるようにしたいと考えています。コンテンツがチャンク化され、Data Cloud 検索インデックスでベクトル化されています。</p>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">ワークフロー 1</h2><p>この例では、AI エージェントとベクトル検索によって、ユーザークエリに基づいて関連コンテンツを取得して集計するプロセスが合理化される方法を示します。</p><div style="text-align:left;">
+        <a name="c360_a_search_index_retrieve_content__image_dhq_xl1_xcc"></a><img alt="取得機能を使用したベクトル検索および LLM からの AI エージェントクエリと応答。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_search_index_retrieve_content_retrievers_v2.png" id="c360_a_search_index_retrieve_content__image_dhq_xl1_xcc" style="width:800px;">
+      </div><ol>
+        <li>ユーザーは AI エージェントを介して要求を開始します。</li>
+
+        <li>エージェントがプロンプトテンプレートをトリガーします。</li>
+
+        <li>プロンプトによって取得が開始され、Data 360 ベクトル検索に送信されます。</li>
+
+        <li>Data 360 ベクトル検索では、Azure Blob ストアに保存されている Salesforce Knowledge記事と PDF から取得された関連ドキュメントから一致する抜粋を取得します。</li>
+
+        <li>プロンプトテンプレートが入力され、集計のために大規模言語モデル (LLM) に送信されます。</li>
+
+        <li>LLM が処理し、プロンプトテンプレートに要約された応答を返します。</li>
+
+        <li>この応答はエージェントにリレーされます。</li>
+
+        <li>応答がユーザーに表示されます。</li>
+
+      </ol></div>
+    <div id="c360_a_search_index_retrieve_content__section_ink_c2n_bdc"><a name="c360_a_search_index_retrieve_content__section_ink_c2n_bdc"></a><h2 class="slds-text-heading_medium slds-p-top_small">ワークフロー 2</h2><p>この例では、AIエージェント、Apex呼び出し可能なアクション、フロー、ベクトル検索によって、ユーザー クエリに基づいて関連するコンテンツの取得と集計のプロセスがどのように合理化されるのかを説明します。</p><div id="c360_a_search_index_retrieve_content__fig_jnk_c2n_bdc" style="text-align:left;"><a name="c360_a_search_index_retrieve_content__fig_jnk_c2n_bdc"></a>
+        <a name="c360_a_search_index_retrieve_content__image_u4b_rk1_xcc"></a><img alt="ベクトル検索および LLM からの AI エージェントクエリと応答。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_search_index_retrieve_content_v2.png" id="c360_a_search_index_retrieve_content__image_u4b_rk1_xcc" style="width:800px;">
+      </div><a name="c360_a_search_index_retrieve_content__ol_knk_c2n_bdc"></a><ol id="c360_a_search_index_retrieve_content__ol_knk_c2n_bdc">
+        <li>ユーザーは AI エージェントを介して要求を開始します。</li>
+
+        <li>エージェントがフローを有効化します。</li>
+
+        <li>フローは、ユーザーの入力を取得してカスタムオブジェクトに保存します。</li>
+
+        <li>フローによってプロンプトテンプレートがトリガーされます。</li>
+
+        <li>プロンプトビルダーは、カスタムオブジェクトからデータを取得し、Apex 呼び出し可能なアクションを実行します。</li>
+
+        <li>Apexの呼び出し可能なアクションは、Data 360ベクトル検索を実行します。</li>
+
+        <li>Data 360 ベクトル検索では、Azure Blob ストアに保存されている Salesforce Knowledge記事と PDF から取得された関連ドキュメントから一致する抜粋を取得します。</li>
+
+        <li>Apex 呼び出し可能アクションは、Data 360 から一致する抜粋を受信し、プロンプトテンプレートに入力します。</li>
+
+        <li>プロンプトテンプレートは、集計のために大規模言語モデル (LLM) に送信されます。</li>
+
+        <li>LLM が処理し、プロンプトテンプレートに要約された応答を返します。</li>
+
+        <li>この応答は、フローを介してリレーされます。</li>
+
+        <li>フローによって応答がエージェントに送信されます。</li>
+
+        <li>応答がユーザーに表示されます。</li>
+
+      </ol></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Data 360の非構造化データを使用して、Agentforceエージェント、生成AI、分析、自動化の使用事例をビジネス固有のデータでグラウンディングし、ユーザーと顧客に深いインサイトを提供します。" href="https://help.salesforce.com/s/articleView?id=data.c360_a_unstructured_data_connect_overview.htm&amp;language=ja&amp;type=5">Data 360 での非構造化データの使用</a></li><li><a title="Data 360 では、非構造化データと構造化データから検索可能なセマンティックベクトル埋め込みを作成できます。ベクトル検索は、生成 AI、自動化、分析アプリケーションで埋め込み間のセマンティック類似性とコンテキストを理解するのに役立ちます。" href="#c360_a_search_index_vector_index">ベクトル検索</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=ai.copilot_intro.htm&amp;language=ja&amp;type=5">Salesforceヘルプ: Agentforce</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_search_index_sfr_v2_small">
+<h1 class="slds-text-heading_large">SFR-v2-small 組み込みモデルリファレンス</h1>
+ <p>SFR-v2-small 組み込みモデルでは、8,000 トークンの拡張コンテキストウィンドウが提供され、ユーザーエクスペリエンスとモデル機能が大幅に向上します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+  <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data Cloud でサポートされている<strong>すべてのエディション</strong>。<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data Cloud エディションの使用可能状況</a>を参照してください。</td>
+
+     </tr>
+    </tbody></table>
+  <div><p>SFR-v2-small 埋め込みモデルに関する技術情報を次に示します。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 中国のエンティティによって開発された LLM に影響する規制の変更により Salesforce がこのモデルを削除した場合は、90 日未満の通知または適用される法律で許容される最大期間のいずれか短い方の期間で、代替モデルで検索インデックスを再構築できます。</div></div></div>
+</div>
+  <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+     <tr class="">
+      <th id="d97722e67" style="vertical-align:top;" class="slds-cell-wrap" scope="col">MoDel 情報</th>
+      <th id="d97722e70" style="vertical-align:top;" class="slds-cell-wrap" scope="col">詳細</th>
+     </tr>
+    </thead><tbody>
+     <tr class="">
+      <td headers="d97722e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="MoDel 情報">モデル種別</td>
+
+      <td headers="d97722e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">テキストを入力として受け入れ、1024 次元の連続埋め込みベクトルを生成するテキスト埋め込みモデル。クエリとドキュメントのペアで対照的な損失でトレーニングされます。</td>
+
+     </tr>
+     <tr class="">
+      <td headers="d97722e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="MoDel 情報">モデルアーキテクチャ</td>
+
+      <td headers="d97722e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">434M パラメーター言語モデル</td>
+
+     </tr>
+     <tr class="">
+      <td headers="d97722e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="MoDel 情報">コンテキストウィンドウ</td>
+
+      <td headers="d97722e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">8192</td>
+
+     </tr>
+     <tr class="">
+      <td headers="d97722e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="MoDel 情報">モデルの系統</td>
+
+      <td headers="d97722e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">以前の本番モデルなし</td>
+
+     </tr>
+     <tr class="">
+      <td headers="d97722e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="MoDel 情報">言語</td>
+
+      <td headers="d97722e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">英語</td>
+
+     </tr>
+     <tr class="">
+      <td headers="d97722e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="MoDel 情報">モデルから微調整</td>
+
+      <td headers="d97722e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">gte-large-en-v1.5</td>
+
+     </tr>
+     <tr class="">
+      <td headers="d97722e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="MoDel 情報">モデルから定量化</td>
+
+      <td headers="d97722e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">なし</td>
+
+     </tr>
+     <tr class="">
+      <td headers="d97722e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="MoDel 情報">免責事項と著作権表示</td>
+
+      <td headers="d97722e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">Apache ライセンス 2.0</td>
+
+     </tr>
+    </tbody></table>
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">技術仕様</h2><ul>
+    <li>レイヤー数: 24</li>
+
+    <li>埋め込みディメンション: 1024</li>
+
+    <li>パラメーター数: 434,000,000</li>
+
+    <li>モデルコンテキストサイズ: 8,000</li>
+
+    <li>サポート言語: 英語</li>
+
+   </ul>
+</div>
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">パフォーマンスと評価</h2><p>次の図は、公開ベンチマークスコアと他の組み込みモデルとの比較を示しています。</p><ul>
+     <li>e5-large-v2 と比較して取得パフォーマンスが +7.5% (相対 15%) 向上</li>
+
+     <li>トークンのコンテキスト長が512トークンから8,000トークンに延長され、より柔軟なKnowledge処理が可能</li>
+
+    </ul>
+<table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:16.666666666666664%"><col style="width:16.666666666666664%"><col style="width:16.666666666666664%"><col style="width:16.666666666666664%"><col style="width:16.666666666666664%"><col style="width:16.666666666666664%"></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d97722e212" style="vertical-align:top;" class="slds-cell-wrap" scope="col">MoDel 情報</th>
+       <th id="d97722e215" style="vertical-align:top;" class="slds-cell-wrap" scope="col">MTEB (56 ToDo)</th>
+       <th id="d97722e218" style="vertical-align:top;" class="slds-cell-wrap" scope="col">取得 (15 ToDo)</th>
+       <th id="d97722e221" style="vertical-align:top;" class="slds-cell-wrap" scope="col">モデルサイズ</th>
+       <th id="d97722e224" style="vertical-align:top;" class="slds-cell-wrap" scope="col">ディメンションの埋め込み</th>
+       <th id="d97722e228" style="vertical-align:top;" class="slds-cell-wrap" scope="col">コンテキスト長</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d97722e212" style="vertical-align:top;" class="slds-cell-wrap" data-label="MoDel 情報">e5-large-v2</td>
+
+       <td headers="d97722e215" style="vertical-align:top;" class="slds-cell-wrap" data-label="MTEB (56 ToDo)">62.2</td>
+
+       <td headers="d97722e218" style="vertical-align:top;" class="slds-cell-wrap" data-label="取得 (15 ToDo)">50.6</td>
+
+       <td headers="d97722e221" style="vertical-align:top;" class="slds-cell-wrap" data-label="モデルサイズ">335 百万</td>
+
+       <td headers="d97722e224" style="vertical-align:top;" class="slds-cell-wrap" data-label="ディメンションの埋め込み">1024</td>
+
+       <td headers="d97722e228" style="vertical-align:top;" class="slds-cell-wrap" data-label="コンテキスト長">512 トークン</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d97722e212" style="vertical-align:top;" class="slds-cell-wrap" data-label="MoDel 情報">SFR-v2-small</td>
+
+       <td headers="d97722e215" style="vertical-align:top;" class="slds-cell-wrap" data-label="MTEB (56 ToDo)">65.9</td>
+
+       <td headers="d97722e218" style="vertical-align:top;" class="slds-cell-wrap" data-label="取得 (15 ToDo)">58.1</td>
+
+       <td headers="d97722e221" style="vertical-align:top;" class="slds-cell-wrap" data-label="モデルサイズ">434 百万</td>
+
+       <td headers="d97722e224" style="vertical-align:top;" class="slds-cell-wrap" data-label="ディメンションの埋め込み">1024</td>
+
+       <td headers="d97722e228" style="vertical-align:top;" class="slds-cell-wrap" data-label="コンテキスト長">8192トークン</td>
+
+      </tr>
+     </tbody></table></div>
+ 
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_search_index_supported_chunking_strategies">
+<h1 class="slds-text-heading_large">チャンク戦略</h1>
+  <p>Data 360 では、いくつかのチャンク戦略がサポートされています。Data 360 では、使用しているコンテンツタイプに基づいて最適なチャンク戦略が自動的に選択されます。</p>
+
+    <p>たとえば、最も関連性の高いコンテキストと意味を提供する項目、それらの項目を分割する方法、取得した結果がEinstein Gen AI、自動化、分析アプリケーションでどのように使用されるかを検討します。たとえば、パス抽出戦略を使用して Knowledge 記事 DMO のカスタム テキスト フィールドを分割し、Knowledge オブジェクト間で検索するときに意味的に類似する結果を簡単に返すことができます。</p>
+    <ul>
+      <li><a href="#c360_a_search_index_supported_chunking_strategies">セクション対応チャンク</a></li>
+
+      <li><a href="#c360_a_search_index_supported_chunking_strategies">セマンティック・ベースの通路の抽出</a></li>
+
+      <li><a href="#c360_a_search_index_supported_chunking_strategies">会話ベースのチャンク</a></li>
+
+      <li><a href="#c360_a_search_index_supported_chunking_strategies">先頭のフィールドチャンク</a></li>
+
+      <li><a href="#c360_a_search_index_supported_chunking_strategies">コード拡張</a></li>
+
+    </ul>
+
+    <div id="c360_a_search_index_supported_chunking_strategies__section_tj2_dnz_rfc"><a name="c360_a_search_index_supported_chunking_strategies__section_tj2_dnz_rfc"></a><h2 class="slds-text-heading_medium slds-p-top_small">セクション対応チャンク</h2><p>セクション対応チャンクでは、タイトル要素とヘッダー要素を使用してドキュメントをチャンクします。セクションタイトルまたはヘッダー要素の下にあるすべてのテキストは、Data 360 で新しいセクションタイトルまたはヘッダー要素が検出されるまで、まとめてチャンクされます。これにより、文書の構造に基づいてコンテンツを一貫したセクションに分割できます。</p><p>セクションが任意に分割されることはありません。チャンクは常に自然なコンテンツの境界を尊重し、読みやすさとコンテキストを維持します。短いパラグラフやリスト項目がスタンドアロンセクションとして誤って認識されると、チャンクが過度に小さくなります。これを回避するには、検索インデックスを作成するときに次の設定を使用します。</p><ul>
+        <li>Max Token (最大トークン): 隣接する小さなセクションをより大きなチャンクに結合することで、一貫性を犠牲にすることなくチャンクサイズを最適化します。「<a target="_blank" href="#c360_a_search_index_max_token_setting">How the Max Token Setting Affects Chunking</a> (最大トークン設定によるチャンクへの影響)」を参照してください。</li>
+
+        <li>重複トークン: 1 つのセクションから複数のチャンクが作成された場合にのみ使用されます。各チャンクの末尾から次のチャンクの先頭までに追加するトークン数を指定します。これにより、連続するチャンク間でコンテキストの重複が発生し、スムーズな移行と検索や取得などのタスクのパフォーマンスが向上します。</li>
+
+      </ul>
+<p>組み合わせたコンテンツが設定されたトークン制限を超えない場合は、複数の段落を 1 つのチャンクにグループ化できます。</p><p>トークンの制限に達すると、チャンクロジックによって文や段落の途中で分割されず、区切りがなくなります。代わりに、段落の末尾まで拡張され、チャンク全体でセマンティックと構造の整合性が維持されます。</p><p>たとえば、このテキストはタイトルと後続のセクションヘッダーに基づいてセクションに分割されます。</p><div style="text-align:left;">
+        <img alt="セクション対応チャンクを示すアノテーションが付加されたテキストドキュメント。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/section_aware_chunking.png" style="width:600px;">
+      </div><p>結果のチャンクデータモデルオブジェクトの例には、次のレコードが含まれます。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:25%"><col style="width:25%"><col style="width:25%"><col style="width:25%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d137596e109" style="vertical-align:top;" class="slds-cell-wrap" scope="col">チャンク シーケンス番号</th>
+              <th id="d137596e112" style="vertical-align:top;" class="slds-cell-wrap" scope="col">チャンク</th>
+              <th id="d137596e115" style="vertical-align:top;" class="slds-cell-wrap" scope="col">DaTAsource オブジェクトのチャンク</th>
+              <th id="d137596e118" style="vertical-align:top;" class="slds-cell-wrap" scope="col">データソース</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d137596e109" style="vertical-align:top;" class="slds-cell-wrap" data-label="チャンク シーケンス番号">1</td>
+
+              <td headers="d137596e112" style="vertical-align:top;" class="slds-cell-wrap" data-label="チャンク"><code>Retrievers A retriever returns relevant data from the vector database
+                  to augment a prompt. By augmenting prompts with accurate, current, and pertinent
+                  information, retrievers improve the value and relevance of LLM responses for
+                  users. . . </code></td>
+
+              <td headers="d137596e115" style="vertical-align:top;" class="slds-cell-wrap" data-label="DaTAsource オブジェクトのチャンク"><code>DataSourceObject__c</code></td>
+
+              <td headers="d137596e118" style="vertical-align:top;" class="slds-cell-wrap" data-label="データソース"><code>DataSource__c</code></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d137596e109" style="vertical-align:top;" class="slds-cell-wrap" data-label="チャンク シーケンス番号">2</td>
+
+              <td headers="d137596e112" style="vertical-align:top;" class="slds-cell-wrap" data-label="チャンク"><code>Default and Custom Retrievers When a search index is created in Data
+                  Cloud, a default retriever is created automatically. You can't customize a default
+                  retriever. However, in AI Models, you can create and customize retrievers for
+                  search indexes.</code></td>
+
+              <td headers="d137596e115" style="vertical-align:top;" class="slds-cell-wrap" data-label="DaTAsource オブジェクトのチャンク"><code>DataSourceObject__c</code></td>
+
+              <td headers="d137596e118" style="vertical-align:top;" class="slds-cell-wrap" data-label="データソース"><code>DataSource__c</code></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d137596e109" style="vertical-align:top;" class="slds-cell-wrap" data-label="チャンク シーケンス番号">3</td>
+
+              <td headers="d137596e112" style="vertical-align:top;" class="slds-cell-wrap" data-label="チャンク"><code>Dynamic Retrievers Some standard templates contain dynamic retrievers.
+                  A dynamic retriever is a placeholder for a retriever specified at runtime
+                  depending on the needs of the prompt template. To test a dynamic retriever, enter
+                  the retriever’s API name, which you can find in AI Models.</code></td>
+
+              <td headers="d137596e115" style="vertical-align:top;" class="slds-cell-wrap" data-label="DaTAsource オブジェクトのチャンク"><code>DataSourceObject__c</code></td>
+
+              <td headers="d137596e118" style="vertical-align:top;" class="slds-cell-wrap" data-label="データソース"><code>DataSource__c</code></td>
+
+            </tr>
+          </tbody></table><p>Data 360 の高度なビルダーで検索インデックス設定を作成する場合、セクション対応チャンクが HTML ファイルと PDF ファイルのデフォルトのチャンク戦略になります。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> HTML ドキュメントのセクション対応戦略を使用する場合、チャンクの前に HTML タグが自動的にコンテンツから削除されます。</div></div></div>
+</div>
+    <div id="c360_a_search_index_supported_chunking_strategies__section_pvt_jkq_c2c"><a name="c360_a_search_index_supported_chunking_strategies__section_pvt_jkq_c2c"></a><h2 class="slds-text-heading_medium slds-p-top_small">セマンティックベースのパッセージ抽出</h2><p>セマンティックベースの通路の抽出では、HTML タグに固有のセマンティックな意味を使用して文書を通路に分割します。これらの HTML 要素はチャンクの論理境界とみなされます。</p><a name="c360_a_search_index_supported_chunking_strategies__ul_otc_pns_ydc"></a><ul id="c360_a_search_index_supported_chunking_strategies__ul_otc_pns_ydc">
+        <li>ヘッダーレベル 1 ～ 6 の<code>&lt;h1-h6&gt;</code></li>
+
+        <li>テーマ別休憩<code>&lt;hr&gt;</code></li>
+
+        <li>太字 <code>&lt;b&gt;</code>– タグ付きテキストが単独行にある場合や、<code>font_weight</code>が 700 以上に設定されている段落や<code>font_weight</code>が <code>bold</code> に設定されている段落のテキストで使用されている場合に使用します。</li>
+
+        <li>強い<code>&lt;strong&gt;</code> — タグ付きテキストが 1 行にある場合、または<code>font_weight</code>が 700 以上に設定されている段落や<code>font_weight</code>が太字に設定されている段落のテキストで使用されている場合に使用します。</li>
+
+        <li>段落<code>&lt;p&gt;</code> — タグ付きテキストが単独の行にある場合に使用します。</li>
+
+        <li>改行<code>&lt;br&gt;</code> — 現在のチャンクがトークン制限を超えた場合に使用されます。</li>
+
+      </ul>
+<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> HTML ドキュメントでパッセージ抽出戦略を使用すると、チャンクする前から HTML タグが自動的に削除されます。これは検索インデックススビルダーのデフォルト設定ですが、必要に応じて無効にできます。</div></div></div>
+<p>たとえば、このテキストにはいくつかの HTML 要素が含まれています。</p><div id="c360_a_search_index_supported_chunking_strategies__fig_qvt_jkq_c2c" style="text-align:left;"><a name="c360_a_search_index_supported_chunking_strategies__fig_qvt_jkq_c2c"></a>
+        <a name="c360_a_search_index_supported_chunking_strategies__image_rvt_jkq_c2c"></a><img alt="セマンティックベースのパッセージ抽出を示すアノテーションが付加されたテキストドキュメント。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/semantic_based_passage_extraction2.png" id="c360_a_search_index_supported_chunking_strategies__image_rvt_jkq_c2c" style="width:600px;">
+      </div><p>HTML では次のようになります。</p><pre id="c360_a_search_index_supported_chunking_strategies__codeblock_svt_jkq_c2c" class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><a name="c360_a_search_index_supported_chunking_strategies__codeblock_svt_jkq_c2c"></a><code>&lt;h1&gt;Enable Custom Time Zones&lt;/h1&gt;
+&lt;p&gt;Time zone support lets you view time-specific data...&lt;/p&gt;
+
+&lt;h4&gt;REQUIRED EDITIONS&lt;/h4&gt;
+&lt;p&gt;Available in Salesforce Classic and Lightning Experience&lt;/p&gt;
+&lt;p&gt;...&lt;/p&gt;
+
+&lt;h2&gt;Enable Time Zone Support&lt;/h2&gt;
+&lt;ul&gt;...&lt;/ul&gt;</code></pre><p>結果のチャンクデータモデルオブジェクトの例には、次のレコードが含まれます。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:25%"><col style="width:25%"><col style="width:25%"><col style="width:25%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d137596e290" style="vertical-align:top;" class="slds-cell-wrap" scope="col">ChunkSequenceNumber</th>
+              <th id="d137596e293" style="vertical-align:top;" class="slds-cell-wrap" scope="col">チャンク</th>
+              <th id="d137596e296" style="vertical-align:top;" class="slds-cell-wrap" scope="col">データソースオブジェクト</th>
+              <th id="d137596e299" style="vertical-align:top;" class="slds-cell-wrap" scope="col">データソース</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d137596e290" style="vertical-align:top;" class="slds-cell-wrap" data-label="ChunkSequenceNumber"><code>1</code></td>
+
+              <td headers="d137596e293" style="vertical-align:top;" class="slds-cell-wrap" data-label="チャンク"><code>Enable Custom Time Zones Time zone support lets you view time-specific
+                  data....</code></td>
+
+              <td headers="d137596e296" style="vertical-align:top;" class="slds-cell-wrap" data-label="データソースオブジェクト"><code>DataSourceObject__c</code></td>
+
+              <td headers="d137596e299" style="vertical-align:top;" class="slds-cell-wrap" data-label="データソース"><code>DataSource__c</code></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d137596e290" style="vertical-align:top;" class="slds-cell-wrap" data-label="ChunkSequenceNumber"><code>2</code></td>
+
+              <td headers="d137596e293" style="vertical-align:top;" class="slds-cell-wrap" data-label="チャンク"><code>REQUIRED EDITIONS Available in Salesforce Classic...</code></td>
+
+              <td headers="d137596e296" style="vertical-align:top;" class="slds-cell-wrap" data-label="データソースオブジェクト"><code>DataSourceObject__c</code></td>
+
+              <td headers="d137596e299" style="vertical-align:top;" class="slds-cell-wrap" data-label="データソース"><code>DataSource__c</code></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d137596e290" style="vertical-align:top;" class="slds-cell-wrap" data-label="ChunkSequenceNumber"><code>3</code></td>
+
+              <td headers="d137596e293" style="vertical-align:top;" class="slds-cell-wrap" data-label="チャンク"><code>Enable Time Zone Support From Setup, enter
+                Analytics...</code></td>
+
+              <td headers="d137596e296" style="vertical-align:top;" class="slds-cell-wrap" data-label="データソースオブジェクト"><code>DataSourceObject__c</code></td>
+
+              <td headers="d137596e299" style="vertical-align:top;" class="slds-cell-wrap" data-label="データソース"><code>DataSource__c</code></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d137596e290" style="vertical-align:top;" class="slds-cell-wrap" data-label="ChunkSequenceNumber"><code>4</code></td>
+
+              <td headers="d137596e293" style="vertical-align:top;" class="slds-cell-wrap" data-label="チャンク"><code>Sync Connected Objects and Refresh Datasets Run a full Data Sync of
+                  your connected objects...</code></td>
+
+              <td headers="d137596e296" style="vertical-align:top;" class="slds-cell-wrap" data-label="データソースオブジェクト"><code>DataSourceObject__c</code></td>
+
+              <td headers="d137596e299" style="vertical-align:top;" class="slds-cell-wrap" data-label="データソース"><code>DataSource__c</code></td>
+
+            </tr>
+          </tbody></table><p>2 つのヘッダータグの間にコンテンツがない場合、それらのタグと後続のコンテンツは 2 つではなく 1 つのチャンクで表示されます。ヘッダー間にコンテンツがない場合、Data 360 は 1 つのチャンクに収まるだけのヘッダータグを組み合わせます。</p><p>デフォルトでは、Data 360 では最初にセマンティックベースの方法が使用されますが、結果の通路が長すぎる場合は、ウィンドウベースの通路抽出を使用してさらに処理されます。ウィンドウベースの抽出では、<code>&lt;div&gt;</code>や<code>&lt;p&gt;</code>などのブロックレベル要素、または改行<code>&lt;br&gt;</code>で区切られた未加工テキストを使用して、ドキュメントを通路に分割します。段落に HTML が含まれない場合、集計は文レベルで行われます。</p></div>
+    <div id="c360_a_search_index_supported_chunking_strategies__section_q5y_tqx_jfc"><a name="c360_a_search_index_supported_chunking_strategies__section_q5y_tqx_jfc"></a><h2 class="slds-text-heading_medium slds-p-top_small">会話ベースのチャンク</h2><p>会話ベースのチャンクでは、音声ファイルと動画ファイルから文字起こしされたデータをチャンクに分割します。通常、音声が変更されると分割されます。</p><p>文字起こし中に複数の話者が存在する場合、各チャンクは個々の話者の話を表します。</p><p>トランスクリプトの最初の数行を次に示します。</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>"Hello? Hi Alex, it's Sam from Bullseye. I didn't hear from you yesterday, so I wanted to check in. Hi Sam, sorry about that."</code></pre><p>結果のチャンクデータモデルオブジェクトの一部に次のレコードが含まれます。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:20%"><col style="width:20%"><col style="width:20%"><col style="width:20%"><col style="width:20%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d137596e443" style="vertical-align:top;" class="slds-cell-wrap" scope="col">ChunkSequenceNumber</th>
+              <th id="d137596e446" style="vertical-align:top;" class="slds-cell-wrap" scope="col">チャンク</th>
+              <th id="d137596e449" style="vertical-align:top;" class="slds-cell-wrap" scope="col">開始タイムスタンプ</th>
+              <th id="d137596e452" style="vertical-align:top;" class="slds-cell-wrap" scope="col">終了タイムスタンプ</th>
+              <th id="d137596e455" style="vertical-align:top;" class="slds-cell-wrap" scope="col">スピーカー</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d137596e443" style="vertical-align:top;" class="slds-cell-wrap" data-label="ChunkSequenceNumber">
+                <code>1</code>
+              </td>
+
+              <td headers="d137596e446" style="vertical-align:top;" class="slds-cell-wrap" data-label="チャンク">
+                <code>Hello?</code>
+              </td>
+
+              <td headers="d137596e449" style="vertical-align:top;" class="slds-cell-wrap" data-label="開始タイムスタンプ">
+                <code>1.051</code>
+              </td>
+
+              <td headers="d137596e452" style="vertical-align:top;" class="slds-cell-wrap" data-label="終了タイムスタンプ">
+                <code>1.253</code>
+              </td>
+
+              <td headers="d137596e455" style="vertical-align:top;" class="slds-cell-wrap" data-label="スピーカー">
+                <code>SPEAKER_00</code>
+              </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d137596e443" style="vertical-align:top;" class="slds-cell-wrap" data-label="ChunkSequenceNumber">
+                <code>2</code>
+              </td>
+
+              <td headers="d137596e446" style="vertical-align:top;" class="slds-cell-wrap" data-label="チャンク">
+                <code>Hi Alex, it 's Sam from Bullseye. I didn't hear from you yesterday, so I
+                  wanted to check in.</code>
+              </td>
+
+              <td headers="d137596e449" style="vertical-align:top;" class="slds-cell-wrap" data-label="開始タイムスタンプ">
+                <code>3.203</code>
+              </td>
+
+              <td headers="d137596e452" style="vertical-align:top;" class="slds-cell-wrap" data-label="終了タイムスタンプ">
+                <code>8.418</code>
+              </td>
+
+              <td headers="d137596e455" style="vertical-align:top;" class="slds-cell-wrap" data-label="スピーカー">
+                <code>SPEAKER_01</code>
+              </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d137596e443" style="vertical-align:top;" class="slds-cell-wrap" data-label="ChunkSequenceNumber">
+                <code>3</code>
+              </td>
+
+              <td headers="d137596e446" style="vertical-align:top;" class="slds-cell-wrap" data-label="チャンク">
+                <code>Hi Sam, sorry about that.</code>
+              </td>
+
+              <td headers="d137596e449" style="vertical-align:top;" class="slds-cell-wrap" data-label="開始タイムスタンプ">
+                <code>10.263</code>
+              </td>
+
+              <td headers="d137596e452" style="vertical-align:top;" class="slds-cell-wrap" data-label="終了タイムスタンプ">
+                <code>11.546</code>
+              </td>
+
+              <td headers="d137596e455" style="vertical-align:top;" class="slds-cell-wrap" data-label="スピーカー">
+                <code>SPEAKER_00</code>
+              </td>
+
+            </tr>
+          </tbody></table></div>
+    <div id="c360_a_search_index_supported_chunking_strategies__section_vsx_lkq_c2c"><a name="c360_a_search_index_supported_chunking_strategies__section_vsx_lkq_c2c"></a><h2 class="slds-text-heading_medium slds-p-top_small">項目チャンクの先頭へ</h2><p>DMO または UDMO から生成されたチャンクのコンテキストを提供するためにメタデータを追加する必要がある場合、チャンクに項目を追加します。たとえば、ナレッジ記事の <code>Description</code> 項目は、プロンプトベースの取得に最適なチャンク サイズを超える可能性があります。チャンクの先頭に <code>Title</code> 項目を追加することで、プロンプト結果により多くのコンテキストを提供できます。</p><p>次の表に、便利なメタデータ項目の例を示します。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d137596e591" style="vertical-align:top;" class="slds-cell-wrap" scope="col">タイプ</th>
+              <th id="d137596e594" style="vertical-align:top;" class="slds-cell-wrap" scope="col">メタデータ項目の例</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d137596e591" style="vertical-align:top;" class="slds-cell-wrap" data-label="タイプ"> DMO (Knowledge記事) </td>
+
+              <td headers="d137596e594" style="vertical-align:top;" class="slds-cell-wrap" data-label="メタデータ項目の例"><ul>
+                  <li>タイトル</li>
+
+                  <li>製品名</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d137596e591" style="vertical-align:top;" class="slds-cell-wrap" data-label="タイプ"> UDMO (外部 Blob ストアコネクタ) </td>
+
+              <td headers="d137596e594" style="vertical-align:top;" class="slds-cell-wrap" data-label="メタデータ項目の例"> ファイルパス</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d137596e591" style="vertical-align:top;" class="slds-cell-wrap" data-label="タイプ"> UDMO (Web クローラーまたはサイトマップコネクタ) </td>
+
+              <td headers="d137596e594" style="vertical-align:top;" class="slds-cell-wrap" data-label="メタデータ項目の例"><ul>
+                  <li>Labels (ラベル)</li>
+
+                  <li>タイトル</li>
+
+                  <li>URL</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table><p>ベクトル検索またはハイブリッド検索の検索インデックスの高度な設定で、DMO または UDMO からチャンクの先頭に追加する項目を設定します。</p><p>チャンクの最大トークン制限は 512 であるため、先頭に追加する項目の値は必ずその制限内に収まるようにします。先頭に追加される項目の長さが 512 トークンを超える場合、Data 360 は先頭に追加される項目をスキップします。</p></div>
+    <div id="c360_a_search_index_supported_chunking_strategies__section_custom_function_chunking"><a name="c360_a_search_index_supported_chunking_strategies__section_custom_function_chunking"></a><h2 class="slds-text-heading_medium slds-p-top_small">コード拡張</h2><p>カスタムチャンク関数は、組み込みチャンク戦略がコンテンツまたは取得要件を満たしていない場合に使用します。カスタム関数は、チャンク境界がドメイン固有のロジックに従う必要がある場合 (複雑な PDF の関連セクションを保持したり、LLM ゲートウェイコールを介してプロンプト駆動チャンクを適用したりする場合など) に便利です。</p><p> コード拡張を使用して、カスタム関数をリリースし、検索インデックスの高度な設定でチャンク戦略として選択します。カスタム チャンク関数を作成、検証、リリース、使用するエンドツーエンドのワークフローについては、「<a target="_blank" href="https://developer.salesforce.com/docs/data/data-cloud-code-ext/guide/function/use-custom-function.html">Use Custom Functions</a> in Data 360 (Data 360 でのカスタム関数の使用)」を参照してください。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="データ モデル オブジェクトのベクトル検索インデックス設定を作成すると、Data 360によって参照されるデータが意味的に関連するチャンクに分解され、検索可能なベクトルが生成されます。RAG ワークフローとエージェントワークフローでは、クエリを実行するときにこれらのベクトルを使用して、セマンティックに類似する項目を見つけて返します。検索インデックス設定をより詳細に制御するには、プロセスの各ステップをガイドする高度な設定を使用します。" href="#c360_a_search_index_create_vector_index_config">高度な設定を使用したベクトル検索インデックスの作成</a></li><li><a target="_blank" href="https://developer.salesforce.com/docs/data/data-cloud-code-ext/guide/use-custom-code.html">Salesforce 開発者: Data 360 でのコード拡張</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_search_index_vector_index">
+<h1 class="slds-text-heading_large">ベクトル検索</h1>
+  <p>Data 360 では、非構造化データと構造化データから検索可能なセマンティックベクトル埋め込みを作成できます。ベクトル検索は、生成 AI、自動化、分析アプリケーションで埋め込み間のセマンティック類似性とコンテキストを理解するのに役立ちます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+          </tr>
+        </tbody></table>
+    <p>ベクトル化とは、非構造化データを、機械が読み取れるデータの数値表現に埋め込むプロセスです。ベクトル埋め込みを使用して、さまざまなテキストのセマンティックな類似性を測定し、RAG クエリとエージェントクエリで正確かつ関連性の高い結果を作成します。</p>
+    <p>Data 360 では、次のデータがインデックス付けされます。Data 360 検索インデックス UI または Connect API を使用してベクトル検索インデックスを作成する場合、最初に DMO と UDMO に保存されている非構造化データをチャンクします。チャンクを使用すると、データを管理しやすく意味的な単位に分割できます。Next Data Cloud では、これらのチャンクからベクトル埋め込みが生成されます。チャンクはチャンクデータモデルオブジェクト (CDMO) に保存され、ベクトル埋め込みはインデックスDAAモデルオブジェクト (IDMO) に保存されます。</p>
+    <p>ベクトル埋め込みを検索インデックスに追加したら、プロンプトビルダー、AI エージェント、Tableau などのアプリケーションからそのデータに対してベクトル検索を実行できます。</p>
+    <div id="c360_a_search_index_vector_index__fig_yj4_sgz_tcc" style="text-align:left;"><a name="c360_a_search_index_vector_index__fig_yj4_sgz_tcc"></a>
+      <a name="c360_a_search_index_vector_index__image_zj4_sgz_tcc"></a><img alt="ベクトルインデックスを作成して使用するフローを図で示します。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_vector_index_flow_v2.png" id="c360_a_search_index_vector_index__image_zj4_sgz_tcc" style="width:600px;">
+    </div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#c360_a_search_index_create_vector_index_config">高度な設定を使用したベクトル検索インデックスの作成</a></strong><br>データ モデル オブジェクトのベクトル検索インデックス設定を作成すると、Data 360によって参照されるデータが意味的に関連するチャンクに分解され、検索可能なベクトルが生成されます。RAG ワークフローとエージェントワークフローでは、クエリを実行するときにこれらのベクトルを使用して、セマンティックに類似する項目を見つけて返します。検索インデックス設定をより詳細に制御するには、プロセスの各ステップをガイドする高度な設定を使用します。</li><li class="slds-p-bottom_small"><strong><a href="insights_query-3.html#c360_a_search_index_query">クエリ API を使用したベクトル検索の実行</a></strong><br>クエリ API を使用して、Data 360 でベクトル検索を実行します。 次の例を出発点として使用します。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_search_index_retrieve_content">ベクトル検索を使用したコンテンツの取得</a></strong><br>ベクトル検索と AI エージェントクエリを使用すると、クエリを取得し、構造化および非構造化データソースを検索し、効率性と精度を向上させる集計された応答を受信できます。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_search_index_vector_search_analytics">Tableau でのベクトル検索を使用したデータ分析の強化</a></strong><br>Tableau クエリでベクトル検索を使用して、キーワードだけでなく意味に基づいてデータを検索および分析します。ベクトル検索では、キーワードの完全一致のみに依存するのではなく、セマンティックの類似性を特定することで、データ探索の範囲が広がるだけでなく、インサイトの精度と関連性も向上します。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Data 360の検索では、非構造化データ、モデルの埋め込み、検索結果の事前絞り込み操作など、さまざまなファイル形式がサポートされます。" href="#c360_a_search_index_reference">検索インデックス参照</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_search_index_vector_search_analytics">
+<h1 class="slds-text-heading_large">Tableau でのベクトル検索を使用したデータ分析の強化</h1>
+  <p>Tableau クエリでベクトル検索を使用して、キーワードだけでなく意味に基づいてデータを検索および分析します。ベクトル検索では、キーワードの完全一致のみに依存するのではなく、セマンティックの類似性を特定することで、データ探索の範囲が広がるだけでなく、インサイトの精度と関連性も向上します。</p>
+
+    <p>たとえば、ビジネスアナリストが Voice of the Customer (顧客の声) 分析ダッシュボードを作成するとします。アナリストは、Amazon S3バケットのファイルからデータを取得し、そのコンテンツからData 360データストリームを作成し、カスタム項目を「<code>dc_voc</code>」という名前のカスタムDMOに対応付けました。次に、アナリストは <code>dc_voc</code> オブジェクトから検索インデックス設定を作成し、オブジェクトから [説明] 項目をチャンク化してベクトル化しました。アナリストは、Voice of the Customer の説明に合わせて特別に調整された Tableau で検索条件を使用できるようになりました。</p>
+    <p>Tableau ダッシュボードには、構造化および非構造化の両方のデータ分析が表示されます。左側ではカテゴリ検索条件が使用され、右側ではデータ探索を強化するためにセマンティック検索が使用されます。</p>
+    
+    <div style="text-align:left;">
+      <img alt="ベクトル検索を使用した VOC ダッシュボード" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_search_index_vector_search_analytics.png" style="width:800px;">
+    </div>
+    <p>たとえば、右側のセマンティック検索に「real time」と入力すると、レコードにはリアルタイム有効化、ほぼリアルタイムのデータ取り込み、リアルタイムデータストリームなどの関連語を含むエントリが表示されます。</p>
+    <p>一致スコアでは、検索語に対する説明の類似性に基づいて結果がランク付けされます。このスコアリングシステムは、類似する概念のさまざまな表現を取得するため、単純なキーワード検索よりも豊富なインサイトが得られるため、セマンティック検索の利点を強調します。</p>
+    <p>この機能を実装するために、アナリストは Tableau で <code>vector_search( )</code> 関数を使用するカスタム SQL クエリを作成しました。(クエリには非標準オブジェクトまたはカスタムオブジェクトが含まれていますが、これらは例であり、顧客組織のオブジェクトには対応していない可能性があります)。</p>
+    <pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>SELECT distinct "dc_voc__dlm"."Accounts_Impacted__c" AS "# Accounts Impacted",
+  "dc_voc__dlm"."Opportunities_Impacted__c" AS "# Opportunities Impacted",
+  "dc_voc__dlm"."Created_By_Role_Name__c" AS "Created By: Role: Name",
+  "dc_voc__dlm"."Created_Date__c" AS "Created Date",
+  "dc_voc__dlm"."Description__c" AS "Description",
+  "dc_voc__dlm"."Input_Name__c" AS "Input Name",
+  "dc_voc__dlm"."Product_Area__c" AS "Product Area",
+  "dc_voc__dlm"."Total_ACV_Impacted_converted__c" AS "Total ACV Impacted (converted)",
+  "dc_voc__dlm"."Total_AOV_Impacted__c" AS "Total AOV Impacted",
+  "Chunk__c", "score__c" FROM vector_search(table("dc_voc_str_id_vector__dlm"), &lt;Parameters.Query String&gt;, '', 500) vs
+INNER JOIN "dc_voc_str_id_chunk__dlm" USING ("RecordId__c")
+INNER JOIN "dc_voc__dlm" USING("Str_id__c")
+ORDER BY "score__c" DESC
+LIMIT &lt;Parameters.Limit VOC Matches&gt;
+</code></pre>
+    <p>2 つの特定のパラメーターに注意してください。</p>
+    <ul>
+      <li>検索語を入力するための<code>Query String</code>。</li>
+
+      <li><code>Limit VOC Matches</code> は、表示される VOC レコードの数を制御します。</li>
+
+    </ul>
+
+    <p>Tableau 内のベクトル検索のこの統合により、キーワードの完全一致のみに依存するのではなく、セマンティックの類似点を特定することで、データ探索の範囲が広がるだけでなく、顧客のフィードバックから得られるインサイトの精度と関連性が高まります。</p>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="クエリ API を使用して、Data 360 でベクトル検索を実行します。 次の例を出発点として使用します。" href="insights_query-3.html#c360_a_search_index_query">クエリ API を使用したベクトル検索の実行</a></li><li><a title="データ モデル オブジェクトのベクトル検索インデックス設定を作成すると、Data 360によって参照されるデータが意味的に関連するチャンクに分解され、検索可能なベクトルが生成されます。RAG ワークフローとエージェントワークフローでは、クエリを実行するときにこれらのベクトルを使用して、セマンティックに類似する項目を見つけて返します。検索インデックス設定をより詳細に制御するには、プロセスの各ステップをガイドする高度な設定を使用します。" href="#c360_a_search_index_create_vector_index_config">高度な設定を使用したベクトル検索インデックスの作成</a></li><li><a title="Data 360のデータを結合、統合、ハーモナイズしたら、分析する準備が整いました。Tableau を使用して、ビジネスの成功を促進することができる役に立つアクション可能なインサイトを見つけて、顧客向けのパーソナライズした環境を作成します。Data 360、Tableau、および Salesforce 360 アプリケーションは連携してデータを統合し、1 つの顧客レコードを作成します。隠れたインサイトを解放し、すべての顧客データに基づいて意思決定を行います。" href="data360_general-1.html#c360_a_dc_for_tableau">Tableau を使用した隠れたインサイトの解放</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_search_index_view_search_index">
+<h1 class="slds-text-heading_large">検索インデックス状況およびプロセス履歴の表示</h1>
+  <p>[検索インデックス] リストビューとオブジェクトレコードビューから検索インデックス設定の詳細を表示し、インデックス付けプロセスを監視します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d107697e60" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d107697e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">検索インデックス設定を参照する</td>
+
+              <td headers="d107697e60" style="vertical-align:top;" class="slds-cell-wrap"><p>権限セット</p><ul>
+                  <li>Data Cloud アーキテクト</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p><strong>検索インデックス処理:</strong> 簡単な設定または高度な設定を使用して、データモデルオブジェクト (DMO) または非構造化データモデルオブジェクト (UDMO) の検索インデックスを作成します。<span>Data 360</span>は、ソースDMOまたはUDMOの変更を自動的に処理し、検索インデックスを増分更新します。データストリーム設定と更新モードによって、ソース DMO または UDMO の更新スケジュールが決まります。フル更新モードを含むすべての更新モードでは、検索インデックスは変更されたレコードのみを処理します。取得元オブジェクトからレコードを削除すると、増分処理によって、トランスクリプト、チャンク、ベクトル埋め込みなど、そのレコードから派生したすべての情報が削除されます。</p></div>
+  
+
+<div id="u5w_fqx_lfc" aria-labelledby="ariaid-title2" class="nested1"><a name="u5w_fqx_lfc"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">検索インデックス状況の状態</h2>
+    
+      <p>作成および処理中は、検索インデックスは次の状況になります。</p>
+<div><div style="text-align:left;">
+        <a name="u5w_fqx_lfc__image_wyb_vtq_qdc"></a><img alt="[送信済み] から [処理中]、さらに [準備完了] または [失敗] に遷移している検索インデックスの状況と、増分処理のステップが表示されているシステム図。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_search_index_status.png" id="u5w_fqx_lfc__image_wyb_vtq_qdc">
+      </div><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d107697e138" style="vertical-align:top;" class="slds-cell-wrap" scope="col">状況</th>
+              <th id="d107697e141" style="vertical-align:top;" class="slds-cell-wrap" scope="col">定義</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d107697e138" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">申請済み</td>
+
+              <td headers="d107697e141" style="vertical-align:top;" class="slds-cell-wrap" data-label="定義">ユーザーが UI または API を使用して検索インデックスを作成しました。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d107697e138" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">処理中</td>
+
+              <td headers="d107697e141" style="vertical-align:top;" class="slds-cell-wrap" data-label="定義">Data 360 は、ソース DMO/UDMO からデータを処理するためのインデックス付けジョブを実行しています。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d107697e138" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">準備完了</td>
+
+              <td headers="d107697e141" style="vertical-align:top;" class="slds-cell-wrap" data-label="定義">検索インデックスを使用する準備が整っています。インデックス付けジョブは、ソース DMO/UDMO からのデータの変更を処理するために増分的に実行されます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d107697e138" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">失敗</td>
+
+              <td headers="d107697e141" style="vertical-align:top;" class="slds-cell-wrap" data-label="定義">ソース DMO/UDMO からのデータを処理中に Data 360 でエラーが発生しました。</td>
+
+            </tr>
+          </tbody></table></div>
+      
+  </div>
+
+  <div id="p2b_gqx_lfc" aria-labelledby="ariaid-title3" class="nested1"><a name="p2b_gqx_lfc"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">検索インデックスプロセス履歴</h2>
+    
+    <p>[プロセス履歴] タブでは、検索インデックススジョブの総計値を追跡します。<span>Data 360</span> では、最大 1,000 件の最近のジョブの総計値が保持されます。評価指標は、ジョブが完了した後にのみ使用可能になります。</p>
+<div><p>大規模なデータセットの場合、<span>Data 360</span>は処理を高速化するために複数の同時ジョブに分割します。各ジョブが完了すると、検索インデックスに順次入力されます。[<strong class="uicontrol">Process History</strong> (プロセス履歴)] タブには、個々のジョブの評価指標が個別に表示されます。[<strong class="uicontrol">Process History</strong> (プロセス履歴)] タブでは、次の評価指標を取得します。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col><col></colgroup><thead class="slds-text-title_caps">
+              <tr class="">
+                <th id="d107697e224" style="vertical-align:top;" class="slds-cell-wrap" scope="col">詳細</th>
+                <th id="d107697e227" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+              </tr>
+            </thead><tbody>
+              <tr class="">
+                <td headers="d107697e224" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">開始時刻</td>
+
+                <td headers="d107697e227" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ジョブが開始されたタイムスタンプ。</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d107697e224" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">終了時刻</td>
+
+                <td headers="d107697e227" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ジョブが終了したタイムスタンプ。</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d107697e224" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">処理済みレコード</td>
+
+                <td headers="d107697e227" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">DMO から処理されたレコード数または UDMO から処理されたファイル数。添付ファイル UDMO を参照する検索インデックスの場合、各添付ファイルは個別のレコードとして扱われます。</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d107697e224" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">スキップされたレコード</td>
+
+                <td headers="d107697e227" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>スキップされたファイルの数。たとえば、次の理由でファイルはスキップされます。</p><ul>
+                    <li>ファイル タイプが検索インデックスで設定したファイル タイプと一致しません</li>
+
+                    <li>データソースで認証エラーが発生した</li>
+
+                    <li>ファイルサイズが制限を超えている</li>
+
+                    <li>サポートされていないファイル形式を処理しようとした</li>
+
+                  </ul>
+<p style="margin-bottom:0;">スキップされたすべてのファイルは、処理されたレコードとスキップされたレコードの両方として報告されます。</p></td>
+
+              </tr>
+              <tr class="">
+                <td headers="d107697e224" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">処理サイズ</td>
+
+                <td headers="d107697e227" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>インデックス更新ジョブで処理されるコンテンツのサイズ (バイト単位)。</p><p>この評価指標では、1）検索インデックスでファイル・タイプを選択しなかった場合にスキップされたファイル、または2）システム・エラーのためにスキップされたファイルは報告されません。</p><p style="margin-bottom:0;">注意: この指標は、請求のために Digital Wallet に報告される指標と必ずしも一致しません。Digital Wallet にサイズを報告するには、レコードとファイルを正常に処理する必要があります。</p></td>
+
+              </tr>
+              <tr class="">
+                <td headers="d107697e224" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">作成されたチャンク</td>
+
+                <td headers="d107697e227" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">作成されたチャンクの数。ジョブが失敗した場合、この評価指標は 0 を報告します。</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d107697e224" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">削除されたチャンク</td>
+
+                <td headers="d107697e227" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">削除されたチャンクの数。ジョブが失敗した場合、この評価指標は 0 を報告します。</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d107697e224" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">ジョブの状況</td>
+
+                <td headers="d107697e227" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ジョブ実行の状況 ([成功] または [失敗])。</td>
+
+              </tr>
+            </tbody></table></div>
+  </div>
+
+  <div id="dxr_pqx_lfc" aria-labelledby="ariaid-title4" class="nested1"><a name="dxr_pqx_lfc"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">検索インデックスの表示</h2>
+    
+    <ol><li>
+          <span>アプリケーションランチャーで、[<strong class="uicontrol">Data Cloud]</strong> を選択します。</span>
+        </li><li>
+          <span><strong class="uicontrol">検索インデックス</strong> をクリックします。</span>
+        </li><li>
+          <span>検索インデックス設定のリストから、検索インデックスをクリックして [<strong class="uicontrol">プロセス履歴]</strong> を選択します。</span>
+          <div>詳細を表示して、検索インデックス処理履歴を把握します。</div>
+        </li></ol>
+
+  
+</div>
+
+</div></div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="search_rag-1.html">&larr; 検索・検索インデックス・RAG・ハイブリッド検索（1/2）</a><a href="ai_models-1.html">AI・予測モデル・Model Builder・Einstein（1/2） &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=data.c360_a_data_cloud.htm&type=5&language=ja">help.salesforce.com — Data 360（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>

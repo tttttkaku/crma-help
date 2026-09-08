@@ -1,0 +1,2710 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>AI・予測モデル・Model Builder・Einstein（1/2） | Data 360 ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（38）</h2>
+    <ol>
+      <li><a href="#c360_a_ai_apex">Apex での予測の取得</a></li>
+      <li><a href="#c360_a_ai_byom_set_up_your_data_google_vertex">Vertex AI でのデータの設定</a></li>
+      <li><a href="#c360_a_ai_byom_use_google_vertex_models">Google Cloud Vertex AI モデルの使用</a></li>
+      <li><a href="#c360_a_ai_ec_actionable_variables_prescriptions">アクション可能な変数と処方箋</a></li>
+      <li><a href="#c360_a_ai_ec_binary_metrics">バイナリ分類総計値</a></li>
+      <li><a href="#c360_a_ai_ec_common_data_issues">データの問題の解決</a></li>
+      <li><a href="#c360_a_ai_ec_create_model">ゼロからの予測 AI モデルの作成</a></li>
+      <li><a href="#c360_a_ai_ec_create_model_steps">モデルをゼロから作成</a></li>
+      <li><a href="#c360_a_ai_ec_ethical_model_building">倫理的な AI モデルの設計</a></li>
+      <li><a href="#c360_a_ai_ec_evaluate_model_quality">モデル品質の評価</a></li>
+      <li><a href="#c360_a_ai_ec_manage_quality_alerts">品質アラートの管理</a></li>
+      <li><a href="#c360_a_ai_ec_personalized_recommendations">リアルタイム予測を使用したパーソナライズされたおすすめの促進</a></li>
+      <li><a href="#c360_a_ai_ec_quality_alert_auc">曲線下面積 (AUC) 品質アラート</a></li>
+      <li><a href="#c360_a_ai_ec_quality_alert_collinearity">多重共線性アラート</a></li>
+      <li><a href="#c360_a_ai_ec_quality_alert_cross_validation">交差検証失敗アラート</a></li>
+      <li><a href="#c360_a_ai_ec_quality_alert_data_leakage">データ漏洩アラート</a></li>
+      <li><a href="#c360_a_ai_ec_quality_alert_high_frequency_values">高頻度値アラート</a></li>
+      <li><a href="#c360_a_ai_ec_quality_alert_imbalanced_distribution">不均衡な分布アラート</a></li>
+      <li><a href="#c360_a_ai_ec_quality_alert_outliers">異常値アラート</a></li>
+      <li><a href="#c360_a_ai_ec_quality_alert_r2">R2 品質アラート</a></li>
+      <li><a href="#c360_a_ai_ec_regression_metrics">回帰総計値</a></li>
+      <li><a href="#c360_a_ai_ec_set_actionable_variables">アクション可能変数の設定</a></li>
+      <li><a href="#c360_a_ai_ec_use_cases">サポートされる予測モデル種別</a></li>
+      <li><a href="#c360_a_ai_flow_builder_predictions">Flow Builder での予測の使用</a></li>
+      <li><a href="#c360_a_ai_foundation_models">Bring Your Own Large Language Model (独自の大規模言語モデル)</a></li>
+      <li><a href="#c360_a_ai_foundation_models_configure">モデル設定の作成</a></li>
+      <li><a href="#c360_a_ai_foundation_models_configured_edit">モデル設定の編集</a></li>
+      <li><a href="#c360_a_ai_foundation_models_configured_monitor">モデル活動の監視</a></li>
+      <li><a href="#c360_a_ai_foundation_models_configured_prompts">プロンプトのテスト</a></li>
+      <li><a href="#c360_a_ai_foundation_models_create">基盤モデルの追加</a></li>
+      <li><a href="#c360_a_ai_foundation_models_edit_delete">基盤モデルの編集または削除</a></li>
+      <li><a href="#c360_a_ai_foundation_models_prompt_templates">プロンプトテンプレートの作成</a></li>
+      <li><a href="#c360_a_ai_foundation_models_test">モデル Playground でのモデルの設定とテスト</a></li>
+      <li><a href="#c360_a_ai_glossary">予測 AI の用語集</a></li>
+      <li><a href="#c360_a_ai_license_perms">AI モデルの設定</a></li>
+      <li><a href="#c360_a_ai_mm_activate_models">モデルの有効化</a></li>
+      <li><a href="#c360_a_ai_mm_manage_models">モデルの管理</a></li>
+      <li><a href="#c360_a_ai_mm_show_hide_models">設定の非表示による大規模言語モデル (LLM) アクセスの管理</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>AI・予測モデル・Model Builder・Einstein（1/2）</h1>
+      <div class="meta">Data 360（旧 Data Cloud）ヘルプ · 38 記事 · 生成 2026-08-12</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="search_rag-2.html">&larr; 検索・検索インデックス・RAG・ハイブリッド検索（2/2）</a><a href="ai_models-2.html">AI・予測モデル・Model Builder・Einstein（2/2） &rarr;</a></div>
+<section class="article" id="c360_a_ai_apex">
+<h1 class="slds-text-heading_large">Apex での予測の取得</h1>
+  <p>Apex コードを使用して、モデルビルダーのコードなしモデルから予測、上位の要素、処方箋を取得します。</p>
+<div id="task_1_invocable_action" aria-labelledby="ariaid-title2" class="nested1"><a name="task_1_invocable_action"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">呼び出し可能なアクション</h2>
+    
+    <p>Apex で予測モデルを使用するには、このメソッドを使用して呼び出し可能なアクションを作成します。このメソッドは、予測モデルに入力データを提供する呼び出し可能なアクションを作成します。モデル要求をトリガーし、返された出力 (予測、上位の要素、処方箋 (推奨アクション) など) を処理します。</p>
+
+      <div id="task_1_invocable_action__context_qkr_zxw_q2c"><a name="task_1_invocable_action__context_qkr_zxw_q2c"></a><pre id="task_1_invocable_action__codeblock_rkr_zxw_q2c" class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><a name="task_1_invocable_action__codeblock_rkr_zxw_q2c"></a><code class="language-markup">Invocable.Action.createCustomAction</code></pre></div>
+    
+  </div>
+
+  <div id="task_2_REST_Request" aria-labelledby="ariaid-title3" class="nested1"><a name="task_2_REST_Request"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">REST 要求</h2>
+    
+    <p>モデルが有効化されると、呼び出し可能なアクションが自動的に作成され、フローまたは Apex で使用できます。Apex でこの呼び出し可能なアクションを使用する場合、この REST エンドポイントを使用して入力パラメータを取得する必要がある場合があります。</p>
+
+      <div id="task_2_REST_Request__context_kyl_2lx_q2c"><a name="task_2_REST_Request__context_kyl_2lx_q2c"></a><pre id="task_2_REST_Request__codeblock_lyl_2lx_q2c" class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><a name="task_2_REST_Request__codeblock_lyl_2lx_q2c"></a><code class="language-markup">GET /services/data/v63.0/actions/custom/cdpMlPrediction/{ModelIdOrName}</code></pre><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div id="task_2_REST_Request__note_lkt_wvx_q2c" style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><a name="task_2_REST_Request__note_lkt_wvx_q2c"></a><span class="slds-text-title_caps">メモ</span> 予測モデル名 (この例では) またはモデル ID (API 参照名) を使用できます。一部の API では、モデル API 参照名「{ModelIdOrName}」も必要です。モデルの API 参照名は、モデルビルダーのモデルの詳細ページで確認できます。</div></div></div>
+<div style="text-align:left;">
+          <a name="task_2_REST_Request__image_v4f_yly_q2c"></a><img alt="モデルの詳細ページにモデルの API 参照名が表示されます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_ec_model_details_api_name.png" id="task_2_REST_Request__image_v4f_yly_q2c" style="width:800px;">
+        </div><p>「予測購入済み」モデルの REST 要求の使用方法を見てみましょう。</p><pre id="task_2_REST_Request__codeblock_vsr_5lx_q2c" class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><a name="task_2_REST_Request__codeblock_vsr_5lx_q2c"></a><code class="language-markup">GET /services/data/v63.0/actions/custom/cdpMlPrediction/Predicted_Purchased_CM_12l_YSs01128465</code></pre><p>
+          この要求では、モデル入力パラメーターなど、呼び出し可能なアクションに関するメタデータを取得します。</p><pre id="task_2_REST_Request__codeblock_tz3_zlx_q2c" class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><a name="task_2_REST_Request__codeblock_tz3_zlx_q2c"></a><code class="language-markup">
+{
+"inputs" : [ 
+{
+    "label" : "Top Predictors",
+    "name" : "maxTopFactors",
+    "type" : "INTEGER"
+  }, 
+{
+    "label" : "Top Prescriptions",
+    "name" :  "maxPrescriptions",
+    "type" : "INTEGER"
+  },
+{
+    "label" : "Lead Source",
+    "name" : "param_Lead_Source_c__c",
+    "type" : "STRING"
+  }, 
+{
+    "label" : "Industry",
+    "name" : "param_Industry_c__c",
+    "type" : "STRING"
+  }, 
+{
+    "label" : "Title",
+    "name" : "param_Title_c__c",
+    "type" : "STRING"
+  }, 
+{
+    "label" : "Response Time From Assignment",
+    "name" : "param_Response_Time_From_Assignment_c__c",
+    "type" : "DOUBLE"
+  }, 
+{
+    "label" : "No. of Employees",
+    "name" : "param_No_of_Employees_c__c",
+    "type" : "DOUBLE"
+  }, 
+{
+    "label" : "Response Time from Creation",
+    "name" : "param_Response_Time_from_Creation_c__c",
+    "type" : "DOUBLE"
+  } ]
+}</code></pre></div>
+    
+  </div>
+
+  <div id="task_3_apex_for_predictions" aria-labelledby="ariaid-title4" class="nested1"><a name="task_3_apex_for_predictions"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">予測用 Apex</h2>
+    
+    <p>次に、Apexコードを使用して「予測購入済み」モデルを呼び出し、予測、上位の要素、処方箋を提供できます。</p>
+
+      <div id="task_3_apex_for_predictions__context_mkt_wvx_q2c"><a name="task_3_apex_for_predictions__context_mkt_wvx_q2c"></a><pre id="task_3_apex_for_predictions__codeblock_d54_clx_q2c" class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><a name="task_3_apex_for_predictions__codeblock_d54_clx_q2c"></a><code class="language-markup">Invocable.Action action = Invocable.Action.createCustomAction('cdpMlPrediction', 'Predicted_Purchased_CM_12l_YSs01128465');
+        action.setInvocationParameter('param_Industry_c__c', 'High Tech');
+        action.setInvocationParameter('param_No_of_Employees_c__c', 100);
+        action.setInvocationParameter('param_Lead_Source_c__c', 'Chat');
+        action.setInvocationParameter('param_Response_Time_from_Creation_c__c', 100);
+        action.setInvocationParameter('param_Response_Time_From_Assignment_c__c', 300);
+        action.setInvocationParameter('maxTopFactors', 3);
+        action.setInvocationParameter('maxPrescriptions', 3);
+        List&lt;Invocable.Action.Result&gt; results = action.invoke();
+        if (results.size() &gt; 0 &amp;&amp; results[0].isSuccess()) {
+        System.debug('Prediction =' + results[0].getOutputParameters().get('prediction')); //output will be in the same data type as the model output
+        System.debug('Top Factors =' + results[0].getOutputParameters().get('factors')); //output is a custom APEX Type ConnectAPI.CdpMlPredictionContribution
+        System.debug('Prescriptions =' + results[0].getOutputParameters().get('prescriptions')); //output is a custom APEX Type ConnectAPI.CdpMlPredictionContribution
+        }
+</code></pre></div>
+    
+  <div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.apexcode.meta/apexcode/apex_dev_guide.htm">Salesforce 開発者: Apex 開発者ガイド</a></li></ul></div>
+</div>
+
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_byom_set_up_your_data_google_vertex">
+<h1 class="slds-text-heading_large">Vertex AI でのデータの設定 </h1>
+  <p>Google Cloud Vertex AI ノートブックで Salesforce データにアクセスするには、Python コネクタを使用します。使いやすいインターフェースにより、<span>Data 360</span> のデータをすばやく照会できるため、必要なデータを Python に抽出できます。</p>
+
+    <ol><li>
+        <span>Vertex AIワークベンチで、CDP Pythonコネクタをインストールして、<span>Data 360</span>オブジェクトにアクセスし、SalesforceデータをVertex AIに取り込みます。</span>
+      </li><li>
+        <span>Python コネクタ設定の一環として、外部クライアントアプリケーションまたは接続アプリケーションを作成します。</span>
+        <div>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> Spring '26 以降、接続アプリケーションの作成は制限されます。 Spring '26 中およびそれ以降も、既存の接続アプリケーションを使用できます。 ただし、代わりに<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.external_client_apps.htm&amp;language=ja&amp;type=5">外部クライアントアプリケーション</a>を使用することをお勧めします。引き続き接続アプリケーションを作成する必要がある場合は、Salesforce サポートにお問い合わせください。<p>詳細については、「Spring '26 で<a target="_blank" href="https://help.salesforce.com/s/articleView?id=005228017&amp;language=ja&amp;type=1">新しい接続アプリケーション</a>を作成できなくなりました」を参照してください。</p></div></div></div>
+
+        </div>
+      </li><li>
+        <span>データに安全にアクセスするために、次のいずれかの方法で認証します。</span>
+        <ul>
+          <li>Google サービスアカウントのログイン情報</li>
+
+          <li>API キー</li>
+
+        </ul>
+
+      </li><li>
+        <span><span>Data 360</span>で、Vertex AIのSalesforceデータソースに接続してデータセットを照会します。たとえば、メールエンゲージメントデータを取得するには、Marketing Cloud Engagement のメールエンゲージメントオブジェクトにアクセスします。</span>
+      </li><li>
+        <span><span>Data 360</span> で推測を使用するには、Python ファイルをノートブックにアップロードします。</span>
+      </li><li>
+        <span>モデルエンドポイントを取得するには、[オンライン予測] セクションの Vertex AI ダッシュボードに移動します。モデルを Salesforce に接続するには次の詳細が必要なため、URL をメモします。</span>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.c360a_api.meta/c360a_api/c360a_api_python_connector.htm">Salesforce 開発者: CDP Python コネクタ</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.connected_app_create.htm&amp;language=ja&amp;type=5">Salesforce ヘルプ: 接続アプリケーションの作成</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_byom_use_google_vertex_models">
+<h1 class="slds-text-heading_large">Google Cloud Vertex AI モデルの使用</h1>
+  <p>Google Cloud Vertex AI と Salesforce のデータを使用して、高度なカスタム機械学習 (ML) モデルを作成、トレーニングして、リリースできます。Vertex AIでモデルを登録したら、予測条件を定義し、モデルを<span>Data 360</span>に接続して、使用事例の予測とインサイトを取得します。このインサイトを使用して、顧客プロファイルの強化、セグメントの作成、さまざまなチャネルのエクスペリエンスのカスタマイズを行うことができます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Developer Edition、Enterprise Edition、Performance Edition、および Unlimited Edition。</td>
+
+          </tr>
+        </tbody></table>
+    <p>Salesforce のデータで Vertex AI モデルを使用すると、次のような利点があります。</p>
+    <ul>
+      <li>Customer 360 全体で、厳選され、ハーモナイズされたほぼリアルタイムのデータにアクセスできます。 この機能により、よりインテリジェントな予測を提供するエキスパートモデルが創出されます。</li>
+
+      <li>Vertex AIでモデルを作成し、<span>Data 360</span>に簡単に接続して、ビジネスプロセスを最適化するための予測インサイトを利用します。使用事例には、購入傾向、リードの取引開始、商品の関心などが含まれます。</li>
+
+      <li>Salesforceでモデルと推測を簡単に運用できます。<span>Data 360</span>は、ビジネスプロセスからの結果の消費をシンプルにし、価値を高めます。</li>
+
+      <li>データへのゼロコピーの方法により、Google Cloud の複雑で、コストのかかる、ミスが発生しやすい抽出、変換、読み込み (ETL) ジョブが排除されます。この方法では、ビジネスの効率も向上します。</li>
+
+      <li>Vertex AI モデルを統合し、Salesforce で予測を取得します。ワークフロー自動化スイートであるフローを使用して、データに対するリアルタイムの更新に基づいて進化できる AI 主導の意思決定を可能にします。</li>
+
+    </ul>
+
+    <p>Salesforce で Vertex AI モデルを使用する</p>
+    <ul>
+      <li>Vertex AIで<span>Data 360</span>データにアクセスして、モデルを作成、トレーニング、リリースします。</li>
+
+      <li><span>Data 360</span>でVertex AIモデルを接続し、Salesforce全体のさまざまなワークフローで予測とインサイトの推測を消費します。</li>
+
+    </ul>
+
+    <div>
+      <img alt="Vertex AI モデルと Data Cloud 間のデータフロー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_byom_google_data_flow.png" style="width:600px;">
+    </div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#c360_a_ai_byom_set_up_your_data_google_vertex">Vertex AI でのデータの設定</a></strong><br>Google Cloud Vertex AI ノートブックで Salesforce データにアクセスするには、Python コネクタを使用します。使いやすいインターフェースにより、<span>Data 360</span> のデータをすばやく照会できるため、必要なデータを Python に抽出できます。</li><li class="slds-p-bottom_small"><strong><a href="ingest_connect-1.html#c360_a_ai_byom_connect_your_external_model_google_vertex">Vertex AI モデルの接続</a></strong><br>SalesforceでVertex AIモデルからの予測を使用するには、<span>Data 360</span>に接続して、使用事例の予測条件を定義します。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://developer.salesforce.com/blogs/2023/11/bring-your-google-vertex-ai-models-to-data-cloud">外部: Data Cloud への独自の Google Vertex AI モデルの取り込み</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_ec_actionable_variables_prescriptions">
+<h1 class="slds-text-heading_large">アクション可能な変数と処方箋</h1>
+  <p>Data 360 からのデータを使用する AI モデル (旧 Einstein Studio) モデルビルダーでは、アクション可能変数はゼロから作成された (AI によって作成された) モデル内の項目であり、予測結果に影響を与えるために変更できます。他の項目 (顧客のロケーション、性別、年齢など) は変更できませんが、アクション可能変数は変更できます。これらの変数は、より適切な結果を得るためにユーザーが実行できる推奨アクション (処方箋) を提供するため重要です。</p>
+
+    <p>アクション可能な変数とその調整方法を次に示します。</p>
+    <ul>
+      <li>Credit Limit (クレジット限度): 限度の引き上げを提案</li>
+
+      <li>利率: さまざまな顧客グループの利率を設定します。</li>
+
+      <li>Product Price (商品価格): 商品の単価を引き上げる</li>
+
+      <li>配送オプション: 送料無料または迅速な配送を提供</li>
+
+    </ul>
+
+    <p>予測モデルのアクション可能変数を設定したら、次の Salesforce インテグレーションを使用して処方箋を取得できます。</p>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">一括処理データ変換</h2><p>一括処理データ変換を使用して、大規模なデータセットでモデルを実行します。モデルでは、モデルビルダーで設定したアクション可能変数に基づいて、各データポイントの予測が生成されます。一括処理データ変換では、アクション可能変数を使用して処方箋を処理します。これらの処方箋は、データセットの各予測の横にある列に追加され、ダッシュボードなどの決定ツールに役立ちます。</p></div>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> 
+      <p>[変数名]: [新しい値] - Discount_Offered: 10%</p>
+      <p>[影響値] - 20 (この値は、割引を 5% から 10% に変更すると、予測コンバージョンスコアが 20 ポイント増加することを意味します)。</p>
+    </div></div></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">フロー</h2><p>自動フローを使用して、予測インサイトを価格の更新や提案の開始など、自動化されたパーソナライズされた指示的なアクションに変換します。これにより、意思決定の説明可能性と信頼性が向上します。アクション可能変数の設定後:</p><ul>
+        <li>モデルは予測スコアを返すだけではありません。</li>
+
+        <li>モデルでは、結果を改善するために実行するアクションを提案する処方箋を返すこともできます。プロンプトビルダーを使用して、「提供期間を 7 日間延長」などのわかりやすい出力にすることをお勧めします。</li>
+
+      </ul>
+<p>これらの処方箋は、フローの呼び出し可能なアクション (cdpMlPrediction) の出力項目になります。特定の顧客、商品、または地域で何を変更するかを示す画面を作成できます。フローでは次のこともできます。</p><ul>
+        <li>メッセージング、割引、ルーティングを規定の値に基づいて動的に調整します。</li>
+
+        <li>最も影響する可能性の高いアクションに基づいて顧客をセグメント化します。たとえば、割引を提供したり、サービス担当者にエスカレーションしたりします。</li>
+
+      </ul>
+<p>フローに、担当者向けに作成された画面フローなどの画面要素がある場合、次の操作を実行できます。</p><ul>
+        <li>処方箋について詳細に説明します。</li>
+
+        <li>ユーザーに有効期限を提供します。例: 購入の可能性が 20% 高くなる可能性があるため、10% の割引を提供します。</li>
+
+      </ul>
+</div>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> <p>新しいリードがシステムに追加されたときのフローロジックを見てみましょう。</p>
+      <ul>
+        <li>トリガー: 新規リード</li>
+
+        <li>予測: 取引開始の可能性が低い</li>
+
+        <li>処方箋: 24 時間以内のフォローアップを提案</li>
+
+        <li>フロー結果: リードをトップサービス担当者に割り当て、同じ日に通話をスケジュールします。</li>
+
+      </ul>
+<p>このフローはループを閉じます。リードをスコアリングするだけでなく、営業担当がリードをフォローアップできるようにアクションを<em>指示および自動化</em>します。</p></div></div></div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#c360_a_ai_ec_set_actionable_variables">アクション可能変数の設定</a></strong><br>モデルビルダーのアクション可能変数は、モデルの予測結果に影響を与えるために変更できる項目です。アクション可能変数を設定すると、モデルで処方箋 (結果を改善するためにユーザーが実行できる推奨アクション) を提供できます。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_ec_binary_metrics">
+<h1 class="slds-text-heading_large">バイナリ分類総計値</h1>
+  <p>バイナリ分類の総計値は、データを 2 つのクラスに分類するモデルのパフォーマンスを評価するのに役立ちます。</p>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">精度</h2><p>AUC を使用する全体的な精度スコアに加えて、バイナリ分類モデルの精度を把握するための 2 つの追加の総計値があります。</p><p>
+      <span style="vertical-align:text-bottom;display:inline-block;"><img alt="モデル精度タイル" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_ec_evaluate_model_quality_threshold.png" style="width:600px;margin-bottom:0;"></span>
+      </p><p>モデルが正しい予測と誤った予測を行う頻度を表示します (1)。クラス間で予測が分類される方法のしきい値切り捨てポイントを表示します (2)。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">混同行列</h2><p>混同行列は、しきい値に基づいてさまざまなエラーの種類間のトレードオフを評価する場合に使用します。関連付けられたしきい値で、モデルが観察を正しく分類した回数と誤って分類した回数が表示されます。</p><p>
+      <span style="vertical-align:text-bottom;display:inline-block;"><img alt="混同行列グラフ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_ec_binary_metrics_confusion_matrix.png" style="width:600px;margin-bottom:0;"></span>
+    </p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">ROC 曲線</h2><p>受信者動作特性 (ROC) 曲線には、さまざまなしきい値設定でのパフォーマンス測定値が表示されます。ROC は確率曲線であり、AUC (曲線下面積) は分離可能性の程度を定量化します。グラフを使用して、モデルがどのくらい効果的にクラスを区別できるかを確認します。</p><p>
+      <span style="vertical-align:text-bottom;display:inline-block;"><img alt="ROC 曲線グラフ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_ec_binary_metrics_roc.png" style="width:600px;margin-bottom:0;"></span>
+    </p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">ゲインおよびリフト</h2><p>ゲイングラフとリフトグラフには、モデルの利点が示されます。これらのグラフは分析のためにスコアリングされランク付けされたデータの一部を使用して、モデルを使用して取得した結果とモデルを使用しないランダムな推測の比較を測定します。ゲインが大きくリフトが高いほど、モデルはより効果的です。</p><p>
+      <span style="vertical-align:text-bottom;display:inline-block;"><img alt="ROC 曲線グラフ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_ec_binary_metrics_gainlift.png" style="width:600px;margin-bottom:0;"></span>
+      </p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:27.068437180796735%"><col style="width:72.93156281920328%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d90250e99" style="vertical-align:top;" class="slds-cell-wrap" scope="col">
+                <strong class="uicontrol">グラフ</strong>
+              </th>
+              <th id="d90250e105" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d90250e99" style="vertical-align:top;" class="slds-cell-wrap" data-label="グラフ">ゲイン</td>
+
+              <td headers="d90250e105" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>ゲイングラフでは、データのパーセント別に合計陽性率、つまりゲインが描画されます。モデルの線が理論的正確さ (完全なモデル) に近く、ランダムな推測 (モデルなし) から遠いほど、ゲインは大きくなります。ゲインは、組織のリソースに優先度を付けるために使用できます。</p><p style="margin-bottom:0;">たとえば、あるモデルのゲインがデータの 20% で 80% であれば、上位 20% のデータで目標の 80% に到達できます。</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90250e99" style="vertical-align:top;" class="slds-cell-wrap" data-label="グラフ">リフト</td>
+
+              <td headers="d90250e105" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>リフトグラフでは、データのパーセント別に改善率、つまりリフトが描画されます。モデルが適切であるほどリフトが高くなります。</p><p style="margin-bottom:0;">たとえば、モデルで 20% のデータでリフトが 2.5 の場合、モデルの結果はモデルなしと比べて上位 20% のデータが 2.5 倍優れていることになります。</p></td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">4 回の交差検証の結果</h2><p>4 回の交差検証のアプローチは、モデルの検証プロセスのサンプリングバイアスを減らします。この方法では、データをランダムに 4 つの同じサイズのパーティションに分割し、モデルは 4 つのテストパス (分割) を通ります。各パスでは 3 つのパーティションがトレーニングデータ、残りのパーティションがテストデータとして機能します。4 つのテストパスが完了すると、各パーティションは検証セットとして 1 回機能し、トレーニングセットの一部として 3 回機能したことになり、包括的な評価が保証されます。検証結果のテーブルを参照して、データの各分割に対応する総計値を調べます。</p><p>
+      <span style="vertical-align:text-bottom;display:inline-block;"><img alt="交差検証メトリクステーブル" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_ec_binary_metrics_4fold_cross_validation.png" style="width:600px;margin-bottom:0;"></span>
+      </p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:17.36111111111111%"><col style="width:82.63888888888889%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d90250e172" style="vertical-align:top;" class="slds-cell-wrap" scope="col">指標</th>
+              <th id="d90250e175" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d90250e172" style="vertical-align:top;" class="slds-cell-wrap" data-label="指標">レコード数</td>
+
+              <td headers="d90250e175" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>観測の合計数。値の意味は、列ごとに異なります。</p><ul><li><strong class="uicontrol">[トレーニングデータ]</strong> 列と <strong class="uicontrol">[検証データ]</strong> 列では、この数値は同じです。この値は、モデルの作成で使用されるデータ全体の観測の合計数を表します。</li>
+<li><strong class="uicontrol">[分割 #1]</strong> ～ <strong class="uicontrol">[分割 #4]</strong> 列の場合、この値はその分割に含まれる観測数 (データ全体の約 25%) を表します。</li>
+</ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90250e172" style="vertical-align:top;" class="slds-cell-wrap" data-label="指標">AUC</td>
+
+              <td headers="d90250e175" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>曲線下面積 (AUC) は、ロジスティックモデルによる正分類率を表します。</p><ul>
+                  <li>0.5 は、モデルのパフォーマンスがランダムな推測と同等であることを意味します。</li>
+
+                  <li>1.0 は、モデルで 100% の確率でデータが正しく分類されることを意味します。これは、データ漏洩を示している可能性があります。</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90250e172" style="vertical-align:top;" class="slds-cell-wrap" data-label="指標">GINI</td>
+
+              <td headers="d90250e175" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ジニインデックスは、このロジスティックモデルのパフォーマンスが、理論的に最適なモデルにどれほど近いのかを測定します。</td>
+
+            </tr>
+            
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">その他の評価指標</h2><p>モデル品質の評価によく使用される他の評価指標を検討します。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:17.36111111111111%"><col style="width:82.63888888888889%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d90250e261" style="vertical-align:top;" class="slds-cell-wrap" scope="col">指標</th>
+              <th id="d90250e264" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d90250e261" style="vertical-align:top;" class="slds-cell-wrap" data-label="指標">精度</td>
+
+              <td headers="d90250e264" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>精度は、モデルで正しく予測された結果の割合 (真陽性と真陰性) を測定します。</p><ul><li>モデルの全体的な分類パフォーマンスを評価する場合に使用します。</li>
+<li>範囲は 0 ～ 1 で、値が大きいほどパフォーマンスが高くなります。</li>
+<li>次のように計算されます: <code>(True Negative+True
+                      Positive)/(True Negative+False Negative+True Positive+False
+                      Positive).</code></li>
+</ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90250e261" style="vertical-align:top;" class="slds-cell-wrap" data-label="指標">F1 スコア</td>
+
+              <td headers="d90250e264" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>F1 スコアは、陽性予測値 (精度) と真陽性率 (リコール) の調和平均です。</p><ul>
+                  <li>バイナリ分類モデルの全体的なパフォーマンスを評価する場合に使用します。特に、偽陽性と偽陰性を最小限に抑えることが同様に重要な場合に使用します。</li>
+
+                  <li>範囲は 0 ～ 1 で、値が大きいほどパフォーマンスが高くなります。</li>
+
+                  <li>2*<code>(Positive Predicted Value*True Positive
+                      Rate)/(Positive Predicted Value+True Positive Rate)</code> として計算されます。</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90250e261" style="vertical-align:top;" class="slds-cell-wrap" data-label="指標">偽陰性</td>
+
+              <td headers="d90250e264" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">実際に陽性である予測陰性の数。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90250e261" style="vertical-align:top;" class="slds-cell-wrap" data-label="指標">偽陰性率</td>
+
+              <td headers="d90250e264" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>偽陰性率 (FNR、タイプ II エラーまたはミス率とも呼ばれる) は、すべての実際の陽性に対する予測偽陰性の割合です。</p><ul><li>分類モデルで陽性が陰性として誤って分類される頻度や、偽陰性エラーを最小限に抑えることが重要である場合に使用します。</li>
+<li>指定できる範囲は 0 ～ 1 です。値が低いほどパフォーマンスが高くなります。</li>
+<li>次のように計算されます: <code>False Negative/(False
+                      Negative+True Positive)</code></li>
+</ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90250e261" style="vertical-align:top;" class="slds-cell-wrap" data-label="指標">偽陽性</td>
+
+              <td headers="d90250e264" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">実際に負の予測陽性の数。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90250e261" style="vertical-align:top;" class="slds-cell-wrap" data-label="指標">偽陽性率</td>
+
+              <td headers="d90250e264" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>偽陽性率 (FPR。タイプ I エラー、偽アラーム率、フォールアウトとも呼ばれる) は、すべての実際の陰性のうちの予測偽陽性の数です。</p><ul><li>分類モデルで陰性を陽性として誤って分類する頻度や、偽陽性エラーを最小限に抑えることが重要である場合に使用します。</li>
+<li>指定できる範囲は 0 ～ 1 です。値が低いほどパフォーマンスが高くなります。</li>
+<li>次のように計算されます: <code>False Positive/(False
+                      Positive+True Negative)</code></li>
+</ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90250e261" style="vertical-align:top;" class="slds-cell-wrap" data-label="指標">情報性</td>
+
+              <td headers="d90250e264" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>情報性 (Youden の J 統計とも呼ばれる) は、モデルが肯定と否定の両方をどの程度適切に予測しているかを測定します。</p><ul><li>バイナリ分類モデルの全体的なパフォーマンスを評価する場合に使用します。特に、真陽性と真陰性の分類が同様に重要な場合に使用します。</li>
+<li>範囲は -1 ～ 1 で、1 は完全なパフォーマンス、0 はランダムなパフォーマンス、-1 は完全な逆パフォーマンスを示します。</li>
+<li>次のように計算されます: <code>True Positive Rate+True
+                      Negative Rate-1</code></li>
+</ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90250e261" style="vertical-align:top;" class="slds-cell-wrap" data-label="指標">有標性</td>
+
+              <td headers="d90250e264" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>有標性は、モデルによる陽性予測と陰性予測の信頼性を測定します。</p><ul><li>バイナリ分類モデルの全体的なパフォーマンスを評価する場合に使用します。特に、肯定と否定のパフォーマンスを個別に評価することが重要です。</li>
+<li>範囲は -1 ～ 1 で、1 は完全なパフォーマンス、0 はランダムなパフォーマンス、-1 は完全な逆パフォーマンスを示します。</li>
+<li>次のように計算されます: <code>Positive Predicted
+                      Value+Negative Predicted Value-1</code></li>
+</ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90250e261" style="vertical-align:top;" class="slds-cell-wrap" data-label="指標">MCC</td>
+
+              <td headers="d90250e264" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>Matthews Correlation Coefficient (MCC) は混同行列の 4 つの部分が他の分類評価指標よりも均等になっている表現を提供します。</p><ul><li>特にデータが不均衡な場合に、全体的なパフォーマンスを評価する場合に使用します。</li>
+<li>範囲は -1 ～ 1 で、1 は完全なパフォーマンス、0 はランダムなパフォーマンス、-1 は完全な逆パフォーマンスを示します。</li>
+<li>次のように計算されます: <code>(True Positive*True
+                      Negative-False Positive*False Negative )/square root((True Positive+False
+                      Positive)*(True Positive+False Negative)*(True Negative+False Positive)*(True
+                      Negative+False Negative))</code></li>
+</ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90250e261" style="vertical-align:top;" class="slds-cell-wrap" data-label="指標">陰性的中率</td>
+
+              <td headers="d90250e264" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>陰性予測値 (NPV) は、すべての予測陰性に対する実際の陰性の比率です。</p><ul><li>分類モデルで陰性インスタンスがどの程度適切に予測されているかを評価する場合や、偽陰性を最小限に抑えることが重要である場合に使用します。</li>
+<li>範囲は 0 ～ 1 で、値が大きいほどパフォーマンスが高くなります。</li>
+<li>次のように計算されます: <code>True Negative/(True
+                      Negative+False Negative)</code></li>
+</ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90250e261" style="vertical-align:top;" class="slds-cell-wrap" data-label="指標">正の予測値 (精度)</td>
+
+              <td headers="d90250e264" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>陽性予測値 (PPV、精度ともいう) は、すべての予測陽性に対する実際の陽性の割合です。</p><ul><li>分類モデルで陽性インスタンスがどの程度適切に予測されているかを評価する場合や、偽陽性を最小限に抑えることが重要である場合に使用します。</li>
+<li>範囲は 0 ～ 1 で、値が大きいほどパフォーマンスが高くなります。</li>
+<li>次のように計算されます: <code>True Positive/(True
+                      Positive+False Positive)</code></li>
+</ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90250e261" style="vertical-align:top;" class="slds-cell-wrap" data-label="指標">True Negatives</td>
+
+              <td headers="d90250e264" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">実際に陰性である予測陰性の数。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90250e261" style="vertical-align:top;" class="slds-cell-wrap" data-label="指標">真陰性率 (特異性)</td>
+
+              <td headers="d90250e264" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>真陰性率 (TNR、特異度ともいう) は、すべての実際の陰性に対する予測陰性の割合です。</p><ul><li>分類モデルで陰性を正しく分類する頻度や、陰性インスタンスを正しく識別することが重要である場合に使用します。</li>
+<li>範囲は 0 ～ 1 で、値が大きいほどパフォーマンスが高くなります。</li>
+<li>次のように計算されます: <code>True Negative/(True
+                      Negative+False Positive)</code></li>
+</ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90250e261" style="vertical-align:top;" class="slds-cell-wrap" data-label="指標">真陽性</td>
+
+              <td headers="d90250e264" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">実際に陽性である予測陽性の数。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90250e261" style="vertical-align:top;" class="slds-cell-wrap" data-label="指標">真陽性率 (感度、リコール)</td>
+
+              <td headers="d90250e264" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>真陽性率 (TPR、感度または想起とも呼ばれる) は、すべての実際の陽性に対する予測陽性の割合です。</p><ul><li>分類モデルで陽性が正しく分類される頻度や、陽性インスタンスを正しく識別することが重要である場合に使用します。</li>
+<li>範囲は 0 ～ 1 で、値が大きいほどパフォーマンスが高くなります。</li>
+<li>次のように計算されます: <code>True Positive/(True
+                      Positive+False Negative)</code></li>
+</ul>
+</td>
+
+            </tr>
+            
+          </tbody></table></div>
+  
+</div>
+
+
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_ec_common_data_issues">
+<h1 class="slds-text-heading_large">データの問題の解決</h1>
+  <p>モデル作成用のデータの準備時やモデルのトレーニング後に発生する可能性がある一般的な問題に対処します。</p>
+
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:27.27272727272727%"><col style="width:72.72727272727273%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d190447e35" style="vertical-align:top;" class="slds-cell-wrap" scope="col">問題</th>
+            <th id="d190447e38" style="vertical-align:top;" class="slds-cell-wrap" scope="col">アプローチ</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d190447e35" style="vertical-align:top;" class="slds-cell-wrap" data-label="問題">極値と異常値</td>
+
+            <td headers="d190447e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="アプローチ">異常値は統計的に有意な計算で平均と標準偏差に影響するため、予測アルゴリズムは異常値に対して敏感です。異常値が見つかった場合、そのデータポイントは関連性があり、実在するかどうかを確認します。多くの場合、異常値はエラーです。極端なデータポイントが正確かつ予測可能で、繰り返し発生する場合、そのポイントが重要でなければ削除しないでください。
+              </td>
+
+          </tr>
+          <tr class="">
+            <td headers="d190447e35" style="vertical-align:top;" class="slds-cell-wrap" data-label="問題">不正値</td>
+
+            <td headers="d190447e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="アプローチ">予測アルゴリズムは、入力情報が正しいと想定します。数行のみに不正値が含まれている場合は、何を行うかを決定します。つまり、分析からそれらの行を削除するか、不正値をより正確な値または平均値に置き換えます。多数の不正値がある場合、不正が発生した理由を調べ、修正可能かどうかを判断します。エラーの原因となる可能性が高い変数は、分析に含めるよりも削除した方がよい場合があります。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d190447e35" style="vertical-align:top;" class="slds-cell-wrap" data-label="問題">カテゴリ値の標準化</td>
+
+            <td headers="d190447e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="アプローチ">カテゴリ値では、一貫したカテゴリ名を使用してください。スペルのバリエーション (複数形や省略形など) を削除します。入力ミスやその他のエラーを修正します。また、意味のある、わかりやすい表示ラベルを使用します。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d190447e35" style="vertical-align:top;" class="slds-cell-wrap" data-label="問題">高カーディナリティ項目</td>
+
+            <td headers="d190447e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="アプローチ">高カーディナリティ項目は、多数の個別値を含むカテゴリ属性です。例として、名前、郵便番号、取引先番号などがあります。これらの変数は多数の情報を提供しますが、高カーディナリティ属性は予測モデリングではほとんど使用されません。この属性を含めるとデータの次元が大幅に増加し、ほとんどのアルゴリズムで正確な予測モデルを構築することが困難になる可能性があります。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d190447e35" style="vertical-align:top;" class="slds-cell-wrap" data-label="問題">順序変数</td>
+
+            <td headers="d190447e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="アプローチ">順序変数は、予測モデルでは問題となることがあります。順序データは、セット内の項目のランクを表すカテゴリデータの一種ですが、値の間隔が均一でなく、意味のあるものではありません。たとえば、1 位、2 位、3 位というように、販売金額に基づく営業担当者のランキングについて考えてみます。順位は明確ですが、ランク 1 位とランク 2 位の営業担当者の金額の差は、ランク 2 位とランク 3 位の差とは異なります。その他の例としては、教育レベル、満足度評価、評価スケールを用いた回答などがあります。順序値を使用する場合は、演算子をテキスト (カテゴリ) と数値 (連続) のどちらとして処理するかを検討してください。順序データが数値であれば、1 と 2 の評価は低く、3 は中間、4 と 5 は良いというように、意味のあるビンにグループ化しましょう。定数データがテキストの場合は、各値が個別に分析およびモデル化されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d190447e35" style="vertical-align:top;" class="slds-cell-wrap" data-label="問題">重複変数、冗長な変数、または高度に相関する変数</td>
+
+            <td headers="d190447e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="アプローチ">同じ情報が格納される重複変数、冗長な変数、その他の高度に相関する変数は最小限に抑えます。予測アルゴリズムは、このような共線変数がない場合にパフォーマンスが向上します。共線性は、2 つ以上の予測変数が高度に相関する場合に発生します。その結果、一方を他方からかなりの精度で線形的に予測できます。共線性を回避するには、高度に相関する複数の変数、または同じレポート階層のデータを含めないようにします。たとえば、タンパ市に住む顧客はフロリダ州にも住んでいます。2 つの連続変数間の高度な相関を識別するには、散布図を確認します。散布図のパターンで、変数間のリレーションが示されます。リレーションは線形または非線形です。リレーションの強度を調べるには、相関関係を計算します。相関関係は –1 ～ +1 の間で変動します。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d190447e35" style="vertical-align:top;" class="slds-cell-wrap" data-label="問題">欠損値</td>
+
+            <td headers="d190447e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="アプローチ">欠損値の最も一般的な修正は、分布の平均または計算値を使用して期待値を代入することです。平均値を使用する場合、標準偏差が低減される可能性があります。したがって、分布の代入方法の方が信頼性が高くなります。別の方法は、欠損値のあるレコードを削除することです。だだし、欠損値を安易に除外しないでください。欠損データ内にパターンが存在する場合があります。また、削除するレコード数が多すぎると、分析で実環境の側面が低減します。</td>
+
+          </tr>
+        </tbody></table>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_ec_create_model">
+<h1 class="slds-text-heading_large">ゼロからの予測 AI モデルの作成</h1>
+  <p>モデルを作成してデータを分析し、機械学習に基づいて AI を活用した予測を取得します。サポートされる使用事例と倫理的なモデル構築について説明します。そして、手順に従ってモデルを作成し、モデル品質を評価します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#c360_a_ai_ec_use_cases">サポートされる予測モデル種別</a></strong><br>予測モデルは、一般的なビジネスの使用事例に対処します。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_ai_ec_ethical_model_building">倫理的な AI モデルの設計</a></strong><br>Salesforce では、ビジネスで人工知能 (AI) の倫理的な活用を実践するためのガイダンスを用意しています。</li><li class="slds-p-bottom_small"><strong><a href="transform_prep-1.html#c360_a_ai_predictive_prep_data">トレーニングデータの準備</a></strong><br>効果的なデータプレップは、予測モデルで優れた結果を得るための鍵です。Data 360 のデータインテグレーション機能を活用します。 1 つ以上のデータソースのデータを読み込み、最適化されたトレーニングデータを使用してデータモデルオブジェクト (DMO) に変換します。データは Salesforce や外部ソースから取得できます。サードパーティのツールとユーティリティを使用して、データの整理と収集タスクをさらに迅速に実行することもできます。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_ai_ec_create_model_steps">モデルをゼロから作成</a></strong><br>履歴データを使用して将来の結果を予測するモデルを作成します。データソースを選択して構造化し、目的の結果を定義します。次に、AI、機械学習、統計分析を使用して、予測推測とインサイトを明らかにするようにモデルをトレーニングします。</li><li class="slds-p-bottom_small"><strong><a href="ai_models-2.html#c360_a_ai_predictive_model_quality">予測モデルの改善</a></strong><br>モデル品質は、予測 AI ソリューションの重要な成功要因です。AIモデル(旧称Einstein Studio)では、予測モデルの継続的な反復的な改善がサポートされます。本番でのモデル品質を経時的に測定します。品質アラートを使用して、改善すべき領域を特定し、対処します。新しいモデルバージョンを試します。モデル品質の改善に取り組むことで、ビジネス成果が向上します。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_ai_ec_evaluate_model_quality">モデル品質の評価</a></strong><br>トレーニング総計値を使用して、モデルで結果を予測する能力を評価し、有効化する準備ができているかどうかを判断します。トレーニング総計値は、モデルがトレーニングデータに含まれるパターンと関係をどれだけ効果的に理解しているかについての情報を提供し、その予測効果を示します。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_ec_create_model_steps">
+<h1 class="slds-text-heading_large">モデルをゼロから作成</h1>
+  <p>履歴データを使用して将来の結果を予測するモデルを作成します。データソースを選択して構造化し、目的の結果を定義します。次に、AI、機械学習、統計分析を使用して、予測推測とインサイトを明らかにするようにモデルをトレーニングします。</p>
+
+    <div><p>モデルをトレーニングするには、次のデータ要件を考慮します。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:38.837920489296636%"><col style="width:30.58103975535168%"><col style="width:30.58103975535168%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d61101e42" style="vertical-align:top;" class="slds-cell-wrap" scope="col">要件</th>
+              <th id="d61101e45" style="vertical-align:top;" class="slds-cell-wrap" scope="col">最小</th>
+              <th id="d61101e48" style="vertical-align:top;" class="slds-cell-wrap" scope="col">最大</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d61101e42" style="vertical-align:top;" class="slds-cell-wrap" data-label="要件">行数</td>
+
+              <td headers="d61101e45" style="vertical-align:top;" class="slds-cell-wrap" data-label="最小">400</td>
+
+              <td headers="d61101e48" style="vertical-align:top;" class="slds-cell-wrap" data-label="最大"><p>2000 万</p><p style="margin-bottom:0;">XGBoost アルゴリズムの場合は 500 万件</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d61101e42" style="vertical-align:top;" class="slds-cell-wrap" data-label="要件">変数の数 (項目または列)</td>
+
+              <td headers="d61101e45" style="vertical-align:top;" class="slds-cell-wrap" data-label="最小">3 (1 つの結果変数と 2 つの他の項目)</td>
+
+              <td headers="d61101e48" style="vertical-align:top;" class="slds-cell-wrap" data-label="最大"><p>50 (手動選択)</p><p style="margin-bottom:0;">350 (自動選択)。これらの項目から、Autopilot では最も関連性の高い 50 項目のみが考慮されます。</p></td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>種別を選択</span>
+        <div>使用事例に基づいて、バイナリモデル、回帰モデル、またはマルチクラス (ベータ) モデルを選択します。<div style="text-align:left;"><img alt="ステップ 1 でバイナリ、回帰、マルチクラスモデル種別を選択します。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_ec_create_a_model.png" style="width:700px;"></div>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 
+            <p>分類モデルはパイロットまたはベータサービスであり、<a target="_blank" href="https://www.salesforce.com/company/legal/agreements/">Agreements - Salesforce.com</a> のベータサービス条件、またはお客様が締結した場合は書面による統合パイロット契約、および<a target="_blank" href="https://ptd.salesforce.com/">製品条件ディレクトリ</a>の適用条件が適用されます。このパイロットサービスまたはベータサービスは、お客様ご自身の裁量でご利用ください。</p>
+          </div></div></div>
+
+        </div>
+      </li><li>
+        <span>データの選択</span>
+        <div>モデルをトレーニングするデータソースを選択します。Einstein は、そのデータを使用してモデルをトレーニングおよびテストします。</div>
+        <div>データソースを選択するときは、以下の質問とガイダンスを参考にしてください。<table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:33.670033670033675%"><col style="width:66.32996632996634%"></colgroup><thead class="slds-text-title_caps">
+                <tr class="">
+                  <th id="d61101e145" style="vertical-align:top;" class="slds-cell-wrap" scope="col">質問</th>
+                  <th id="d61101e148" style="vertical-align:top;" class="slds-cell-wrap" scope="col">ガイダンス</th>
+                </tr>
+              </thead><tbody>
+                <tr class="">
+                  <td headers="d61101e145" style="vertical-align:top;" class="slds-cell-wrap" data-label="質問">どの結果 (KPI など) を予測する必要があるか?</td>
+
+                  <td headers="d61101e148" style="vertical-align:top;" class="slds-cell-wrap" data-label="ガイダンス">予測モデリングでは、回帰 (連続する数値)、バイナリ分類 (2 つの値のテキスト結果)、複数分類 (3 ～ 10 個の結果候補) の 3 つの種別の使用事例に関連するパターンを検出します。予測モデリングに理想的なデータ候補には、大量のデータと多くのビジネス上の意思決定に関連付けられた KPI が含まれることがよくあります。</td>
+
+                </tr>
+                <tr class="">
+                  <td headers="d61101e145" style="vertical-align:top;" class="slds-cell-wrap" data-label="質問">含める変数は?</td>
+
+                  <td headers="d61101e148" style="vertical-align:top;" class="slds-cell-wrap" data-label="ガイダンス">含める変数は、予測モデルの品質と解釈のしやすさに影響します。変数に意味があり、関連性があれば、関係者やビジネスユーザーが容易に要因どうしの関係を理解して、予測される結果を信頼できるようになります。</td>
+
+                </tr>
+                <tr class="">
+                  <td headers="d61101e145" style="vertical-align:top;" class="slds-cell-wrap" data-label="質問">この情報はどこで見つけられるか?</td>
+
+                  <td headers="d61101e148" style="vertical-align:top;" class="slds-cell-wrap" data-label="ガイダンス">データのソースを把握することは、品質の評価、バイアスの特定、データガバナンスとコンプライアンスの遵守に役立ちます。</td>
+
+                </tr>
+              </tbody></table></div>
+      </li><li>
+        <span>トレーニングデータの選択</span>
+        <div>データソースのすべてのレコードを使用して、モデルをトレーニングします。または、モデルのトレーニングに使用するレコードを制限する条件を指定します。</div>
+        <ol>
+          <li>
+            <span>特定のデータサブセットを選択してモデルをトレーニングするには、[<strong class="uicontrol">Filtered Set of Records</strong> (条件設定済みレコードセット)] をクリックします。</span>
+          </li>
+
+          <li>
+            <span>検索条件を定義します。</span>
+            <div>
+              <div style="text-align:left;"><img alt="レコードを絞り込むステップ 3。[絞り込まれたレコードセット] を使用するオプションが選択されている" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_ec_filter_set_of_records.png" style="width:700px;"></div>
+              <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_important.png" style="margin-bottom:0;"></span></div><div id="c360_a_ai_ec_create_model_steps__note_x4r_lbw_g2c" style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><a name="c360_a_ai_ec_create_model_steps__note_x4r_lbw_g2c"></a><span class="slds-text-title_caps">重要</span> 
+                <p>使用する行数が 2,000 万未満になるようにトレーニングセットを絞り込みます。</p>
+              </div></div></div>
+
+              <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:33.670033670033675%"><col style="width:66.32996632996634%"></colgroup><thead class="slds-text-title_caps">
+                    <tr class="">
+                      <th id="d61101e236" style="vertical-align:top;" class="slds-cell-wrap" scope="col">ロジック</th>
+                      <th id="d61101e239" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+                    </tr>
+                  </thead><tbody>
+                    <tr class="">
+                      <td headers="d61101e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="ロジック">条件の要件</td>
+
+                      <td headers="d61101e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>すべての条件に一致 — すべての条件が true の場合、検索条件が適用されます。いずれかの条件が false の場合、検索条件は適用されません。</p><p style="margin-bottom:0;">いずれかの条件に一致 — 1 つの条件が true の場合、検索条件が適用されます。</p></td>
+
+                    </tr>
+                    <tr class="">
+                      <td headers="d61101e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="ロジック">項目</td>
+
+                      <td headers="d61101e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">データソースに基づきます。検索条件を適用するときに使用するデータ属性または変数です。</td>
+
+                    </tr>
+                    <tr class="">
+                      <td headers="d61101e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="ロジック">演算子</td>
+
+                      <td headers="d61101e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">項目と条件のリレーションを定義します。サポートされる演算子は、項目のデータ型によって異なります。</td>
+
+                    </tr>
+                    <tr class="">
+                      <td headers="d61101e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="ロジック">値</td>
+
+                      <td headers="d61101e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">項目を評価するための特定の値。テキスト項目では、1 つ以上の値を選択します。数値項目では、値を入力します。日付項目の場合、カレンダーを使用して日付を選択します。</td>
+
+                    </tr>
+                  </tbody></table>
+            </div>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>目標の設定</span>
+        <div>解決するビジネスの問題を選択します。改善する重要業績評価指標 (KPI) を確認します。AI を駆使したソリューションを導入することで最大のメリットを得られる KPI 候補を探索します。</div>
+        <ol>
+          <li>
+            <span>値を予測する項目を選択します。どの結果変数を、どの粒度で探索する必要があるかを決定します。結果変数には KPI 値 (収益、割引、コスト基準、期間など)、またはその他の定量化可能な結果を使用できます。2 つの値 (バイナリ) が含まれるカテゴリ (テキスト項目) を結果変数として使用することもできます。</span>
+          </li>
+
+          <li>
+            <span>目標を最大化するか最小化するかを選択します。Einstein は、結果変数の最大化または最小化に焦点を絞ったモデルを作成してトレーニングします。たとえば、目標として、純利益率の最大化や顧客の離脱の最小化が考えられます。Einsteinは、高い正味利益を達成するか、顧客離脱を減らすことに焦点を絞ったモデルを作成します。</span>
+          </li>
+
+        </ol>
+        <div>
+          <div style="text-align:left;"><img alt="モデルの目標または結果を設定するステップ 4" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_ec_set_goal.png" style="width:700px;"></div>
+        </div>
+      </li><li>
+        <span>データの準備</span>
+        <div>モデルに変数として含める項目を選択します。変数が予測するビジネス結果に関連していることを確認します。数量 (量) とバリエーション (多様性) の観点で、正確で完全、かつ実際の業務を表す変数を使用して、より適切な結果を提供するようにデータを絞り込みます。機密データや個人識別情報 (PII) が含まれる項目は使用しないでください。</div>
+        <div>
+          <p>Einstein が予測と使用事例に最も影響する変数を自動的に選択できるように、<strong class="uicontrol">自動パイロット</strong>を有効にすることもできます。</p>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_important.png" style="margin-bottom:0;"></span></div><div id="c360_a_ai_ec_create_model_steps__note_zgf_c3w_g2c" style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><a name="c360_a_ai_ec_create_model_steps__note_zgf_c3w_g2c"></a><span class="slds-text-title_caps">重要</span> 100 個以上の一意の値を持つ最大 50 個のテキスト変数 (項目) がサポートされます。この制限を超えるテキスト変数を持つデータモデルオブジェクトは、モデルの設定時に削除または表示されない場合があります。</div></div></div>
+
+          
+          <a name="c360_a_ai_ec_create_model_steps__image_ahf_c3w_g2c"></a><div style="text-align:left;"><img alt="含める項目または変数を選択するためにデータを準備するステップ 5" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_ec_prepare_variables.png" id="c360_a_ai_ec_create_model_steps__image_ahf_c3w_g2c" style="width:700px;"></div>
+        </div>
+      </li><li>
+        <span>アルゴリズムの選択</span>
+        <div>アルゴリズムは、データから学習して予測を行うためにモデルで使用されるアプローチ (計算手順) です。<strong class="uicontrol">自動選択</strong>を有効にして、Einstein が予測と使用事例に最も影響するアルゴリズムを自動的に選択できるようにすることもできます。</div>
+        <ol>
+          <li>
+            <span>モデルのアルゴリズムを選択します。</span>
+            <div>
+              <div style="text-align:left;"><img alt="3 つのオプションからアルゴリズムを選択するステップ 6" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_ec_select_a_algorithm.png" style="width:700px;"></div>
+              <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:27.068437180796735%"><col style="width:72.93156281920328%"></colgroup><thead class="slds-text-title_caps">
+                    <tr class="">
+                      <th id="d61101e394" style="vertical-align:top;" class="slds-cell-wrap" scope="col">アルゴリズム</th>
+                      <th id="d61101e397" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+                    </tr>
+                  </thead><tbody>
+                    <tr class="">
+                      <td headers="d61101e394" style="vertical-align:top;" class="slds-cell-wrap" data-label="アルゴリズム">
+                        <strong class="uicontrol">GLM</strong>
+                      </td>
+
+                      <td headers="d61101e397" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">デフォルト。一般化された線形モデル (GLM) は、通常すぐに完了する等式ベースのアルゴリズムです。変数と結果の関係が比較的シンプルな場合に最適です。GLM のみが、変数間のインタラクション (地域と月を組み合わせた影響など) に基づいて説明を生成できます。</td>
+
+                    </tr>
+                    <tr class="">
+                      <td headers="d61101e394" style="vertical-align:top;" class="slds-cell-wrap" data-label="アルゴリズム">
+                        <strong class="uicontrol">GBM</strong>
+                      </td>
+
+                      <td headers="d61101e397" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">勾配ブーストマシン (GBM) は、データに適切に適合するようにディシジョンツリーを連続して構築するツリーベースのアルゴリズムです。GLM と比較して、変数間の異なる関係やデータ分布の変化など、データの複雑さを巧みに処理できます。</td>
+
+                    </tr>
+                    <tr class="">
+                      <td headers="d61101e394" style="vertical-align:top;" class="slds-cell-wrap" data-label="アルゴリズム">
+                        <strong class="uicontrol">XGBoost</strong>
+                      </td>
+
+                      <td headers="d61101e397" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">極端な勾配ブースティング (XGBoost) は、効率化するために最適化された GBM の拡張アルゴリズムです。ツリーベースのアルゴリズムで、ディシジョンツリーのグループを順次作成してデータの適合性を高める一方で、過学習を回避します。</td>
+
+                    </tr>
+                    
+                    
+                  </tbody></table>
+            </div>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>確認とトレーニング</span>
+        <div>詳細を確認したら、モデルをトレーニングします。<div style="text-align:left;"><img alt="最後のステップ 7 (前のステップで選択した内容の概要を表示して保存およびトレーニング)" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_ec_review_and_train1.png" style="width:700px;"></div></div>
+        <ol>
+          <li>
+            <span>モデルの詳細を指定します。必要に応じて鉛筆アイコンをクリックして、ステップを編集します。</span>
+            <div>
+              <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 
+                <p>モデルの作成時にすべてのステップを編集できます。モデルを作成したら、[種別を選択]、[データを選択]、[目標を設定] などのステップは編集できません。</p>
+              </div></div></div>
+
+            </div>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[保存]</strong> をクリックし、モデルの名前と説明 (省略可能) を入力してから、<strong class="uicontrol">[保存してトレーニングを行う]</strong> をクリックしてモデルを作成します。</span>
+            <div>
+              <div style="text-align:left;"><img alt="モデルの命名とトレーニング" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_ec_review_and_train2.png" style="width:600px;"></div>
+            </div>
+          </li>
+
+        </ol>
+      </li></ol>
+
+    <div><p>Einstein はデータを分析し、設定に基づいてモデルをトレーニングします。モデルの作成には時間がかかり、途中経過が Einstein に表示されるため、残り時間 (分) がわかります。</p><p>モデルが作成されたら、[AI モデル] の [予測モデル] タブで見つけることができます。「<a target="_blank" href="#c360_a_ai_mm_manage_models">AI モデルホーム</a>」を参照してください。</p></div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#c360_a_ai_ec_common_data_issues">データの問題の解決</a></strong><br>モデル作成用のデータの準備時やモデルのトレーニング後に発生する可能性がある一般的な問題に対処します。</li><li class="slds-p-bottom_small"><strong><a href="transform_prep-1.html#c360_a_ai_ec_use_transformations">データへの変換の適用</a></strong><br>モデリングデータを変換して、予測の信頼性、精度、説明可能性を向上させます。ゼロから作成されたモデルの場合、モデルビルダーによって自動的に非構造化テキストが変換され、欠損データが置き換えられます。バイナリモデルまたは回帰モデルの変数を手動で変換することもできます。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_ec_ethical_model_building">
+<h1 class="slds-text-heading_large">倫理的な AI モデルの設計</h1>
+  <p>Salesforce では、ビジネスで人工知能 (AI) の倫理的な活用を実践するためのガイダンスを用意しています。</p>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Salesforce の倫理的な AI</h2><p>倫理的な AI は、テクノロジーの倫理的および人道的な使用に対する Salesforce のコミットメントの重要な部分です。概要については、次のリソースを参照してください。</p><ul>
+        <li>Salesforce の<a target="_blank" href="https://www.salesforce.com/company/ethical-and-humane-use/">「Ethical and Humane Use (倫理的・人道的な利用)」</a></li>
+
+        <li>Trailhead モジュールの<a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/modules/responsible-creation-of-artificial-intelligence">「人工知能の責任ある作成」</a></li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">モデリングデータのバイアス</h2><p>データのバイアスは、不公正または不正確な予測につながり、意図せずに特定のグループに不利益を与えたり、ビジネス結果を歪めたりする可能性があります。AIモデル(旧称Einstein Studio)では、倫理的なモデルの構築は、まずデータのどこにバイアスがあるかを理解し、モデル ライフサイクル全体にわたってその影響を最小限に抑えるためのプロアクティブなアクションを実行することから始まります。</p><table summary="バイナリモデルまたはマルチクラスモデル" class="slds-table slds-table_bordered slds-m-bottom_small"><caption>バイナリモデルまたはマルチクラスモデル</caption><colgroup><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d191304e67" style="vertical-align:top;" class="slds-cell-wrap" scope="col"><strong>バイアスタイプ</strong></th>
+              <th id="d191304e71" style="vertical-align:top;" class="slds-cell-wrap" scope="col"><strong>シナリオ</strong></th>
+              <th id="d191304e75" style="vertical-align:top;" class="slds-cell-wrap" scope="col"><strong>推奨される作業</strong></th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d191304e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="バイアスタイプ">履歴</td>
+
+              <td headers="d191304e71" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオ"><p>過去のデータには、客観的ではない既存の不平等や人間の決定が反映されます。</p><p style="margin-bottom:0;">たとえば、顧客の優先順位付けを予測するモデルでは、既存の顧客プロファイルを継続的に優先することでサービス品質の不均衡を永続化できます。過去のサポートデータでは、重要度や支出パワーによって特定の顧客がより迅速に解決できたことが示されています。</p></td>
+
+              <td headers="d191304e75" style="vertical-align:top;" class="slds-cell-wrap" data-label="推奨される作業"><p>リリース前に、さまざまなデータセットと公平性評価指標を使用するモデルを監査またはテストしてバイアスがないかどうかを確認します。</p><p style="margin-bottom:0;">誤分類を検出して対処するには、重要な意思決定のための Human-in-the-Loop レビュープロセスを実装します。</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d191304e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="バイアスタイプ">変数 (機能)</td>
+
+              <td headers="d191304e71" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオ"><p>モデルのトレーニングに使用される入力変数は、予測に不当に影響したり、隠れたバイアスを明らかにしたりする。これらは、選択によって導入されるか、データ内の変数の表現です。バイアスは、場所、年齢、性別など、特定の属性が予測に偏りがある場合に発生します。</p><p style="margin-bottom:0;">たとえば、顧客満足度を予測するモデルでは、「優先されるコミュニケーションチャネル」変数を使用します。一部の顧客セグメントは、年齢、アクセシビリティ、文化的な要因により、特定のチャネル (チャット、電話、メール) を好みます。このモデルでは、エンゲージメントが優勢でないチャネルを使用しているグループの満足度が誤って判断されます。</p></td>
+
+              <td headers="d191304e75" style="vertical-align:top;" class="slds-cell-wrap" data-label="推奨される作業"><p>リリース前に、さまざまなデータセットと公平性評価指標を使用するモデルを監査またはテストしてバイアスがないかどうかを確認します。</p><p>機密属性を直接参照する変数を削除または変更するか、バイアスの掛からないプロキシに置き換えます。</p><p>成果が不平等になるのを軽減するために、過小評価されているグループの決定しきい値を変更します。</p><p style="margin-bottom:0;">誤分類を検出して対処するには、重要な意思決定のための Human-in-the-Loop レビュープロセスを実装します。</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d191304e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="バイアスタイプ">表示ラベル</td>
+
+              <td headers="d191304e71" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオ"><p>データの結果は、一貫性がない、不正確、または主観的な判断のために、一貫性がない、または不当にラベル付けされています。</p><p style="margin-bottom:0;">たとえば、離脱を予測するモデルでは、「90 日以内に購入なし」という離脱表示ラベルが使用されます。ただし、季節性のある買い物客など、購入サイクルが長い顧客もいます。このモデルでは、セグメントの消費者行動は正常であっても、これらの顧客は「離脱」したと予測されます。</p></td>
+
+              <td headers="d191304e75" style="vertical-align:top;" class="slds-cell-wrap" data-label="推奨される作業"><p>表示ラベルを監査して、実際の結果を正確に反映していることを確認します。</p><p style="margin-bottom:0;">表示ラベルが明らかに矛盾している、または主観的であるデータポイントを除外します。誤って表示されたセグメントに、正しい表示ラベルが付いている十分な例があることを確認します。</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d191304e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="バイアスタイプ">サンプリング</td>
+
+              <td headers="d191304e71" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオ"><p>トレーニングデータは、顧客や使用事例を表すほど多様ではありません。</p><p style="margin-bottom:0;">たとえば、購入の可能性を予測するモデルでは、エンゲージメントスコアや満足度スコアが過大評価されます。無効な顧客や離脱した顧客は過小評価されているため、モデルは活動の少ない顧客セグメントから学習していません。
+                </p></td>
+
+              <td headers="d191304e75" style="vertical-align:top;" class="slds-cell-wrap" data-label="推奨される作業">トレーニングデータを監査して、顧客ベースまたは使用事例のどのセグメントが過小評価されているかを特定します。また、異なるセグメント間でモデルのパフォーマンスを比較して、格差を特定します。</td>
+
+            </tr>
+          </tbody></table></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_ec_evaluate_model_quality">
+<h1 class="slds-text-heading_large">モデル品質の評価</h1>
+  <p>トレーニング総計値を使用して、モデルで結果を予測する能力を評価し、有効化する準備ができているかどうかを判断します。トレーニング総計値は、モデルがトレーニングデータに含まれるパターンと関係をどれだけ効果的に理解しているかについての情報を提供し、その予測効果を示します。</p>
+
+    <p>モデル品質を評価する前に、主要概念を確認しておくと役に立ちます。</p>
+    <ul>
+      <li>結果変数とはモデルの目標であり、求められる予測あるいは結果です。</li>
+
+      <li>変数とは、モデルが予測を行うために分析する入力データです。</li>
+
+      <li>トレーニングとは、モデルがパターンや関係を学習し、新しい未知のデータに対して予測を行うためのプロセスです。</li>
+
+    </ul>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> どのモデルも完璧ではないため、予測には限界や不確実性があります。機械学習モデルの結果を解釈する際には、常に注意を払い、常識に基づいて判断してください。</div></div></div>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">精度</h2><p>Einstein は、回帰の決定係数 R2 と 2 値分類の曲線下面積 (AUC) を使用して精度を測定します。Einstein は、パフォーマンスに関する標準的なしきい値に基づいて、モデルの全体的な精度が適切か、低すぎるか、高すぎるかを教えてくれます。</p><p>
+      <span style="vertical-align:text-bottom;display:inline-block;"><img alt="モデル精度タイル" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_ec_evaluate_model_quality_accuracy.png" style="width:600px;margin-bottom:0;"></span>
+      </p><ul>
+        <li>「適切」は、モデルが全般的に正確であることを意味します。</li>
+
+        <li>「低すぎる」は、ランダムな推測とほとんど同じであることを意味します。</li>
+
+        <li>「高すぎる」は、場合は、モデルが (ほぼ) 完全であり、データ漏洩や過学習の可能性があることを意味します。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">上位の予測因子</h2><p>上位の予測因子は、結果の予測に最も影響する入力 (変数) です。</p><p>
+      <span style="vertical-align:text-bottom;display:inline-block;"><img alt="モデル精度タイル" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_ec_evaluate_model_quality_predictors.png" style="width:600px;margin-bottom:0;"></span>
+    </p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">変数の分布</h2><p>結果変数のデータの実際の値または観測された値の分布。</p><p>
+      <span style="vertical-align:text-bottom;display:inline-block;"><img alt="モデル精度タイル" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_ec_evaluate_model_quality_distribution.png" style="width:600px;margin-bottom:0;"></span>
+    </p></div>
+    
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#c360_a_ai_ec_regression_metrics">回帰総計値</a></strong><br>回帰の総計値は、連続データの数値を予測するモデルの性能を評価するのに役立ちます。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_ai_ec_binary_metrics">バイナリ分類総計値</a></strong><br>バイナリ分類の総計値は、データを 2 つのクラスに分類するモデルのパフォーマンスを評価するのに役立ちます。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_ec_manage_quality_alerts">
+<h1 class="slds-text-heading_large">品質アラートの管理</h1>
+ <p>モデルビルダーでは、モデルのトレーニングデータ、品質評価指標、または交差検証中に問題が検出されたときに品質アラートが表示されます。アラートは、モデルの設定、詳細、インスペクターに表示される可能性があります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+  <div id="c360_a_ai_ec_manage_quality_alerts__prereq_hyv_ktb_l2c"><a name="c360_a_ai_ec_manage_quality_alerts__prereq_hyv_ktb_l2c"></a><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d239681e37" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d239681e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">ユーザーが AI モデルでモデルを管理できるようにする</td>
+
+       <td headers="d239681e37" style="vertical-align:top;" class="slds-cell-wrap">AI モデルでモデルを作成、更新、削除できます。</td>
+
+      </tr>
+     </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d239681e68" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">権限セット </th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d239681e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="権限セット">Data Cloud アーキテクト</td>
+
+       <td headers="d239681e68" style="vertical-align:top;" class="slds-cell-wrap">モデルの作成、更新、削除、有効化など、すべての AI モデル機能へのシステム管理者レベルのアクセス権。</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d239681e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="権限セット">「Data Cloud ユーザー」</td>
+
+       <td headers="d239681e68" style="vertical-align:top;" class="slds-cell-wrap">モデルを使用するための制限されたアクセス権 (モデルから派生した予測や改善の取得など)。</td>
+
+      </tr>
+     </tbody></table></div>
+ 
+ <div id="c360_a_ai_ec_manage_quality_alerts_task_1" aria-labelledby="ariaid-title2" class="nested1"><a name="c360_a_ai_ec_manage_quality_alerts_task_1"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">モデル設定のアラート</h2>
+  
+  <p>モデルの変数を設定するときにアラートを管理できます。また、モデルを保存してトレーニングする前に、設定を確認するときにアラートに対処することをお勧めします。変数を設定するときにアラートを管理する手順は、次のとおりです。</p>
+
+   <div id="c360_a_ai_ec_manage_quality_alerts_task_1__context_uc2_4tb_l2c"><a name="c360_a_ai_ec_manage_quality_alerts_task_1__context_uc2_4tb_l2c"></a><div id="c360_a_ai_ec_manage_quality_alerts_task_1__fig_vkj_zsb_l2c" style="text-align:left;"><a name="c360_a_ai_ec_manage_quality_alerts_task_1__fig_vkj_zsb_l2c"></a>
+     <a name="c360_a_ai_ec_manage_quality_alerts_task_1__image_wkj_zsb_l2c"></a><img alt="変数の準備や設定の確認時に、モデル設定でアラートに対応します。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_ec_manage_model_alerts_setup.png" id="c360_a_ai_ec_manage_quality_alerts_task_1__image_wkj_zsb_l2c" style="width:600px;">
+    </div></div>
+   <a name="c360_a_ai_ec_manage_quality_alerts_task_1__steps_xkj_zsb_l2c"></a><ol id="c360_a_ai_ec_manage_quality_alerts_task_1__steps_xkj_zsb_l2c"><li>
+     <span>モデルをクリックしてその設定にアクセスします。</span>
+    </li><li>
+     <span>変数アラートを表示するには、[<strong class="uicontrol">変数を準備</strong>] をクリックします。</span>
+    </li><li>
+     <span>モデルに影響する問題についての詳細は、ページの右側に移動してアクションを選択します。たとえば、モデルのトレーニングの前に特定の変数を除外することで、多重共線性アラートを解決できます。</span>
+    </li></ol>
+
+  
+ </div>
+
+ <div id="c360_a_ai_ec_manage_quality_alerts_task_2" aria-labelledby="ariaid-title3" class="nested1"><a name="c360_a_ai_ec_manage_quality_alerts_task_2"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">モデルの詳細のアラート </h2>
+  
+  <p>モデルのトレーニング後、アラートがモデルの詳細に表示されることがあります。ここでは、アラートの概要、トレーニングデータへの影響、モデル総計値を確認できます。モデルの詳細の概要でアラートを管理する手順は、次のとおりです。</p>
+
+   <div id="c360_a_ai_ec_manage_quality_alerts_task_2__context_zkj_zsb_l2c"><a name="c360_a_ai_ec_manage_quality_alerts_task_2__context_zkj_zsb_l2c"></a><div id="c360_a_ai_ec_manage_quality_alerts_task_2__fig_alj_zsb_l2c" style="text-align:left;"><a name="c360_a_ai_ec_manage_quality_alerts_task_2__fig_alj_zsb_l2c"></a>
+     <a name="c360_a_ai_ec_manage_quality_alerts_task_2__image_blj_zsb_l2c"></a><img alt="モデルの詳細の [概要] タブでアラートに対応します。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_ec_manage_model_alerts_details.png" id="c360_a_ai_ec_manage_quality_alerts_task_2__image_blj_zsb_l2c" style="width:600px;">
+    </div></div>
+   <a name="c360_a_ai_ec_manage_quality_alerts_task_2__steps_clj_zsb_l2c"></a><ol id="c360_a_ai_ec_manage_quality_alerts_task_2__steps_clj_zsb_l2c"><li>
+     <span>モデルをクリックすると、その詳細が表示されます。</span>
+    </li><li>
+     <span>[概要] タブで、モデルに影響しているアラートを確認します。</span>
+    </li><li>
+     <span>モデルに影響する問題を確認するには、[<strong class="uicontrol">レビュー]</strong> をクリックします。モデルの詳細が開きます。ここでアラートに対処できます。</span>
+    </li></ol>
+
+  
+ </div>
+
+ <div id="c360_a_ai_ec_manage_quality_alerts_task_3" aria-labelledby="ariaid-title4" class="nested1"><a name="c360_a_ai_ec_manage_quality_alerts_task_3"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">モデルインスペクターのアラート</h2>
+  
+  <p>モデルのトレーニング後、アラートはモデルインスペクターにも表示され、モデルのトレーニング品質と関連総計値を確認できます。モデルインスペクターでアラートを管理する手順は、次のとおりです。</p>
+
+   <div id="c360_a_ai_ec_manage_quality_alerts_task_3__context_elj_zsb_l2c"><a name="c360_a_ai_ec_manage_quality_alerts_task_3__context_elj_zsb_l2c"></a><div id="c360_a_ai_ec_manage_quality_alerts_task_3__fig_flj_zsb_l2c" style="text-align:left;"><a name="c360_a_ai_ec_manage_quality_alerts_task_3__fig_flj_zsb_l2c"></a>
+     <a name="c360_a_ai_ec_manage_quality_alerts_task_3__image_glj_zsb_l2c"></a><img alt="モデルインスペクターでアラートに対応します。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_ec_manage_model_alerts_inspector.png" id="c360_a_ai_ec_manage_quality_alerts_task_3__image_glj_zsb_l2c" style="width:600px;">
+    </div></div>
+   <a name="c360_a_ai_ec_manage_quality_alerts_task_3__steps_hlj_zsb_l2c"></a><ol id="c360_a_ai_ec_manage_quality_alerts_task_3__steps_hlj_zsb_l2c"><li>
+     <span>モデルをクリックして、その設定を表示します。ここで、アラート種別や郡など、モデルアラートの詳細を確認できます。</span>
+    </li><li>
+     <span>モデルに影響する問題についての詳細は、アラートの下のセクションを参照してください。</span>
+    </li><li>
+     <span>(省略可能) 後でアラートを確認するには、[ミュート] <strong class="uicontrol">を</strong>クリックします。アラートを確認して対処する準備が整ったら、ミュートを解除できます。</span>
+    </li><li>
+     <span>モデルに影響する問題を確認するには、[<strong class="uicontrol">Review Alerts (アラート</strong>の確認)] をクリックします。モデルの設定が開き、さらにアクションを実行できます。</span>
+    </li></ol>
+
+  
+ </div>
+
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_ec_personalized_recommendations">
+<h1 class="slds-text-heading_large">リアルタイム予測を使用したパーソナライズされたおすすめの促進</h1>
+ 
+ <p>AIモデル(旧Einstein Studio)の予測モデルでは、Salesforce Personalizationでパーソナライズされたおすすめを通知するリアルタイムの予測を生成できます。このインテグレーションにより、カスタマイズされたエクスペリエンスの提供が可能になり、エンゲージメントを高めることができます。顧客の生涯価値の年間支出を予測するか、または購入してパーソナライズ決定ターゲティングルールのモデルの予測を使用して、さまざまなコンテンツレコメンデーション戦略を提供します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+  <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table><p>Salesforce Personalization ターゲティングルールを使用するために必要なエディションと権限については、「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=mktg.persnl_personalization_point_targeting_rules_create.htm&amp;language=ja&amp;type=5">ターゲティングルールの作成</a>」を参照してください。</p><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d151312e65" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d151312e65" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">ユーザーが AI モデルでモデルを管理できるようにする</td>
+
+       <td headers="d151312e65" style="vertical-align:top;" class="slds-cell-wrap">AI モデルでモデルを作成、更新、削除できます。</td>
+
+      </tr>
+     </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d151312e95" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">権限セット </th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d151312e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="権限セット">Data Cloud アーキテクト</td>
+
+       <td headers="d151312e95" style="vertical-align:top;" class="slds-cell-wrap">モデルの作成、更新、削除、有効化など、すべての AI モデル機能へのシステム管理者レベルのアクセス権。</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d151312e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="権限セット">「Data Cloud ユーザー」</td>
+
+       <td headers="d151312e95" style="vertical-align:top;" class="slds-cell-wrap">モデルを使用するための制限されたアクセス権 (モデルから派生した予測や改善の取得など)。</td>
+
+      </tr>
+     </tbody></table><p>Salesforce Personalization の AI モデルで予測モデルを使用する場合、次の点を考慮してください。</p><a name="c360_a_ai_ec_personalized_recommendations__ul_sv4_ztl_vgc"></a><ul id="c360_a_ai_ec_personalized_recommendations__ul_sv4_ztl_vgc">
+    <li>パーソナライズマップは、ゼロから作成されたモデルでのみサポートされます。接続モデルはサポートされていません。</li>
+
+    <li>ゼロから作成したモデルをリアルタイムのプロファイルデータグラフに対応付けることができます。</li>
+
+    <li>ディメンションのない直接属性と計算済みインサイトをゼロから作成したモデルに対応付けることができます。計算済みインサイトには数値データ型が必要です。</li>
+
+   </ul>
+</div>
+  <div><p>Salesforce Personalization でパーソナライズされたおすすめを提供するモデルを設定する手順は、次のとおりです。</p><p>開始する前に、AIモデルで<a target="_blank" href="#c360_a_ai_ec_create_model"><u>モデルをゼロ</u></a>から作成する必要があります。</p></div>
+  <ol><li>
+    <span>[AI モデル] の [予測モデル] タブで、モデルをクリックします。予測を提供できるようにするには、モデルを有効化する必要があります。</span>
+   </li><li>
+    <span>モデルの詳細から、[インテグレーション] タブをクリックします。</span>
+   </li><li>
+    <span>Personalization Map を新規作成するには、<strong class="uicontrol">［New］</strong> をクリックします。</span>
+    <div><div style="text-align:left;">
+     <a name="c360_a_ai_ec_personalized_recommendations__image_n3q_bzj_xgc"></a><img alt="パーソナライズマップを管理できるモデルの詳細の [インテグレーション] タブ。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_ec_predictive_create_personalization_map.png" id="c360_a_ai_ec_personalized_recommendations__image_n3q_bzj_xgc" style="width:700px;">
+    </div></div>
+   </li><li>
+    <span>データスペースとプロファイルデータグラフを選択します。</span>
+    <div>
+     <div style="text-align:left;">
+      <a name="c360_a_ai_ec_personalized_recommendations__image_kpq_4hk_xgc"></a><img alt="Personalization Map Builder で、使用するデータスペース、データグラフ、データを選択します。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_ec_predictive_personalization_map_data.png" id="c360_a_ai_ec_personalized_recommendations__image_kpq_4hk_xgc" style="width:700px;">
+     </div>
+    </div>
+   </li><li>
+    <span>パーソナライズされた予測を生成するために使用するデータグラフマップの項目を特定します。</span>
+   </li><li>
+    <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+   </li><li>
+    <span>対応付けを確認します。</span>
+    <div><div>
+     <a name="c360_a_ai_ec_personalized_recommendations__image_ljj_zhk_xgc"></a><img alt="Personalization Map Builder で、地図を作成する準備ができたらデータ設定を確認して保存します。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_ec_predictive_personalization_map_review.png" id="c360_a_ai_ec_personalized_recommendations__image_ljj_zhk_xgc" style="width:700px;">
+    </div></div>
+   </li><li>
+    <span>設定を保存します。</span>
+   </li></ol>
+
+  <div><p>モデルをリアルタイムプロファイルデータグラフにリンクしたら、Salesforce Personalization ターゲティングルールでモデルを使用してパーソナライズされたおすすめを取得できます。</p></div>
+ 
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=mktg.persnl_esi_realtime_prediction_for_persnl.htm&amp;language=ja&amp;type=5">Salesforce ヘルプ: パーソナライズのための Einstein Studio モデル予測</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_ec_quality_alert_auc">
+<h1 class="slds-text-heading_large">曲線下面積 (AUC) 品質アラート</h1>
+  <p>曲線下面積 (AUC) は、バイナリ分類のパフォーマンス指標です。2 つのクラス (肯定と否定、true と false、yes と no など) を区別するモデルの能力を測定します。AUC は、さまざまなしきい値設定で偽陽性率 (FPR) に対する真陽性率 (TPR) をプロットする受信者動作特性 (ROC) 曲線から取得されます。</p>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">考慮すべきアクション</h2><ul>
+        <li>AUC が低い場合は、モデルのパフォーマンスが低いことを示します。モデルを有効化する前に、モデルを改善することを検討してください。</li>
+
+        <li>高い AUC は、モデルのパフォーマンスが非常に高いため、データ漏洩が発生している可能性があることを示します。データ漏洩の原因となる変数を調査してモデルから削除します。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">検出方法</h2><p>モデルビルダーでは、次の値に基づいて AUC が高いまたは低いことが検出されるとアラートが表示されます。</p><ul>
+        <li>0.6 を下回る (低)</li>
+
+        <li>0.95 を上回る (高)</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">例</h2><p>ある通信会社は、顧客が 1 か月以内に離脱する可能性を予測したいと考えています。会社はこれらの入力変数を使用してバイナリモデルを作成します。</p><ul>
+        <li>顧客在職期間</li>
+
+        <li>月額料金</li>
+
+        <li>internet service type (インターネットサービス種別)</li>
+
+        <li>苦情の数</li>
+
+        <li>コール数</li>
+
+        <li>データ使用量</li>
+
+      </ul>
+<p>モデルのトレーニング後、AUC スコアが想定よりも低かったため、アラートが表示されます (トレーニング AUC=0.58)。スコアはランダムな推測 (AUC=0.5) よりもわずかに優れています。これは、モデルが顧客を離脱させるか、サービスを続行させるかを区別できないことを示しています。この問題を解決するには、次の点を考慮してください。</p><ul>
+        <li>「顧客満足度スコア」、「顧客とのやりとり」、「競合他社のプレゼンス」などの追加変数を使用して、予測精度を向上させます。</li>
+
+        <li>小さいグループ (チャーン) をオーバーサンプリングして不均衡なデータを改善するか、モデルのトレーニング中にクラスの加重を使用してチャーンデータの重要性を高めます。</li>
+
+        <li>データベースをクリーンアップして、不一致、異常値、欠損値を削除します。</li>
+
+        <li>ビジネス目標に基づいて精度と取り消しのバランスを取るように AUC しきい値を調整します。</li>
+
+        <li>線形モデルのパフォーマンスが低い場合は、ランダムフォレストや勾配ブースティングなど、より複雑なモデリングアルゴリズムを使用します。</li>
+
+        <li>更新されたデータセットを使用してモデルを再トレーニングします。</li>
+
+      </ul>
+</div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_ec_quality_alert_collinearity">
+<h1 class="slds-text-heading_large">多重共線性アラート</h1>
+ <p>多重共線性は、データセットの複数の変数 (「市区郡」と「郵便番号」など) の相関関係が高いことを示します。これらの変数は結果に重複の影響を及ぼす可能性があるため、高い共線性は過学習につながる可能性があります。つまり、モデルはトレーニングデータでは適切に機能しますが、モデルがまだ公開されていないデータでは適切に機能しない可能性があります。</p>
+
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">考慮すべきアクション</h2><p>結果を改善するには、1 つの変数のみを選択します。最もわかりやすい項目 (「city」など) を使用して、インサイトをよりわかりやすくします。</p></div>
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">検出方法</h2><p>モデルビルダーでは、多重共線性をテストする Cramér の V アルゴリズムが 2 つの変数で 0.5 以上の値を返すと、データアラートが表示されます。</p></div>
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">例</h2><p>ある不動産会社が新規物件の住宅価格を予測したいと考えています。これを実現するために、代理店は次の入力変数を使用して回帰モデルを作成します。</p><ul>
+    <li>住宅の規模 (平方フィート)ft)</li>
+
+    <li>ベッドルームの数</li>
+
+    <li>バスルームの数</li>
+
+    <li>家屋の年数</li>
+
+    <li>収入中央値</li>
+
+    <li>改築状況</li>
+
+   </ul>
+<p>モデルのトレーニング後にアラートが表示されるのは、「家のサイズ」、「寝室の数」、「バスルームの数」変数の相関関係が高いためです。その結果、モデルでは各変数の重要度を判断できず、係数の信頼性が低下します。この問題を解決するには、次の点を考慮してください。</p><ul>
+    <li>相関変数のいずれかを除外して、まだトレーニングされていないデータの汎化を改善します。たとえば、データセットから「house size (家のサイズ)」を含めて「number ofbedrooms (ベッドルームの数)」を除外します。</li>
+
+    <li>主成分分析 (PCA) や放物線回帰などの変数選択手法を使用して、冗長性を減らします。</li>
+
+    <li>更新されたデータセットを使用してモデルを再トレーニングします。</li>
+
+   </ul>
+</div>
+ 
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_ec_quality_alert_cross_validation">
+<h1 class="slds-text-heading_large">交差検証失敗アラート</h1>
+ <p>交差検証では、データセットを複数の部分に分割し、ある部分でモデルをトレーニングし、別の部分で検証することで、モデルがどの程度目に見えないデータに一般化されるかを評価します。失敗は、トレーニングデータが十分に大きくない場合、使用する例が少なすぎる場合、無効な形式、欠損値、異常値がある場合に発生します。</p>
+
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">考慮すべきアクション</h2><p>K 分割交差検証の 1 つの分割のパフォーマンスが他の分割とは大きく異なっています。トレーニングデータで異常値または異常データを調査し、それに応じて絞り込んでください。</p></div>
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">検出方法</h2><p>モデルビルダーでは、いずれかの分割でパフォーマンスの大きな違いが検出されるとアラートが表示されます。</p></div>
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">例</h2><p>ある小売ブランドは、在庫を最適化して在庫の補充を改善できるように、さまざまな店舗での商品の週次需要を予測したいと考えています。これを実現するために、小売業者は次の入力変数を使用して回帰モデルを作成してトレーニングします。</p><ul>
+    <li>ストア ID</li>
+
+    <li>商品 ID</li>
+
+    <li>price</li>
+
+    <li>昇格</li>
+
+    <li>在庫数</li>
+
+    <li>季節</li>
+
+    <li>週次売上</li>
+
+   </ul>
+<p>モデルのトレーニング後、交差検証に失敗したためアラートが表示されます。データセットに商品データ、店舗データ、または販売履歴データがない場合や、交差検証用のデータ分割が失敗する可能性があります。この問題を解決するには、次の点を考慮してください。</p><ul>
+    <li>「商品種別」や「店舗種別」など、属性が豊富な入力変数を使用してモデルを再トレーニングします。「商品 ID」や「ストア ID」は使用しないでください。</li>
+
+    <li>将来の情報が漏洩する可能性がある「週末在庫数」などの変数を削除すると、モデルの信頼性が低下します。</li>
+
+    <li>データセットが小さすぎる (行数、列数、またはその両方が少なすぎる) 場合は、より多くのデータを使用します。</li>
+
+   </ul>
+</div>
+ 
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_ec_quality_alert_data_leakage">
+<h1 class="slds-text-heading_large">データ漏洩アラート</h1>
+ <p>データ漏洩は、モデルのトレーニングデータに予測しようとしている情報が含まれている場合に発生します。漏洩により、モデルのトレーニングでスコアが楽観的に高くなりますが、ライブデータでの精度が低下します。実際には使用できない学習パターンにモデルを誘導し、予測を損なう可能性があります。</p>
+
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">考慮すべきアクション</h2><p>変数のデータ漏洩を調査します。検出された場合、モデルからこの変数を除外します。</p></div>
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">検出方法</h2><p>モデルビルダーでは、常に同じ結果の説明変数が検出されるとアラートが表示されます。</p></div>
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">例</h2><p>貸し手は、顧客がローンを不履行にするかどうかを予測したいと考えています。これを実現するために、貸し手は次の入力変数を使用してバイナリモデルを作成します。</p><ul>
+    <li>経過時間</li>
+
+    <li>収入</li>
+
+    <li>クレジットスコア</li>
+
+    <li>貸付金額</li>
+
+    <li>loan status (ローン状況)</li>
+
+    <li>支払履歴</li>
+
+    <li>ローン最終支払日</li>
+
+   </ul>
+<p>トレーニング後、データ漏洩が検出されたため、モデルにアラートが表示されます。「ローン状況」変数と「支払履歴」変数の値は、ローンが承認され、一部が返済された後にのみ決定されます。このような情報を含めると、モデルが予測を行うときに現実的に使用できない将来のデータが漏洩します。この問題を解決するには、次の点を考慮してください。</p><a name="c360_a_ai_ec_quality_alert_data_leakage__ul_ccb_czm_d2c"></a><ul id="c360_a_ai_ec_quality_alert_data_leakage__ul_ccb_czm_d2c">
+    <li>トレーニングセットから「ローン状況」、「支払履歴」、「ローン最終支払日」入力変数を除外します。</li>
+
+    <li>「経過時間」、「収入」、「クレジットスコア」、「ローン金額」の代わりに、ローン承認時に把握された変数を使用します。</li>
+
+    <li>更新されたデータセットを使用してモデルを再トレーニングします。</li>
+
+   </ul>
+</div>
+ 
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_ec_quality_alert_high_frequency_values">
+<h1 class="slds-text-heading_large">高頻度値アラート</h1>
+ <p>頻度が高い値は、変数のほとんどの値が同じカテゴリにあることを示します。これは、変数で提供される予測値が少なく、モデルへの貢献度が制限される可能性があることを示します。</p>
+
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">考慮すべきアクション</h2><p>データ値のより均等な分布で変数を更新します。または、モデルから変数を削除することを検討します。</p></div>
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">検出方法</h2><p>データセットの 1 つの値が 90% 以上の確率で出現する (相対頻度 0.9 以上) と、モデルビルダーに変数のアラートが表示されます。</p></div>
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">例</h2><p>E コマース小売業者は、さまざまな地域でブランドを購入する顧客の傾向を予測したいと考えています。これを実現するために、小売業者は次の入力変数を使用して回帰モデルを作成します。</p><ul>
+    <li>商品 ID</li>
+
+    <li>顧客 ID</li>
+
+    <li>販売チャネル</li>
+
+    <li>購入頻度</li>
+
+    <li>region</li>
+
+   </ul>
+<p>モデルトレーニング後にアラートが表示されるのは、このデータによると、ブランドを購入する可能性の高い顧客の 95% が米国にいて、カナダにはわずか 5% しかいないためです。このモデルは、USA がブランドの顧客にとって最適な地域であることを前提としています。ただし、「地域」変数は変動性が低いため、この変数は予測には意味がありません。この問題を解決するには、次の点を考慮してください。</p><ul>
+    <li>1 つの値を使用して、支配的でない値を削除します。たとえば、カナダではなく米国の顧客データがあるとします。または、データセットから「region」変数を削除します。</li>
+
+    <li>USA 以外の地域のデータ値をより適切に表現した更新されたデータセットを使用してモデルを再トレーニングします。</li>
+
+   </ul>
+</div>
+ 
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_ec_quality_alert_imbalanced_distribution">
+<h1 class="slds-text-heading_large">不均衡な分布アラート</h1>
+ <p>不均衡な分布は、トレーニングデータの各クラスの観測の不均衡な比率を示します。</p>
+
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">考慮すべきアクション</h2><p>不均衡なデータセットでモデルをトレーニングすると、予測にバイアスがかかってモデルの信頼性が低下する可能性があります。モデルバージョンを作成すると、Einstein は次の処理を実行します。</p><ul>
+    <li>データのアップサンプリングにより、小数クラスの頻度を増やす。</li>
+
+    <li>異常なイベント、定期的でないイベント、または頻繁ではないイベントを反映する正しい値。</li>
+
+   </ul>
+</div>
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">検出方法</h2><p>不均衡な分布が検出されると、モデルビルダーによって自動的にアラートが表示されます。</p></div>
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">例</h2><p>ある E コマース会社は、顧客がサブスクリプションをキャンセルするか離脱するかを予測したいと考えています。これを実現するために、会社は次の入力変数を使用してバイナリ分類モデルを作成します。</p><ul>
+    <li>顧客 ID</li>
+
+    <li>月間コスト</li>
+
+    <li>毎月のログイン頻度</li>
+
+    <li>サブスクリプション種別</li>
+
+    <li>在職期間</li>
+
+    <li>離脱</li>
+
+   </ul>
+<p>モデルのトレーニング後、変数「離脱」のクラス分布が不均衡で、顧客の 95% が有効、5% のみが離脱と表示されているため、アラートが表示されます。この不均衡により、モデルは「有効な」顧客を優先的に予測し、離脱した顧客を正確に識別する能力が低下する可能性があります (偽陰性率高)。この問題を解決するには、次の点を考慮してください。</p><ul>
+    <li>アラートで提供される推奨事項に従って、データセットのバランスを取ります。</li>
+
+    <li>更新されたデータセットを使用してモデルを再トレーニングします。</li>
+
+   </ul>
+</div>
+ 
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_ec_quality_alert_outliers">
+<h1 class="slds-text-heading_large">異常値アラート</h1>
+ <p>異常値とは、データセットの大部分と大きく異なるデータポイントのことです。このアラートは、少なくとも 1 つの異常値が検出され、異常に小さいまたは大きい数値が存在することを示します。異常値は、モデルのパフォーマンスを歪めたり、精度を低下させたり、販売予測を誤ったものにしたりする可能性があります。</p>
+
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">考慮すべきアクション</h2><p>異常値には 2 種類があります。</p><ul>
+    <li>データ入力エラー、処理エラー、またはその他の問題により、不正な値。</li>
+
+    <li>異常なイベント、定期的でないイベント、または頻繁ではないイベントを反映する正しい値。</li>
+
+   </ul>
+</div>
+  <div><p>調査して、保持する異常値とモデルから除外する異常値を決定します。モデルのトレーニングの前に、誤った値を除外して修正することを検討してください。</p></div>
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">検出方法</h2><p>変数の場合、モデルビルダーは次のようになります。</p><ul>
+    <li>は、その値のグローバル平均とグローバル標準偏差を計算します。</li>
+
+    <li>は、グローバル平均から 5 標準偏差以上離れた値として異常値を指定します。</li>
+
+   </ul>
+</div>
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">例</h2><p>小売業者がさまざまな商品の販売台数を予測したいと考えているとします。これを実現するために、小売業者は次の入力変数を使用して回帰モデルを作成します。</p><ul>
+    <li>商品 ID</li>
+
+    <li>単価</li>
+
+    <li>曜日</li>
+
+    <li>店舗ロケーション</li>
+
+    <li>在庫状況</li>
+
+    <li>競合他社の単価</li>
+
+    <li>プロモーションイベント</li>
+
+   </ul>
+<p>モデルのトレーニング後、商品の高い異常値スコアが検出されたため、アラートが表示されます。ほとんどの商品は 1 日あたり 10 ～ 100 個を販売しますが、レコードでは 1 日あたり 1000 個以上を販売しています。この問題を解決するには、次の点を考慮してください。</p><ul>
+    <li>エラーによって発生した可能性があるデータポイントを削除します。</li>
+
+    <li>トレーニング中に異常値スコアを含めて、モデルが通常の販売金額を示すパターンを学習できるようにします。次に、データを使用して、標準から大幅に逸脱する取引を特定します。</li>
+
+    <li>更新されたデータセットを使用してモデルを再トレーニングします。</li>
+
+   </ul>
+</div>
+ 
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_ec_quality_alert_r2">
+<h1 class="slds-text-heading_large">R<sup>2</sup> 品質アラート</h1>
+ <p>R<sup>2</sup> (R 二乗)、つまり決定係数は、回帰モデルがどの程度データに適合するかを評価するパフォーマンス評価指標です。</p>
+
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">考慮すべきアクション</h2><ul>
+    <li>低い R<sup>2</sup> は、モデルのパフォーマンスが低いことを示します。有効化する前にモデルを改善します。</li>
+
+    <li>高い R<sup>2</sup> は、モデルのパフォーマンスが非常に高いため、データ漏洩が発生している可能性があることを示します。データ漏洩の原因となっている変数を調査して削除します。</li>
+
+   </ul>
+</div>
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">検出方法</h2><p>モデルビルダーでは、これらの値に基づいて高または低の R<sup>2</sup> スコアが検出されるとアラートが表示されます。</p><ul>
+    <li>0.3 未満 (低)</li>
+
+    <li>0.95 を上回る (高)</li>
+
+   </ul>
+</div>
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">例</h2><p>ある小売ブランドは、各店舗の月間売上を予測したいと考えています。これを実現するために、小売業者は次の入力変数を使用して回帰モデルを作成します。</p><ul>
+    <li>店舗サイズ (sq.ft)</li>
+
+    <li>従業員数</li>
+
+    <li>1 日あたりの平均顧客占有面積</li>
+
+    <li>1 か月あたりの広告費</li>
+
+    <li>地域の個体群密度</li>
+
+   </ul>
+<p>モデルのトレーニング後、R 二乗スコアが 0.45 で低いとみなされるため、アラートが表示されます。このスコアは、モデルが「月次売上」目標変数の変動の 45% のみを説明しており、売上に影響する他の要素は把握していないことを示しています。したがって、予測は信頼できない可能性があります。この問題を解決するには、次の点を考慮してください。</p><ul>
+    <li>「店舗プロモーション」や「競合他社の近接性」などの追加変数を使用して、モデルのパフォーマンスを向上させます。</li>
+
+    <li>データ品質をチェックして、欠損値、異常値、矛盾を特定します。</li>
+
+    <li>より多くの販売履歴データを使用して、データの品質を向上させます。</li>
+
+    <li>線形モデルのパフォーマンスが低い場合は、ランダムフォレストや勾配ブースティングなど、より複雑なモデリングアルゴリズムを使用します。</li>
+
+    <li>実際の売上と予測売上の差を比較して、パターンや矛盾を明らかにします。</li>
+
+    <li>更新されたデータセットを使用してモデルを再トレーニングします。</li>
+
+   </ul>
+</div>
+ 
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_ec_regression_metrics">
+<h1 class="slds-text-heading_large">回帰総計値</h1>
+  <p>回帰の総計値は、連続データの数値を予測するモデルの性能を評価するのに役立ちます。</p>
+
+    
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">予測 vs 実際</h2><p>予測された散布図と実際の散布図は、モデルの予測結果と実際のデータ結果を対比させます。対角線に対する点の近さはモデルの精度を示し、点が近いほど精度が高いことを表します。</p><p>
+      <span style="vertical-align:text-bottom;display:inline-block;"><img alt="予測グラフと実際のグラフ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_ec_regression_metrics_predicted_actual.png" style="width:600px;margin-bottom:0;"></span>
+    </p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">残差</h2><p>残差の散布図は、予測値に対する実際の値と予測値の間の分散 (残差と呼ばれます) を示します。点がランダムに分布しているように見えることが理想です。Y 軸の正の値は予測が低すぎたことを示し、負の値は予測が高すぎたことを示し、ゼロの値は予測が正確に正しかったことを示します。</p><p>
+      <span style="vertical-align:text-bottom;display:inline-block;"><img alt="残差グラフ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_ec_regression_metrics_residuals.png" style="width:600px;margin-bottom:0;"></span>
+    </p></div>
+    
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">4 回の交差検証の結果</h2><p>4 回の交差検証のアプローチは、モデルの検証プロセスのサンプリングバイアスを減らします。この方法では、データをランダムに 4 つの同じサイズのパーティションに分割し、モデルは 4 つのテストパス (分割) を通ります。各パスでは 3 つのパーティションがトレーニングデータ、残りのパーティションがテストデータとして機能します。4 つのテストパスが完了すると、各パーティションは検証セットとして 1 回機能し、トレーニングセットの一部として 3 回機能したことになり、包括的な評価が保証されます。検証結果のテーブルを参照して、データの各分割に対応する総計値を調べます。</p><p>
+      <span style="vertical-align:text-bottom;display:inline-block;"><img alt="交差検証メトリクステーブル" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_ec_regression_metrics_4fold_cross_validation.png" style="width:600px;margin-bottom:0;"></span>
+      </p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:17.36111111111111%"><col style="width:82.63888888888889%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d91807e81" style="vertical-align:top;" class="slds-cell-wrap" scope="col">指標</th>
+              <th id="d91807e84" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d91807e81" style="vertical-align:top;" class="slds-cell-wrap" data-label="指標">レコード数</td>
+
+              <td headers="d91807e84" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>観測の合計数。値の意味は、列ごとに異なります。</p><ul><li>[<strong class="uicontrol">Training Data (トレーニングデータ</strong>)] 列と [<strong class="uicontrol">Validation Data (</strong>検証データ)] 列の場合、数値はそれぞれトレーニングと検証のモデルの作成で使用されるデータ全体の観測の合計数を表します。</li>
+<li><strong class="uicontrol">[分割 #1]</strong> ～ <strong class="uicontrol">[分割 #4]</strong> 列の場合、この値はその分割に含まれる観測数 (データ全体の約 25%) を表します。</li>
+</ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d91807e81" style="vertical-align:top;" class="slds-cell-wrap" data-label="指標">R<sup>2</sup></td>
+
+              <td headers="d91807e84" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p><em>R<sup>2</sup></em> は、モデルでどれくらい結果の変動を説明できるのかを測定します。これはモデルの予測能力を示す指標になります。</p><p>範囲:</p><ul><li>0 は、モデルで結果のどの変動も説明できないことを意味します (偶然)。</li>
+<li>1 は、モデルですべての変動を説明できることを意味します (完全モデル)。</li>
+</ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d91807e81" style="vertical-align:top;" class="slds-cell-wrap" data-label="指標">MAE</td>
+
+              <td headers="d91807e84" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">平均絶対誤差。実際の値と予測値の絶対差を測定します。この平均では、すべての差が均等に荷重されるため、MSE ほど異常値に対する感度は高くありません。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d91807e81" style="vertical-align:top;" class="slds-cell-wrap" data-label="指標">MSE</td>
+
+              <td headers="d91807e84" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">平均二乗誤差。モデルの予測の平均二乗誤差を測定します。MSE は、観測された (実際の) 結果と予測値の平方差を計算して平均します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d91807e81" style="vertical-align:top;" class="slds-cell-wrap" data-label="指標">RMSE</td>
+
+              <td headers="d91807e84" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">二乗平均平方根誤差。MSE の平方根を表します。RMSE は、モデルの予測値と観測された (実際の) 値の差を測定します。この値は、「誤差の標準偏差」と考えることができます。</td>
+
+            </tr>
+            
+          </tbody></table></div>
+  
+</div>
+
+
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_ec_set_actionable_variables">
+<h1 class="slds-text-heading_large">アクション可能変数の設定 </h1>
+  <p>モデルビルダーのアクション可能変数は、モデルの予測結果に影響を与えるために変更できる項目です。アクション可能変数を設定すると、モデルで処方箋 (結果を改善するためにユーザーが実行できる推奨アクション) を提供できます。</p>
+
+    
+    <ol><li>
+        <span>AIモデル(旧称Einstein Studio)で、[予測モデル]タブに移動します。</span>
+      </li><li>
+        <span>モデルをクリックします。</span>
+        <div>
+          <p>予測と処方箋を取得するには、モデルが有効化されていることを確認します。</p>
+        </div>
+        <div>
+          <div id="c360_a_ai_ec_set_actionable_variables__fig_w5d_yt2_yfc" style="text-align:left;"><a name="c360_a_ai_ec_set_actionable_variables__fig_w5d_yt2_yfc"></a>
+            <a name="c360_a_ai_ec_set_actionable_variables__image_o1w_4p2_yfc"></a><img alt="モデルのリストが表示されているモデルビルダーの [予測] タブのリストビュー。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_ec_predictive_models_list_view.png" id="c360_a_ai_ec_set_actionable_variables__image_o1w_4p2_yfc" style="width:700px;">
+          </div>
+        </div>
+      </li><li>
+        <span>モデルから、[インテグレーション] タブをクリックして、処方箋の変数を設定します。</span>
+        <div><div style="text-align:left;">
+            <a name="c360_a_ai_ec_set_actionable_variables__image_d1y_mq2_yfc"></a><img alt="モデルビルダーでアクション可能変数を設定する予測モデルの [インテグレーション] タブ。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_ec_predictive_model_integrations.png" id="c360_a_ai_ec_set_actionable_variables__image_d1y_mq2_yfc" style="width:700px;">
+          </div></div>
+      </li><li>
+        <span><strong class="uicontrol">[+</strong>] アイコンをクリックして、アクション可能変数として設定するフィールドを検索して選択します。</span>
+        <div><div style="text-align:left;">
+            <a name="c360_a_ai_ec_set_actionable_variables__image_chp_tr2_yfc"></a><img alt="アクション可能変数を設定するオプションが表示されている予測モデルの [インテグレーション] タブ。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_ec_predictive_model_set_actionable_variables.png" id="c360_a_ai_ec_set_actionable_variables__image_chp_tr2_yfc" style="width:700px;">
+          </div></div>
+      </li><li>
+        <span>予測結果に影響する可能性がある変数を選択します。モデルビルダーでは、ここで設定した変数に基づいて処方箋が提案されます。</span>
+        <div>
+          <p>モデルから処方箋を取得するには、少なくとも 1 つのアクション可能変数を設定します。</p>
+        </div>
+        <div><div style="text-align:left;">
+            <a name="c360_a_ai_ec_set_actionable_variables__image_r5m_5s2_yfc"></a><img alt="この予測モデルに設定できるアクション可能な変数が表示されている [変数を設定] モーダル。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_ec_predictive_model_select_actionable_variables.png" id="c360_a_ai_ec_set_actionable_variables__image_r5m_5s2_yfc" style="width:700px;">
+          </div></div>
+      </li><li>
+        <span><strong class="uicontrol">[適用]</strong> をクリックします。</span>
+      </li></ol>
+
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_ec_use_cases">
+<h1 class="slds-text-heading_large">サポートされる予測モデル種別</h1>
+  <p>予測モデルは、一般的なビジネスの使用事例に対処します。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="#c360_a_ai_ec_use_cases">数値の回帰</a></strong><br>数値 (回帰) の使用事例は、通貨、件数、パーセントなど、量的データ (基準) として表される数値結果を目標とします。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_ai_ec_use_cases">テキストのバイナリ分類</a></strong><br>バイナリ分類ソリューションは、テキストデータとして表される 2 つの結果のみを使用するビジネス成果を対象とします。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_ai_ec_use_cases">マルチクラス分類</a></strong><br>マルチクラス分類ソリューションでは、詳細な予測、実際の状況との密接な連携、対象を絞ったアクションの実行が可能です。</li></ul>
+<div id="c360_a_ai_ec_regression" lang="ja-jp" aria-labelledby="ariaid-title2" class="nested1"><a name="c360_a_ai_ec_regression"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">数値の回帰</h2>
+  
+  <p>数値 (回帰) の使用事例は、通貨、件数、パーセントなど、量的データ (基準) として表される数値結果を目標とします。</p>
+
+    <div><h3 class="slds-text-heading_small slds-p-top_small">回帰の例</h3><p>AIモデル(旧Einstein Studio)で作成されたモデルが組織の数値結果の改善にどのように役立つかを示すいくつかの例を次に示します。</p><ul><li>商談の予測金額</li>
+<li>商談の予測成立時間</li>
+<li>取引先の予測顧客生涯価値</li>
+<li>ケースの予測顧客満足度</li>
+</ul>
+</div>
+    <div><h3 class="slds-text-heading_small slds-p-top_small">回帰でサポートされるアルゴリズム</h3><ul>
+        <li>一般化された線形モデル (GLM) - 線形回帰</li>
+
+        <li>XGBoost</li>
+
+        <li>勾配ブーストマシン (GBM)</li>
+
+        
+      </ul>
+</div>
+  
+</div>
+<div id="c360_a_ai_ec_binary_classification" lang="ja-jp" aria-labelledby="ariaid-title3" class="nested1"><a name="c360_a_ai_ec_binary_classification"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">テキストのバイナリ分類</h2>
+  
+  <p>バイナリ分類ソリューションは、テキストデータとして表される 2 つの結果のみを使用するビジネス成果を対象とします。</p>
+
+    <div><h3 class="slds-text-heading_small slds-p-top_small">バイナリ結果</h3><p>通常、この結果はビジネス用語で表現される「はい」か「いいえ」の質問です (離脱したかどうか、商談が成立したかどうか、従業員が留まったかどうか、など)。分析目的で、AIモデル(旧Einstein Studio)は2つの値をboolean値のtrueとfalseに変換します。</p></div>
+    <div><h3 class="slds-text-heading_small slds-p-top_small">バイナリ分類ソリューションの例</h3><p>AI モデルで作成されたモデルが組織のバイナリ分類の結果を改善するのにどのように役立つかを示すいくつかの例を次に示します。</p><ul>
+        <li>商談成立の確度を予測する</li>
+
+        <li>取引先が特定の商品を購入する確度を予測する</li>
+
+        <li>リードが取引を開始する確度を予測する</li>
+
+        <li>取引先が離脱する確度を予測する</li>
+
+      </ul>
+</div>
+    <div><h3 class="slds-text-heading_small slds-p-top_small">バイナリ分類でサポートされるアルゴリズム</h3><ul>
+        <li>一般化された線形モデル (GLM) - ロジスティック回帰</li>
+
+        <li>XGBoost</li>
+
+        <li>勾配ブーストマシン (GBM)</li>
+
+        
+      </ul>
+</div>
+  
+</div>
+<div id="c360_a_ai_ec_multiclass_classification" lang="ja-jp" aria-labelledby="ariaid-title4" class="nested1"><a name="c360_a_ai_ec_multiclass_classification"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">マルチクラス分類</h2>
+  
+  <p>マルチクラス分類ソリューションでは、詳細な予測、実際の状況との密接な連携、対象を絞ったアクションの実行が可能です。</p>
+
+    <div><h3 class="slds-text-heading_small slds-p-top_small">マルチクラスの結果</h3></div>
+    <div><p>AIモデル（旧Einstein Studio）を使用すると、マルチクラス分類を使用して、レコードが3つまたは最大50個のバケットのいずれかに分類される可能性を予測できます。[はい] と [いいえ] の 2 つの結果を提供するバイナリ分類とは対照的に、マルチクラスモデルでは複数の結果を処理できます。</p></div>
+    <div><h3 class="slds-text-heading_small slds-p-top_small">マルチクラス分類ソリューションの例</h3><p>次のマルチクラスの使用事例を使用して、組織の結果を改善します。</p><ul>
+        <li>複数のアップセルまたはクロスセルオプションから最も可能性の高い商品を予測</li>
+
+        <li>サービスのカタログから最も可能性の高い商品カテゴリを予測する</li>
+
+        <li>商談ライフサイクルの最も可能性の高い次の販売フェーズを予測する</li>
+
+        <li>サポートケースをいくつかのケース理由カテゴリのいずれかに分類する</li>
+
+        <li>取引先をいくつかの定義済みの顧客セグメントのいずれかに分類する</li>
+
+      </ul>
+<p>たとえば、マーケティングチームはマルチクラス分類を使用して、特定の顧客にとって最も効果的なコミュニケーションチャネルを予測します。特定の商品のキャンペーンを対象とするために、モデルではレコードがさまざまなカテゴリに属する確率が評価されます。顧客が電話、メール、チャットなどのタッチポイントを使用する場合、モデルではデモグラフィックと過去のやりとりを分析して適切なチャネルを推奨します。正確なターゲティングにより、購入、アップセル、またはブランドロイヤルティの向上を促進する最適なマーケティングチャネルが顧客に提供されます。</p></div>
+  
+</div>
+</div>
+
+
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_flow_builder_predictions">
+<h1 class="slds-text-heading_large">Flow Builder での予測の使用</h1>
+  <p>有効化されたモデルからの出力を使用して自動化を作成し、意思決定に役立てます。AIモデル(旧称Einstein Studio)で有効化された予測モデルは、フローでアクションとして表示されます。すべてのフロー種別を使用し、目標に基づいてフローを選択できます。たとえば、ビジネスプロセスでユーザー入力が必要な場合や、特定のデータをユーザーに表示する場合は、画面フローを使用します。レコードの作成、更新、削除後に実行できるアクションを自動化する場合は、レコードトリガーフローを使用します。 </p>
+<ul><li class="slds-p-bottom_small"><strong><a href="ai_models-2.html#c360_a_ai_screen_flow_predictions">画面フローを使用した予測によるレコードの強化</a></strong><br>Salesforceオブジェクトからレコードを取得し、Lightningページに予測を追加する画面フローを作成します。たとえば、リード取引開始予測スコアをリードレコードに追加できます。</li><li class="slds-p-bottom_small"><strong><a href="ai_models-2.html#c360_a_ai_record_triggered_flow_predictions">レコードトリガーフローを使用した予測の変更時のアクションの自動化</a></strong><br>レコードが作成、更新、削除されたときにアクションを自動的に実行します。ケースの予測スコアが更新されてしきい値を超えた場合 (ケースのエスカレーションを示す)、フローを使用してアクションを作成する方法を見てみましょう。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.flow_ref_elements_actions_list.htm&amp;language=ja&amp;type=5">Salesforce ヘルプ: 提供されるフローコアアクション</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_foundation_models">
+<h1 class="slds-text-heading_large">Bring Your Own Large Language Model (独自の大規模言語モデル) </h1>
+  <p>BYOLLM(Bring Your Own Large Language Model)機能を使用すると、外部プラットフォームでホストされる基盤モデルを追加して、AIモデル(旧称Einstein Studio)に接続できます。基盤モデルを使用して、生成 AI を強化するモデル設定を作成できます。モデルを本番にリリースする前に、モデル Playground でさまざまな設定を使用してプロンプトに対するモデルの応答を評価します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">Einstein生成AIはLightning Experienceで使用できます。Einstein 生成 AI の設定は Lightning Experience で使用できます。</td>
+
+     </tr>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Sales、Einstein for Platform、または Einstein for Service アドオンが付属する <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、および <strong>Unlimited</strong> Edition。Einstein for Sales、Einstein for Platform、またはEinstein for Serviceアドオンを購入する場合は、Salesforceアカウント エグゼクティブにお問い合わせください。</td>
+
+     </tr>
+    </tbody></table>
+    
+    <a name="c360_a_ai_foundation_models__image_l23_bfl_1cc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="Einstein Trust Layer の図。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/trust_layer_full.png" id="c360_a_ai_foundation_models__image_l23_bfl_1cc" style="margin-bottom:0;"></span>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#c360_a_ai_foundation_models_create">基盤モデルの追加</a></strong><br>AIモデル(旧称Einstein Studio)に基盤モデルを追加すると、外部モデル プロバイダーとSalesforce間のエンドポイント接続が確立されます。モデルを接続したら、新しいモデル設定を作成し、カスタムプロンプトに対するモデルの応答を評価します。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_ai_foundation_models_edit_delete">基盤モデルの編集または削除</a></strong><br>モデルが他のモデルのソースでない限り、ほとんどの基盤モデル設定を編集できます。ソースとして使用される場合は、まず関連付けられたすべてのモデル設定を削除する必要があります。不要になった基盤モデルは削除できます。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_ai_foundation_models_configured_monitor">モデル活動の監視</a></strong><br>ダッシュボードでモデル推測の使用状況とエラーを表示します。重要なインジケーターを使用して、モデルのパフォーマンスを追跡、調整、および改善できます。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=ai.generative_ai_enable.htm&amp;language=ja&amp;type=5">Salesforce ヘルプ: Einstein 生成 AI の設定</a></li><li><a target="_blank" href="https://developer.salesforce.com/docs/einstein/genai/guide/supported-models.html">Salesforce 開発者: サポートされるモデル</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=ai.prompt_builder_about.htm&amp;language=ja&amp;type=5">Salesforce ヘルプ: プロンプトビルダー</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=000384438&amp;language=ja&amp;type=1">Knowledge Article: Salesforce Core Services - IP Addresss and Domains to Allow (Salesforce コアサービス - 許可する IP アドレスとドメイン)</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_foundation_models_configure">
+<h1 class="slds-text-heading_large">モデル設定の作成 </h1>
+  <p>基盤モデルを追加したら、特定の使用事例に関連付けられたモデル設定を作成できます。</p>
+
+    <ol><li>
+        <span> AIモデル(旧称Einstein Studio)で、[<strong class="uicontrol">新規設定]</strong>をクリックします。</span>
+      </li><li>
+        <span>モデル Playground で、[<strong class="uicontrol">Create model</strong>] を選択します。</span>
+      </li><li>
+        <span>使用する基盤モデルを選択します。</span>
+      </li><li>
+        <span>[高度な設定] で、モデルの学習プロセスを制御するハイパーパラメーターを定義します。</span>
+        <div>これらの値は、トレーニングで重要であり、プロンプトの応答に影響します。</div>
+        <ul>
+          <li>
+            <p>温度</p>
+            <p>0 ～ 2 の値で応答の創造性を決定します。 値が低いほど、応答の一貫性が高まります。値が大きいほど (0.7 ～ 0.9 など)、ランダムな応答が生成されます。生成するテキストの一貫性やクリエイティブ性に基づいて、値を指定します。</p>
+            <p>この設定をテストに使用できるのは Anthropic モデルのみです。</p>
+          </li>
+
+          <li>頻度ペナルティ<p>応答での同じトークン (単語、語句、コード) を頻繁に使用しないようにします。-2.0 ～ 2.0 の値を指定します。 生成されるテキストの繰り返しを減らすには、より高い値を使用します。</p></li>
+
+          <li>プレゼンスペナルティ<p dir="ltr">応答でさまざまなトークンの使用を促します。-2.0 ～ 2.0 の値を指定します。 生成されたテキストで使用されていないトークンを含めるには、より高い値を使用します。</p></li>
+
+        </ul>
+
+      </li><li>
+        <span>プロンプト設定を定義します。</span>
+        <div>
+          <a name="c360_a_ai_foundation_models_configure__ul_jcy_w3f_1cc"></a><ul id="c360_a_ai_foundation_models_configure__ul_jcy_w3f_1cc">
+            <li>[プロンプト] セクションに移動して、[<strong class="uicontrol">設定]</strong> をクリックします。</li>
+
+            <li>入力するプロンプトごとに停止シーケンスとデータマスキングを指定します。</li>
+
+          </ul>
+
+        </div>
+      </li><li>
+        <span>モデル構成設定を最初から定義する場合は、[デフォルトに<strong class="uicontrol">戻す] を</strong>クリックします。</span>
+      </li><li>
+        <span>モデル Playground を終了し、[生成] タブでモデルを表示するには、[<strong class="uicontrol">閉じる] を</strong>クリックします。</span>
+      </li></ol>
+
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_foundation_models_configured_edit">
+<h1 class="slds-text-heading_large">モデル設定の編集</h1>
+  <p>さまざまなプロンプトを試してハイパーパラメーターを調整し、モデルがプロンプトにどの程度適切に応答するかを評価します。ただし、モデルがすでにプロンプトに関連付けられている場合は、代わりに新しいモデルを作成します。モデル設定を更新すると、関連付けられたプロンプトのパフォーマンスに影響する可能性があります。</p>
+
+    <ol><li>
+        <span>AI モデル (旧 Einstein Studio) の [生成] タブで、モデルをクリックして設定を編集します。</span>
+      </li><li>
+        <span>モデル Playground で、[<strong class="uicontrol">モデルを編集</strong>] をクリックします。</span>
+      </li><li>
+        <span>プロンプト、プロンプト設定、ハイパーパラメーターを変更します。次に、[<strong class="uicontrol">更新] を</strong>クリックします。</span>
+      </li></ol>
+
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_foundation_models_configured_monitor">
+<h1 class="slds-text-heading_large">モデル活動の監視</h1>
+  <p>ダッシュボードでモデル推測の使用状況とエラーを表示します。重要なインジケーターを使用して、モデルのパフォーマンスを追跡、調整、および改善できます。</p>
+
+    <p>設定したモデルのパフォーマンスを監視するには、[AI Models (formerly Einstein Studio) Model Home (AI モデル (旧 Einstein Studio) モデルホーム)] に移動します。モデルを選択し、[モデル活動] タブを参照します。</p>
+    <div id="c360_a_ai_foundation_models_configured_monitor__section_kfl_fz1_tzb"><a name="c360_a_ai_foundation_models_configured_monitor__section_kfl_fz1_tzb"></a><h2 class="slds-text-heading_medium slds-p-top_small">推測</h2><p dir="ltr">基礎モデルは、大規模なデータセットで事前にトレーニングされていますが、人間のようなテキストを生成したり、特定の言語関連タスクを実行したりする際には、推論中のプロンプトからも学習します。モデルを調整し、ドメイン固有の要件に合わせてハイパーパラメーターを微調整することも重要です。モデルの効率、リリースインフラストラクチャ、および倫理的な影響も考慮する必要があります。</p><p dir="ltr">モデル活動は、特定の期間に使用されたすべての設定済みモデルからのすべての推測のスナップショットを提供します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">エラー</h2><p dir="ltr">モデルの操作およびリリース中にエラーが発生する可能性があります。これらのエラーは、実世界のアプリケーションにおける LLM のパフォーマンス、信頼性、およびセキュリティに影響を与える可能性があります。一般的な問題としては、不正確な応答やバイアスのかかった応答、待ち時間やスケーラビリティの問題などがあります。</p></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_foundation_models_configured_prompts">
+<h1 class="slds-text-heading_large">プロンプトのテスト</h1>
+  <p>モデルを本番環境にする前に、モデル Playground でプロンプトを使用してテストし、モデルのハイパーパラメーター設定に基づいて生成された応答を評価します。</p>
+
+    <ol><li>
+        <span>モデル Playground に、質問や ToDo などのプロンプトを入力します。</span>
+        <div>
+          <p>たとえば、新規顧客にオンライン商談を提供するメールを作成するプロンプトを入力します。</p>
+        </div>
+      </li><li>
+        <span><strong class="uicontrol">[設定]</strong> をクリックします。</span>
+      </li><li>
+        <span>各プロンプトの応答数と停止シーケンスを入力します。</span>
+      </li><li>
+        <span>テスト中に機密情報をマスキングするには、データマスキングを有効にします。モデル Playground でマスキングを有効にしない場合、組織レベルのデータマスキング設定が適用されます。</span>
+        <div>
+          <p>これらのプロンプト設定は、テスト中にのみ使用されます。モデル設定には保存されません。</p>
+        </div>
+      </li><li>
+        <span>プロンプト応答を取得するには、<strong class="uicontrol">［Generate］</strong> をクリックします。</span>
+      </li><li>
+        <span>プロンプトを評価するには、<strong class="uicontrol">[デバッグ]</strong> をクリックします。</span>
+      </li><li>
+        <span>テストプロンプトの品質に満足したら、作業を保存してモデル Playground を終了します。</span>
+      </li></ol>
+
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_foundation_models_create">
+<h1 class="slds-text-heading_large">基盤モデルの追加</h1>
+  <p>AIモデル(旧称Einstein Studio)に基盤モデルを追加すると、外部モデル プロバイダーとSalesforce間のエンドポイント接続が確立されます。モデルを接続したら、新しいモデル設定を作成し、カスタムプロンプトに対するモデルの応答を評価します。</p>
+
+    <div><p>Bring Your Own LLM (BYOLLM) は、基盤モデルプロバイダーとして Google の Amazon Bedrock、Azure OpenAI、OpenAI、Vertex AI をサポートしています。LLM Open Connectorを使用するには、[Connect to your LLM]オプションを使用します。これにより、主要なクラウド プラットフォームでホストされている、または自分でホストしている任意の言語モデルにEinstein AI Platformを接続できます。</p><p>基盤モデルを追加するには、Einstein生成AIが組織で有効になっている必要があります。詳細は、Salesforce ヘルプの<a target="_blank" href="https://help.salesforce.com/s/articleView?id=ai.generative_ai_enable.htm&amp;language=ja&amp;type=5">「Einstein 生成 AI の設定」</a>を参照してください。</p><p>モデルエンドポイントに接続するには、その URL と認証情報が必要です。プロバイダーのダッシュボードで次の詳細を確認してください。</p><p>LLM Open Connector の場合、URL は <samp class="filepath">/chat/completions</samp> で終わる必要があります。URL パスがこの要件を満たしていない場合、Open Connector は URL パスに <samp class="filepath">/chat/completions</samp> を自動的に追加します。</p></div>
+    <ol><li>
+        <span>AI モデルで、[生成] タブに移動します。</span>
+      </li><li>
+        <span>[<strong class="uicontrol">基盤モデルを追加</strong>] をクリックします。 <div><img alt="基盤モデルを追加するオプションが表示されている Einstein Studio モデルビルダー。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_add_foundation_model.png" style="width:800px;"></div></span>
+      </li><li>
+        <span>接続する基盤モデルの種別を選択し、[<strong class="uicontrol">次へ</strong>] をクリックします。<a name="c360_a_ai_foundation_models_create__image_ngw_2jc_ccc"></a><div><img alt="追加可能な基盤モデルが表示されている Einstein Studio モデルビルダー。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_choose_type_google_vertex_ai.png" id="c360_a_ai_foundation_models_create__image_ngw_2jc_ccc" style="width:800px;"></div></span>
+      </li><li>
+        <span>モデルエンドポイントに接続します。</span>
+        <ol>
+          <li>
+            <span>エンドポイント名と URL を入力します。</span>
+            <div>
+              <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> リモートモデルエンドポイントに接続するには、標準 HTTPS 443 ポートが必要です。</div></div></div>
+
+            </div>
+          </li>
+
+          <li>
+            <span>認証の詳細を入力します。</span>
+            <div>独自の Azure Open AI モデルを使用する場合は、[OAuth] を選択して指定ログイン情報を選択できます。詳細は、<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.nc_named_creds_and_ext_creds.htm&amp;language=ja&amp;type=5">Salesforce ヘルプの</a>「指定ログイン情報と外部ログイン情報の作成」を参照してください</div>
+          </li>
+
+          <li>
+            <span>モデル情報を入力します。</span>
+            <div>Azure Open AI モデルを接続する場合は、Azure リリースを入力します。この情報は、[リリース] の Azure OpenAI ダッシュボードにあります。OpenAI で微調整されたモデルを接続する場合は、設定時に促されたら [<strong class="uicontrol">Yes] を</strong>選択します。</div>
+            <div>サポートされるモデルについての詳細は、<a target="_blank" href="https://help.salesforce.com/s/articleView?id=ai.generative_ai_large_language_model_support.htm&amp;language=ja&amp;type=5">「大規模言語モデルのサポート」</a>を参照してください。</div>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[保存 &amp; テスト]</strong> をクリックします。</span>
+          </li>
+
+          <li>
+            <span>接続するモデルの正確な名前を入力します。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[接続]</strong> をクリックします。</span>
+          </li>
+
+          <li>
+            <span>モデルの名前を入力し、[<strong class="uicontrol">名前と接続</strong>] をクリックします。</span>
+          </li>
+
+          <li>
+            <span>モデルバージョンを選択します。</span>
+            <div>
+              <p>プロンプトに対するモデルで生成されたテキスト応答に「朗読」への参照が表示されることがあります。詳細は、『<a target="_blank" href="https://ai.google.dev/api/rest/v1/GenerateContentResponse">Google Gemini API Reference</a>』を参照してください。</p>
+            </div>
+          </li>
+
+          <li>
+            <span>モデル種別を選択します。</span>
+            <div> Amazon Bedrock の場合は、Anthropic を使用します。モデルのリストについては、「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=ai.generative_ai_large_language_model_support.htm&amp;language=ja&amp;type=5">Large Language Model Support</a> (大言語モデルのサポート)」を参照してください。</div>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>基盤モデルを使用するには、[基盤モデル] タブに移動して設定します。</span>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=ai.generative_ai_enable.htm&amp;language=ja&amp;type=5">Salesforce ヘルプ: Einstein 生成 AI の設定</a></li><li><a target="_blank" href="https://developer.salesforce.com/docs/einstein/genai/guide/supported-models.html">Salesforce 開発者: サポートされるモデル</a></li><li><a target="_blank" href="https://opensource.salesforce.com/einstein-platform/open-connector">Einstein Platform Cookbook： Introducing the LLM Open Connector （Einstein プラットフォーム料理本： LLM Open コネクタの概要）</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_foundation_models_edit_delete">
+<h1 class="slds-text-heading_large">基盤モデルの編集または削除</h1>
+  <p>モデルが他のモデルのソースでない限り、ほとんどの基盤モデル設定を編集できます。ソースとして使用される場合は、まず関連付けられたすべてのモデル設定を削除する必要があります。不要になった基盤モデルは削除できます。</p>
+
+    <a name="c360_a_ai_foundation_models_edit_delete__steps_mm3_s4r_tzb"></a><ol id="c360_a_ai_foundation_models_edit_delete__steps_mm3_s4r_tzb"><li>
+        <span>[AI Models (formerly Einstein Studio) Generative (AI モデル (旧 Einstein Studio) 生成)] タブで、基盤モデルを選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[設定を編集]</strong> をクリックします。</span>
+        <ul>
+          <li>モデル設定を編集し、[<strong class="uicontrol">更新]</strong> をクリックします。</li>
+
+          <li>モデルを削除するには、[<strong class="uicontrol">Delete Model (モデル</strong>を削除)] をクリックします。削除されたモデルは復元できません。</li>
+
+        </ul>
+
+      </li></ol>
+
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_foundation_models_prompt_templates">
+<h1 class="slds-text-heading_large">プロンプトテンプレートの作成 </h1>
+  <p>モデル Playground の 1 つ以上のテストプロンプトに対するモデルの応答に満足したら、プロンプトテンプレートを作成します。</p>
+
+    <ul>
+      <li>[生成] タブで、モデルに移動し、アクションメニューオプションをクリックしてプロンプトテンプレートを作成します。</li>
+
+      <li>モデルの詳細から、プロンプトテンプレートを作成します。</li>
+
+    </ul>
+
+    <div id="c360_a_ai_foundation_models_prompt_templates__fig_m4h_ljc_ccc"><a name="c360_a_ai_foundation_models_prompt_templates__fig_m4h_ljc_ccc"></a>
+      <a name="c360_a_ai_foundation_models_prompt_templates__image_n4h_ljc_ccc"></a><img alt="プロンプトテンプレートを作成するオプションが表示されている Einstein Studio Salesforce 対応モデル。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_create_prompt_template.png" id="c360_a_ai_foundation_models_prompt_templates__image_n4h_ljc_ccc" style="width:800px;">
+    </div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=ai.prompt_builder_build_template.htm&amp;language=ja&amp;type=5">Salesforce ヘルプ: プロンプトテンプレートの作成</a></li><li><a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/modules/prompt-fundamentals">Trailhead: プロンプトの基礎</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_foundation_models_test">
+<h1 class="slds-text-heading_large">モデル Playground でのモデルの設定とテスト</h1>
+  <p>モデル Playground でモデル設定を作成、編集、評価します。設定や専門的な専門知識は必要ありません。Playgroundモデルでは、データのプライバシーとセキュリティを確保するTrustレイヤーを使用します。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="#c360_a_ai_foundation_models_configure">モデル設定の作成</a></strong><br>基盤モデルを追加したら、特定の使用事例に関連付けられたモデル設定を作成できます。</li><li class="slds-p-bottom_small"><strong><a href="governance-1.html#c360_a_ai_foundation_models_data_masking">データマスキング</a></strong><br>Salesforce 組織とモデル Playground のデータマスキング設定によって、機密情報のプライバシーと、そのデータが応答でどのように表示されるかが決まります。組織レベルの設定はデフォルトで有効になっています。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_ai_foundation_models_configured_edit">モデル設定の編集</a></strong><br>さまざまなプロンプトを試してハイパーパラメーターを調整し、モデルがプロンプトにどの程度適切に応答するかを評価します。ただし、モデルがすでにプロンプトに関連付けられている場合は、代わりに新しいモデルを作成します。モデル設定を更新すると、関連付けられたプロンプトのパフォーマンスに影響する可能性があります。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_ai_foundation_models_configured_prompts">プロンプトのテスト</a></strong><br>モデルを本番環境にする前に、モデル Playground でプロンプトを使用してテストし、モデルのハイパーパラメーター設定に基づいて生成された応答を評価します。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_ai_foundation_models_prompt_templates">プロンプトテンプレートの作成</a></strong><br>モデル Playground の 1 つ以上のテストプロンプトに対するモデルの応答に満足したら、プロンプトテンプレートを作成します。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=ai.generative_ai_trust_setup.htm&amp;language=ja&amp;type=5">Salesforce ヘルプ: Einstein Trust Layer の設定</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_glossary">
+<h1 class="slds-text-heading_large">予測 AI の用語集</h1>
+  <p>AIモデル(旧Einstein Studio)での予測AIによく関連する用語を理解しておきましょう。</p>
+
+    <div><dl>
+        
+          <dt id="c360_a_ai_glossary__actionable_variable" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__actionable_variable"></a>アクション可能な変数</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__actionable_variable_definition"><a name="c360_a_ai_glossary__actionable_variable_definition"></a><dfn>アクション可能な変数</dfn>とは、特定の顧客に使用するマーケティングキャンペーンの決定など、ユーザーが制御または影響を及ぼすことができる説明変数です。この変数を、顧客の住所や個人の年齢など、制御できない説明変数と対比します。変数がアクション可能として指定されている場合、モデルは指示的分析を使用して、<dfn>予測</dfn>結果を改善するためにユーザーが実行できるアクションを推奨します&nbsp;。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__actual_outcome" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__actual_outcome"></a>実際の結果</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__actual_outcome_definition"><a name="c360_a_ai_glossary__actual_outcome_definition"></a><em>実際の結果</em>とは、結果が発生した後の観測の結果変数の実際の値です。モデルのパフォーマンスは、予測結果が実際の結果にどれほど近いかを比較することで計算します。実際の結果は、<em>観測された結果</em>と呼ばれることもあります。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__algorithm" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__algorithm"></a>アルゴリズム</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__algorithm_definition"><a name="c360_a_ai_glossary__algorithm_definition"></a><em>アルゴリズム</em>は、予測モデリングでモデルを作成するために使用されます。AIモデルで作成されたモデルは、いくつかのアルゴリズムのいずれかを使用します。GLM(一般化された線形モデル)は回帰ベースのアルゴリズムですが、GBM(勾配ブースティング マシン)とXGBoostはディシジョン ツリー ベースの機械学習アルゴリズムです。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__attribute" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__attribute"></a>属性</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__attribute_definition"><a name="c360_a_ai_glossary__attribute_definition"></a><em>「変数」</em>を参照してください。</span>
+          </dd>
+        
+        
+        
+          <dt id="c360_a_ai_glossary__auth_header" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__auth_header"></a>認証ヘッダー</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__auth_header_definition"><a name="c360_a_ai_glossary__auth_header_definition"></a><em>認証ヘッダー</em>は、API 要求の実行時にクライアントからサーバーに送信される HTTP 要求の一部です。要求されたリソースにアクセスするためのクライアント ID および権限を検証するためにサーバーが使用する情報を提供します。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__binary" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__binary"></a>バイナリ分類</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__binary_outcome_definition"><a name="c360_a_ai_glossary__binary_outcome_definition"></a><em>バイナリ分類</em>の使用事例は、バイナリであるビジネス結果、つまり成立/不成立、合格/失敗、公開/非公開、維持/離脱などの 2 つの値のみを含むカテゴリ (テキスト) 項目に適用されます。これらの結果により、データが 2 つの個別のグループに分類されます。Einstein は分析目的で 2 つの値を Boolean 値の true と false に変換します。ロジスティック回帰は、バイナリ結果を分析するために使用されます。バイナリ分類は、AI モデルで作成されたモデルがサポートする主要な使用事例の 1 つです。<em>回帰</em>と比較してください。</span>
+          </dd>
+        
+        
+        
+        
+          <dt id="c360_a_ai_glossary__cardinality" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__cardinality"></a>カーディナリティ</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__cardinality_definition"><a name="c360_a_ai_glossary__cardinality_definition"></a><em>カーディナリティ</em>とは、カテゴリ内の個別値の数です。カーディナリティの高い (個別値が非常に多い) 変数では、解釈が難しい複雑さをもたらすことがあります。AI モデルで作成されたモデルは、変数ごとに最大 100 個のカテゴリをサポートします。必要に応じて、残りのカテゴリ (観測数が 25 個未満のカテゴリ) を <strong class="uicontrol">[その他]</strong> というカテゴリに統合できます。null 値は、<strong class="uicontrol">[未定義]</strong> というカテゴリに配置されます。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__categorical_variable" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__categorical_variable"></a>カテゴリ変数</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__categorical_variable_definition"><a name="c360_a_ai_glossary__categorical_variable_definition"></a><em>カテゴリ変数</em>は、定性的な値 (カテゴリ) を表す変数の種別です。バイナリ分類の使用事例を表すモデルには、その結果としてカテゴリ変数が含まれます。<em>「カテゴリ」</em>を参照してください。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__category" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__category"></a>カテゴリ</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__category_definition"><a name="c360_a_ai_glossary__category_definition"></a><em>カテゴリ</em>は、通常は商品カテゴリ、リード状況、ケース件名などのカテゴリ (テキスト) データを含む、定性的な値です。カテゴリは、データのグループ化や絞り込みに便利です。数値変数とは異なり、カテゴリで計算を行うことはできません。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__causation" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__causation"></a>因果関係</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__causation_definition"><a name="c360_a_ai_glossary__causation_definition"></a><em>因果関係</em>は、状況の原因と結果の関係を説明します。予測モデリングでは、因果関係は、たとえば、変数と結果変数間で変数がどの程度相互に影響している (または影響していない) かを表します。一部の変数は、明白で直接的な影響を相互に及ぼしている可能性があります (価格と割引が販売利益に及ぼす影響など)。また、それほど明白ではない、弱い影響を及ぼしている可能性がある変数もあります (天候が、時間どおりの配送に及ぼす影響など)。多くの変数は相互に影響しません。変数は独立しており、相互に排他的です (サッカーチームの勝敗記録や通貨換算レートなど)。変数間の因果関係を、単に変数間の統計的相関のみに基づいて想定できないことに注意してください。実際には、相関関係では、該当の変数間の関連付けをさらに調査するための<em>ヒント</em>が提供されます。詳細な探索を行ってのみ、これらの項目間に因果関係が実際に存在するかどうかを判断でき、存在する場合は、その影響の重要度を判断できます。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__coefficient" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__coefficient"></a>係数</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <em>係数</em><span id="c360_a_ai_glossary__coefficient_definition"><a name="c360_a_ai_glossary__coefficient_definition"></a>とは、結果変数に対する変数 (または変数のペア) の影響を表す数値です。係数は、変数に 1 単位の変化があったときの結果変数の平均の変化を定量化します。モデルの他のすべての変数はそのまま維持されることを前提としています。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__correlation" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__correlation"></a>相関関係</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__correlation_definition"><a name="c360_a_ai_glossary__correlation_definition"></a><em>相関関係</em>とは、2 つ以上の状況間の単なる<em>関連付け</em>、つまり「相互関係」です。予測モデリングでは、相関関係は変数間 (通常は変数と結果変数間) の統計的な関連付けを説明します。相関関係の強度はパーセントとして定量化されます。パーセントが高いほど、相関関係が強くなります。ただし、相関関係は因果関係<em>ではありません</em>。相関関係は、単に変数間の関連付けの強度を説明します。変数が互いに因果的な影響を及ぼしているかどうかを説明するものではありません。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__count" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__count"></a>件数</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__count_definition"><a name="c360_a_ai_glossary__count_definition"></a><em>件数</em>は、モデルのトレーニングに関連付けられている観測 (行) の数です。件数は、データ内のすべての観測、または関連付けられた検索条件を満たす観測のサブセットを表すことができます。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__date" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__date"></a>日付変数</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__date_definition"><a name="c360_a_ai_glossary__date_definition"></a><em>日付変数</em>は、日付/時間 (一時) データを含む変数の種別です。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__dependent_variable" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__dependent_variable"></a>連動変数</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__dependent_variable_definition"><a name="c360_a_ai_glossary__dependent_variable_definition"></a><em>「結果変数」</em>を参照してください。</span>
+          </dd>
+        
+        
+        
+        
+          <dt id="c360_a_ai_glossary__drift_values" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__drift_values"></a>ドリフト</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__drift_definition"><a name="c360_a_ai_glossary__drift_definition"></a>時間が経つにつれて、リリース済みモデルのパフォーマンスが<em>ドリフト</em>し、結果の予測精度が低下する可能性があります。ドリフトは、データやビジネス環境の要素が変化することにより発生する可能性があります。また、ドリフトは、モデルの基盤となっているデータに組み込まれている、使用されなくなった仮定により発生することもあります。モデルがドリフトした場合は、データ設定を調整したり、モデルを新しいデータで再トレーニングしたりすることで、モデルを更新して修復できます。</span>
+          </dd>
+        
+        
+        
+          <dt id="c360_a_ai_glossary__endpoint_url" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__endpoint_url"></a>エンドポイント URL</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__endpoint_url_definition"><a name="c360_a_ai_glossary__endpoint_url_definition"></a>特定の API またはサービスにアクセスできる場所を表す URL。API のエンドポイントを操作する要求を実行できる場所です。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__ethical_ai" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__ethical_ai"></a>倫理的な使用</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__ea_ethical_ai_definition"><a name="c360_a_ai_glossary__ea_ethical_ai_definition"></a>倫理的な使用とは、AI と機械学習を公正で偏りのない目的に応用することを意味します。AI モデルを使用すると、倫理的で説明可能なモデル、インサイト、予測を作成できます。概要については、Trailhead モジュールの<a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/modules/responsible-creation-of-artificial-intelligence">「人工知能の責任ある作成」</a>を受講してください。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__feature" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__feature"></a>機能</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__feature_definition"><a name="c360_a_ai_glossary__feature_definition"></a>「<em>予測変数</em>」を参照してください。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__feature_selection" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__feature_selection"></a>機能の選択</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__feature_selection_definition"><a name="c360_a_ai_glossary__feature_selection_definition"></a><em>機能の選択</em>では、モデルの最適な機能 (予測変数) のセットを選択します。モデルには、結果変数の変動を最適に説明する変数の数を含めることをお勧めします。変数が少なすぎるモデルはデータの基本パターンを検出するにはあいまいすぎて、学習不足のモデルが生成される可能性があります。変数が多すぎるモデルはデータ内の不要な情報を除外するには過度に具体的かつ複雑であり、過学習のモデルが生成される可能性があります。成功する特徴の選択には、有意な潜伏変数 (モデルにない重要な変数) がなく、最も影響力のある変数が含まれます。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__generalized_linear_model" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__generalized_linear_model"></a>一般化された線形モデル (GLM)</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__generalized_linear_model_definition"><a name="c360_a_ai_glossary__generalized_linear_model_definition"></a><em>一般線形モデル</em>は、モデルを作成するために使用される等式ベースのモデリングアルゴリズムです。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__goal" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__goal"></a>目標</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__goal_definition"><a name="c360_a_ai_glossary__goal_definition"></a><em>目標</em>では、モデルの目的の結果を指定します。モデルの目標には、その結果変数と、目的とする結果の方向 (最小化または最大化) が含まれます。たとえば、目標として、利益率の最大化やコストの最小化が考えられます。予測モデリングでは、モデルの目標を使用して分析とトレーニングをガイドします。<em>「結果変数」</em>を参照してください。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__gradient_boosting" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__gradient_boosting"></a>勾配ブースティング</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__gradient_boosting_definition"><a name="c360_a_ai_glossary__gradient_boosting_definition"></a><em>勾配ブースティング</em>は、モデルを構築するために使用するディシジョンツリーベースのアンサンブル機械学習アルゴリズムです。<em>勾配ブースティングマシン</em> (<em>GBM</em>) とも呼ばれます。</span>
+          </dd>
+        
+        
+        
+          <dt id="c360_a_ai_glossary__importance" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__importance"></a>重要性</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__importance_definition"><a name="c360_a_ai_glossary__importance_definition"></a><em>重要度</em>は、モデルの予測結果に対する変数の相対的な影響度です。AI モデルで作成されたモデルの場合、重要度は、結果を予測するときにモデルが変数を使用する量を示します。重要度のレベルはパーセントとして定量化されます。パーセントが高いほど、影響が大きくなります。重要度は、変数間のインタラクションを考慮する高度な評価指標です。2 つの変数に高い相関関係があり、類似する情報が含まれている場合、モデルはより適切な変数を選択して使用します。たとえば、エネルギー使用量を予測する場合、温度とエアコンの稼働時間の変数は両方とも高度に相関していますが、重要度スコアが高くなるのはいずれか一方の変数のみです。</span>
+          </dd>
+        
+        
+        
+          <dt id="c360_a_ai_glossary__independent_variable" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__independent_variable"></a>独立変数</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__independent_variable_definition"><a name="c360_a_ai_glossary__independent_variable_definition"></a>「<em>予測変数</em>」を参照してください。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__inference" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__inference"></a>推測</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__inference_definition"><a name="c360_a_ai_glossary__inference_definition"></a><em>推測</em>とは、AIモデルのAIモデルによって生成されるあらゆるタイプのデータ出力です。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__k-fold" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__k-fold"></a>k 分割交差検証</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__k-fold_definition"><a name="c360_a_ai_glossary__k-fold_definition"></a>データのすべての観測を 4 つの同じサイズの個別のパーティションにランダムに分割するモデル検証プロセス。次に、4 つのテストパス (分割) を実行します。3 つのパーティションはトレーニングセットとして機能し、1 つのパーティションはテストセットとして機能します。総計値は 4 つすべての分割で平均されます。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__key_based_auth" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__key_based_auth"></a>キーベースの認証</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__key_based_auth_definition"><a name="c360_a_ai_glossary__key_based_auth_definition"></a>API エンドポイントへのアクセスを承認するために API キーを使用する認証。API キーは、API を保護し、特定のリソースへのアクセスを制御する一般的な方法です。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__leakage" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__leakage"></a>漏洩</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__leakage_definition"><a name="c360_a_ai_glossary__leakage_definition"></a><em>漏洩</em>は、モデルのトレーニングに使用したデータに、予測しようとしている情報を含む変数が 1 つ以上含まれている場合に発生します。これにより、実際にはモデルに問題がある場合でも、非常に正確なモデルになる可能性があります。データ漏洩を修復するには、漏洩の原因となっている変数をモデルからすべて削除します。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__linear_regression" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__linear_regression"></a>線形回帰</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__linear_regression_definition"><a name="c360_a_ai_glossary__linear_regression_definition"></a><em>線形回帰</em>は、数値の使用事例で使用される分析手法です。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__logistic_regression" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__logistic_regression"></a>ロジスティック回帰</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__logistic_regression_definition"><a name="c360_a_ai_glossary__logistic_regression_definition"></a><em>ロジスティック回帰</em>は、バイナリ分類の使用事例で使用される分析手法です。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__lurking_variable" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__lurking_variable"></a>潜伏変数</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__lurking_variable_definition"><a name="c360_a_ai_glossary__lurking_variable_definition"></a><em>潜伏変数</em>とは、モデルにはないが、結果変数の変動を有意に説明する変数です。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__mean" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__mean"></a>平均値</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__mean_definition"><a name="c360_a_ai_glossary__mean_definition"></a><em>平均</em>は、すべての項目を項目数で除算した統計的な平均です。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__model" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__model"></a>モデル</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <em>モデル</em><span id="c360_a_ai_glossary__model_definition"><a name="c360_a_ai_glossary__model_definition"></a>は、将来の結果を予測するために使用された過去の結果に関する包括的かつ統計的な理解に基づく高度なカスタム表現です。モデルは、1 つ以上の予測変数の値を入力として受け入れて、予測結果を出力として生成します。要求に応じて、上位の要素と改善も生成されます。 </span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__model_builder" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__model_builder"></a>モデルビルダー</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__model_builder_definition"><a name="c360_a_ai_glossary__model_builder_definition"></a><em>モデルビルダー</em>は、モデルの作成、接続、編集に使用される AI モデルのツールです。</span>
+          </dd>
+        
+        
+        
+          <dt id="c360_a_ai_glossary__modeling_algorithm" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__modeling_algorithm"></a>モデリングアルゴリズム</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__modeling_algorithm_definition"><a name="c360_a_ai_glossary__modeling_algorithm_definition"></a>モデリング アルゴリズムは、AIモデルがモデルの作成に使用するものです。Einstein ではいくつかのアルゴリズムのいずれかが使用されます。一般化された線形モデル (GLM) は線形アルゴリズムです。勾配ブースティングマシン (GBM) と XGBoost はディシジョンツリーベースの機械学習アルゴリズムです。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__model_performance" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__model_performance"></a>モデルのパフォーマンス</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;"><span id="c360_a_ai_glossary__model_performance_definition"><a name="c360_a_ai_glossary__model_performance_definition"></a>モデルのパフォーマンスは、予測モデルのパフォーマンスを説明するために使用される評価指標です。これらの評価指標 (適合度統計とも呼ばれる品質インジケーター) は、モデルの予測がデータセットのトレーニングデータにどの程度適合しているかを示します。Model Performance に表示される品質インジケーターの定義については、「</span><span class="doc_external_link"><a target="_blank" href="https://help.salesforce.com/s/articleView?id=analytics.bi_edd_model_metrics.htm&amp;language=ja&amp;type=5">モデル品質の評価</a></span>」を参照してください。</dd>
+        
+        
+          <dt id="c360_a_ai_glossary__noise" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__noise"></a>ノイズ</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__noise_definition"><a name="c360_a_ai_glossary__noise_definition"></a><em>ノイズ</em>は、結果変数の変動を有意義に説明できないデータです。<em>「シグナル」</em>を参照してください。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__numerical" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__numerical"></a>数値変数</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__numerical_definition"><a name="c360_a_ai_glossary__numerical_definition"></a><em>数値変数</em>は、収益や価格など、定量的な値 (数値) を表す変数の種別です。総収益や平均価格の計算など、数値変数に対して算術処理ができます。数値には常に測定単位 (通貨、量、重量など) が関連付けられています。数値の使用事例を表すモデルには、数値の結果変数が含まれます。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__observation" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__observation"></a>観測</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__observation_definition"><a name="c360_a_ai_glossary__observation_definition"></a><em>観測</em>は、データのインスタンスを表します。観測は、テーブルデータの行、または Salesforce のレコードに似ています。たとえば、モデルの目標が商談成立の最大化である場合、各観測は商談を表します。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__outcome" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__outcome"></a>結果</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__outcome_definition"><a name="c360_a_ai_glossary__outcome_definition"></a><em>結果</em>はビジネスの結果です。結果は通常、販売利益や商談の成立などの重要業績評価指標 (KPI) です。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__outcome_variable" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__outcome_variable"></a>結果変数</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__outcome_variable_definition"><a name="c360_a_ai_glossary__outcome_variable_definition"></a>予測モデリングでは、<em>結果変数</em>は分析および予測の 1 つの主な焦点として使用される項目です。モデルの目標は、結果変数を最大化または最小化することです。結果変数は、<em>応答</em>、<em>対象変数</em>、または<em>従属変数</em>と呼ばれることもあります。<em>「目標」</em>参照。</span>
+          </dd>
+        
+        
+        
+          <dt id="c360_a_ai_glossary__outlier" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__outlier"></a>異常値</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            Einstein でデータの異常値が検出さ<span id="c360_a_ai_glossary__outlier_definition"><a name="c360_a_ai_glossary__outlier_definition"></a>れた場合、変数に平均値から異常に離れた (その変数の平均からの標準偏差の 5 倍以上の) データポイントが含まれることを意味します。データエントリエラーまたはまれなイベントにより発生する可能性がある異常に大きいまたは小さい数値は、平均および標準偏差に影響し、インサイトまたは予測の精度が低下する可能性があります。異常値は、モデルから選択的に除外できます。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__overfitting" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__overfitting"></a>過学習</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            予測モデリング<span id="c360_a_ai_glossary__overfitting_definition"><a name="c360_a_ai_glossary__overfitting_definition"></a>では、データのトレーニングデータでモデルが結果を適切に予測し、新しい未経験のデータ (本番データなど) でモデルが結果を適切に予測しない場合、<em>過学習</em>が発生します。使用する変数が多すぎると、データ内の不要な情報が取得される過度に複雑な予測モデルが生成される可能性があります。過学習を軽減するために、AI モデルで作成されたモデルはリッジ回帰と正規化を使用します。<em>「学習不足」</em>も参照してください。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__performance" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__performance"></a>パフォーマンス</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__performance_definition"><a name="c360_a_ai_glossary__performance_definition"></a>予測モデルの場合、パフォーマンスはモデルがどの程度正確に結果を予測するかの定性的測定で表されます。AIモデルで作成されたモデルの場合、モデルのトレーニング評価指標を使用してパフォーマンスを評価します。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__predicted_outcome" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__predicted_outcome"></a>予測結果</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__predicted_outcome_definition"><a name="c360_a_ai_glossary__predicted_outcome_definition"></a><em>予測結果</em>は、予測モデルが入力データと学習したパターンに基づいて推定または予測する結果です。対象変数に対するモデルの最適な推測を表します。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__prediction" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__prediction"></a>予測</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            AIモデル<span id="c360_a_ai_glossary__prediction_defined"><a name="c360_a_ai_glossary__prediction_defined"></a>では、予測は、予測結果を表す派生値(モデルによって生成される)です。予測は、予測モデルの出力として考えることができます。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__predictive_model" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__predictive_model"></a>予測モデル</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__predictive_model_definition"><a name="c360_a_ai_glossary__predictive_model_definition"></a><em>「モデル」</em>を参照してください。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__predictive_modeling" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__predictive_modeling"></a>予測モデリング</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__predictive_modeling_definition"><a name="c360_a_ai_glossary__predictive_modeling_definition"></a><em>予測モデリング</em>は、AI、機械学習、予測モデリング、統計的手法に基づいて履歴データと現在のデータを分析し、パターンを特定し、将来の結果を確率的に予測する手法です。予測モデリングは、<em>予測分析</em>または<em>予測 AI</em> と呼ばれることもあります。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__predictor_variable" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__predictor_variable"></a>予測因子または予測変数</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__predictor_variable_definition"><a name="c360_a_ai_glossary__predictor_variable_definition"></a>モデルで入力として想定される変数。予測要求では、モデルで必要な各予測変数の値を渡します。指定された入力値に基づいて、モデルの等式によって予測が出力として生成されます。予測因子は<em>機能</em>および<em>独立変数</em>とも呼ばれます。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__prescription" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__prescription"></a>指示</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__prescription_definition"><a name="c360_a_ai_glossary__prescription_definition"></a><em>指示</em>は、求められる結果の可能性を高めることができる推奨アクションです。指示は、<em>アクション可能な変数</em>に関連付けられます。アクション可能な変数は、ユーザーが制御できる説明変数です。推奨アクションを実行すると、<em>予測</em>結果が改善される可能性があります。</span>
+          </dd>
+        
+        
+        
+          <dt id="c360_a_ai_glossary__r2" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__r2"></a>R<sup>2</sup></dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__r2_definition"><a name="c360_a_ai_glossary__r2_definition"></a><em>R<sup>2</sup></em> は、回帰のモデルで結果の変動を説明する能力を測定します。これは、1 つ以上の変数から予測できる結果変数の分散の比率を表します。一般に、R<sup>2</sup> が大きいほど、モデルで結果を予測する精度が高くなります。R<sup>2</sup> は、数値を予測する回帰の使用事例で一般的に使用される総計値です。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__ranked_data" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__ranked_data"></a>ランク付けされたデータ</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__ranked_data_definition"><a name="c360_a_ai_glossary__ranked_data_definition"></a><em>ランク付けされたデータ</em>は、確度でデータを分散するために使用されます。ランク付けされたデータは、累積分数とも呼ばれ、多くの場合、十分位数または四分位数として表示されます。AI モデルで作成されたモデルのトレーニング総計値では、ランク付けされたデータの割合の X 軸にゲイングラフとリフトグラフが描画されます。たとえば、ランク付けされたデータが 0.1 の場合、最上位の十分位数 (スコアが最も高いレコードの 10%) になります。</span>
+          </dd>
+        
+        
+        
+          <dt id="c360_a_ai_glossary__numerical_use_case" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__numerical_use_case"></a>回帰</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__numerical_use_case_definition"><a name="c360_a_ai_glossary__numerical_use_case_definition"></a><em>回帰</em>は、数値結果変数に適用されます。数値項目の予測は、モデル品質を測定する総計値の独自のセットを使用する回帰問題です。予測モデリングでは、線形回帰を数値の結果の予測に使用します。数値の使用事例は、AIモデルで作成されたモデルがサポートする主な使用事例の1つです。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__request" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__request"></a>要求</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__request_definition"><a name="c360_a_ai_glossary__request_definition"></a>エンドポイント要求は、クライアントから特定の URL またはサーバー上のエンドポイントへの要求です。この要求には、HTTP メソッド、ヘッダー、パラメーター、およびリクエストボディ (該当する場合) が含まれます。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__residual" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__residual"></a>残差</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__residual_definition"><a name="c360_a_ai_glossary__residual_definition"></a><em>残差</em>とは、観測値 (実際の値) と予測値との数学的な差です。次のように計算されます: <code>residual=observed value-predicted value</code>。残差は誤差とも呼ばれ、モデルの品質と精度を評価するために使用されます。正の残差は予測が低すぎることを意味し、負の残差は予測が高すぎることを意味します。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__response" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__response"></a>応答</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__response_definition"><a name="c360_a_ai_glossary__response_definition"></a>エンドポイント応答は、クライアントの要求に対するサーバーの応答です。要求には、要求の成功または失敗を示す HTTP 状況コード、応答に関するメタデータを提供するヘッダー、および要求されたデータまたは追加情報を記載するリクエストボディ (該当する場合) が含まれます。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__retriever" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__retriever"></a>Retriever</dt>
+
+          <dd id="c360_a_ai_glossary__retriever_definition" style="padding-left:1.5rem;padding-bottom:.5rem;"><a name="c360_a_ai_glossary__retriever_definition"></a>取得者は、大規模言語モデル (LLM) プロンプトを増強するために、ベクトルデータベースでインデックス付けされたテキストデータから関連する事実を返します。取得者は、プロンプトに正確で最新の関連情報を追加することで、ユーザーの LLM 応答の価値と関連性を向上させます。</dd>
+        
+        
+          <dt id="c360_a_ai_glossary__ridge_regression" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__ridge_regression"></a>リッジ回帰</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__ridge_regression_definition"><a name="c360_a_ai_glossary__ridge_regression_definition"></a><em>リッジ回帰</em>は、AIモデルで作成されたモデルが係数が大きくなりすぎないようにすることでモデルの過学習を軽減するために使用される正規化アプローチです。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__sampling" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__sampling"></a>サンプリング</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__sampling_definition"><a name="c360_a_ai_glossary__sampling_definition"></a>データの分析に必要な時間の短縮を目的として、分析する観測のサブセットをランダムに選択する手法。サンプルは、データの変動を十分に表すことができる大きさにする必要があります。 </span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__score" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__score"></a>スコア</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__score_definition"><a name="c360_a_ai_glossary__score_definition"></a>(名詞) 観測に関連付けられた予測。スコアリングする (動詞): 観測セットの結果を予測するプロセス。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__secret_key" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__secret_key"></a>秘密鍵</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__secret_key_definition"><a name="c360_a_ai_glossary__secret_key_definition"></a>API エンドポイントに関連付けられた秘密の暗号鍵。この鍵によってエンドポイント要求が認証および承認されます。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__segment" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__segment"></a>区分</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__segment_definition"><a name="c360_a_ai_glossary__segment_definition"></a><em>区分</em>は、区分条件で指定された条件を満たす観測 (行) のサブセットです。<em>「セグメンテーション」</em>を参照してください。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__segmentation" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__segmentation"></a>セグメンテーション</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__segmentation_definition"><a name="c360_a_ai_glossary__segmentation_definition"></a>セグメンテーションには、特定のグループ (顧客種別や地域など) に予測の焦点を絞るためのデータの絞り込みが含まれます。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__sensitive_variable" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__sensitive_variable"></a>機密変数</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__sensitive_variable_definition"><a name="c360_a_ai_glossary__sensitive_variable_definition"></a>機密変数には、不平等な扱いに関連付けられる可能性のあるデータが含まれます。いくつかの例として、人種、性別、宗教、出身国、性的指向、障害、年齢に関連付けられた変数があります。それほど明白ではない例として、差別的慣行を反映する可能性があるプロキシ変数 (住所や郵便番号など) があります。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__signal" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__signal"></a>シグナル</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__signal_definition"><a name="c360_a_ai_glossary__signal_definition"></a>シグナルは、統計的に有意で潜在的に意味のあるデータのパターンを示します。たとえば、インサイトで変数と結果変数間の高い相関関係を説明できます。リレーションをさらに調査することで、相関関係が結果の変動を説明するのに役立つか (潜在的シグナル)、否か (潜在的ノイズ) を確認できます。<em>ヒント</em>と呼ばれることもあります。</span>
+          </dd>
+        
+        
+        
+          <dt id="c360_a_ai_glossary__sync_type" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__sync_type"></a>同期種別</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__sync_type_definition"><a name="c360_a_ai_glossary__sync_type_definition"></a>さまざまなシステム、デバイス、またはアプリケーション間のデータを同期するために使用される方法。同期は、2 つ以上のデータセット間の一貫性を維持するプロセスです。 </span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__terminal_state" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__terminal_state"></a>最終状態</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__terminal_state_definition"><a name="c360_a_ai_glossary__terminal_state_definition"></a>最終決定されて、変更が期待されないデータ。最終的なデータの例として注文の発送日があります。最終状態に達したレコードは、<em>実際</em>の結果 (または<em>観測された結果</em>) を表します。モデルの結果変数が最終状態を達成した条件を定義します。 </span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__text_variable" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__text_variable"></a>テキスト変数</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__text_variable_definition"><a name="c360_a_ai_glossary__text_variable_definition"></a><em>「カテゴリ変数」</em>、<em>「バイナリ結果」</em>を参照してください。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__threshold" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__threshold"></a>しきい値</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__threshold_definition"><a name="c360_a_ai_glossary__threshold_definition"></a>バイナリ分類モデルでは、バイナリ結果を分類する方法が<em>しきい値</em>によりモデルに指示されます。AIモデルで作成されたモデルでは、計算された確度がしきい値を上回る場合、Einsteinは結果を一方向(TrueやPositiveなど)で分類します。計算された確度がしきい値を下回る場合、Einstein は逆の方向 (False や Negative など) で結果を分類します。デフォルトのしきい値は 0.5 ですが、使用事例に合わせてこの値を上下に調整できます。しきい値は、<em>分類しきい値</em>または<em>決定しきい値</em>と呼ばれることもあります。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__tokens" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__tokens"></a>トークン</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__tokens_definition"><a name="c360_a_ai_glossary__tokens_definition"></a>大きな言語モデル (LLM) で処理および生成されるテキストの単位。トークンは、未処理のテキストデータと LLM が扱うことのできる数値表現との橋渡しとしての役割を果たします。単位としては、個別の文字、単語、熟語、さらに大きな言語単位などがあります。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__top_predictors" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__top_predictors"></a>上位の予測因子</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__top_predictors_definition"><a name="c360_a_ai_glossary__top_predictors_definition"></a><em>上位の予測因子</em>は、予測結果に最も大きな影響を与える条件です (規模の降順)。条件は、列に関連付けられたデータ値です。AI モデルで作成されたモデルでは、予測因子は 1 つまたは 2 つの条件で構成されます。<em>「予測変数」</em>を参照してください。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__training_set" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__training_set"></a>トレーニングセット</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__training_set_definition"><a name="c360_a_ai_glossary__training_set_definition"></a>予測モデリングでは、<em>トレーニングセット</em>は、予測を行うためのモデルをトレーニングするために使用するデータの部分です。「<em>検証セット</em>」も参照してください。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__underfitting" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__underfitting"></a>学習不足</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__underfitting_definition"><a name="c360_a_ai_glossary__underfitting_definition"></a>予測モデリングでは、データセットのトレーニングデータでモデルが結果を適切に予測しない場合、<em>学習不足</em>が発生します。学習不足は多くの場合、十分な変数がないために統計アルゴリズムでデータの基本パターンを取得できない過度にシンプルなモデルが原因で発生します。<em>「過学習」</em>も参照してください。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__unstructured_text" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__unstructured_text"></a>非構造化テキスト</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__unstructured_text_definition"><a name="c360_a_ai_glossary__unstructured_text_definition"></a>コンテンツと長さが異なる自由形式のテキスト。例として、顧客のコメント、アンケートのフィードバック、ソーシャルメディア投稿、テキストメッセージ、メールがあります。<em>「カテゴリ変数」</em>とは対照的です。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__validation_set" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__validation_set"></a>検証セット</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__validation_set_definition"><a name="c360_a_ai_glossary__validation_set_definition"></a>予測モデリングでは、<em>検証セット</em>は、トレーニングされたモデルが生成した予測を検証するために使用されるデータの部分です。「<em>トレーニングセット</em>」も参照してください。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__variable" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__variable"></a>変数</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__variable_definition"><a name="c360_a_ai_glossary__variable_definition"></a><em>変数</em>は、分析するデータの特性を表します。変数は、テーブルの列または Salesforce オブジェクトの項目に似ています。たとえば、商談には、各商談に関連付けられるプロパティを説明する変数 (商談種別、リードソース、会計年度、リードソース、期待収益など) があります。各変数には 1 つのデータ型 (数値、テキスト、または日付) があります。予測モデリングでは、2 つの種別の変数 (結果変数と変数) 間のリレーションが分析されます。データサイエンティストは、変数を<em>属性</em>または<em>機能</em>と呼ぶことがあります。</span>
+          </dd>
+        
+        
+          <dt id="c360_a_ai_glossary__xgboost" style="font-weight:bold;padding-top:.25rem;"><a name="c360_a_ai_glossary__xgboost"></a>XGBoost</dt>
+
+          <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+            <span id="c360_a_ai_glossary__xgboost_definition"><a name="c360_a_ai_glossary__xgboost_definition"></a><em>XGBoost</em> (極端な勾配ブースティング) は、効率化を目的として最適化された GBM の拡張アルゴリズムです。XGBoost ツリーベースのアンサンブル機械学習アルゴリズムで、ディシジョンツリーのグループを順次作成してデータの適合性を高める一方で、過学習を回避します。 </span>
+          </dd>
+        
+      </dl>
+</div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="AI ソリューションで予測モデルを使用するための主要な概念について説明します。" href="ai_models-2.html#c360_a_ai_predictive_about">予測 AI の主要な概念</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_license_perms">
+<h1 class="slds-text-heading_large">AI モデルの設定</h1>
+  <p>AIモデル ビルダー(旧称Einstein Studioモデル ビルダー)を使用するには、該当するライセンスを組織にプロビジョニングし、ユーザーに適切な権限を割り当てる必要があります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <p>Data 360 は、いくつかの標準 Salesforce エディションで使用でき、<span>Data 360</span> へのシングルユーザーアクセスが含まれます。すべてのライセンスで権限セットが提供されます。権限セットは、組織でライセンスがプロビジョニングされると自動的に作成されます。</p>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">権限</h2><p>AI モデルでモデルを管理するユーザーには、次の権限が必要です。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:20%"><col style="width:40%"><col style="width:40%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d88686e82" style="vertical-align:top;" class="slds-cell-wrap" scope="col">ユーザー権限</th>
+              <th id="d88686e85" style="vertical-align:top;" class="slds-cell-wrap" scope="col">可能になる機能</th>
+              <th id="d88686e88" style="vertical-align:top;" class="slds-cell-wrap" scope="col">詳細</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d88686e82" style="vertical-align:top;" class="slds-cell-wrap" data-label="ユーザー権限">ユーザーが AI モデルでモデルを管理できるようにする</td>
+
+              <td headers="d88686e85" style="vertical-align:top;" class="slds-cell-wrap" data-label="可能になる機能">AI モデルで予測モデルを作成、更新、削除します。</td>
+
+              <td headers="d88686e88" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">
+                <a target="_blank" href="https://help.salesforce.com/s/articleView?id=release-notes.rn_cdp_2024_summer_ai_model_permissions.htm&amp;language=ja&amp;release=250&amp;type=5">AIモデルの管理</a>
+              </td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">権限セット</h2><p>この権限は、組織にライセンスがプロビジョニングされている場合、次の権限セットで使用できます。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:33.33333333333333%"><col style="width:66.66666666666666%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d88686e135" style="vertical-align:top;" class="slds-cell-wrap" scope="col">権限セット</th>
+              <th id="d88686e138" style="vertical-align:top;" class="slds-cell-wrap" scope="col">提供される権利</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d88686e135" style="vertical-align:top;" class="slds-cell-wrap" data-label="権限セット">Data Cloud アーキテクト</td>
+
+              <td headers="d88686e138" style="vertical-align:top;" class="slds-cell-wrap" data-label="提供される権利">モデルの作成、更新、削除、有効化など、すべての AI モデル機能へのシステム管理者レベルのアクセス権。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d88686e135" style="vertical-align:top;" class="slds-cell-wrap" data-label="権限セット">「Data Cloud ユーザー」</td>
+
+              <td headers="d88686e138" style="vertical-align:top;" class="slds-cell-wrap" data-label="提供される権利">モデルを使用するための制限されたアクセス権 (モデルから派生した予測や改善の取得など)。</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">ユーザーへの AI モデルへのアクセス権の付与 </h2><p>ユーザーが AI モデルでモデルを管理できるようにするには、関連する Data Cloud 権限セットと権限を割り当てます。AIモデルへのアクセス権をユーザーに付与する方法については、「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=data.c360_a_userpermissions.htm&amp;language=ja&amp;type=5">Data 360 Standard Permission Sets</a>」を参照してください。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Salesforce ヘルプ: Data 360 Standard Edition およびライセンス</a></li><li><a target="_blank" href="setup_admin-2.html#c360_a_setup_walkthrough">Salesforce ヘルプ: Data 360 権限セットを使用したアクセスの管理</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.perm_sets_manage_assignments.htm&amp;language=ja&amp;type=5">Salesforce ヘルプ: 権限セットの割り当ての管理</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_mm_activate_models">
+<h1 class="slds-text-heading_large">モデルの有効化</h1>
+  <p>予測モデル設定を保存すると、モデルを有効化できます。予測を消費するには、まずモデルを有効化する必要があります。</p>
+
+    <div style="text-align:left;">
+      <img alt="[有効化] はモデルの詳細ページでコールアウトされます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_ec_activate_model.png" style="width:700px;">
+    </div>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> 一度に有効化できるモデルのバージョンは 1 つのみです。最新バージョンを有効化すると、モデルの以前のバージョンが自動的に無効化されます。</div></div></div>
+
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_mm_manage_models">
+<h1 class="slds-text-heading_large">モデルの管理</h1>
+  <p>予測モデルを作成したら、編集して設定を更新したり、不要になった場合は削除したりできます。</p>
+
+    <div><p>モデルを有効化する前にその設定を更新できるため、モデルの作成にかかる時間と労力を節約できます。</p></div>
+    <ol><li>
+        <span>[モデルの詳細] に移動し、編集するモデルバージョンをクリックします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[編集]</strong> をクリックして、設定を確認して更新します。モデルバージョンを編集すると、新しいバージョンのモデルが作成されます。</span>
+      </li><li>
+        <span>作業内容を保存します。</span>
+        <div>
+          <div style="text-align:left;">
+            <img alt="[編集] はモデルの詳細ページでコールアウトされます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_ec_edit_model.png" style="width:700px;">
+          </div>
+        </div>
+      </li></ol>
+
+    <div><p>モデルを削除すると、モデルまたはその予測ジョブのバージョンを復元できなくなります。</p><div style="text-align:left;"><img alt="[削除] はモデルの詳細ページでコールアウトされます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_ec_delete_model.png" style="width:700px;"></div></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_mm_show_hide_models">
+<h1 class="slds-text-heading_large">設定の非表示による大規模言語モデル (LLM) アクセスの管理</h1>
+  <p>プロンプトビルダーのユーザーがプロンプトテンプレートで別のモデルに変更する場合は、LLM 設定を非表示にします。新しい LLM バージョンまたは別のプロバイダーの別の LLM を選択できます。テストが完了するまで、新しい LLM へのアクセスを一時停止できます。必要に応じて、非表示の LLM 設定を後で表示して選択できるようにすることもできます。</p>
+
+    <ol><li>
+        <span>モデルライブラリで、非表示にする LLM 設定をクリックします。</span>
+        <div>[モデルの表示] 列には、プロンプトビルダーでモデルを表示または非表示にするかどうかが表示されます。</div>
+      </li><li>
+        <span>[設定済みモデル] タブをクリックします。</span>
+      </li><li>
+        <span>非表示にする LLM 設定の場合、ドロップダウンメニューから [<strong class="uicontrol">Hide Model</strong> (モデルを非表示)] を選択します。</span>
+        <div>
+          <div style="text-align:left;">
+            <img alt="非表示にする LLM 設定の場合、ドロップダウンメニューから [モデルを非表示] を選択します。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_mm_show_hide_models.png" style="width:300px;">
+          </div>
+          <p>[モデル表示] 列には、モデル設定が [<strong class="uicontrol">非表示]</strong> として表示されます。モデル設定名の前にテキスト <strong class="uicontrol">(使用不可)</strong> が表示されます。</p>
+        </div>
+      </li><li>
+        <span>非表示のモデルを表示するには、ドロップダウンメニューから [<strong class="uicontrol">Hide Model (モデル</strong>を非表示)] を選択します。</span>
+      </li></ol>
+
+    <div><p>現在非表示モデルを使用しているプロンプトテンプレートは、以前と同じように実行されます。プロンプトビルダーでは、プロンプトテンプレートはモデルが非表示であることを示します。別のモデルに変更するには、[モデル] リストから使用可能なモデルを選択します。非表示のモデルを使用してプロンプトテンプレートをコピーする場合、コピーを保存する前に別のモデルを選択する必要があります。</p></div>
+  
+</div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="search_rag-2.html">&larr; 検索・検索インデックス・RAG・ハイブリッド検索（2/2）</a><a href="ai_models-2.html">AI・予測モデル・Model Builder・Einstein（2/2） &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=data.c360_a_data_cloud.htm&type=5&language=ja">help.salesforce.com — Data 360（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>

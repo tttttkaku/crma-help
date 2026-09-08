@@ -1,0 +1,1940 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>セットアップ・管理・データスペース・権限（2/2） | Data 360 ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（30）</h2>
+    <ol>
+      <li><a href="#c360_a_enable_permissions_for_crm_streaming">CRM ストリーミングの権限の有効化</a></li>
+      <li><a href="#c360_a_enable_user_permissions_external_salesforce_org">Salesforce CRM 権限</a></li>
+      <li><a href="#c360_a_enable_user_permissions_external_salesforce_org_encrypted">Salesforce の従来の暗号化を使用する Salesforce CRM オブジェクトと項目を取り込むための権限の有効化</a></li>
+      <li><a href="#c360_a_license_update_perm_set_migration">Customer Data Platform ライセンスから Data Cloud ライセンスへのユーザーの移行</a></li>
+      <li><a href="#c360_a_manage_multiple_data_spaces">複数のデータスペースでの機能アクセスの管理</a></li>
+      <li><a href="#c360_a_map_data_model_objects_in_a_data_space">データスペースのデータモデルオブジェクトのマッピング</a></li>
+      <li><a href="#c360_a_remove_data_lake_objects_from_data_spaces">データスペースからのデータレークオブジェクトの削除</a></li>
+      <li><a href="#c360_a_schema_setup_concepts">Data 360 のデータオブジェクトの概念とスキーマ</a></li>
+      <li><a href="#c360_a_search_index_easy_setup_search_index">簡単な設定を使用した検索インデックス設定の作成</a></li>
+      <li><a href="#c360_a_set_up_a_google_cloud_storage_target_connection">Google Cloud Storage 接続先の設定</a></li>
+      <li><a href="#c360_a_set_up_a_microsoft_azure_target_connection">Microsoft Azure 接続先の設定</a></li>
+      <li><a href="#c360_a_set_up_a_redshift_federation_connection_for_private_connect">プライベートコネクト用の Redshift フェデレーション接続の設定</a></li>
+      <li><a href="#c360_a_set_up_a_snowflake_federation_connection_for_private_connect">プライベートコネクト用の Snowflake フェデレーション接続の設定</a></li>
+      <li><a href="#c360_a_set_up_an_amazon_s3_target_connection">Amazon S3 対象接続の設定</a></li>
+      <li><a href="#c360_a_set_up_an_sftp_target_connection">SFTP 接続先の設定</a></li>
+      <li><a href="#c360_a_set_up_crm_connection">CRM Salesforce 組織接続の設定</a></li>
+      <li><a href="#c360_a_set_up_interaction_studio_connector">Marketing Cloud Personalization への接続の設定</a></li>
+      <li><a href="#c360_a_set_up_marketing_cloud_connection">Data 360 での Marketing Cloud Engagement 接続の設定</a></li>
+      <li><a href="#c360_a_set_up_oci_connection">オムニチャネル在庫接続の設定</a></li>
+      <li><a href="#c360_a_set_up_tableau_connected_app">Data 360 での Tableau の接続</a></li>
+      <li><a href="#c360_a_set_up_your_data">SageMaker でのデータの設定</a></li>
+      <li><a href="#c360_a_setup_oauth_google">Google OAuth を使用したコネクタの設定</a></li>
+      <li><a href="#c360_a_setup_oauth_linkedin">LinkedIn OAuth を使用したコネクタの設定</a></li>
+      <li><a href="#c360_a_setup_oauth_microsoft">Microsoft OAuth を使用したコネクタの設定</a></li>
+      <li><a href="#c360_a_setup_oauth_openid">OpenId Connect OAuth を使用したコネクタの設定</a></li>
+      <li><a href="#c360_a_setup_platform_encryption_data_cloud">Data 360 のプラットフォーム暗号化の設定</a></li>
+      <li><a href="#c360_a_setup_provision">Data 360 の設定と有効化</a></li>
+      <li><a href="#c360_a_setup_walkthrough">Data 360 ユーザーの作成と権限の割り当て</a></li>
+      <li><a href="#c360_a_sl_c360sdm_setup">C360 セマンティックモデルの管理</a></li>
+      <li><a href="#c360_a_sl_c360sdm_setup_task">C360 セマンティックモデルの設定</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>セットアップ・管理・データスペース・権限（2/2）</h1>
+      <div class="meta">Data 360（旧 Data Cloud）ヘルプ · 30 記事 · 生成 2026-08-12</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="setup_admin-1.html">&larr; セットアップ・管理・データスペース・権限（1/2）</a><a href="billing.html">課金・使用量・デジタルウォレット &rarr;</a></div>
+<section class="article" id="c360_a_enable_permissions_for_crm_streaming">
+<h1 class="slds-text-heading_large">CRM ストリーミングの権限の有効化</h1>
+ 
+ <p>CRM ストリーミングの場合、次のシステム権限とユーザー権限を設定します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+  <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d95660e62" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d95660e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">オブジェクトと項目を取り込む</td>
+
+       <td headers="d95660e62" style="vertical-align:top;" class="slds-cell-wrap"><p>権限セット</p><ul>
+         <li>Data 360 アーキテクト</li>
+
+        </ul>
+</td>
+
+      </tr>
+     </tbody></table></div>
+  <div><p>特定のシナリオでは、ストリーミング処理モードがバッチに変更される場合があります。「<a title="一括処理とストリーム処理ではデータの処理が異なります。バッチモードでは、10 ～ 15 分のスケジュール間隔でデータが 1 回チェックされ、アクセスできるデータレークオブジェクト (DLO) に処理されて保存されます。ストリーミングモードでは、最小限の遅延でデータが処理され、変更が組織で行われた直後に反映されます。" href="ingest_connect-2.html#c360_a_crm_connector_streaming">CRM コネクタストリーミング</a>」を参照してください。</p></div>
+  <ol><li>
+    <span>[設定] の [クイック検索] ボックスに<kbd>「権限」</kbd>と入力し、<strong class="uicontrol">[権限セット]</strong> を選択します。</span>
+   </li><li>
+    <span>[<strong class="uicontrol">Data 360 Salesforce Connector</strong> (Data 360 Salesforce コネクタ)] 権限セットを選択します。</span>
+   </li><li>
+    <span><strong class="uicontrol">[システム権限]</strong> をクリックします。</span>
+   </li><li>
+    <span>[<strong class="uicontrol">View Setup and Configuration</strong> (設定・定義の参照)]、[<strong class="uicontrol">Customize Application (アプリケーション</strong>のカスタマイズ)]、[<strong class="uicontrol">Modify Metadata Through</strong> Metadata API Functions (メタデータ API 関数を使用したメタデータの変更)] を有効にします。</span>
+   </li><li>
+    <span>ユーザーデータストリームの<strong class="uicontrol">「ユーザー」</strong>にある「<strong class="uicontrol">すべてのユーザー</strong>の参照」権限を有効化</span>
+   </li><li>
+    <span>変更内容を保存します。</span>
+   </li></ol>
+
+ 
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_enable_user_permissions_external_salesforce_org">
+<h1 class="slds-text-heading_large">Salesforce CRM 権限</h1>
+  
+  <p>組織に接続すると、Data 360 オブジェクトおよび項目へのアクセスを許可する「Data 360 Salesforce コネクタ」権限セットが作成されます。組織のニーズに合わせて「Data 360 Salesforce コネクタ」権限セットを編集できます。</p>
+
+    <div><ul><li><cite>「すべてのレコードの参照」</cite>、<cite>「すべてのレコードの編集」</cite>、および<cite>「すべての項目の表示」</cite>権限はオブジェクト権限です。データを取り込むには、オブジェクトおよび項目に対して<cite>「すべてのレコードの参照」</cite>および<cite>「すべての項目の表示」</cite>が付与されている必要があります。<cite>［View All Fields］</cite> はデフォルトで有効になっています。「<cite>すべてのフィールド</cite>の参照」ユーザー権限を持つユーザーは、割り当てられたフィールド権限に関係なく、すべてのオブジェクトのすべてのフィールドとフィールドデータを表示できます。</li>
+
+        <li>[<cite>View All Records</cite> (すべてのレコードの参照)] は、デフォルトでは有効になっていません。この権限は、「<cite>Query All Fields</cite> (すべてのフィールドのクエリ)」権限を有効にするために必要です。この権限は、コンテンツファイルとオブジェクトへのアクセス権をユーザーに付与します。</li>
+<li><cite>「すべてのデータの参照」</cite>または<cite>「すべてのデータの編集」</cite>ユーザー権限を持つユーザーは、アプリケーションとデータが自分と共有されていない場合でも、すべてのアプリケーションとデータを参照または変更できます。</li>
+<li>Data 360 では、プラットフォームインテグレーションユーザーと呼ばれるシステムユーザーが使用されます。このユーザーに権限セットを介して付与された権限によって、Data 360 から取得するデータが決まります。</li>
+<li>関連オブジェクトを Data 360 に取り込まない場合でも、関連オブジェクトに対する権限を付与します。 関連オブジェクトを参照する取り込みオブジェクトには、関連オブジェクト情報にアクセスしてデータストリームを作成する権限が必要です。</li>
+<li>Winter '25 リリース以降:<a name="c360_a_enable_user_permissions_external_salesforce_org__ul_sct_n4s_fdc"></a><ul id="c360_a_enable_user_permissions_external_salesforce_org__ul_sct_n4s_fdc"><li>Data 360 Salesforce コネクタ権限セットには、新しい組織でデフォルトで有効になっている「<cite>すべてのデータ</cite>の参照」権限が含まれます。既存の Data 360 Salesforce コネクタ権限セットの場合、「<cite>すべてのデータ</cite>の参照」権限を手動で適用するか、オブジェクト権限を一度に 1 つずつ設定できます。</li>
+<li><code>sfdc_c360a_sfdctrust_permSet</code> API の名前が <code>sfdc_a360_sfcrm_data_extract</code> に変更されました。これは内部 API ですが、<cite>Data 360 Salesforce コネクタ</cite>権限セットの詳細ページに表示されます。Winter '25 にアップグレードすると、廃止された <code>sfdc_c360a_sfdctrust_permSet</code> API 参照名を使用するスクリプトは 0 を返します。</li>
+</ul>
+</li>
+<li>SurveyQuestionResponse オブジェクトへのアクセスは、SurveyResponse オブジェクトによって制御されます。Survey オブジェクトのデータの取り込みを有効にするには、SurveyResponse オブジェクトに「<cite>すべてのレコード</cite>の参照」または「<cite>すべてのレコード</cite>の編集」権限を付与します。</li>
+<li>Salesforce CRM 組織で権限セットを変更すると、<span>Data 360</span> のデータバンドルのデフォルトの動作に影響する可能性があります。</li>
+
+        <li>ユーザーが ToDo と行動にアクセスできるようにするには、「Data 360 Salesforce コネクタ」権限セットで「活動にアクセス」システム権限を有効にします。</li>
+</ul>
+</div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="setup_admin-1.html#c360_a_crm_enable_object_and_field_permissions">CRM 接続のオブジェクトおよび項目権限の有効化</a></strong><br>「Data Cloud Salesforce コネクタ」権限セットを編集して、オブジェクトと項目を Data 360 に取り込むことができます。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_enable_permissions_for_crm_streaming">CRM ストリーミングの権限の有効化</a></strong><br>CRM ストリーミングの場合、次のシステム権限とユーザー権限を設定します。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_enable_user_permissions_external_salesforce_org_encrypted">Salesforce の従来の暗号化を使用する Salesforce CRM オブジェクトと項目を取り込むための権限の有効化</a></strong><br>接続された Salesforce CRM 組織から取り込まれた Salesforce Classic カスタム暗号化項目の値は、デフォルトで <span>Data 360</span> でマスクされます。代わりに、この値をマスクなしの値として取り込むことができます。</li><li class="slds-p-bottom_small"><strong><a href="misc_combined.html#c360_a_crm_salesforce_commerce_object_perms">Salesforce Commerce オブジェクト権限</a></strong><br>Salesforce Commerce オブジェクトのオブジェクトと項目の権限を有効にする場合、コネクタインテグレーション権限セットではオブジェクト名が異なることがあります。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="接続された Salesforce CRM 組織から取り込まれた Salesforce Classic カスタム暗号化項目の値は、デフォルトで Data 360 でマスクされます。代わりに、この値をマスクなしの値として取り込むことができます。" href="#c360_a_enable_user_permissions_external_salesforce_org_encrypted">Salesforce の従来の暗号化を使用する Salesforce CRM オブジェクトと項目を取り込むための権限の有効化</a></li><li><a title="Data 360 でスキーマを作成したら、必要に応じてソースフィールドをデータストリームに追加できます。接続された Salesforce CRM 組織のオブジェクトに項目を追加するときは、項目に適切な権限が設定されていることを確認します。" href="ingest_connect-1.html#c360_a_add_new_source_fields">取得元項目の追加</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_enable_user_permissions_external_salesforce_org_encrypted">
+<h1 class="slds-text-heading_large">Salesforce の従来の暗号化を使用する Salesforce CRM オブジェクトと項目を取り込むための権限の有効化</h1>
+  
+  <p>接続された Salesforce CRM 組織から取り込まれた Salesforce Classic カスタム暗号化項目の値は、デフォルトで <span>Data 360</span> でマスクされます。代わりに、この値をマスクなしの値として取り込むことができます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d224025e72" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d224025e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">オブジェクトと項目を取り込む</td>
+
+              <td headers="d224025e72" style="vertical-align:top;" class="slds-cell-wrap"><p>「Data Cloud アーキテクト」権限セット</p><p>および</p><p style="margin-bottom:0;">取り込まれるオブジェクトに対する「すべてのレコードの参照」および「参照」権限</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d224025e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">従来の暗号化を使用する項目をマスクなしの値で取り込む手順は、次のとおりです。</td>
+
+              <td headers="d224025e72" style="vertical-align:top;" class="slds-cell-wrap"><p>接続された組織の「Data Cloud Salesforce Connector (Data Cloud Salesforce コネクタ)」権限セット</p><p>および</p><p style="margin-bottom:0;">「暗号化されたデータの参照」権限</p></td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-error"><img alt="警告" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_warning.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">警告</span> Classic で暗号化されたフィールドを取り込むことを選択し、値のマスクを解除する場合、値は <span>Data 360</span> のあらゆる場所でマスクされずに保存されます。</div></div></div>
+<p>マスクなしの値が含まれる従来の暗号化を使用する項目を取り込むには、暗号化された項目の取り込み元である各 Salesforce 組織で権限を更新します。</p></div>
+    <ol><li>
+        <span>[設定] の [クイック検索] ボックスに<kbd>「権限」</kbd>と入力し、<strong class="uicontrol">[権限セット]</strong> を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[Data Cloud Salesforce Connector (Data Cloud Salesforce コネクタ)]</strong> 権限セットを選択します。</span>
+        <div>この権限セットは、CRM 組織を <span>Data 360</span> に接続すると使用可能になります。最近更新されていないリリース済みの組織の場合、「Data Cloud Salesforce Connector (Data Cloud Salesforce コネクタ)」権限セットは、「Salesforce CDP Salesforce Connector Integration (Salesforce CDP Salesforce コネクタインテグレーション)」、「Customer Data Platform Salesforce Connector Integration (Customer Data Platform Salesforce コネクタインテグレーション)」、または「Customer 360 Audiences Salesforce Connector Integration (Customer 360 Audiences Salesforce コネクタインテグレーション)」としてリストされます。</div>
+      </li><li>
+        <span><strong class="uicontrol">[システム権限]</strong> を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[編集]</strong> をクリックし、<strong class="uicontrol">[暗号化されたデータの参照]</strong> を追加します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[Data Cloud Salesforce Connector (Data Cloud Salesforce コネクタ)]</strong> 権限セットを必要なユーザーに割り当てます。</span>
+      </li></ol>
+
+    <div><p>従来の暗号化を使用する項目をマスクなしの値で取り込む Salesforce CRM 組織ごとに、この手順を繰り返します。</p></div>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> <span>Data 360</span> に接続されている各 Salesforce CRM 組織は、Classic 暗号化項目に対して独自の権限設定を持つことができます。</div></div></div>
+<p>「Data Cloud Salesforce コネクタ」権限セットへの変更は、データストリームの次回のフル更新時に反映されます。フル更新は次の状況で実行されます。</p><ul><li>データストリームが初めてリリースされたとき。</li>
+<li>データストリームが編集されたとき (ソース項目や数式項目が追加されたときなど)。</li>
+<li>Salesforce カスタマーサポートに問い合わせてケースを登録した場合。</li>
+</ul>
+</div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="組織に接続すると、Data 360 オブジェクトおよび項目へのアクセスを許可する「Data 360 Salesforce コネクタ」権限セットが作成されます。組織のニーズに合わせて「Data 360 Salesforce コネクタ」権限セットを編集できます。" href="#c360_a_enable_user_permissions_external_salesforce_org">Salesforce CRM 権限</a></li><li><a title="データストリームは、さまざまな更新スケジュールで操作できます。これらのデータストリームがいつどのように更新されるかを確認してください。" href="ingest_connect-2.html#c360_a_data_stream_schedule">Data 360 のデータストリームスケジュール</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.fields_about_encrypted_fields.htm&amp;language=ja&amp;type=5">Salesforce ヘルプ: カスタム項目の従来の暗号化</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_license_update_perm_set_migration">
+<h1 class="slds-text-heading_large">Customer Data Platform ライセンスから Data Cloud ライセンスへのユーザーの移行</h1>
+  
+  <p>以前に Customer Data Platform ライセンスで <span>Data 360</span> を運用していた組織に Data Cloud ライセンスを追加すると、Customer Data Platform ライセンスで付与された権限セットによって <span>Data 360</span> へのアクセスは許可されなくなります。ユーザーに <span>Data 360</span> への継続的なアクセスを提供するには、Data Cloud ライセンスに関連付けられた権限セットをユーザーに割り当てる必要があります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d127331e47" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d127331e47" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">権限セットを割り当てる</td>
+
+              <td headers="d127331e47" style="vertical-align:top;" class="slds-cell-wrap"><p>「権限セットの割り当て」</p><p>および</p><p style="margin-bottom:0;">「設定・定義を参照する」</p></td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>Data Cloud ライセンスに関連付けられている Data Cloud 権限セットを特定します。</span>
+      </li><li>
+        <span>必要に応じて、Data Cloud ライセンスで付与される標準権限セットをカスタマイズするか、標準権限セットからカスタム権限セットを作成します。</span>
+      </li><li>
+        <span>Data Cloud ライセンスで付与された権限セットをユーザーに割り当てます。</span>
+        <div>このプロセスを自動化するには、<a target="_blank" href="https://help.salesforce.com/s/articleView?id=sf.perm_manual_user_access_policies.htm&amp;language=ja&amp;type=5">ユーザーアクセスポリシー</a>を使用してユーザーグループの権限セットを移行します。</div>
+      </li><li>
+        <span>Customer Data Platform ライセンスで付与された権限セットを削除します。</span>
+        <div>このプロセスを自動化するには、<a target="_blank" href="https://help.salesforce.com/s/articleView?id=sf.perm_manual_user_access_policies.htm&amp;language=ja&amp;type=5">ユーザーアクセスポリシー</a>を使用してユーザーグループの権限セットを移行します。</div>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_manage_multiple_data_spaces">
+<h1 class="slds-text-heading_large">複数のデータスペースでの機能アクセスの管理</h1>
+ 
+ <p>複数のデータスペースで機能アクセスを管理する方法について説明します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+  <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">アドオンライセンスで使用可能な機能: <strong>データスペース</strong></td>
+
+     </tr>
+    </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col><col></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d56463e70" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d56463e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">データスペースを管理する</td>
+
+       <td headers="d56463e70" style="vertical-align:top;" class="slds-cell-wrap">データスペース範囲の管理</td>
+
+      </tr>
+     </tbody></table></div>
+  <div><p>複数のデータスペースにアクセスする必要がある Data Cloud ユーザーがいる場合、機能アクセス専用の権限セットを作成します。この専用の権限セットでは、ユーザーを特定のデータスペースに接続して、そのスペース内の機能レベルのアクセス権のみを付与します。オブジェクト権限は含まれません。標準 Data Cloud 権限セットを使用して、ユーザーにロールベースのオブジェクト権限を付与します。専用権限セットは、データスペースを認識する機能に適用できます。</p></div>
+  <ol><li>
+    <span>特定のアクセス権が必要なデータスペースごとに専用の権限セットを作成します。</span>
+   </li><li>
+    <span><strong class="uicontrol">Data Cloud データスペース管理</strong>設定で、専用の権限セットをデータスペースに接続します。</span>
+   </li><li>
+    <span>ユーザーにロール権限とオブジェクト権限を付与するには、標準の Data Cloud 権限セット (「Data Cloud データアウェアスペシャリスト」など) を割り当てます。</span>
+   </li><li>
+    <span>特定のデータスペースの機能へのアクセス権をユーザーに付与するには、専用の権限セットを割り当てます。</span>
+   </li><li>
+    <span>レコードレベルでユーザーアクセスを制御するには、[<strong class="uicontrol">Data Cloud Feature Permissions</strong> (Data Cloud 機能権限)] で、各機能の [<strong class="uicontrol">表示]</strong> または [<strong class="uicontrol">カスタマイズ]</strong> を有効にします。</span>
+   </li></ol>
+
+ 
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_map_data_model_objects_in_a_data_space">
+<h1 class="slds-text-heading_large">データスペースのデータモデルオブジェクトのマッピング</h1>
+  <p>データスペースのデータレークオブジェクト (DLO) とデータモデルオブジェクト (DMO) の間の接続を作成します。セグメンテーションと有効化のリレーションではマッピングされた項目とオブジェクトのみを使用できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">アドオンライセンスで使用可能な機能: <strong>データスペース</strong></td>
+
+     </tr>
+    </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d83227e68" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d83227e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">データオブジェクトをマッピングする</td>
+
+              <td headers="d83227e68" style="vertical-align:top;" class="slds-cell-wrap"><p>権限セット</p><ul>
+                  <li>Data Cloud アーキテクト</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table><p>データオブジェクトをデータスペースにマッピングする前に、<a target="_blank" href="model_mapping-1.html#c360_a_data_mapping">「データマッピング」</a>を参照して要件と DMO リレーションを理解します。</p></div>
+    <ol><li>
+        <span><span>Data 360</span> で、[データストリーム] タブに移動します。</span>
+      </li><li>
+        <span>マッピングするデータストリームを開きます。[データマッピング] セクションには、DLO が関連付けられているすべてのデータスペースが表示されます。</span>
+      </li><li>
+        <span><strong class="uicontrol">［Start］</strong> をクリックします。<div style="text-align:left;"><img alt="DLO マッピング" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_dlo_mapping_data_spaces.png" style="width:800px;"></div></span>
+      </li><li>
+        <span>[データモデル] エンティティで、<strong class="uicontrol">[オブジェクトを選択]</strong> をクリックします。</span>
+        <div>キャンバスの左側にソース DLO、右側に対象 DMO が表示されます。マッピングではすべての標準 DMO を使用できます。</div>
+      </li><li>
+        <span>カスタムデータモデルを選択するには、[カスタムデータモデル] タブに移動し、<strong class="uicontrol">[新規カスタムオブジェクト]</strong> をクリックします。</span>
+      </li><li>
+        <span>オブジェクトの表示ラベル、オブジェクト API 参照名、項目を確認します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[保存] </strong>をクリックします。</span>
+      </li><li>
+        <span>マッピングを確立するには、DLO で項目を選択し、DMO で関連項目をクリックします。項目を接続する矢印と共に確認メッセージが表示されます。</span>
+      </li><li>
+        <span><strong class="uicontrol">[保存] </strong>をクリックします。</span>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="データマッピングにより、データレークオブジェクト (DLO) 項目がデータモデルオブジェクト (DMO) 項目に関連付けられ、ソースデータを 1 つの標準化された Customer 360 データモデルに統合できます。" href="model_mapping-2.html#c360_a_map_custom_data_model_objects">データモデルオブジェクトのマッピング</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_remove_data_lake_objects_from_data_spaces">
+<h1 class="slds-text-heading_large">データスペースからのデータレークオブジェクトの削除</h1>
+  <p>データスペースからデータレークオブジェクト (DLO) を削除する前に、DLO からマッピングなどのすべての連動関係を削除します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">アドオンライセンスで使用可能な機能: <strong>データスペース</strong></td>
+
+     </tr>
+    </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d187077e68" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d187077e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">データスペースから DLO を削除する</td>
+
+              <td headers="d187077e68" style="vertical-align:top;" class="slds-cell-wrap"><p>権限セット</p><ul>
+                  <li>Data Cloud アーキテクト</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span><span>Data 360</span> で、[データスペース] タブに移動します。</span>
+      </li><li>
+        <span>DLO を削除するデータスペースを選択します。</span>
+      </li><li>
+        <span>DLO を検索し、対応するドロップダウンをクリックします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[削除]</strong> を選択します。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_schema_setup_concepts">
+<h1 class="slds-text-heading_large">Data 360 のデータオブジェクトの概念とスキーマ</h1>
+  <p>取り込み時に、<span>Data 360</span>はデータのサンプルを取得し、ソース スキーマを推奨します。その後、推奨されるスキーマを確認して変更できます。</p>
+
+    <p>スキーマでは、編集不可のヘッダーの表示ラベルで未加工データのソースが識別されます。その他の表示ラベルは変更できます。</p>
+    <ul>
+      <li>項目の表示ラベル — 各ソースヘッダー列の提案された Data 360 の表示名。</li>
+
+      <li>項目 API 参照名 — 各ソースヘッダー列の提案された Data 360 API 参照名。</li>
+
+      <li>データ型 — 各ソースヘッダー列の提案されたデータ型。サポートされるデータ型についての詳細は、「<a title="Data 360 では、次のデータ型がサポートされています。" href="data360_general-1.html#c360_a_data_types">Data 360 のデータ型</a>」を参照してください。<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-error"><img alt="警告" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_warning.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">警告</span> 誤ったデータ型を選択した場合、データストリームを削除して再作成する必要があります。データストリームの作成後にデータ型を変更することはできません。</div></div></div>
+
+      </li>
+
+    </ul>
+
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=data.c360_a_source_object_name_and_object_api_name.htm&amp;language=ja&amp;type=5">ソース、オブジェクト名、オブジェクト API 参照名</a></strong><br>データセットを <span>Data 360</span> に取り込むときに、データセットに source という名前を付けます。</li><li class="slds-p-bottom_small"><strong><a href="data360_general-1.html#c360_a_category">カテゴリ</a></strong><br>データストリームを作成するときに、そのデータストリームで見つかったデータのカテゴリまたはタイプを選択します。</li><li class="slds-p-bottom_small"><strong><a href="data360_general-2.html#c360_a_primary_key">主キー</a></strong><br>Data Cloud でデータストリームを作成するには、そのソースのプライマリキーまたは一意の識別子を選択します。データソースに主キーとして使用できる項目がない場合は、数式項目を使用して 2 つ以上のソース項目を組み合わせて複合キーを作成します。</li><li class="slds-p-bottom_small"><strong><a href="ingest_connect-3.html#c360_a_ingestion_anonymous_vs_known_profiles">匿名プロファイルと既知のプロファイルの分類</a></strong><br>ソースプロファイルは、取り込み時にデータストリームの個人 DMO の <samp class="parmname">[匿名]</samp> 項目の値に基づいて匿名または既知に分類されます。この項目がマッピングされていないソースプロファイルは常に既知とみなされます。既知のプロファイルと匿名プロファイルを分類できるように、このマッピングを追加してください。</li><li class="slds-p-bottom_small"><strong><a href="data360_general-2.html#c360_a_organization_unit_identifier">組織単位識別子</a></strong><br>Organization Unit Identifier (組織単位識別子) は、<span>Data 360</span> データでビジネスユニットを指定できる省略可能なフィールドです。</li><li class="slds-p-bottom_small"><strong><a href="governance-1.html#c360_a_data_lineage_fields">データ系統項目</a></strong><br><span>Data 360 は</span>、データオブジェクトに項目を追加して、データソースの詳細を取得します。</li><li class="slds-p-bottom_small"><strong><a href="ingest_connect-3.html#c360_a_edit_source_object_schema">ソースオブジェクトスキーマの変更</a></strong><br><span>Data 360</span> ソースオブジェクトスキーマは、データストリームの詳細ページで変更できます。すべての変更は、以降のデータインポートに適用されます。ロジックを遡って適用するには、ソースから取得して <span>Data 360</span> に取り込みます。</li><li class="slds-p-bottom_small"><strong><a href="data360_general-1.html#c360_a_fully_qualified_keys">完全修飾キー</a></strong><br><span>Data 360</span> データモデルでさまざまなソースからのデータがハーモナイズされるときに、完全修飾キー (FQK) を使用してキーの競合を回避します。</li><li class="slds-p-bottom_small"><strong><a href="data360_general-1.html#c360_a_formula_expression_library">数式項目の作成</a></strong><br><span>Data 360</span> データストリームを作成するときに、他のフィールドを生成するように選択できます。これらの補足項目は、ハードコードしたり、データストリームの他の項目から派生させたりできます。</li><li class="slds-p-bottom_small"><strong><a href="data360_general-1.html#c360_a_formula_expression_use_cases">数式の使用事例</a></strong><br>次の例は、<span>Data 360</span> での数式機能の使用事例を示しています。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_search_index_easy_setup_search_index">
+<h1 class="slds-text-heading_large">簡単な設定を使用した検索インデックス設定の作成</h1>
+  <p>いくつかの自動化された手順に従って、DMO(データ モデル オブジェクト)またはUDMO(非構造化データ モデル オブジェクト)のハイブリッド検索インデックス設定を作成します。Data 360 では、チャンクおよびベクトル化戦略のデフォルトが自動的に適用され、チャンクおよびインデックスモデルオブジェクトが作成されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d169119e60" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d169119e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">検索インデックス設定を作成する</td>
+
+              <td headers="d169119e60" style="vertical-align:top;" class="slds-cell-wrap"><p>権限セット</p><ul>
+                  <li>Data Cloud アーキテクト</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table><p>検索インデックスを作成する前に、『検索リファレンス』で検索インデックスの考慮事項を確認してください<a title="Data 360の検索では、非構造化データ、モデルの埋め込み、検索結果の事前絞り込み操作など、さまざまなファイル形式がサポートされます。" href="search_rag-2.html#c360_a_search_index_reference">。</a></p></div>
+    <div id="c360_a_search_index_easy_setup_search_index__context_qff_4ln_ycc"><a name="c360_a_search_index_easy_setup_search_index__context_qff_4ln_ycc"></a><p>[簡易設定] には次のデフォルトが含まれます。</p><a name="c360_a_search_index_easy_setup_search_index__ul_rff_4ln_ycc"></a><ul id="c360_a_search_index_easy_setup_search_index__ul_rff_4ln_ycc">
+        <li>チャンク戦略: 通路の抽出</li>
+
+        <li>組み込みモデル: E5-Large V2</li>
+
+        <li>検索種別: ハイブリッド検索</li>
+
+      </ul>
+</div>
+    <a name="c360_a_search_index_easy_setup_search_index__steps_fg5_yln_ycc"></a><ol id="c360_a_search_index_easy_setup_search_index__steps_fg5_yln_ycc"><li>
+        <span>アプリケーションランチャーで、[<strong class="uicontrol">Data Cloud]</strong> を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">検索インデックス</strong>&gt; <strong class="uicontrol">[新規]</strong> をクリックします。</span>
+      </li><li>
+        <span> [<strong class="uicontrol">Easy Setup (</strong>簡易設定)]&gt; [<strong class="uicontrol">Next (次</strong>へ)] をクリックします。</span>
+      </li><li>
+        <span> [新規検索インデックス設定] ページから、データスペースと 1 つ以上の UDMO または DMO を選択します。選択したオブジェクトごとに検索インデックス設定が作成されます。</span>
+        <div>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div id="c360_a_search_index_easy_setup_search_index__note_gg5_yln_ycc" style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><a name="c360_a_search_index_easy_setup_search_index__note_gg5_yln_ycc"></a><span class="slds-text-title_caps">メモ</span>  1 つ以上の外部 DLO からのマッピングがある DMO は、それらのすべての外部 DLO でキャッシュが有効になっている場合にのみデータソースとして使用できます。詳細は、「<a target="_blank" href="model_mapping-1.html#c360_a_accelerated_data_lake_objects">データフェデレーションのキャッシュ</a>」を参照してください。</div></div></div>
+
+        </div>
+      </li><li>
+        <span>検索インデックス設定名と検索インデックス設定 API 参照名を追加します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>設定と対象データモデルオブジェクトを確認し、[<strong class="uicontrol">保存] を</strong>クリックします</span>
+      </li><li>
+        <span>AIモデル(旧称Einstein Studio)で取得者を作成し、検索インデックスからデータを取得します。</span>
+        <div>プロンプトテンプレートとエージェントアクションで取得者を使用して、関連する結果を取得します。詳細は、「<a title="特定の使用事例のプロンプトに返されるコンテンツの関連性を向上させるには、AIモデル(旧称Einstein Studio)でカスタムの個人取得機能を作成します。取得者をカスタマイズするには、検索インデックスを選択し、フィルタを定義して、返される情報を指定します。" href="search_rag-1.html#c360_a_ai_retriever_create">Create a Individual Retriever</a> (個人取得者の作成)」を参照してください。</div>
+      </li></ol>
+
+    <div><p><span>Data 360 は</span>、選択した DMO または UDMO のハイブリッド検索インデックスを作成します。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Data 360の検索では、非構造化データ、モデルの埋め込み、検索結果の事前絞り込み操作など、さまざまなファイル形式がサポートされます。" href="search_rag-2.html#c360_a_search_index_reference">検索インデックス参照</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_set_up_a_google_cloud_storage_target_connection">
+<h1 class="slds-text-heading_large">Google Cloud Storage 接続先の設定</h1>
+  <p><span>Data 360</span>インスタンスを作成したら、Google Cloud Storage(GCS)接続を設定できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d22900e60" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d22900e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Data Cloud 設定にアクセスする</td>
+
+              <td headers="d22900e60" style="vertical-align:top;" class="slds-cell-wrap"><p>システム管理者プロファイルまたは </p><p style="margin-bottom:0;">「Data Cloud アーキテクト」権限セット</p></td>
+
+            </tr>
+          </tbody></table><p>前提条件</p><ul>
+        <li><a target="_blank" href="https://developer.salesforce.com/docs/data/data-cloud-int/guide/c360-a-gcs-bucket-permission-setup.html">「Google Cloud Storage コネクタの権限設定」</a>の手順を完了します。</li>
+
+        <li><a title="Data 360 では、これらの IP アドレスを使用して Amazon S3、Google Cloud Storage、Azure Blob Storage、Snowflake、SFTP などの外部サービスと通信します。セキュリティポリシーで厳格なネットワーク ACL (アクセス制御リスト) が要求されている場合は、必ず次の IP アドレスを許可リストに含めてください。" href="getstarted-1.html#c360_a_data_cloud_ip_address_allowlist">「Data Cloud サービスで使用される IP アドレス」</a>を参照し、必要なアクセス権が GCS 接続にあることを確認します。</li>
+
+      </ul>
+</div>
+    <ol><li>
+        <span><span>Data 360</span> で、[<strong class="uicontrol">Data Cloud 設定</strong>] を選択します。</span>
+      </li><li>
+        <span>[外部インテグレーション] で、[その<strong class="uicontrol">他のコネクタ</strong>] を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[新規]</strong> をクリックして、<strong class="uicontrol">[対象]</strong> をクリックします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[Google Cloud Storage]</strong> を選択し、<strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>接続名、接続の API 参照名、認証の詳細 (アクセスキー、秘密鍵、接続の詳細 (バケット名と親ディレクトリ)) を入力します。</span>
+        <div>
+          <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:25.97402597402597%"><col style="width:74.02597402597402%"></colgroup><tbody>
+                <tr class="">
+                  <td style="vertical-align:top;" class="slds-cell-wrap">アクセスキー</td>
+
+                  <td style="vertical-align:top;" class="slds-cell-wrap">Google Cloud Storage プラットフォームのキーの作成時に生成されたアクセスキー</td>
+
+                </tr>
+                <tr class="">
+                  <td style="vertical-align:top;" class="slds-cell-wrap">秘密鍵</td>
+
+                  <td style="vertical-align:top;" class="slds-cell-wrap">秘密鍵は、Google Cloud Storage プラットフォームの鍵の作成時に生成されます。</td>
+
+                </tr>
+                <tr class="">
+                  <td style="vertical-align:top;" class="slds-cell-wrap">バケット名</td>
+
+                  <td style="vertical-align:top;" class="slds-cell-wrap">Google Cloud Storage プラットフォームで権限を設定するバケットの名前。</td>
+
+                </tr>
+                <tr class="">
+                  <td style="vertical-align:top;" class="slds-cell-wrap">親ディレクトリ</td>
+
+                  <td style="vertical-align:top;" class="slds-cell-wrap">データの転送先のバケット内にあるフォルダー。バケット名は含まれません。</td>
+
+                </tr>
+              </tbody></table>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> 接続元と接続先には異なる親ディレクトリを使用することをお勧めします。</div></div></div>
+
+        </div>
+      </li><li>
+        <span>設定を確認するには、<strong class="uicontrol">[接続をテスト]</strong> をクリックします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[保存] </strong>をクリックします。</span>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://cloud.google.com/compute/docs/instances/protecting-resources-vpc-service-controls">外部: VPC サービスコントロールによるリソースの保護</a></li><li><a title="Data 360 で有効化対象を作成し、セグメントと一括処理データモデルオブジェクト (DMO) を Amazon S3、SFTP、Google Cloud Storage (GCS)、Microsoft Azure Blob Storage などの外部ファイルストレージ有効化プラットフォームに公開します。" href="search_rag-1.html#c360_a_create_cloud_file_storage_activation_target">ファイルストレージ有効化対象の作成</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_set_up_a_microsoft_azure_target_connection">
+<h1 class="slds-text-heading_large">Microsoft Azure 接続先の設定</h1>
+  <p><span>Data 360</span> インスタンスを作成したら、Microsoft Azure Blob Storage 接続を設定できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d86293e60" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d86293e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Data Cloud 設定にアクセスする</td>
+
+              <td headers="d86293e60" style="vertical-align:top;" class="slds-cell-wrap"><p>システム管理者プロファイルまたは </p><p style="margin-bottom:0;">「Data Cloud アーキテクト」権限セット</p></td>
+
+            </tr>
+          </tbody></table><p>次の前提条件を満たします。</p><ul>
+        <li>次の主要な設定で Microsoft Azure Storage アカウントを取得します。<ul>
+            <li>公開アクセスレベル: 非公開</li>
+
+            <li>少なくとも 1 つのアカウントキーをプロビジョニングする</li>
+
+          </ul>
+</li>
+
+        <li>データの転送先のコンテナを取得します。<ul>
+            <li>匿名アクセスレベル: 非公開</li>
+
+          </ul>
+</li>
+
+        <li>コンテナ SAS (共有アクセス署名) トークンを設定します。詳細は、<a title="コンテナの共有アクセス署名 (SAS) トークンによって、Microsoft Azure Storage コンテナのファイルへのアクセス権限が付与されます。" href="model_mapping-1.html#c360_a_create_an_azure_container_sas_token">「Microsoft Azure Container SAS トークンの作成」</a>を参照してください。</li>
+
+      </ul>
+<p>ストレージサービスへのアクセス権が制限されている場合は、Microsoft Azure Storage サービス接続にストレージサービスへのアクセス権があることを確認します。「Data Cloud サービスで使用される IP アドレス」の<a title="Data 360 では、これらの IP アドレスを使用して Amazon S3、Google Cloud Storage、Azure Blob Storage、Snowflake、SFTP などの外部サービスと通信します。セキュリティポリシーで厳格なネットワーク ACL (アクセス制御リスト) が要求されている場合は、必ず次の IP アドレスを許可リストに含めてください。" href="getstarted-1.html#c360_a_data_cloud_ip_address_allowlist">「AWS ID IP の表」</a>セクションに記載されている IP ソースアドレスを許可リストに追加します。</p></div>
+    <ol><li>
+        <span><span>Data 360</span> で、[<strong class="uicontrol">Data Cloud 設定</strong>] を選択します。</span>
+      </li><li>
+        <span>[外部インテグレーション] で、[その<strong class="uicontrol">他のコネクタ</strong>] を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[新規]</strong> をクリックして、<strong class="uicontrol">[対象]</strong> をクリックします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[Microsoft Azure Storage]</strong> を選択して、<strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>接続名、接続の API 参照名、認証の詳細 (SAS トークンと接続の詳細 (コンテナ URL とコンテナパス)) を入力します。</span>
+        <div>
+          <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:25.97402597402597%"><col style="width:74.02597402597402%"></colgroup><tbody>
+                <tr class="">
+                  <td style="vertical-align:top;" class="slds-cell-wrap">SAS トークン</td>
+
+                  <td style="vertical-align:top;" class="slds-cell-wrap">ストレージアカウントまたはストレージコンテナ内のストレージリソースへのアクセス権を付与する共有アクセス署名 (SAS) トークン</td>
+
+                </tr>
+                <tr class="">
+                  <td style="vertical-align:top;" class="slds-cell-wrap">コンテナ URL</td>
+
+                  <td style="vertical-align:top;" class="slds-cell-wrap"><p>Azure ストレージコンテナにアクセスするための URL。コンテナ URL は、ストレージアカウントのコンテナプロパティから取得できます。</p><p style="margin-bottom:0;">例: https://{storage account name}.blob.core.windows.net/{container name}</p></td>
+
+                </tr>
+                <tr class="">
+                  <td style="vertical-align:top;" class="slds-cell-wrap">コンテナパス</td>
+
+                  <td style="vertical-align:top;" class="slds-cell-wrap">コンテナパスは、ファイルシステム内のディレクトリを参照します。また、他のコネクタの親ディレクトリと似ています。コンテナパスはファイルを有効化する場所です。コンテナパスには、コンテナ名ではなく、ディレクトリ名のみを含める必要があります。</td>
+
+                </tr>
+              </tbody></table>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> 接続元と接続先には異なるコンテナパスを使用することをお勧めします。</div></div></div>
+
+        </div>
+      </li><li>
+        <span>設定を確認するには、<strong class="uicontrol">[接続をテスト]</strong> をクリックします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[保存] </strong>をクリックします。</span>
+      </li></ol>
+
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="model_mapping-1.html#c360_a_create_an_azure_container_sas_token">Microsoft Azure コンテナ SAS トークンの作成</a></strong><br>コンテナの共有アクセス署名 (SAS) トークンによって、Microsoft Azure Storage コンテナのファイルへのアクセス権限が付与されます。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Data 360 で有効化対象を作成し、セグメントと一括処理データモデルオブジェクト (DMO) を Amazon S3、SFTP、Google Cloud Storage (GCS)、Microsoft Azure Blob Storage などの外部ファイルストレージ有効化プラットフォームに公開します。" href="search_rag-1.html#c360_a_create_cloud_file_storage_activation_target">ファイルストレージ有効化対象の作成</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_set_up_a_redshift_federation_connection_for_private_connect">
+<h1 class="slds-text-heading_large">プライベートコネクト用の Redshift フェデレーション接続の設定</h1>
+  <p>Redshift と Data Cloud のプライベートコネクト間の接続を設定して  データにアクセスします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d231542e67" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d231542e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Data Cloud で Amazon Redshift フェデレーション接続を作成する</td>
+
+              <td headers="d231542e67" style="vertical-align:top;" class="slds-cell-wrap"><p>システム管理者プロファイルまたは </p><p style="margin-bottom:0;">Data Cloud アーキテクト</p></td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>開始する前に、Amazon Redshift または Redshift Serverless クラスターとプライベートネットワークルートが設定されていることを確認します。</p></div>
+    <ol><li>
+        <span>Data Cloud で、Data Cloud の [設定] に移動します。</span>
+      </li><li>
+        <span>[外部インテグレーション] で、[その<strong class="uicontrol">他のコネクタ</strong>] を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[新規]</strong> をクリックします。</span>
+      </li><li>
+        <span>[Source (ソース)] で、[<strong class="uicontrol">Amazon Redshift]</strong> を選択し、[<strong class="uicontrol">Next (次</strong>へ)] をクリックします。</span>
+      </li><li>
+        <span>接続名と接続 API 参照名を入力します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[非公開ネットワークルートを使用]</strong> をクリックします。</span>
+      </li><li>
+        <span>作成した非公開ネットワークルートを選択します。ルートのリストは、Redshift への非公開ルート専用です。</span>
+      </li><li>
+        <span>設定を確認するには、<strong class="uicontrol">[接続をテスト]</strong> をクリックします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[保存] </strong>をクリックします。</span>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="統合接続を有効にするには、Private Connect for Data Cloud を使用して、Redshift データソースと Data Cloud テナントを専用のネットワークルートに接続します。プライベートコネクトでは、自己管理 PrivateLink がサポートされます。Redshift で管理される PrivateLink は現在サポートされていません。" href="ingest_connect-3.html#c360_a_private_connect_redshift">Redshift の非公開ネットワークルートの追加</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_set_up_a_snowflake_federation_connection_for_private_connect">
+<h1 class="slds-text-heading_large">プライベートコネクト用の Snowflake フェデレーション接続の設定</h1>
+  <p>Snowflake と Data Cloud のプライベートコネクト間の接続を設定してデータにアクセスします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d50854e67" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d50854e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Data Cloud で Snowflake データフェデレーション接続を作成する。</td>
+
+              <td headers="d50854e67" style="vertical-align:top;" class="slds-cell-wrap"><p>システム管理者プロファイルまたは </p><p style="margin-bottom:0;">Data Cloud アーキテクト</p></td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>開始する前に、Snowflake への接続を作成するネットワークルートを設定します。</p></div>
+    <ol><li>
+        <span>Data Cloud で、Data Cloud の [設定] に移動します。</span>
+      </li><li>
+        <span>[外部インテグレーション] で、[<strong class="uicontrol">Snowflake] を</strong>選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[新規]</strong> をクリックします。</span>
+      </li><li>
+        <span>接続名と接続 API 参照名を入力します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[非公開ネットワークルートを使用]</strong> をクリックします。</span>
+      </li><li>
+        <span>Snowflake インスタンスの非公開ネットワークルートを選択します。ルートのリストは、Snowflake への非公開ネットワークルート専用です。</span>
+      </li><li>
+        <span>Snowflake アカウントのユーザー名を入力します。</span>
+      </li><li>
+        <span>非公開鍵の詳細を入力します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>データベースを選択し、[<strong class="uicontrol">保存] を</strong>クリックします。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_set_up_an_amazon_s3_target_connection">
+<h1 class="slds-text-heading_large">Amazon S3 対象接続の設定</h1>
+  <p><span>Data 360</span>インスタンスを作成したら、Amazon S3ターゲット接続を設定できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d222716e60" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d222716e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Data Cloud 設定にアクセスする</td>
+
+              <td headers="d222716e60" style="vertical-align:top;" class="slds-cell-wrap"><p>システム管理者プロファイルまたは </p><p style="margin-bottom:0;">「Data Cloud アーキテクト」権限セット</p></td>
+
+            </tr>
+          </tbody></table><p>前提条件</p><ul>
+        <li><a target="_blank" href="https://developer.salesforce.com/docs/data/data-cloud-int/guide/c360-a-awss3-prerequisites.html">Amazon S3 接続の準備</a></li>
+
+      </ul>
+</div>
+    <ol><li>
+        <span>Data Cloud で、[<strong class="uicontrol">Data Cloud 設定</strong>] に移動します。</span>
+      </li><li>
+        <span>[外部インテグレーション] で、[<strong class="uicontrol">その他のコネクタ</strong>] を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[新規]</strong> をクリックします。</span>
+      </li><li>
+        <span>[Target]で[<strong class="uicontrol">Amazon S3]</strong>を選択し、[<strong class="uicontrol">Next]を</strong>クリックします。</span>
+      </li><li>
+        <span>接続名と接続 API 参照名を入力します。</span>
+      </li><li>
+        <span>認証の詳細を入力します。</span>
+        <div>
+          <p>[アクセスキー] と [秘密] を使用する場合は、[<strong class="uicontrol">アクセスキー/秘密ベース</strong>] をクリックします。</p>
+          <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:25.97402597402597%"><col style="width:74.02597402597402%"></colgroup><thead class="slds-text-title_caps">
+                <tr class="">
+                  <th id="d222716e165" style="vertical-align:top;" class="slds-cell-wrap" scope="col">項目の表示ラベル</th>
+                  <th id="d222716e168" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+                </tr>
+              </thead><tbody>
+                <tr class="">
+                  <td headers="d222716e165" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目の表示ラベル">AWS アクセスキー</td>
+
+                  <td headers="d222716e168" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">AWS への API アクセス用のプログラムによるユーザー名。</td>
+
+                </tr>
+                <tr class="">
+                  <td headers="d222716e165" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目の表示ラベル">AWS Secret Access Key (AWS の秘密のアクセスキー)</td>
+
+                  <td headers="d222716e168" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">AWS への API アクセス用のプログラムによるパスワード。</td>
+
+                </tr>
+              </tbody></table>
+          <p>IdP を使用することを選択した場合は、[<strong class="uicontrol">ID プロバイダーベース</strong>] をクリックします。詳細は、「<a target="_blank" href="https://developer.salesforce.com/docs/data/data-cloud-int/guide/c360-a-awss3-connector-idp-settings.html">Use ID Provider-Based Authentication for S3 Connectors</a> (S3 コネクタでの ID プロバイダーベースの認証の使用)」を参照して、値を入力します。</p>
+          <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:25.97402597402597%"><col style="width:74.02597402597402%"></colgroup><thead class="slds-text-title_caps">
+                <tr class="">
+                  <th id="d222716e218" style="vertical-align:top;" class="slds-cell-wrap" scope="col">項目の表示ラベル</th>
+                  <th id="d222716e221" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+                </tr>
+              </thead><tbody>
+                <tr class="">
+                  <td headers="d222716e218" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目の表示ラベル">IAM ロール名</td>
+
+                  <td headers="d222716e221" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ロールを指定する Amazon リソース名 (ARN)。</td>
+
+                </tr>
+                <tr class="">
+                  <td headers="d222716e218" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目の表示ラベル">外部 ID</td>
+
+                  <td headers="d222716e221" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">これは自動生成された接続IDです。接続をテストする前に、ロールのAWS Trustポリシーに外部IDを入力します。</td>
+
+                </tr>
+              </tbody></table>
+        </div>
+      </li><li>
+        <span>接続の詳細を入力します。</span>
+        <div>
+          <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:25.97402597402597%"><col style="width:74.02597402597402%"></colgroup><thead class="slds-text-title_caps">
+                <tr class="">
+                  <th id="d222716e270" style="vertical-align:top;" class="slds-cell-wrap" scope="col">項目の表示ラベル</th>
+                  <th id="d222716e273" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+                </tr>
+              </thead><tbody>
+                <tr class="">
+                  <td headers="d222716e270" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目の表示ラベル">バケット名</td>
+
+                  <td headers="d222716e273" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">AWS の特定の公開クラウドストレージリソース。</td>
+
+                </tr>
+                <tr class="">
+                  <td headers="d222716e270" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目の表示ラベル">親ディレクトリ</td>
+
+                  <td headers="d222716e273" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">S3 バケットに対応する親フォルダー。</td>
+
+                </tr>
+              </tbody></table>
+        </div>
+      </li><li>
+        <span>設定を確認するには、<strong class="uicontrol">[接続をテスト]</strong> をクリックします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[保存] </strong>をクリックします。</span>
+      </li></ol>
+
+    <div><p>このAmazon S3接続を使用して、有効化対象を作成し、<span>Data 360</span>からAmazon S3バケットへのデータを有効化します。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://developer.salesforce.com/docs/data/data-cloud-int/guide/c360-a-awss3-bucket-policies.html">Salesforce 開発者: Amazon S3 バケットのポリシーと権限の設定</a></li><li><a target="_blank" href="https://developer.salesforce.com/docs/data/data-cloud-int/guide/c360-a-awss3-bucket-policies.html#configure-permissions-for-activation">Salesforce 開発者: 有効化の権限の設定</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_set_up_an_sftp_target_connection">
+<h1 class="slds-text-heading_large">SFTP 接続先の設定</h1>
+  <p>Marketing Cloud Engagement で提供または使用されていない独自の SFTP サーバーを使用して、<span>Data 360</span> で SFTP 接続を作成します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d34084e63" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d34084e63" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Data Cloud 設定にアクセスする</td>
+
+              <td headers="d34084e63" style="vertical-align:top;" class="slds-cell-wrap"><p>システム管理者プロファイルまたは </p><p style="margin-bottom:0;">「Data Cloud アーキテクト」権限セット</p></td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span><span>Data 360</span> で、[<strong class="uicontrol">Data Cloud 設定</strong>] を選択します。</span>
+      </li><li>
+        <span>[外部インテグレーション] で、[その<strong class="uicontrol">他のコネクタ</strong>] を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[新規]</strong> をクリックして、<strong class="uicontrol">[対象]</strong> をクリックします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[セキュアファイル転送 (SFTP)]</strong> を選択し、<strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>接続名と接続の API 参照名を入力し、認証の詳細を入力します。</span>
+        <div>
+          <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+                <tr class="">
+                  <th id="d34084e148" style="vertical-align:top;" class="slds-cell-wrap" scope="col">項目</th>
+                  <th id="d34084e151" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+                </tr>
+              </thead><tbody>
+                <tr class="">
+                  <td headers="d34084e148" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">認証メソッド</td>
+
+                  <td headers="d34084e151" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">SSH 非公開鍵または SSH 非公開鍵とパスワードを選択します。</td>
+
+                </tr>
+                <tr class="">
+                  <td headers="d34084e148" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">ユーザー名</td>
+
+                  <td headers="d34084e151" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">接続の認証に使用される SFTP アカウント。</td>
+
+                </tr>
+                <tr class="">
+                  <td headers="d34084e148" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">パスワード</td>
+
+                  <td headers="d34084e151" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ユーザーを認証するためのパスワード。</td>
+
+                </tr>
+                <tr class="">
+                  <td headers="d34084e148" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">SSH 非公開鍵</td>
+
+                  <td headers="d34084e151" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">アクセスを保護するには、SSH の公開鍵と非公開鍵を作成します。公開鍵は、データを Data Cloud に送信する前に暗号化するために SFTP サーバーで使用されます。非公開鍵は SFTP 接続の詳細に入力され、Data Cloud でデータを復号化するために使用されます。</td>
+
+                </tr>
+                <tr class="">
+                  <td headers="d34084e148" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">パスフレーズ (省略可能)</td>
+
+                  <td headers="d34084e151" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">非公開鍵を保護するためのパスフレーズ。</td>
+
+                </tr>
+                <tr class="">
+                  <td headers="d34084e148" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">ホスト名</td>
+
+                  <td headers="d34084e151" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">SFTP サーバーの名前またはアドレス。</td>
+
+                </tr>
+                <tr class="">
+                  <td headers="d34084e148" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">ポート: 22 (デフォルト)</td>
+
+                  <td headers="d34084e151" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">SFTP サーバーが実行されるポート。</td>
+
+                </tr>
+                <tr class="">
+                  <td headers="d34084e148" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">PGP 暗号化 (省略可能)</td>
+
+                  <td headers="d34084e151" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">公開キーは RSA 形式です。PGP 暗号化は、CSV ファイルと JSON ファイルの形式ではサポートされますが、Parquet ではサポートされません。</td>
+
+                </tr>
+                <tr class="">
+                  <td headers="d34084e148" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">親ディレクトリ</td>
+
+                  <td headers="d34084e151" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">有効化対象の子フォルダーが存在するベースディレクトリ。選択したディレクトリには「更新」権限が必要です。また、SFTP サーバーで有効化されたファイルにはファイル名の変更権限が必要です。</td>
+
+                </tr>
+              </tbody></table>
+        </div>
+      </li><li>
+        <span>設定を確認するには、<strong class="uicontrol">[接続をテスト]</strong> をクリックします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[保存] </strong>をクリックします。</span>
+      </li></ol>
+
+    <div><p>コネクタの詳細が受け入れられると、接続が作成され、有効化対象で使用できるようになります。セキュリティポリシーに従って、SFTP ログイン情報と暗号化鍵を定期的に変更します。</p><p>SSH 鍵は、公開鍵と非公開鍵 (省略可能なパスフレーズを含む) で構成されます。SSH 鍵のペアは、いくつかの SSH キージェネレーターユーティリティを使用して生成できます。PuTTY などの SSH キージェネレーターユーティリティを使用して SSH 鍵の対を生成します。SFTP コネクタでは、最大 4096 ビット暗号化による RSA ベースの鍵がサポートされます。たとえば、PuTTY を使用して鍵のペアを作成するには、ターミナルにコマンドライン &lt;ssh-keygen -b 4096 -t rsa&gt; を入力します。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="許可リストでは、システムが信頼するものを定義できます。許可されるトラフィックを制御し、未定義のトラフィックを拒否するために使用されます。OSI モデルのさまざまなレイヤーに適用できます。Data 360 のアプリケーション層とネットワーク層で許可リストがどのように機能するかを次に示します。" href="setup_admin-1.html#c360_a_allowlist">許可リスト登録</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=000384438&amp;language=ja&amp;type=1">Salesforce Knowledge: 許可する IP アドレスとドメイン</a></li><li><a title="Data 360 で有効化対象を作成し、セグメントと一括処理データモデルオブジェクト (DMO) を Amazon S3、SFTP、Google Cloud Storage (GCS)、Microsoft Azure Blob Storage などの外部ファイルストレージ有効化プラットフォームに公開します。" href="search_rag-1.html#c360_a_create_cloud_file_storage_activation_target">ファイルストレージ有効化対象の作成</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_set_up_crm_connection">
+<h1 class="slds-text-heading_large">CRM Salesforce 組織接続の設定</h1>
+  <p>データソースとデータアクションターゲットは、<span>Data 360</span> を設定した組織に対して自動的に作成されます。他の Salesforce 組織を接続するには、手動で接続を設定します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d82447e39" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d82447e39" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Data Cloud 設定にアクセスする</td>
+
+              <td headers="d82447e39" style="vertical-align:top;" class="slds-cell-wrap"><p>システム管理者プロファイルまたは </p><p style="margin-bottom:0;">Data Cloud アーキテクト</p></td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> ユーザーがインスタンス化された URL を使用して組織にログインできないようにします。[設定] の [私のドメイン] ページで、[<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.domain_name_redirections_manage.htm&amp;language=ja&amp;type=5">リダイレクト</a>] セクションで [インスタンス化された URL の<strong class="uicontrol">リダイレクトなし</strong>] を選択します。</div></div></div>
+<ul>
+        <li>CRM 接続を成功させるには、ソース組織と対象組織の両方でドメイン設定を定義します。</li>
+
+        <li>接続する Salesforce 組織に API アクセス権があり、Salesforce IP 範囲のアクセスを許可している必要があります。<a target="_blank" href="https://help.salesforce.com/s/articleView?id=000321501&amp;language=ja&amp;type=1">「許可すべき Salesforce の IP アドレスとドメイン」</a>を参照してください。</li>
+
+        <li>「<a title="システム管理者以外のユーザーが外部Salesforce組織をData 360に接続するには、メインのData 360アカウントによって割り当てられた必要なユーザー権限が必要です。" href="https://help.salesforce.com/s/articleView?id=data.c360_a_setting_user_permissions_to_connect_external_org.htm&amp;language=ja&amp;type=5">Configure User Permissions for</a> an External Salesforce Org Connection in Data 360 (Data 360 での外部 Salesforce 組織接続のユーザー権限の設定)」および「<a title="組織に接続すると、Data 360 オブジェクトおよび項目へのアクセスを許可する「Data 360 Salesforce コネクタ」権限セットが作成されます。組織のニーズに合わせて「Data 360 Salesforce コネクタ」権限セットを編集できます。" href="#c360_a_enable_user_permissions_external_salesforce_org">Enable Object and</a> Field Permissions to Access Salesforce CRM in Data 360 (Data 360 で Salesforce CRM にアクセスするためのオブジェクトおよび項目権限の有効化)」を参照してください。
+        </li>
+
+      </ul>
+</div>
+    <ol><li>
+        <span>Data Cloud の [設定] から、[Salesforce Integrations (Salesforce インテグレーション)] の下の [<strong class="uicontrol">Salesforce CRM]</strong> を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[新規]</strong> をクリックします。</span>
+      </li><li>
+        <span>[<strong class="uicontrol">Salesforce 組織に接続</strong>] または [<strong class="uicontrol">Sandbox 組織に接続</strong>] をクリックします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>組織の別名を作成するには、最大 15 文字の英数字を使用します。このスペースは空白のままにしないでください。接続が確立されると別名を変更できなくなるため、名前は慎重に選択してください。別名は、データストリームおよびデータレイクオブジェクト名に使用されます。たとえば、別名「SourceOrg」を使用して Account データストリームを作成すると、Account_SourceOrg という名前の対応するデータストリームとデータレイクオブジェクトが取得されます。データキットを使用する場合、別名はすべての組織で一致している必要があります。</span>
+      </li><li>
+        <span><strong class="uicontrol">[続行]</strong> をクリックします。</span>
+      </li><li>
+        <span>Salesforce ログイン情報を使用して組織にログインします。</span>
+        <div>Salesforce 本番組織または開発者組織のログインは https://salesforce.com です。Sandbox 組織のログインは https://test.salesforce.com です。</div>
+      </li><li>
+        <span>[アクセスを許可] メニューで、[<strong class="uicontrol">許可] を</strong>選択します。</span>
+      </li><li>
+          <span>Data 360 組織識別子を入力して、接続を確認します。</span>
+          <div>この ID はモーダルの [<strong class="uicontrol">Data 360 Org Details</strong>] にあります。ソース組織からデータを取得する Data 360 組織を指定します。</div>
+        </li><li>
+          <span>チェックボックスをオンにして接続の作成に同意し、[<strong class="uicontrol">接続] を</strong>クリックします。</span>
+          <div>これで、Salesforce CRM コネクタページから組織を使用できるようになります。<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> ホーム組織接続を有効化すると、関連付けられたシステムデータストリームが原因で組織を切断できなくなります。</div></div></div>
+</div>
+        </li></ol>
+
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="ingest_connect-2.html#c360_a_create_crm_data_stream">Salesforce CRM データストリームの作成</a></strong><br>データストリームを作成して、Salesforce CRM データソースから処理と統合のために <span>Data 360</span> へのデータフローを開始します。</li><li class="slds-p-bottom_small"><strong><a href="ingest_connect-2.html#c360_a_create_crm_starter_bundle">Salesforce CRM スターターバンドルの作成</a></strong><br>スターターバンドルを使用してデータストリームを作成し、Salesforce CRM ソースから Data 360 へのデータフローを開始します。</li><li class="slds-p-bottom_small"><strong><a href="ingest_connect-2.html#c360_a_crm_data_stream_fsc_objects">Financial Services Cloud (FSC) オブジェクトからの CRM データストリームの作成</a></strong><br>FSC オブジェクトを取り込むための権限とライセンス要件を Salesforce CRM 組織に追加します。</li><li class="slds-p-bottom_small"><strong><a href="sharing_dev.html#c360_a_install_standard_data_bundles_powered_by_data_kits">データキットにより提供される標準データバンドルのインストール</a></strong><br><span>Data 360</span> インスタンスを作成して Salesforce CRM 接続を設定したら、データキットによって提供される標準データバンドルをインストールして、<span>Data 360</span> 内にデータをリリースできます。</li><li class="slds-p-bottom_small"><strong><a href="misc_combined.html#c360_a_crm_object_sharing_and_access">Salesforce CRM のオブジェクト共有アクセス権の設定</a></strong><br>QuickTextUsage や MacroUsage などの特定のオブジェクトの共有アクセス権は、デフォルトで [非公開] に設定されます。これらのオブジェクトを Data 360 に取り込むには、組織の共有アクセス権を公開に変更します。</li><li class="slds-p-bottom_small"><strong><a href="ingest_connect-3.html#c360_a_disconnect_a_salesforce_crm_connection">Salesforce CRM 接続の切断</a></strong><br>接続が必要なくなったら、削除できます。標準のSalesforce CRM接続を削除すると、<span>Data 360</span>は接続組織からのデータの取り込みを停止し、Trustファイルを除く、その組織から取り込んだすべてのデータを削除できます。組織から取り込まれたデータは、次に ID 解決が実行されるときに統合プロファイルから削除されます。</li><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=data.c360_a_verify_and_reauthenticate_a_salesforce_crm_connection.htm&amp;language=ja&amp;type=5">Salesforce CRM 接続の確認と再認証</a></strong><br>Salesforce CRM Connection Trustを確認し、中断がSandboxの更新によって発生した場合は再認証します。Salesforce 組織に Sandbox 組織への CRM 接続があり、その Sandbox が最近更新された場合、更新プロセスで既存の接続に関連付けられている組織 ID と競合する Sandbox 組織の新しい組織 ID が生成されます。<span>Data 360</span>は更新されたSandboxでTrustを確立できないため、<span>Data 360</span>への接続が中断され、再認証が必要になります。接続が切断されると、新しいストリームのリリースの失敗やストリームの更新履歴内のエラーなど、接続に関連付けられているデータストリームでエラーが発生する可能性があります。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="July '24 以降、Salesforce CRM 接続を設定するときに別名が必要になります。既存の接続には別名が割り当てられません。データストリームとデータレイクオブジェクトの名前は別名から取得されます。" href="misc_combined.html#c360_a_crm_alias">Salesforce CRM 接続の別名の使用</a></li><li><a title="データストリームを作成して、Salesforce CRM データソースから処理と統合のために Data 360 へのデータフローを開始します。" href="ingest_connect-2.html#c360_a_create_crm_data_stream">Salesforce CRM データストリームの作成</a></li><li><a title="システム管理者以外のユーザーが外部Salesforce組織をData 360に接続するには、メインのData 360アカウントによって割り当てられた必要なユーザー権限が必要です。" href="https://help.salesforce.com/s/articleView?id=data.c360_a_setting_user_permissions_to_connect_external_org.htm&amp;language=ja&amp;type=5">Data 360 での外部 Salesforce 組織接続のユーザー権限の設定</a></li><li><a title="組織に接続すると、Data 360 オブジェクトおよび項目へのアクセスを許可する「Data 360 Salesforce コネクタ」権限セットが作成されます。組織のニーズに合わせて「Data 360 Salesforce コネクタ」権限セットを編集できます。" href="#c360_a_enable_user_permissions_external_salesforce_org">Salesforce CRM 権限</a></li><li><a title="ガイドラインでは、Data 360 の採用を最適化して最高のパフォーマンスを実現するためのベストプラクティスの推奨事項を定義します。制限は、それを超えると機能が利用不可になったり、パフォーマンスが調整されたり、使用量の請求料金が適用されたりする境界線です。Data 360 は拡張性を備えているため、ビジネスニーズに合わせていくつかの制限を調整できます。アカウントエグゼクティブと協力して目標を満たすソリューションを見つけてください。" href="getstarted-2.html#c360_a_limits_and_guidelines">Data 360 の制限およびガイドライン</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_set_up_interaction_studio_connector">
+<h1 class="slds-text-heading_large">Marketing Cloud Personalization への接続の設定</h1>
+  
+  <p><span>Data 360</span>インスタンスを作成したら、Marketing Cloud Personalization(旧称Interaction Studio)に接続して、ユーザープロファイルデータとイベントで顧客プロファイルを強化します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d152664e63" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d152664e63" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Marketing Cloud Personalization に接続する</td>
+
+              <td headers="d152664e63" style="vertical-align:top;" class="slds-cell-wrap">Marketing Cloud Personalization での管理者権限</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d152664e63" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Data Cloud 設定にアクセスする</td>
+
+              <td headers="d152664e63" style="vertical-align:top;" class="slds-cell-wrap"><p>システム管理者プロファイルまたは </p><p style="margin-bottom:0;">Data Cloud アーキテクト</p></td>
+
+            </tr>
+          </tbody></table><p><span>Data 360</span> に接続する前に Marketing Cloud Personalization を設定します。設定が完了したら、<span>Data 360</span> で次の手順に従って 2 つを接続します。</p></div>
+    <ol><li>
+        <span>[<strong class="uicontrol">設定]</strong> から、[<span>Data 360</span> 設定] を選択します。</span>
+      </li><li>
+        <span>[マーケティング] の下の Salesforce インテグレーションで、[<strong class="uicontrol">Marketing Cloud Personalization</strong>] を選択します。</span>
+      </li><li>
+        <span>新規のアカウントに接続するには、<strong class="uicontrol">[新規]</strong> または <strong class="uicontrol">[接続]</strong> をクリックします。</span>
+      </li><li>
+        <span>Marketing Cloud Personalization ログイン情報を入力し、<strong class="uicontrol">[ログイン]</strong> をクリックします。</span>
+      </li><li>
+        <span><span>Data 360</span> のアカウントへのアクセス権を付与するには、[<strong class="uicontrol">OK</strong>] をクリックします。</span>
+      </li><li>
+        <span>統合用のデータセットを選択するには、アカウント名の横にある <strong class="uicontrol">[編集]</strong> をクリックします。</span>
+      </li><li>
+        <span>統合するデータセットを選択します。これらのデータセットは、データモデリング、セグメンテーション、有効化に使用できます。</span>
+        <div>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> データセットは 1 つの <span>Data 360</span> アカウントでのみ使用できます。すでに接続されているデータセットは選択可能リストに表示されません。また、選択されていないデータセットは、取り込みまたは有効化のために <span>Data 360</span> インスタンスに含まれません。</div></div></div>
+
+        </div>
+      </li><li>
+        <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+        <div>Marketing Cloud Personalization アカウントは、<span>Data 360</span> で使用するために接続されています。</div>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Data 360のMarketing Cloud Personalization(旧称Interaction Studio)データを使用して、ユーザープロファイルと行動イベントを取り込み、顧客プロファイルを強化してパーソナライズを強化できます。このコネクタでは、Marketing Cloud Personalization を有効化対象として使用することもできます。" href="ingest_connect-3.html#c360_a_interaction_studio_connector">Marketing Cloud Personalization コネクタ</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=mktg.mc_pers_salesforce_cdp.htm&amp;language=ja&amp;type=5">Salesforce ヘルプ: Data 360 とのパーソナライズの統合</a></li><li><a title="Marketing Cloud Personalization (旧称 Interaction Studio) にセグメントを公開するには、Data 360 で有効化対象を作成します。" href="segment_activation-2.html#c360_a_create_mc_personalization_activation_target">Marketing Cloud Personalization 有効化対象の作成</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_set_up_marketing_cloud_connection">
+<h1 class="slds-text-heading_large">Data 360 での Marketing Cloud Engagement 接続の設定</h1>
+  
+  <p><span>Data 360</span>インスタンスを作成したら、Marketing Cloud Engagementやその他のソースからデータの取り込みと有効化の範囲を制御します。<span>Data 360</span>と統合する前に、エンゲージメント ユーザーのデフォルトのビジネス ユニット(BU)がエンタープライズID(EID)に設定されていることを確認します。データマッピングとセグメントのデータの取得元 (取り込みとも呼ばれる) を <span>Data 360</span> に指示するようにデータソースを設定します。複数の EID を 1 つの <span>Data 360</span> 組織に接続できます。各 EID には <span>Data 360</span> への独自の接続があります。これらの接続ごとに、データバンドルまたはデータエクステンションを使用して複数のデータストリームを設定できます。各接続には、独自のビジネスユニットとデータスペースの対応付け設定もあります。Data 360 では、Engagement Enterprise 2.0 アカウント接続のみがサポートされます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Spring '22 リリースより前にエンゲージメント接続を設定した場合は、ステップ 13 に進んで、<span>Data 360</span> と Engagement 間の BU 対応インテグレーションを有効にします。</div></div></div>
+<table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d138172e61" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d138172e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Data Cloud 設定にアクセスする</td>
+
+              <td headers="d138172e61" style="vertical-align:top;" class="slds-cell-wrap"><p>システム管理者プロファイルまたは </p><p style="margin-bottom:0;">Data Cloud アーキテクト</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d138172e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">エンゲージメントアカウントに接続する</td>
+
+              <td headers="d138172e61" style="vertical-align:top;" class="slds-cell-wrap">「管理者」および「Marketing Cloud 管理者ロール」がエンゲージメントアカウントユーザーに割り当てられている必要があります。</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+                <span>[設定] から、[<strong class="uicontrol">Data Cloud 設定</strong>] をクリックします。</span>
+            </li><li><span>[Salesforce Integrations and Marketing (Salesforce インテグレーションおよびマーケティング)] で、[<strong class="uicontrol">Marketing Cloud Engagement]</strong> を選択します。</span></li><li>
+                <span>新しい接続を作成するには、<strong class="uicontrol">[新規]</strong> をクリックし、接続の名前を入力します。</span>
+            </li><li>
+                <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+                <div> 既存の接続を再設定する場合は、接続のリストから接続を選択し、メニューから <strong class="uicontrol">[編集]</strong> を選択します。</div>
+            </li><li>
+                <span>認証用の Engagement ログイン情報を入力するには、[<strong class="uicontrol">管理]</strong> をクリックします。</span>
+                <div>接続の設定時に Marketing Cloud アカウントにすでにログインしている場合、<span>Data 360</span> はそのアカウントのログイン情報を引き継ぎ、接続の設定を開始します。現在ログインしているアカウントとは異なる Marketing Cloud アカウントに接続する場合は、Marketing Cloud Engagement の [認証] ページからアカウントからログアウトする必要があります。</div>
+            </li><li><span>エンゲージメントのユーザー名とパスワードを入力します。</span><div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> サービスの中断を回避するには、<span>Data 360</span>との統合専用のMarketing Cloud APIユーザー アカウントを使用します。パスワードの有効期限が切れた場合、パスワードが更新されるまで、有効化で新規または更新されたセグメントを Engagement に公開することはできません。Marketing Cloud API ユーザーのパスワードに有効期限はありません。</div></div></div>
+</div></li><li><span><span>Data 360</span> でデータを取り込むことができるようにチャネルを有効にするには、[設定バンドルの<strong class="uicontrol">管理]</strong> をクリックして <span>Data 360</span> に取り込みます。</span>
+                <div>
+                    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div id="c360_a_set_up_marketing_cloud_connection__note_zkl_w4t_khc" style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><a name="c360_a_set_up_marketing_cloud_connection__note_zkl_w4t_khc"></a><span class="slds-text-title_caps">メモ</span> データエクステンションデータストリームを有効にするチャネルを有効にします。バンドルが設定されていない場合、新しいデータストリームを作成するときに Marketing Cloud Engagement をオプションとして使用できません。</div></div></div>
+
+                </div></li><li>
+                <span>強調表示されたチャネルを有効にして、<span>Data 360</span> が Data Cloud Starter バンドルを使用してデータを取り込めるようにするには、[<strong class="uicontrol">開始]</strong> をクリックします。</span>
+            </li><li><span>データバンドルソースが表示されます。データバンドルを使用して、複数のデータストリームをすばやく簡単に作成して Engagement からシステム所有のデータを取得します。後でデータエクステンションを手動で追加することもできます。</span><div><span>Data 360 は</span>、データの取り込みをサポートする自動化と自動化アクティビティのセットを Automation Studio で作成します。これらの自動化により、2 つの製品間でデータが転送されます。これらのオートメーションは変更または編集しないでください。</div></li><li><span>データを取り込むビジネスユニットを選択するには、<strong class="uicontrol">[管理]</strong> をクリックします。</span>
+                <div>
+                    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div id="c360_a_set_up_marketing_cloud_connection__note_xpx_4pt_khc" style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><a name="c360_a_set_up_marketing_cloud_connection__note_xpx_4pt_khc"></a><span class="slds-text-title_caps">メモ</span> このステップをスキップすると、新しいデータストリームを作成するときに Marketing Cloud Engagement を [データストリーム] タブのオプションとして使用できません。</div></div></div>
+
+                </div></li><li><span>[設定] で矢印 (1) を使用して追加、削除、移動するビジネスユニット名を選択します。</span><div>最上位のビジネスユニットは事前に選択されており、メールチャネルのすべての登録者データがこのレベルであるため、選択解除できません。<div style="text-align:left;"><img alt="データ取り込み用の BU の選択" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_select_bu_for_ingest.png" style="width:400px;"></div></div><div>新しいビジネス ユニットを選択すると、<span>Data 360</span>はそのビジネス ユニットの90日間の履歴データのみを取り込みます。</div></li><li>
+                <span>ビジネスユニットの対応付けを有効にするには、[<strong class="uicontrol">保存] を</strong>クリックします。</span>
+            </li><li><span>セグメントを有効にするビジネスユニットを選択するには、<strong class="uicontrol">[管理]</strong> をクリックします。</span>
+                <div>
+                    <p>ビジネス ユニットからデータを取り込むことなく、Marketing Cloud Engagementアカウントへのデータのみを有効化する場合は、[<strong class="uicontrol">スキップ] を</strong>クリックします。</p>
+                </div></li><li><span>矢印を使用して、[選択済みのビジネスユニット] のビジネスユニットを追加または削除します。</span><div>取り込み用に選択した BU とは関係なく、ビジネスユニットの任意の数または組み合わせを選択できます。</div></li><li><span>Engagement 購読者のデータを自動的に所属データモデルオブジェクト (DMO) にマッピングするには、[<strong class="uicontrol">プロファイルビジネスユニットで</strong>のデータのマッピングを許可] を有効にします。</span><div><strong class="uicontrol">[プロファイルビジネスユニットでのデータのマッピングを許可]</strong> の有効化は永続的であり、元に戻すことはできません。新しい SFMC 登録者 BU マッピングデータストリームが作成され、所属 DMO にマッピングされます。データが所属 DMO に表示されるまで最大 24 時間かかる場合があります。データが所属 DMO に取り込まれるまで、有効化は共有データエクステンションとして Engagement に送信されます。取り込みに成功すると、有効化はデータエクステンションとして自動的に送信されます。SFMC 登録者 BU マッピングデータストリームは 1 日に 1 回フル更新されるため、更新履歴で最新の状況の詳細を確認します。</div></li><li><span>所属 DMO に他のデータをマッピングします。</span><ol><li>
+                        <span>所属 DMO の関係者項目と個人 DMO の個人 ID 項目間のリレーションを ManyToOne のカーディナリティで作成する。</span>
+                    </li>
+<li><span>データストリームを作成し、データを所属 DMO にマッピングする。</span><div><table summary="所属 DMO 項目" class="slds-table slds-table_bordered slds-m-bottom_small"><caption>所属 DMO 項目</caption><colgroup><col style="width:25%"><col style="width:25%"><col style="width:25%"><col style="width:25%"></colgroup><thead class="slds-text-title_caps"><tr class=""><th id="d138172e275" style="vertical-align:top;" class="slds-cell-wrap" scope="col">項目の表示ラベル</th><th id="d138172e277" style="vertical-align:top;" class="slds-cell-wrap" scope="col">項目 API 表示ラベル</th><th id="d138172e279" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th><th id="d138172e281" style="vertical-align:top;" class="slds-cell-wrap" scope="col">マッピングの要件</th></tr></thead><tbody><tr class=""><td headers="d138172e275" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目の表示ラベル">所属 ID</td>
+<td headers="d138172e277" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目 API 表示ラベル">ssot__Id__c</td>
+<td headers="d138172e279" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">個人ごとの一意の値。</td>
+<td headers="d138172e281" style="vertical-align:top;" class="slds-cell-wrap" data-label="マッピングの要件">必須</td>
+</tr><tr class=""><td headers="d138172e275" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目の表示ラベル">関係者</td>
+<td headers="d138172e277" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目 API 表示ラベル"><p style="margin-bottom:0;">ssot__PartyId__c</p></td>
+<td headers="d138172e279" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>個人に関する情報。</p><p style="margin-bottom:0;">デフォルトの対応付けは、[エンゲージメント登録者キー] 項目です。</p></td>
+<td headers="d138172e281" style="vertical-align:top;" class="slds-cell-wrap" data-label="マッピングの要件">必須</td>
+</tr><tr class=""><td headers="d138172e275" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目の表示ラベル">所属先</td>
+<td headers="d138172e277" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目 API 表示ラベル">ssot__AffiliatedTo__c</td>
+<td headers="d138172e279" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>ビジネスユニットに関する情報。ブランドや地域など。</p><p>デフォルトのマッピングはエンゲージメント MID です。</p><p style="margin-bottom:0;">この項目によって、有効化が Engagement の適切なビジネスユニットに送信されます。</p></td>
+<td headers="d138172e281" style="vertical-align:top;" class="slds-cell-wrap" data-label="マッピングの要件">必須</td>
+</tr><tr class=""><td headers="d138172e275" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目の表示ラベル">所属種別</td>
+<td headers="d138172e277" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目 API 表示ラベル">ssot__AffiliationType__c</td>
+<td headers="d138172e279" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">所属の種別またはカテゴリ。商品カテゴリやその他の詳細情報など。</td>
+<td headers="d138172e281" style="vertical-align:top;" class="slds-cell-wrap" data-label="マッピングの要件">省略可能</td>
+</tr></tbody></table></div></li>
+</ol></li></ol>
+
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=data.c360_update_connection_after_failure.htm&amp;language=ja&amp;type=5">接続失敗後の接続のログイン情報の更新</a></strong><br>1 つ以上の Marketing Cloud Engagement 接続が失敗したという通知を受け取った場合、問題に合わせてログイン情報を更新します。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://resources.docs.salesforce.com/242/latest/en-us/sfdc/pdf/cdp_bu_aware_guide.pdf">Salesforce ヘルプ: ビジネスユニット対応インテグレーション: Marketing Cloud と Data 360 (PDF)</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_set_up_oci_connection">
+<h1 class="slds-text-heading_large">オムニチャネル在庫接続の設定</h1>
+  
+  <p>オムニチャネル在庫コネクタを使用して、オムニチャネル在庫データを Data 360 に取り込みます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d154546e69" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d154546e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">オムニチャネル在庫に接続する</td>
+
+              <td headers="d154546e69" style="vertical-align:top;" class="slds-cell-wrap">「Data Cloud Architect」権限セットまたは「Commerce Intelligence 管理者」権限セット</td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> Data 360 組織とオムニチャネル在庫 (OCI) テナントは同じインスタンスに存在する必要があります。1 つの OCI テナントには 1 つの Data 360 組織のみを接続します。複数の Data 360 組織を 1 つの OCI テナントに接続すると、予期しない動作が発生します。</div></div></div>
+</div>
+    <ol><li>
+        <span>Data Cloud の [設定] から、[クイック検索] ボックスに「<kbd>オムニチャネル在庫コネクタ</kbd>」と入力し、[<strong class="uicontrol">オムニチャネル在庫コネクタ</strong>] を選択します。</span>
+      </li><li>
+        <span>オムニチャネル在庫コネクタの設定画面で、[<strong class="uicontrol">接続] を</strong>クリックします。</span>
+      </li><li>
+        <span>作成する接続種別の横にある <strong class="uicontrol">[接続]</strong> をクリックします。</span>
+      </li><li>
+        <span>オムニチャネル在庫インスタンスにログインします。</span>
+      </li><li>
+        <span>Data Clloud がオムニチャネル在庫に接続してデータにアクセスできるようにします。</span>
+      </li><li>
+        <span>接続の詳細を確認します。</span>
+      </li></ol>
+
+    <div><p>接続プロセスでは、データストリームが作成され、データソースオブジェクトがデータモデルオブジェクト (DMO) にマッピングされ、DMO リレーションが確立されます。新しい接続が 2 分以上無効になっている場合は、データストリームワークスペースに移動して、オムニチャネル在庫データストリームがエラー状態かどうかを確認します。その場合は、それらのストリームで [<strong class="uicontrol">再試行]</strong> をクリックします。再試行に失敗した場合は、データストリームを削除し、[オムニチャネル在庫コネクタ] 設定画面に戻って、新しい接続を作成します。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="オムニチャネル在庫への接続が不要な場合は削除できます。接続を削除すると、Data 360 でインベントリがデータソースおよびデータアクションターゲットとして使用できなくなります。" href="ingest_connect-3.html#c360_a_disconnect_oci_connection">オムニチャネル在庫接続の切断</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_set_up_tableau_connected_app">
+<h1 class="slds-text-heading_large">Data 360 での Tableau の接続
+ </h1>
+  
+  <p>Tableau から <span>Data 360</span> への接続を設定します。使用する Tableau 製品とバージョンに応じて、異なる手順が必要です。</p>
+
+    <div><p>Data 360 は以前は Data Cloud および Customer Data Platform (CDP) と呼ばれていました。Customer Data Platform コネクタは 2023 年 10 月に廃止され、使用できなくなりました。CDP コネクタを使用する既存のアセットは、Salesforce Data Cloud コネクタを使用して再作成する必要があります。</p><p>Salesforce Data Cloud コネクタを使用して、<span>Data 360</span> から次の Tableau 製品に接続できます。</p><a name="c360_a_set_up_tableau_connected_app__ul_xbj_hf4_vcc"></a><ul id="c360_a_set_up_tableau_connected_app__ul_xbj_hf4_vcc">
+        <li>Tableau Server は、Tableau ダッシュボードとワークブックの整理と共有に役立ちます。Salesforce Data Cloud コネクタを使用するには、Tableau Server バージョン 2023.3 が必要です。 バージョン 2024.2 以降、Customer Data Platform コネクタはユーザーインターフェースで使用できなくなりました。「<a target="_blank" href="https://help.tableau.com/current/server-linux/en-us/config_oauth_sfdc_cdp.htm">Connect Tableau Server to the <span>Data 360</span></a>」を参照してください。</li>
+
+        <li>Tableau Desktop は、顧客データをダッシュボードやワークブックなどの対話型の視覚的な表現に変換する視覚化ツールです。Salesforce Data Cloud コネクタを使用するには、Tableau Desktop バージョン 2023.2 以降が必要です。バージョン 2024.1 以降、Customer Data Platform コネクタはユーザーインターフェースで非表示になり、Tableau Desktop 2024.3 以降では完全に削除されます。「<a target="_blank" href="https://help.tableau.com/current/pro/desktop/en-us/examples_data_cloud.htm">Connect Tableau Desktop to the <span>Data 360</span></a>」を参照してください。</li>
+
+        <li>Tableau Prep では、顧客データをクリーンアップして形成し、分析を最適化します。Salesforce Data Cloud コネクタを使用するには、Prep Web オーサリング、Conductor バージョン 2023.2、または Prep Builder 2023.2 が必要です。 「 <a target="_blank" href="https://help.tableau.com/current/prep/en-us/prep_connect.htm#considerations-when-using-builtin-connectors"> <span>Data 360</span> への接続」を参照して</a>ください。</li>
+
+        <li>Tableau Cloud は、コンテンツの作成、共有、配布、およびコラボレーションに使用されます。Salesforce Data Cloud コネクタは、2023 年 10 月に Tableau Cloud 用にリリースされました。 2024 年 6 月以降、Customer Data Platform コネクタはユーザーインターフェースで使用できなくなります。「<a target="_blank" href="https://help.tableau.com/current/online/en-us/config_oauth_sfdc_cdp_online.htm">Connect Tableau Cloud to the <span>Data 360</span></a>」を参照してください。</li>
+
+      </ul>
+</div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_set_up_your_data">
+<h1 class="slds-text-heading_large">SageMaker でのデータの設定 </h1>
+  <p><span>Data 360</span> Python コネクタを使用して、Amazon SageMaker ノートブックから Salesforce データにアクセスします。直感的なインターフェースにより、クエリをすばやく実行し、必要なデータを抽出できます。</p>
+
+    <ol><li>
+        <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> Spring '26 以降、接続アプリケーションの作成は制限されます。 Spring '26 中およびそれ以降も、既存の接続アプリケーションを使用できます。 ただし、代わりに<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.external_client_apps.htm&amp;language=ja&amp;type=5">外部クライアントアプリケーション</a>を使用することをお勧めします。引き続き接続アプリケーションを作成する必要がある場合は、Salesforce サポートにお問い合わせください。<p>詳細については、「Spring '26 で<a target="_blank" href="https://help.salesforce.com/s/articleView?id=005228017&amp;language=ja&amp;type=1">新しい接続アプリケーション</a>を作成できなくなりました」を参照してください。</p></div></div></div>
+
+        <span>SageMaker ノートブックで、Python コネクタをインストールします。このコネクタを使用すると、<span>Data 360</span> オブジェクトにアクセスして Salesforce データを SageMaker に取り込むことができます。</span>
+      </li><li>
+        <span>Python コネクタ設定の一環として、外部クライアントアプリケーションまたは接続アプリケーションを作成します。</span>
+      </li><li>
+        <span>次のいずれかの方法を使用して、データに安全にアクセスするように認証します。</span>
+        <a name="c360_a_set_up_your_data__choices_dzb_zcn_pzb"></a><ul id="c360_a_set_up_your_data__choices_dzb_zcn_pzb">
+          <li>キーベース</li>
+
+          <li>JWT</li>
+
+        </ul>
+
+      </li><li>
+        <span><span>Data 360</span> で、Salesforce データソースに接続してデータセットを照会します。たとえば、メールエンゲージメントデータを取得するには、Marketing Cloud Engagement のメールエンゲージメントオブジェクトにアクセスします。</span>
+      </li><li>
+        <span><span>Data 360</span> で推測を使用するには、Python ファイルをノートブックにアップロードします。</span>
+      </li><li>
+        <span>モデルエンドポイントを取得するには、[推測] セクションの SageMaker ダッシュボードに移動し、[エンドポイント] に移動します。モデルを Salesforce に接続するには次の詳細が必要なため、URL をメモします。</span>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://developer.salesforce.com/docs/data/data-cloud-query-guide/guide/get-started-dc-python.html">Salesforce 開発者: Data 360 Python コネクタ</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.connected_app_create.htm&amp;language=ja&amp;type=5">Salesforce ヘルプ: 接続アプリケーションの作成</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_setup_oauth_google">
+<h1 class="slds-text-heading_large">Google OAuth を使用したコネクタの設定 </h1>
+  
+  <p>パスワードを共有せずに Data Cloud で接続を安全に作成するために、一部の外部コネクタでは OAuth (Open Authorization) を使用したアクセスが許可されています。OAuth を使用する場合、ソースを Data Cloud に接続する前に、いくつかの前提条件の実装手順を完了する必要があります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table><p>Data Cloud の [設定] でデータソースに接続する前に、次の前提条件手順に従います。この手順を完了するには、管理者権限が必要です。</p><p><a name="c360_a_setup_oauth_google__image_owy_425_gdc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ブックマークアイコン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/bookmark_60.png" id="c360_a_setup_oauth_google__image_owy_425_gdc" style="width:20px;margin-bottom:0;"></span> このページをブックマークするか開いたままにして、これらのタスクを実行するときにこのトピックを参照してください。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span>  Salesforce コンテンツ外にある手順やリンクは、更新されないまたは正確でない可能性があります。</div></div></div>
+</div>
+  
+  <div id="task_o4g_5dq_vdc" lang="ja-jp" aria-labelledby="ariaid-title2" class="nested1"><a name="task_o4g_5dq_vdc"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">カスタム OAuth アプリケーションの作成</h2>
+    
+    <p>Salesforce で認証プロバイダーを定義する前に、必要に応じてプロバイダーの Web サイトでカスタム OAuth アプリケーションを作成できます。このプロセスは、プロバイダーによって異なります。</p>
+
+      <ol><li>
+          <span>プロバイダーのドキュメントに従って、プロバイダーの Web サイトで非公開アプリケーションを作成します。</span>
+        </li><li>
+          <span>次の設定値を書き留めます。</span>
+          <ol>
+            <li>
+              <span>クライアント ID</span>
+            </li>
+
+            <li>
+              <span>クライアントの秘密</span>
+            </li>
+
+          </ol>
+        </li></ol>
+
+    
+  </div>
+
+  <div id="task_gms_m2q_vdc" lang="ja-jp" aria-labelledby="ariaid-title3" class="nested1"><a name="task_gms_m2q_vdc"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">認証プロバイダーの設定</h2>
+    
+    <p>Salesforce で認証プロバイダーを作成し、コールバック URL を使用してプロバイダーを更新します。</p>
+
+      <ol><li>
+          <span>[設定] から、[クイック検索] ボックスに「<kbd>認証プロバイダー</kbd>」と入力し、選択します。</span>
+        </li><li>
+          <span><strong class="uicontrol">[新規]</strong> をクリックします。</span>
+        </li><li>
+          <span>プロバイダー種別ドロップダウンから [<strong class="uicontrol">Google] を</strong>選択します。</span>
+        </li><li>
+          <span>必要な情報を入力します (1)。</span>
+          <ol>
+            <li>
+              <span>Name — 認証プロバイダーの名前を入力します。</span>
+            </li>
+
+            <li>
+              <span>URL サフィックス — URL には、認証プロバイダーに指定した名前が自動的にサフィックスとして付けられます。</span>
+            </li>
+
+          </ol>
+          <div>
+            <a name="task_gms_m2q_vdc__image_qhh_kzc_cdc"></a><div style="text-align:left;"><img alt="Goolge 認証プロバイダーの作成。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/GoogleOauth_24Oct2024.jpg" id="task_gms_m2q_vdc__image_qhh_kzc_cdc" style="width:800px;"></div>
+          </div>
+        </li><li>
+          <span>次の項目に入力します。</span>
+          <ol>
+            <li>
+              <span>コンシューマー鍵 — Google アプリケーションのアプリケーション ID を追加します。</span>
+            </li>
+
+            <li>
+              <span>コンシューマーの秘密 — Google アプリケーションのクライアントの秘密の値を追加します。</span>
+            </li>
+
+          </ol>
+        </li><li>
+          <span>(構造化データと非構造化データの取り込みの場合) [承認エンドポイント URL] を [<code>https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&amp;prompt=consent</code>] に設定します。</span>
+        </li><li>
+          <span>使用しているコネクタのスコープ (2) を更新します。すべては https://www.googleapis.com/auth/[VARIABLE] で始まります。各コネクタにリストされている変数を見つけます。</span>
+          <ol>
+            <li>
+              <span>Google 広告マネージャー: analytics.readonly</span>
+            </li>
+
+            <li>
+              <span>Google アナリティクス: analytics.readonly</span>
+            </li>
+
+            <li>
+              <span>Google 連絡先: userinfo.email、userinfo.profile、または連絡先</span>
+            </li>
+
+            <li>
+              <span>Google キャンペーンマネージャー: dfatrafficking、drareporting、ddmconversions</span>
+            </li>
+
+            <li>
+              <span>Google ドライブ: userinfo.email、userinfo.profile、drive.readonly</span>
+            </li>
+
+            <li>
+              <span>Google スプレッドシート: userinfo.email、userinfo.profile、drive.readonly</span>
+            </li>
+
+            <li>
+              <span>Google Spanner: spanner.data</span>
+            </li>
+
+          </ol>
+        </li><li>
+          <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+        </li></ol>
+
+      <div><p>認証プロバイダーを定義した後、複数のクライアント設定 URL が生成されます。作業を保存したら、Salesforce 設定からコールバック URL を書き留めます。</p><p>認証プロバイダーを Salesforce で定義したら、プロバイダーに戻り、アプリケーションのコールバック URL を更新します。</p></div>
+    
+  </div>
+
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_setup_oauth_linkedin">
+<h1 class="slds-text-heading_large">LinkedIn OAuth を使用したコネクタの設定 </h1>
+  
+  <p>パスワードを共有せずに Data Cloud で接続を安全に作成するために、一部の外部コネクタでは OAuth (Open Authorization) を使用したアクセスが許可されています。LinkedIn OAuth を使用する場合、ソースを Data Cloud に接続する前に、いくつかの前提条件の実装手順を完了する必要があります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table><p>Data Cloud の [設定] でデータソースに接続する前に、次の前提条件手順に従います。この手順を完了するには、管理者権限が必要です。</p><p><a name="c360_a_setup_oauth_linkedin__image_owy_425_gdc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ブックマークアイコン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/bookmark_60.png" id="c360_a_setup_oauth_linkedin__image_owy_425_gdc" style="width:20px;margin-bottom:0;"></span> このページをブックマークするか開いたままにして、これらのタスクを実行するときにこのトピックを参照してください。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span>  Salesforce コンテンツ外にある手順やリンクは、更新されないまたは正確でない可能性があります。</div></div></div>
+</div>
+  
+  <div id="task_o4g_5dq_vdc1" lang="ja-jp" aria-labelledby="ariaid-title2" class="nested1"><a name="task_o4g_5dq_vdc1"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">カスタム OAuth アプリケーションの作成</h2>
+    
+    <p>Salesforce で認証プロバイダーを定義する前に、必要に応じてプロバイダーの Web サイトでカスタム OAuth アプリケーションを作成できます。このプロセスは、プロバイダーによって異なります。</p>
+
+      <ol><li>
+          <span><a target="_blank" href="https://www.linkedin.com/help/linkedin/answer/a1667239">LinkedIn のドキュメント</a>に従って非公開アプリケーションを作成します。</span>
+        </li><li>
+          <span>次の設定値を書き留めます。</span>
+          <ol>
+            <li>
+              <span>クライアント ID</span>
+            </li>
+
+            <li>
+              <span>クライアントの秘密</span>
+            </li>
+
+            <li>
+              <span>承認エンドポイント URL (省略可能)</span>
+            </li>
+
+            <li>
+              <span>トークンエンポイント URL (省略可能)</span>
+            </li>
+
+          </ol>
+        </li></ol>
+
+    
+  </div>
+
+  <div id="task_gms_m2q_vdc1" lang="ja-jp" aria-labelledby="ariaid-title3" class="nested1"><a name="task_gms_m2q_vdc1"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">認証プロバイダーの設定</h2>
+    
+    <p>Salesforce で認証プロバイダーを作成し、コールバック URL を使用してプロバイダーを更新します。</p>
+
+      <ol><li>
+          <span>[設定] から、[クイック検索] ボックスに「<kbd>認証プロバイダー</kbd>」と入力し、選択します。</span>
+        </li><li>
+          <span><strong class="uicontrol">[新規]</strong> をクリックし、[プロバイダータイプ] ドロップダウンから <strong class="uicontrol">[LinkedIn]</strong> を選択します。</span>
+        </li><li>
+          <span>必要な情報を入力します。</span>
+          <ol>
+            <li>
+              <span>Name — 認証プロバイダーの名前を入力します。</span>
+            </li>
+
+            <li>
+              <span>URL サフィックス — URL には、認証プロバイダーに指定した名前が自動的にサフィックスとして付けられます。</span>
+            </li>
+
+            <li>
+              <span>コンシューマー鍵 — LinkedIn のクライアント ID を追加します。</span>
+            </li>
+
+            <li>
+              <span>コンシューマーの秘密 — LinkedIn のクライアントの秘密の値を追加します。</span>
+            </li>
+
+          </ol>
+        </li><li>
+          <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+        </li></ol>
+
+      <div><p>認証プロバイダーを定義した後、複数のクライアント設定 URL が生成されます。作業を保存したら、Salesforce 設定からコールバック URL を書き留めます。</p><p>認証プロバイダーを Salesforce で定義したら、プロバイダーに戻り、アプリケーションのコールバック URL を更新します。</p></div>
+    
+  </div>
+
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_setup_oauth_microsoft">
+<h1 class="slds-text-heading_large">Microsoft OAuth を使用したコネクタの設定 </h1>
+  
+  <p>パスワードを共有せずに Data Cloud で接続を安全に作成するために、一部の外部コネクタでは OAuth (Open Authorization) を使用したアクセスが許可されています。OAuth を使用する場合、ソースを Data Cloud に接続する前に、いくつかの前提条件の実装手順を完了する必要があります。
+  
+ </p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table><p>Data Cloud の [設定] でデータソースに接続する前に、次の前提条件手順に従います。この手順を完了するには、管理者権限が必要です。</p><p><a name="c360_a_setup_oauth_microsoft__image_cpl_425_gdc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ブックマークアイコン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/bookmark_60.png" id="c360_a_setup_oauth_microsoft__image_cpl_425_gdc" style="width:20px;margin-bottom:0;"></span> このページをブックマークするか開いたままにして、これらのタスクを実行するときにこのトピックを参照してください。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span>  Salesforce コンテンツ外にある手順やリンクは、更新されないまたは正確でない可能性があります。</div></div></div>
+</div>
+  
+  <div id="task_d2g_wdq_vdc" lang="ja-jp" aria-labelledby="ariaid-title2" class="nested1"><a name="task_d2g_wdq_vdc"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">省略可能: カスタム OAuth アプリケーションの作成</h2>
+    
+    <p>Salesforce で認証プロバイダーを定義する前に、必要に応じてプロバイダーの Web サイトでカスタム OAuth アプリケーションを作成できます。このプロセスは、プロバイダーによって異なります。</p>
+
+      <ol><li>
+          <span>プロバイダーのドキュメントに従って、プロバイダーの Web サイトで非公開アプリケーションを作成します。</span>
+        </li><li>
+          <span>次の設定値を書き留めます。</span>
+          <ol>
+            <li>
+              <span>クライアント ID</span>
+            </li>
+
+            <li>
+              <span>クライアントの秘密</span>
+            </li>
+
+            <li>
+              <span>承認エンドポイント URL</span>
+            </li>
+
+            <li>
+              <span>トークンエンドポイント URL</span>
+            </li>
+
+          </ol>
+        </li></ol>
+
+    
+  </div>
+
+  <div id="task_d44_22h_2cc" lang="ja-jp" aria-labelledby="ariaid-title3" class="nested1"><a name="task_d44_22h_2cc"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">認証プロバイダーの設定</h2>
+    
+    <p>Salesforce で認証プロバイダーを作成し、コールバック URL を使用してプロバイダーを更新します。</p>
+
+      <ol><li>
+          <span>[設定] から、[クイック検索] ボックスに「<kbd>認証プロバイダー</kbd>」と入力し、選択します。</span>
+        </li><li>
+          <span><strong class="uicontrol">[新規]</strong> をクリックします。</span>
+        </li><li>
+          <span>プロバイダー種別ドロップダウンから [<strong class="uicontrol">Microsoft]</strong> を選択します。<a name="task_d44_22h_2cc__image_vqh_dq5_ncc"></a><div style="text-align:left;"><img alt="Microsoft 認証プロバイダー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/AuthProvMicrosoft.jpg" id="task_d44_22h_2cc__image_vqh_dq5_ncc" style="width:600px;"></div></span>
+        </li><li>
+          <span>必要な情報を入力します。</span>
+          <ol>
+            <li>
+              <span>Name — 認証プロバイダーの名前を入力します。</span>
+            </li>
+
+            <li>
+              <span>URL サフィックス — URL には、認証プロバイダーに指定した名前が自動的にサフィックスとして付けられます。</span>
+            </li>
+
+          </ol>
+        </li><li>
+          <span>省略可能な項目を入力します。</span>
+          <ol>
+            <li>
+              <span>コンシューマー鍵 — プロバイダーのクライアント ID を追加します。</span>
+            </li>
+
+            <li>
+              <span>コンシューマーの秘密 — プロバイダーのクライアントの秘密を追加します。</span>
+            </li>
+
+            <li>
+              <span>認証エンドポイント URL — プロバイダーの認証エンドポイント URL を入力します。</span>
+            </li>
+
+            <li>
+              <span>トークンエンドポイント URL — プロバイダーのトークンエンドポイント URL を入力します。</span>
+            </li>
+
+          </ol>
+        </li><li>
+          <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+        </li></ol>
+
+      <div><p>認証プロバイダーを定義した後、複数のクライアント設定 URL が生成されます。作業を保存したら、Salesforce 設定からコールバック URL を書き留めます。</p><p>認証プロバイダーを Salesforce で定義したら、プロバイダーに戻り、アプリケーションのコールバック URL を更新します。</p></div>
+    
+  </div>
+
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_setup_oauth_openid">
+<h1 class="slds-text-heading_large">OpenId Connect OAuth を使用したコネクタの設定</h1>
+  
+  <p>パスワードを共有せずに Data Cloud で接続を安全に作成するために、一部の外部コネクタでは OAuth (Open Authorization) を使用したアクセスが許可されています。OAuth を使用する場合、ソースを Data Cloud に接続する前に、いくつかの前提条件の実装手順を完了する必要があります。
+    
+  </p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table><p>Data Cloud の [設定] でデータソースに接続する前に、次の前提条件手順に従います。この手順を完了するには、管理者権限が必要です。</p><p><a name="c360_a_setup_oauth_openid__image_e5k_p25_gdc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ブックマークアイコン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/bookmark_60.png" id="c360_a_setup_oauth_openid__image_e5k_p25_gdc" style="width:20px;margin-bottom:0;"></span> このページをブックマークするか開いたままにして、これらのタスクを実行するときにこのトピックを参照してください。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span>  Salesforce コンテンツ外にある手順やリンクは、更新されないまたは正確でない可能性があります。</div></div></div>
+</div>
+  
+  <div id="task_ypt_xdq_vdc" lang="ja-jp" aria-labelledby="ariaid-title2" class="nested1"><a name="task_ypt_xdq_vdc"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">タスク 1: カスタム OAuth アプリケーションの作成</h2>
+    
+    <p>Salesforce で認証プロバイダーを定義する前に、プロバイダーの Web サイトでカスタム OAuth アプリケーションを作成する必要があります。このプロセスは、プロバイダーによって異なります。</p>
+
+      <ol><li>
+          <span>プロバイダーのドキュメントに従って、プロバイダーの Web サイトで非公開アプリケーションを作成します。</span>
+        </li><li>
+          <span>次の設定値を書き留めます。</span>
+          <ol>
+            <li>
+              <span>クライアント ID</span>
+            </li>
+
+            <li>
+              <span>クライアントの秘密</span>
+            </li>
+
+            <li>
+              <span>承認エンドポイント URL</span>
+            </li>
+
+            <li>
+              <span>トークンエンドポイント URL</span>
+            </li>
+
+          </ol>
+        </li></ol>
+
+    
+  </div>
+
+  <div id="task_jdm_ydq_vdc" lang="ja-jp" aria-labelledby="ariaid-title3" class="nested1"><a name="task_jdm_ydq_vdc"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">タスク 2: 認証プロバイダーの設定</h2>
+    
+    <p>Salesforce で認証プロバイダーを作成し、コールバック URL を使用してプロバイダーを更新します。</p>
+
+      <ol><li>
+          <span>[設定] から、[クイック検索] ボックスに「<kbd>認証プロバイダー</kbd>」と入力し、選択します。</span>
+        </li><li>
+          <span><strong class="uicontrol">[新規]</strong> をクリックします。</span>
+        </li><li>
+          <span>[プロバイダータイプ] ドロップダウンから [<strong class="uicontrol">Open ID Connect</strong>] を選択します。</span>
+        </li><li>
+          <span>必要な情報を入力します。</span>
+          <ol>
+            <li>
+              <span>Name — 認証プロバイダーの名前を入力します。</span>
+            </li>
+
+            <li>
+              <span>URL サフィックス — URL には、認証プロバイダーに指定した名前が自動的にサフィックスとして付けられます。</span>
+            </li>
+
+            <li>
+              <span>コンシューマー鍵 — プロバイダーのクライアント ID を追加します。</span>
+            </li>
+
+            <li>
+              <span>コンシューマーの秘密 — プロバイダーのクライアントの秘密を追加します。</span>
+            </li>
+
+            <li>
+              <span>認証エンドポイント URL — プロバイダーの認証エンドポイント URL を入力します。</span>
+            </li>
+
+            <li>
+              <span>トークンエンドポイント URL — プロバイダーのトークンエンドポイント URL を入力します。</span>
+            </li>
+
+          </ol>
+        </li><li>
+          <span>省略可能な項目を入力します。</span>
+          <div>省略可能な項目と手順の詳細については、「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.sso_provider_openid_connect.htm&amp;language=ja&amp;type=5">Configure an Authentication Provider</a> Using OpenID Connect (OpenID Connect を使用した認証プロバイダーの設定)」を参照してください。</div>
+        </li><li>
+          <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+        </li></ol>
+
+      <div><p>認証プロバイダーを定義した後、複数のクライアント設定 URL が生成されます。作業を保存したら、Salesforce 設定からコールバック URL を書き留めます。</p><p>Salesforce で認証プロバイダーを定義したら、OpenID プロバイダーに戻り、アプリケーションのコールバック URL を更新します。</p></div>
+    
+  </div>
+
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_setup_platform_encryption_data_cloud">
+<h1 class="slds-text-heading_large">Data 360 のプラットフォーム暗号化の設定</h1>
+  <p>プラットフォームの暗号化を有効にすると、最初の Data 360 ルート鍵が自動的に生成されます。この鍵は、Data 360 に以前取り込まれたすべてのデータを暗号化します。 初期設定後、生成されたルート鍵を引き続き使用するか、外部鍵管理 (EKM) を使用して外部鍵を設定するか、Salesforce UI で Bring Your Own Key (BYOK) を使用して独自の鍵素材を活用し、Data 360 のデータを暗号化できます。ルート鍵を定期的に循環し、[設定] で作成日時や作成者などの鍵メタデータを表示できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+          </tr>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">アドオンライセンスで使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition。Salesforce ShieldまたはShield Platform Encryption、Platform Encryption for Data Cloudを購入する必要があります。また、オプションの外部鍵管理を使用するには、Platform Encryption for Consumption ライセンスを購入する必要があります。</td>
+
+          </tr>
+        </tbody></table>
+    <p>主な移行オプションを次に示します。</p>
+    <ul>
+      <li>顧客が管理する鍵 (CMK) から EKM: 既存の CMK ユーザーは、[設定] の [鍵の在庫と管理] ページから新しい EKM 鍵を設定できます。この変更は、今後の新しいデータの暗号化にのみ影響します。以前に暗号化されたデータは、既存の CMK 鍵で暗号化されたままになります。</li>
+
+      <li>EKM から CMK へ: 既存の EKM ユーザーは、[鍵の在庫と管理] ページで新しい鍵を生成して CMK に切り替えることができます。このアクションでは、新しく生成された CMK 鍵を使用して既存の Data 360 データを再暗号化します。</li>
+
+      <li>CMK または EKM から BYOK へ: [設定] の [Bring Your Own Key (独自の鍵を使用)] オプションを使用して独自の鍵素材をアップロードします。以前の鍵で暗号化されたデータに引き続きアクセスできます。新しいデータは、新しい BYOK ルート鍵を使用して暗号化されます。<ul>
+          <li>顧客は Salesforce UI を使用して、CMK から BYOK および BYOK から CMK に移行できます。この移行時に、以前に取り込まれたデータが新しい鍵に再暗号化されることはありません。以前の鍵で暗号化されたままになります。</li>
+
+          <li>顧客は EKM から BYOK、BYOK から EKM に移行することもできます。<ul>
+              <li>EKM から BYOK: 以前に取り込まれたすべてのデータを新しい鍵に再暗号化します。</li>
+
+              <li>BYOK から EKM: この移行時に、以前に取り込まれたデータを新しい鍵に再暗号化しません。以前の鍵で暗号化されたままになります。</li>
+
+            </ul>
+</li>
+
+        </ul>
+</li>
+
+    </ul>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_setup_provision">
+<h1 class="slds-text-heading_large">Data 360 の設定と有効化</h1>
+    <p><span>Data 360</span>のプロビジョニング後、顧客データの取得、統合、セグメント化、有効化を行うことができます。<span>Data 360</span><span>Data 360</span> は、Data Cloud ライセンスが Salesforce 組織に追加されるとすぐに自動的にプロビジョニングされます。ただし、自動プロビジョニングを使用できない場合、または Developer Edition または Sandbox 組織で作業している場合は、手動で有効にする必要があります。<span>Data 360</span> は、新規または既存の Salesforce 組織で有効にできます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps"><tr class=""><th id="d149929e43" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">次の場合にのみ適用</th></tr></thead><tbody><tr class=""><td headers="d149929e43" style="vertical-align:top;" colspan="2" class="slds-cell-wrap">Developer Edition</td>
+</tr></tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps"><tr class=""><th id="d149929e55" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th></tr></thead><tbody><tr class=""><td headers="d149929e55" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Data Cloud 設定にアクセスする</td>
+<td headers="d149929e55" style="vertical-align:top;" class="slds-cell-wrap"><p>システム管理者プロファイルおよび </p><p style="margin-bottom:0;">「Data Cloud アーキテクト」権限セット</p></td>
+</tr></tbody></table></div><ol><li><span><strong class="uicontrol">Data Cloud の [</strong>設定] に移動します。</span><div><p>このオプションが表示されない場合は、ページを更新するか、ログアウトしてシステム管理者ユーザーのログイン情報を使用して再度ログインしてください。</p></div></li><li><span><span>Data 360 を</span>有効にするには、[<strong class="uicontrol">使用開始]</strong> をクリックします。</span></li></ol>
+<div><p>設定には数分かかることがあります。設定が完了したら、<span>Data 360</span> 管理者は設定とユーザー設定を続行できます。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> <p><span>Data 360</span>が新しいSalesforce組織に追加されると、そのアカウントに関連する管理者ユーザーにお知らせメールが送信されます。メールを受信しなかった場合、または <span>Data 360</span> を別の組織に移動する必要がある場合は、アカウントエグゼクティブにお問い合わせください。</p></div></div></div>
+</div></div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_setup_walkthrough">
+<h1 class="slds-text-heading_large">Data 360 ユーザーの作成と権限の割り当て</h1>
+  
+  <p>ユーザーを作成し、ID 解決、変換、計算済みインサイトなどの Data Cloud 機能へのアクセス権を付与します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+                                                <tr class="">
+                                                  <th id="d165246e69" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+                                                </tr>
+                                        </thead><tbody>
+                                                <tr class="">
+                                                  <td headers="d165246e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Data Cloud 設定にアクセスする</td>
+
+                                                  <td headers="d165246e69" style="vertical-align:top;" class="slds-cell-wrap"><p>システム管理者プロファイルまたは </p><p style="margin-bottom:0;">「Data Cloud アーキテクト」権限セット</p></td>
+
+                                                </tr>
+                                        </tbody></table></div>
+    <ol><li>
+        <span><strong class="uicontrol">Data Cloud の [</strong>設定] に移動します。</span>
+      </li><li>
+        <span>[User Management (ユーザー管理)] で、[<strong class="uicontrol">Users (ユーザー</strong>)] をクリックします。</span>
+      </li><li>
+        <span>新規ユーザーを追加するか、既存のユーザーを編集します。</span>
+      </li><li>
+                <span>ユーザーを選択し、[<strong class="uicontrol">権限セットの割り当て</strong>] をクリックします。</span>
+            </li><li>
+        <span><strong class="uicontrol">[割り当ての編集]</strong> をクリックします。</span>
+      </li><li>
+        <span>適切なData Cloud権限セットを選択し、[<strong class="uicontrol">追加]を</strong>クリックします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+      </li></ol>
+
+    <div><p>Data Cloud 機能にアクセスする必要があるすべてのユーザーに対してこの手順を繰り返します。</p></div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=data.c360_a_userpermissions.htm&amp;language=ja&amp;type=5">Data 360 標準権限セット</a></strong><br>権限セットは、Data 360 のデータと機能に対する Salesforce ユーザーのアクセスレベルと表示レベルを定義します。ライセンスに応じて、Data 360 にはいくつかの標準権限セットが用意されています。 Salesforce システム管理者が権限セットをユーザーに割り当てます。Data 360 アクセス用のカスタム権限セットを作成することはお勧めしませんが、権限セットを他の Salesforce 権限セットと組み合わせることはできます。</li><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=data.c360_a_userpermissions_custom.htm&amp;language=ja&amp;type=5">Data Cloud のカスタム権限セット</a></strong><br>Data Cloud カスタム権限セットを作成するには、既存の標準 Data Cloud 権限セットをコピーすることをお勧めします。一部の Data Cloud 機能には、ゼロから作成された権限セットでアクセスできません。</li><li class="slds-p-bottom_small"><strong><a href="setup_admin-1.html#c360_a_data_spaces_perm_set_migration">ユーザーアクセスポリシーを使用した Data Cloud 権限セットの移行</a></strong><br>ユーザーアクセスポリシーを使用して、更新された Data Cloud 権限セットを設定した基準に基づいてユーザーグループに付与する方法について説明します。</li><li class="slds-p-bottom_small"><strong><a href="governance-1.html#c360_a_data_access_levels_setting">Salesforce ユーザーの Data Cloud データアクセスレベルの管理</a></strong><br>Data Cloud へのアクセス権や他のコンテキストで Data Cloud を表示する権限を付与せずに、Data Cloud データへの関連リスト強化やその他の SOQL クエリへの参照アクセス権を Salesforce ユーザーに付与するように権限セットを設定できます。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_sl_c360sdm_setup">
+<h1 class="slds-text-heading_large">C360 セマンティックモデルの管理 </h1>
+  <p>C360 セマンティックモデルを使用するための考慮事項と要件をメモします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">考慮事項と要件</h2><p>C360 セマンティックモデルの使用に関する次のガイドラインに注意してください。</p><ul>
+        <li>アプリケーションをインストールするには、「Data Cloud アーキテクト」権限が必要です。</li>
+
+        <li>Data 360 と Tableau セマンティックレイヤーを有効にして組織で設定する必要があります。</li>
+
+        <li>管理者ユーザーには、C360 セマンティックモデルに含まれる DMO へのアクセス権が必要です。</li>
+
+        <li>すべての基礎となる DMO をマッピングする必要はありませんが、マッピングされた DMO からのみインサイトを得ることができます。</li>
+
+        <li>C360 セマンティックモデルは、デフォルトのデータスペースまたは任意の Data 360 データスペースにインストールできます。ビジネスのさまざまな側面に複数のデータスペースがある場合、モデルを含めるデータスペースごとにインストールを繰り返すことができます。</li>
+
+      </ul>
+</div>
+    
+
+    
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_sl_c360sdm_setup_task">
+<h1 class="slds-text-heading_large">C360 セマンティックモデルの設定</h1>
+ 
+ 
+ <p>[設定] メニューから C360 セマンティックモデルを有効にします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+  <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col><col></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d129507e70" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d129507e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">セマンティックモデルを作成する</td>
+
+       <td headers="d129507e70" style="vertical-align:top;" class="slds-cell-wrap">Data Cloud アーキテクト</td>
+
+      </tr>
+     </tbody></table></div>
+  <ol><li>
+    <span>[設定] メニューから、[<strong class="uicontrol">アプリケーション]</strong>&gt; [<strong class="uicontrol">インテリジェントアプリケーション]</strong>&gt; [<strong class="uicontrol">C360 セマンティックモデル]</strong> に移動します</span>
+   </li><li>
+    <span>[C360 セマンティックモデル] の [設定] ページで、C360 セマンティックモデルを追加するデータスペースのドロップダウンメニューを開き、[<strong class="uicontrol">インストール]</strong> をクリックします。</span>
+    <div>ドロップダウンメニューには次のオプションが含まれる場合があります。<div><ul>
+       <li>インストール: バージョンの最初のインスタンスを追加します。</li>
+
+       <li>Manage &amp; Monitor (管理および監視): 監視およびリソース情報を表示します。</li>
+
+       <li>再設定: 同じバージョンを再インストールします。</li>
+
+       <li>アップグレード: 最新バージョンをインストールします。</li>
+
+      </ul>
+</div></div>
+   </li><li>
+    <span>(省略可能) 複数のデータスペースが設定されている場合、それぞれに個別のバージョンの C360 セマンティックモデルを追加できます。C360 セマンティックモデルをインストールするデータスペースごとにステップ 2 を繰り返します。</span>
+   </li><li>
+    <span>コンポーネントがインストールされるまでしばらく待ちます。進行状況は、データスペースのタブで確認できます。[設定] ページには、インストールされた各 C360 セマンティックモデルのタブが追加され、そこで監視とリソース情報を参照できます。デフォルト以外のデータスペースにインストールすると、タブの名前にプレフィックスとしてデータスペース名が含まれます (例: 「AMER - C360 セマンティックモデル」)。</span>
+   </li><li>
+    <span>(省略可能) C360 セマンティックモデルを確認または編集するには、[<strong class="uicontrol">Data Cloud</strong>]&gt; [<strong class="uicontrol">セマンティックレイヤー]</strong> に移動します。</span>
+   </li></ol>
+
+ 
+</div></div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="setup_admin-1.html">&larr; セットアップ・管理・データスペース・権限（1/2）</a><a href="billing.html">課金・使用量・デジタルウォレット &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=data.c360_a_data_cloud.htm&type=5&language=ja">help.salesforce.com — Data 360（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>

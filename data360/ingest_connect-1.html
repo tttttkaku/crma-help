@@ -1,0 +1,2307 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>取り込み・接続・ストリーム・フェデレーション・Zero Copy（1/3） | Data 360 ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（40）</h2>
+    <ol>
+      <li><a href="#c260_a_data_federation_compare_methods">データ統合方法の比較</a></li>
+      <li><a href="#c350_a_rebuild_streaming_transform_target_objects">ストリーミング変換対象オブジェクトの再構築</a></li>
+      <li><a href="#c360_a_access_data_from_databricks">クエリ統合を使用した Databricks とのデータの共有</a></li>
+      <li><a href="#c360_a_access_data_from_google_bigquery">Google BigQuery とのデータの共有</a></li>
+      <li><a href="#c360_a_access_data_from_redshift">Amazon SageMaker とのデータの共有</a></li>
+      <li><a href="#c360_a_access_data_from_snowflake">Snowflake とのデータの共有</a></li>
+      <li><a href="#c360_a_activate_data_stream_sync_for_data360">Data 360 のデータストリーム同期の有効化</a></li>
+      <li><a href="#c360_a_add_new_source_fields">取得元項目の追加</a></li>
+      <li><a href="#c360_a_ai_byom_connect_model">モデルの接続</a></li>
+      <li><a href="#c360_a_ai_byom_connect_your_external_model_databricks">Databricks モデルの接続</a></li>
+      <li><a href="#c360_a_ai_byom_connect_your_external_model_endpoint">モデルエンドポイント形式</a></li>
+      <li><a href="#c360_a_ai_byom_connect_your_external_model_google_vertex">Vertex AI モデルの接続</a></li>
+      <li><a href="#c360_a_ai_byom_set_up_your_data_databricks">Databricks でのデータの設定</a></li>
+      <li><a href="#c360_a_ai_byom_set_up_your_endpoint_databricks">Databricks でのエンドポイントの設定</a></li>
+      <li><a href="#c360_a_ai_byom_use_databricks_models">Databricks AI モデルの使用</a></li>
+      <li><a href="#c360_a_ai_create_connect_activate_models">モデルの作成、接続、有効化</a></li>
+      <li><a href="#c360_a_batch_transform_connect_nodes_and_branches">一括処理データ変換のノードまたは分岐の接続と再編成</a></li>
+      <li><a href="#c360_a_byol_data_federation">Zero Copy Data Federation (ゼロコピーデータ統合)</a></li>
+      <li><a href="#c360_a_byol_data_federation_data_type_compatability">データフェデレーションでのデータ型の互換性</a></li>
+      <li><a href="#c360_a_byol_data_federation_supportability">Zero Copy データ統合のサポート</a></li>
+      <li><a href="#c360_a_check_connector_status">コネクタの状況の確認</a></li>
+      <li><a href="#c360_a_commerce_cloud_connector">B2C Commerce コネクタ</a></li>
+      <li><a href="#c360_a_companion_connection_delete">コンパニオン接続の削除</a></li>
+      <li><a href="#c360_a_companion_connection_shared_objects">コンパニオン組織と共有するオブジェクト</a></li>
+      <li><a href="#c360_a_companion_connection_statuses">Data Cloud One コンパニオンの接続状況</a></li>
+      <li><a href="#c360_a_companion_connections">Data Cloud One コンパニオン接続</a></li>
+      <li><a href="#c360_a_companion_org_connection_details">コンパニオン組織の Data 360 接続の詳細</a></li>
+      <li><a href="#c360_a_compare_salesforce_connections">標準の Salesforce CRM と Data Cloud One コンパニオン接続の比較</a></li>
+      <li><a href="#c360_a_conf_connect_dc4sales">ユーザーの設定と Sales Cloud データバンドルのインストール</a></li>
+      <li><a href="#c360_a_conf_connect_dc4service">ユーザーの設定と Service Cloud データバンドルのインストール</a></li>
+      <li><a href="#c360_a_configure_periodic_full_refresh_schedule">定期的なフル更新スケジュールの設定</a></li>
+      <li><a href="#c360_a_connect_commerce_cloud_instance">B2C Commerce 接続の設定</a></li>
+      <li><a href="#c360_a_connect_data_task_steps">Data 360 への Salesforce データの接続</a></li>
+      <li><a href="#c360_a_connect_external_activation_platform">外部有効化プラットフォームの設定</a></li>
+      <li><a href="#c360_a_connect_salesforce_orgs">Data 360 への Salesforce CRM 組織の接続</a></li>
+      <li><a href="#c360_a_connect_your_external_model">SageMaker モデルの接続</a></li>
+      <li><a href="#c360_a_connection_tasks">Data 360 のデータソース設定</a></li>
+      <li><a href="#c360_a_connectors">Data 360 のデータソース</a></li>
+      <li><a href="#c360_a_create_a_data_extension_in_data_cloud">Data 360 でのデータエクステンションの作成</a></li>
+      <li><a href="#c360_a_create_a_streaming_insight_using_sql">SQL を使用したストリーミングインサイトの作成</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>取り込み・接続・ストリーム・フェデレーション・Zero Copy（1/3）</h1>
+      <div class="meta">Data 360（旧 Data Cloud）ヘルプ · 40 記事 · 生成 2026-08-12</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="governance-2.html">&larr; ガバナンス・セキュリティ・同意・分類（2/2）</a><a href="ingest_connect-2.html">取り込み・接続・ストリーム・フェデレーション・Zero Copy（2/3） &rarr;</a></div>
+<section class="article" id="c260_a_data_federation_compare_methods">
+<h1 class="slds-text-heading_large">データ統合方法の比較</h1>
+  <p>データは、ライブ クエリ、ローカル データ キャッシュへの高速クエリ、またはファイルフェデレーションを介して統合できます。各オプションは異なる使用事例をサポートします。パフォーマンス、データの新鮮度、クレジット消費に関する考慮事項は異なります。</p>
+
+    <p>3 種類のデータ統合の違いを理解しておくと、使用事例に適した方法を選択できます。</p>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">ライブクエリ統合</h2><p>ライブクエリはリアルタイムで実行され、データソースから最新の結果を返します。</p><ul>
+        <li><strong>使用事例:</strong> ライブクエリデータ統合は、対話型の分析とリアルタイムダッシュボードに最適です。頻繁ではないクエリに最適化されています。ライブクエリデータ統合では、リアルタイムのパーソナライズと動的ワークフローがサポートされます。</li>
+
+        <li><strong>データソースの場所:</strong> 外部データレイクハウス </li>
+
+        <li><strong>データ新鮮度:</strong> クエリはリアルタイムで実行されます。全体的なデータの更新頻度は、ソースデータの更新頻度によって異なります。ライブクエリデータ統合では、1 秒未満の決定がサポートされます。</li>
+
+        <li><strong>パフォーマンスドライバ:</strong> 外部ソースシステムのパフォーマンスに大きく依存します。述語と集計をソースにプッシュできる場合に最適化されます。</li>
+
+        <li><strong>クレジット消費に関する考慮事項:</strong>
+          <ul>
+            <li>クレジットは、アクセスされた行数に基づいてクエリごとに消費されます。クレジットは主に [データ統合] および [データ共有アクセス] 利用状況種別で消費されます。</li>
+
+            <li>ライブクエリは、頻度の低いクエリではコスト効率が高くなります。ただし、変更頻度の低いデータに対するクエリを頻繁に実行すると、同じデータを照会するために繰り返しクレジットが消費される可能性があるため、このオプションは高速化クエリよりもコストがかかります。</li>
+
+          </ul>
+</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Accelerated Query Federation (高速化されたクエリ統合)</h2><p>クエリ統合でアクセラレーションが有効になっている場合、Data 360 は設定された間隔で更新されるローカルデータキャッシュを保持します。高速クエリでは、データソースを直接照会するのではなく、ローカルデータキャッシュにアクセスします。</p><ul>
+        <li><strong>使用事例:</strong>クエリが頻繁に実行され、データが頻繁に変更されない場合、データ統合の高速化が最適です。高速化を有効にすると、スケジュールされた間隔で更新されるローカルキャッシュを保持できるため、頻繁なアクセスパターンのパフォーマンスが向上します。高速化されたデータ統合は、ダッシュボードとセグメンテーションに適しています。キャッシュの更新頻度よりもデータの変更頻度の方が高い場合、高速化は秒未満の決定には適していません。</li>
+
+        <li><strong>データソースの場所:</strong> 外部データレイク</li>
+
+        <li><strong>Data Freshness:</strong>Freshness は、選択したキャッシュ間隔によって異なります。キャッシュ間隔は 15 分から 7 日まで設定できます。</li>
+
+        <li><strong>パフォーマンスドライバ:</strong> 繰り返されるライブクエリと比較して遅延を削減します。</li>
+
+        <li><strong>クレジット消費に関する考慮事項:</strong>
+          <ul>
+            <li>クレジットは、キャッシュに追加または更新されたデータの行ごとに消費されます。キャッシュが更新されると、クレジットは一括処理データパイプライン利用状況種別で消費されます。</li>
+
+            <li>キャッシュが照会されるときにデータクエリを使用してクレジットも消費されます。</li>
+
+            <li>クエリキャッシュの高速化は、組織の Data 360 ストレージの使用に寄与する可能性があります。</li>
+
+            <li>高速クエリのクレジット消費は、一括処理データ取り込みによる同じバッチデータのクレジット消費に似ています。</li>
+
+          </ul>
+
+        </li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">ファイルフェデレーション</h2><p>ファイルフェデレーションでは、Data 360 はデータソースのメタデータを使用して仮想テーブルを作成します。仮想テーブルは、データソースのファイルへのアクセスと参照に使用されます。</p><ul>
+        <li><strong>使用事例:</strong>ファイルフェデレーションは、大規模なバッチ処理や、AIおよび機械学習モデルのトレーニングに最適です。ファイルフェデレーションは、履歴分析やペタバイト規模のレポート作成に最適です。リアルタイムダッシュボードには適していません。</li>
+
+        <li><strong>データソースの場所:</strong> クラウドオブジェクトストアまたはクラウドデータレイク</li>
+
+        <li><strong>データ新鮮度:</strong> 新鮮度はソースファイルの更新頻度によって異なります。</li>
+
+        <li><strong>パフォーマンスドライバ:</strong> パフォーマンスは、オブジェクトの形式、パーティショニング、および外部システムのスループットに大きく依存します。パーティション分割された列形式 (Parquet) を使用します。</li>
+
+        <li><strong>クレジット消費に関する考慮事項:</strong>
+          <ul>
+            <li>Data 360 テナントと同じリージョンにある AWS 設定を使用している場合、アクセスされた行に対してクレジットは消費されません。たとえば、顧客のデータが US-East-1 の S3 にあり、Data 360 テナントも US-East-1 にある場合、Data 360 によって顧客のデータソースからアクセスされる行に対してクレジットは消費されません。</li>
+
+            <li>Data 360 テナントとは異なるリージョンで AWS を設定している場合、または Azure などの異なるクラウドを使用している場合、アクセスする行数に応じてクレジットを消費します。</li>
+
+          </ul>
+</li>
+
+      </ul>
+</div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c350_a_rebuild_streaming_transform_target_objects">
+<h1 class="slds-text-heading_large">ストリーミング変換対象オブジェクトの再構築</h1>
+ 
+ <p>ストリーミング変換対象オブジェクトを再構築して、データの一貫性を確保します。</p>
+
+  <div><p>ストリーミング変換では、ソースオブジェクトからデータを取得して変換し、出力を新しいオブジェクトに書き込みます。処理中にシステムエラーが発生した場合、出力オブジェクトのデータが不完全である可能性があります。変換対象オブジェクトを再構築すると、すべての変換元データが再処理され、変換先に対して新しい結果が生成されます。</p><p>再構築が役立つもう 1 つの状況は、ストリーミング変換が編集されている場合です。変換の編集は、新規レコードに適用されます。出力の既存のレコードは影響を受けません。すべてのレコードに変更を適用する場合は、変換対象オブジェクトを再構築する必要があります。</p></div>
+  <ol><li>
+        <span>データ変換レコードページで、ドロップダウンメニューから [再構築] を選択します。データ変換で書き込む対象オブジェクトを再構築します。</span>
+      </li><li>
+    <span>再構築を実行します。</span>
+    <ul>
+     <li>対象オブジェクトへの変換書き込みしかない場合は、再構築を確認し、[<strong class="uicontrol">実行] を</strong>クリックします。</li>
+
+     <li>同じ対象オブジェクトに複数の変換書き込みがある場合、[<strong class="uicontrol">続行]</strong> をクリックして、対象オブジェクトを再構築する変換順序を選択するように求められます。1 つの変換を実行すると、前の変換ですでに書き込まれたデータが上書きされる可能性があるため、変換の順序は重要です。順序を選択したら、[<strong class="uicontrol">実行] を</strong>クリックします。
+    </li>
+
+    </ul>
+
+   </li><li>
+    <span>[更新履歴] ページを表示して、データの再構築の進行状況を追跡します。データ量によっては時間がかかる場合があります。再構築プロセス中に、[最終実行状況] が [再構築待機中] に変更され、[再構築] に変更されます。</span>
+    <div>再構築では、対象オブジェクトの既存のレコードが削除され、ソースオブジェクトのレコードが再処理されます。対象オブジェクトは、再構築プロセス全体で変更されません。この間、対象オブジェクトに書き込む変換は作成または削除できません。</div>
+   </li></ol>
+
+ 
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_access_data_from_databricks">
+<h1 class="slds-text-heading_large">クエリ統合を使用した Databricks とのデータの共有</h1>
+  <p>Zero Copy Data Federation を使用して統合クエリを実行することで、データを Data 360 から Databricks に移行することなく、Data 360 データを Databricks と安全に共有できます。Databricks の Unity Catalog を使用して、ワークスペース内のデータレイク、データモデル、計算済みインサイトの各オブジェクトにアクセスできます。</p>
+
+    <p>詳細は、<a target="_blank" href="https://docs.databricks.com/en/query-federation/salesforce-data-cloud.html"><u>「Salesforce Data クラウドでフェデレーションクエリを実行する」</u></a>を参照してください。</p>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://docs.databricks.com/en/query-federation/salesforce-data-cloud.html">外部サイト: Salesforce Data Cloud で統合クエリを実行する</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_access_data_from_google_bigquery">
+<h1 class="slds-text-heading_large">Google BigQuery とのデータの共有</h1>
+  <p>データ共有を作成することで、Google BigQueryのデータセットとして<span>Data 360</span>オブジェクトにアクセスできます。ゼロコピーインテグレーションでは、データを Google BigQuery にコピーすることなく、直接共有および照会できます。Google BigQuery でデータにアクセスできる場合、<span>Data 360</span> のハーモナイズされた統合データを操作できます。データの共有には、次の概要手順が含まれます。</p>
+
+    <div><p>作業を開始する前に</p><ul><li>「<a title="Data Cloud では、Google BigQuery とのクロスクラウドデータ共有がサポートされています。クロスクラウドデータ共有では、Google BigQuery はデータ共有を使用できる任意の場所に配置できます。" href="sharing_dev.html#c360_a_data_shares_region_supportability_bq">Supported Regions for</a> Google BigQuery Integration (Google BigQuery インテグレーションでサポートされる地域)」を参照してください。</li>
+<li>VPC サービスコントロールを使用していて、Analytics Hub API が制限されている場合は、VPC サービスコントロール境界で出力ルールを作成し、Salesforce Analytics Hub Producer プロジェクトを含めます。詳細は、「<a target="_blank" href="https://cloud.google.com/bigquery/docs/analytics-hub-vpc-sc-rules">Analytics Hub VPC Service Controls rules</a>」を参照してください。</li>
+</ul>
+</div>
+    <ol><li>
+        <span>アクセスする <span>Data 360</span> オブジェクトを特定します。</span>
+      </li><li>
+        <span><span>Data 360</span> でデータ共有を作成します。</span>
+        <div>「<a title="外部システムと共有するためにデータ共有に含める Data 360 オブジェクトを選択します。" href="sharing_dev.html#c360_a_create_data_shares">データ共有の作成</a>」を参照してください。</div>
+      </li><li>
+        <span><span>Data 360</span> でデータ共有対象を作成して、Google BigQuery との接続を確立します。</span>
+        <div>「<a title="Google BigQueryアカウントとの接続を確立するには、Data 360でデータ共有対象を作成します。" href="sharing_dev.html#c360_a_create_data_share_target_google_bq">Create a Data Share Target</a> to Connect with Google BigQuery」を参照してください。</div>
+      </li><li>
+        <span>データ共有をデータ共有ターゲットにリンクして、BigQueryで<span>Data 360</span>オブジェクトにアクセスできるようにします。</span>
+        <div>「データ共有とデータ共有対象の<a title="データ共有をデータ共有対象にリンクして、外部システムで使用できるようにします。データ共有をデータ共有対象からリンク解除することもできます。" href="sharing_dev.html#c360_a_link_data_shares_with_data_share_target">リンクまたは</a>リンク解除」を参照してください。</div>
+      </li><li>
+        <span>Google BigQuery で、Analytics ハブを<a title="Google Cloud ユーザーは Analytics ハブを使用してデータを登録できます。" href="https://help.salesforce.com/s/articleView?id=data.c360_a_subscribe_data_shares_bq_analytics_hub.htm&amp;language=ja&amp;type=5">使用して</a> <span>Data 360</span> データ共有を登録します。</span>
+      </li></ol>
+
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="sharing_dev.html#c360_a_create_data_share_target_google_bq">Google BigQuery に接続するためのデータ共有対象の作成</a></strong><br>Google BigQueryアカウントとの接続を確立するには、<span>Data 360</span>でデータ共有対象を作成します。</li><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=data.c360_a_subscribe_data_shares_bq_analytics_hub.htm&amp;language=ja&amp;type=5">Google アナリティクスハブでのデータ共有の登録</a></strong><br>Google Cloud ユーザーは Analytics ハブを使用してデータを登録できます。</li><li class="slds-p-bottom_small"><strong><a href="sharing_dev.html#c360_a_data_shares_region_supportability_bq">Google BigQuery インテグレーションでサポートされる地域</a></strong><br>Data Cloud では、Google BigQuery とのクロスクラウドデータ共有がサポートされています。クロスクラウドデータ共有では、Google BigQuery はデータ共有を使用できる任意の場所に配置できます。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_access_data_from_redshift">
+<h1 class="slds-text-heading_large">Amazon SageMaker とのデータの共有</h1>
+  <p>Amazon SageMaker には、Amazon Redshift、Athena、または Elastic MapReduce (EMR) を使用してクエリを実行するための AWS Glue データカタログビュー、AWS Lake Formation、AWS エンジンが含まれています。データ共有を使用して、データレイクオブジェクト、データモデルオブジェクト、計算済みインサイトオブジェクトなどの Data 360 オブジェクトを Amazon Redshift アカウントと共有します。</p>
+
+    <div><ul>
+        <li>必要な手順とリンクの一部は、Salesforce コンテンツ外部にあります。Salesforce ではこれらのリンクは維持されません。</li>
+
+        <li><a target="_blank" href="https://aws.amazon.com/blogs/big-data/harness-zero-copy-data-sharing-from-salesforce-data-cloud-to-amazon-redshift-for-unified-analytics-part-1/">「Harness Zero Copy Data Sharing from Salesforce Data Cloud to Amazon Redshift for Unified Analytics – Part 1 (統合分析で Salesforce Data Cloud から Amazon Redshift へのゼロコピーデータ共有を利用 – パート 1)」</a>の前提条件を確認してください。</li>
+
+      </ul>
+</div>
+    <div><p>Amazon SageMaker とデータを共有すると、Athena および Redshift SQL 方言を使用して Amazon Redshift、Athena、EMR から Salesforce Data 360 オブジェクトにアクセスできます。データ共有を Amazon SageMaker データ共有対象にリンクして、Data 360 オブジェクトを Amazon Redshift アカウントで使用できるようにします。その後、Amazon Redshift からライブ、ハーモナイズ、統合データを照会できます。</p></div>
+    <ol><li>
+        <span>アクセスする Data 360 オブジェクトを特定し、Data 360 でデータ共有を作成します。「<a title="外部システムと共有するためにデータ共有に含める Data 360 オブジェクトを選択します。" href="sharing_dev.html#c360_a_create_data_shares">データ共有の作成</a>」を参照してください。</span>
+      </li><li>
+        <span>Data 360 でデータ共有対象を作成し、Amazon Redshift アカウントとの接続を確立します。「Amazon SageMaker に接続するためのデータ共有対象<a title="Amazon Redshift アカウントとの接続を確立するには、Data 360 で Amazon SageMaker データ共有対象を作成します。" href="ingest_connect-2.html#c360_a_create_data_share_target_redshift">の作成</a>」を参照してください。</span>
+      </li><li>
+        <span>データ共有をデータ共有対象にリンクして、Amazon Redshift で Data 360 オブジェクトにアクセスできるようにします。「データ共有とデータ共有対象の<a title="データ共有をデータ共有対象にリンクして、外部システムで使用できるようにします。データ共有をデータ共有対象からリンク解除することもできます。" href="sharing_dev.html#c360_a_link_data_shares_with_data_share_target">リンクまたは</a>リンク解除」を参照してください。</span>
+        <div>データ共有とデータ共有対象をリンクすると、AWS で使用できるようになります。</div>
+      </li><li>
+        <span>顧客の AWS アカウントで、Lake Formation コンソールでデータ共有を受け入れ、対象リージョンへのリソースリンクを作成し、Salesforce Data 360 オブジェクトをデータカタログビューとしてマウントして、Amazon Redshift でライブデータと統合データを照会する権限を付与します。<a target="_blank" href="https://aws.amazon.com/blogs/big-data/harness-zero-copy-data-sharing-from-salesforce-data-cloud-to-amazon-redshift-for-unified-analytics-part-1/">「Harness Zero Copy Data Sharing from Salesforce Data Cloud to Amazon Redshift for Unified Analytics – Part 1 (統合分析で Salesforce Data Cloud から Amazon Redshift へのゼロコピーデータ共有を利用 – パート 1)」</a>を参照してください。</span>
+      </li></ol>
+
+    <div><p>Data 360 では、Amazon Redshift Serverless クラスターとプロビジョニング済み RA3 クラスターの両方で同じリージョンでのデータ共有がサポートされています。リージョン間で共有オブジェクトにアクセスするには、Data 360 と同じリージョンで Amazon Redshift Serverless をプロビジョニングします。 プロビジョニングされた RA3 クラスターでは、リージョン間の共有オブジェクトへのアクセスはサポートされていません。<a target="_blank" href="https://aws.amazon.com/blogs/big-data/harness-zero-copy-data-sharing-from-salesforce-data-cloud-to-amazon-redshift-for-unified-analytics-part-2/">「Harness Zero Copy Data Sharing from Salesforce Data Cloud to Amazon Redshift for Unified Analytics – Part 1 (統合分析で Salesforce Data Cloud から Amazon Redshift へのゼロコピーデータ共有を利用 – パート 2)」</a>を参照してください。</p></div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="ingest_connect-2.html#c360_a_create_data_share_target_redshift">Amazon SageMaker に接続するためのデータ共有対象の作成</a></strong><br>Amazon Redshift アカウントとの接続を確立するには、Data 360 で Amazon SageMaker データ共有対象を作成します。</li><li class="slds-p-bottom_small"><strong><a href="ingest_connect-2.html#c360_a_data_shares_aws_supportability_redshift">Amazon Redshift インテグレーションでサポートされるリージョン</a></strong><br>Data Cloud では、同じ地域および地域間のデータ共有がサポートされています。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="プライベートコネクトでは、Amazon Web Services (AWS) PrivateLink を使用して、AWS 仮想プライベートクラウド (VPC) と Data 360 テナント間のポイントツーポイントネットワークインテグレーションを確立します。プライベートコネクトでは、ネットワークトラフィックを公開インターネットに公開することなく、Data 360 からデータソースへの接続が提供されます。" href="ingest_connect-3.html#c360_a_private_connect_data_cloud">Data 360 のプライベートコネクト</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_access_data_from_snowflake">
+<h1 class="slds-text-heading_large">Snowflake とのデータの共有</h1>
+  <p><span>Data 360</span> データにアクセスするには、<span>Data 360</span> オブジェクトを含むデータ共有を作成します。<span>Data 360</span> オブジェクトには Snowflake アカウントのビューとしてアクセスできます。Snowflake でデータが使用可能な場合、ハーモナイズされた統合データを照会できます。</p>
+
+    <div><p>作業を開始する前に</p><ul><li> Snowflake システム管理者が <a title="Data 360 では、これらの IP アドレスを使用して Amazon S3、Google Cloud Storage、Azure Blob Storage、Snowflake、SFTP などの外部サービスと通信します。セキュリティポリシーで厳格なネットワーク ACL (アクセス制御リスト) が要求されている場合は、必ず次の IP アドレスを許可リストに含めてください。" href="getstarted-1.html#c360_a_data_cloud_ip_address_allowlist"><span>Data 360</span> IP アドレス</a>を許可リストに追加していることを確認します。</li>
+<li><a title="Data 360 では、次の地域で Snowflake との統合がサポートされています。" href="ingest_connect-2.html#c360_a_data_shares_aws_supportability_snowflake">Snowflake インテグレーションでサポート</a>される Data 360 リージョンを確認します。</li>
+</ul>
+</div>
+    <ol><li>
+        <span>アクセスする <span>Data 360</span> オブジェクトを特定し、<span>Data 360</span> でデータ共有を作成します。</span>
+        <div>詳細は、「<a title="外部システムと共有するためにデータ共有に含める Data 360 オブジェクトを選択します。" href="sharing_dev.html#c360_a_create_data_shares">データ共有の作成</a>」を参照してください。</div>
+      </li><li>
+        <span>Snowflake でユーザーを作成し、ユーザーのログイン情報を取得します。</span>
+        <div>詳細は、「<a title="Snowflake でユーザー情報と認証の詳細を収集し、データ共有対象を作成します。" href="ingest_connect-3.html#c360_a_get_user_details_snowflake">Get User Credentials from Snowflake</a> (Snowflake からのユーザーログイン情報の取得)」を参照してください。</div>
+      </li><li>
+        <span>Snowflake アカウントとの接続を確立するには、<span>Data 360</span> でデータ共有対象を作成します。</span>
+        <div>詳細は、「<a title="Data 360 でデータ共有対象を作成し、Snowflake アカウントとの接続を確立します。" href="ingest_connect-2.html#c360_a_create_data_share_target_snowflake">Create Data Share Target</a> and Connect with Snowflake」を参照してください。</div>
+      </li><li>
+        <span>Snowflake で <span>Data 360</span> オブジェクトにアクセスできるようにするには、データ共有をデータ共有ターゲットにリンクします。</span>
+        <div>詳細は、「データ共有とデータ共有対象の<a title="データ共有をデータ共有対象にリンクして、外部システムで使用できるようにします。データ共有をデータ共有対象からリンク解除することもできます。" href="sharing_dev.html#c360_a_link_data_shares_with_data_share_target">リンクまたは</a>リンク解除」を参照してください。</div>
+      </li><li>
+        <span>Snowflake でデータ共有を表示します。</span>
+        <ol>
+          <li>
+            <span>Snowflake アカウントでデータ共有の非公開共有を選択します。</span>
+          </li>
+
+          <li>
+            <span>データ共有のデータベースを作成します。</span>
+            <div> データベースの <span>Data 360</span> オブジェクトを表示するには、ACCOUNTADMIN としてログインします。データを照会し、<span>Data 360</span> テーブルと Snowflake テーブルにまたがる結合を作成できます。Classic コンソールを使用している場合、データ共有は [インバウンド] タブで使用できます。
+                        </div>
+          </li>
+
+        </ol>
+      </li></ol>
+
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="ingest_connect-3.html#c360_a_get_user_details_snowflake">Snowflake からのユーザーログイン情報の取得</a></strong><br>Snowflake でユーザー情報と認証の詳細を収集し、データ共有対象を作成します。</li><li class="slds-p-bottom_small"><strong><a href="ingest_connect-2.html#c360_a_create_data_share_target_snowflake">Snowflake に接続するためのデータ共有対象の作成</a></strong><br><span>Data 360</span> でデータ共有対象を作成し、Snowflake アカウントとの接続を確立します。</li><li class="slds-p-bottom_small"><strong><a href="ingest_connect-2.html#c360_a_data_shares_aws_supportability_snowflake">Snowflake インテグレーションでサポートされる Data 360 リージョン</a></strong><br><span>Data 360</span> では、次の地域で Snowflake との統合がサポートされています。 </li><li class="slds-p-bottom_small"><strong><a href="ingest_connect-2.html#c360_a_data_shares_gov_cloud_aws_supportability_snowflake">Snowflake インテグレーションでサポートされる Data 360 Government Cloud リージョン</a></strong><br>Government Cloud の <span>Data 360 は</span>、次の Snowflake リージョンとの統合をサポートしています。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="プライベートコネクトでは、Amazon Web Services (AWS) PrivateLink を使用して、AWS 仮想プライベートクラウド (VPC) と Data 360 テナント間のポイントツーポイントネットワークインテグレーションを確立します。プライベートコネクトでは、ネットワークトラフィックを公開インターネットに公開することなく、Data 360 からデータソースへの接続が提供されます。" href="ingest_connect-3.html#c360_a_private_connect_data_cloud">Data 360 のプライベートコネクト</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_activate_data_stream_sync_for_data360">
+<h1 class="slds-text-heading_large">Data 360 のデータストリーム同期の有効化</h1>
+  <p>Simple Start で Salesforce CRM メタデータを Data 360 に追加したら、データストリームを有効化してデータを取り込むことができます。Simple Start は、無効な状態のストリームを取り込み、クレジット消費をすぐに回避します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><p>開始する前に、次のことを確認してください。</p><ul>
+        <li>組織が 2026 年 6 月以降に Data 360 がプロビジョニングされている。</li>
+
+        <li>ホーム組織の接続で [シンプルスタート] が有効になっている。</li>
+
+      </ul>
+<table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d236078e80" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限セット</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d236078e80" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限セット">Simple Start のデータストリームを有効化する</td>
+
+              <td headers="d236078e80" style="vertical-align:top;" class="slds-cell-wrap"><p>権限セット</p><ul>
+                  <li>Data Cloud アーキテクト</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>[設定] から、[クイック検索] ボックスに「<kbd>Data Cloud 設定</kbd>」と入力し、[<strong class="uicontrol">Data Cloud 設定</strong>] を選択します。</span>
+      </li><li>
+        <span>[<strong class="uicontrol">データストリーム]</strong> をクリックします。</span>
+      </li><li>
+        <span>有効化するデータストリームを見つけます。</span>
+      </li><li>
+        <span>1 つ以上の無効なデータストリームの横にあるチェックボックスをオンにします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[有効化]</strong> をクリックします。</span>
+      </li></ol>
+
+    <div><p>Data 360 では、データストリームの状況が [有効] に変更されます。Data 360 はソースオブジェクトからデータの取り込みを開始します。このデータは標準データレイクオブジェクトに入力され、定義済みの対応付けを使用して対応するデータモデルオブジェクトに入力されます。このデータは、セグメント、分析、その他のプロセスで使用できます。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_add_new_source_fields">
+<h1 class="slds-text-heading_large">取得元項目の追加</h1>
+  
+  <p><span>Data 360</span> でスキーマを作成したら、必要に応じてソースフィールドをデータストリームに追加できます。接続された Salesforce CRM 組織のオブジェクトに項目を追加するときは、項目に適切な権限が設定されていることを確認します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>権限を追加するには、「 <a title="組織に接続すると、Data 360 オブジェクトおよび項目へのアクセスを許可する「Data 360 Salesforce コネクタ」権限セットが作成されます。組織のニーズに合わせて「Data 360 Salesforce コネクタ」権限セットを編集できます。" href="setup_admin-2.html#c360_a_enable_user_permissions_external_salesforce_org"> <span>Data 360</span> で Salesforce CRM にアクセスするためのオブジェクトおよび項目権限の有効</a>化」を参照してください。Amazon S3 または Google Cloud Storage (GCS) データストリームの場合、ソースフィールドを手動で追加することも、<span>Data 360</span> によって検出された後に追加することもできます。新しく検出されたフィールドが S3 ファイルまたは GCS ファイルでデータストリームに追加できるようになると、<span>Data 360 から</span>通知されます。レコードは、項目がデータストリームに追加された時点から、新しいソース項目の値の表示を開始します。</p></div>
+    <ol><li>
+        <span>データストリームの詳細ページで、<strong class="uicontrol">[取得元項目を追加]</strong> を選択します。</span>
+        <ol>
+          <li>
+            <span>GCS または S3 データストリームの場合、<strong class="uicontrol">[項目を手動で追加]</strong> または <strong class="uicontrol">[検出された項目を追加]</strong> を選択します。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>項目を手動で追加する場合、ソーススキーマの取得元となるファイル名を入力して、<strong class="uicontrol">[検証]</strong> をクリックします。ファイル名がディレクトリ内のファイルと一致している必要があります。</span>
+        <div><span>Data 360 で</span>ファイルが処理され、ファイル内のソースフィールドのリストが表示されます。</div>
+      </li><li>
+        <span> <span>Data 360</span> でソーススキーマに追加するフィールドを選択します。</span>
+        <div>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> [自動検出された項目] の [最後に検出された項目] 列では、<span>Data 360 が</span>データソース内の項目を最後に検出した日時を確認できます。この情報は、データストリームに追加する関連データが項目にあるかどうか判断するのに役立ちます。この情報を使用して、目的の項目がデータストリームに追加されることを確認します。</div></div></div>
+
+        </div>
+      </li><li>
+        <span>各項目に推奨されたデータ型を注意深く確認します。項目をスキーマに追加した後でデータ型を変更することはできません。推奨されたデータ型が正しくない場合、上書きできます。</span>
+      </li><li>
+        <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+      </li></ol>
+
+    <div><p>新しい取得元項目がデータストリームのソーススキーマに追加されました。項目が欠落しているためにデータストリームの更新に失敗する場合、その項目を無効にします。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="データストリームで不要になった項目は、無効にできます。項目を無効にすると、データストリームから削除され、新しいデータが取り込まれません。無効にした項目の名前を新しい項目に割り当てることはできません。" href="ingest_connect-2.html#c360_a_disable_data_stream_fields">データストリーム項目の無効化</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_byom_connect_model">
+<h1 class="slds-text-heading_large">モデルの接続</h1>
+  <p>Salesforce の外部で作成された予測および生成 AI モデルを接続し、Salesforce のデータを使用して将来の結果を予測します。データソースを選択して予測条件を定義し、AI と機械学習を使用して予測推測とインサイトを明らかにするモデルをトレーニングします。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="ai_models-2.html#c360_a_bring_your_own_model">Bring Your Own Model</a></strong><br>Bring Your Own Model(BYOM)を使用すると、外部プラットフォームで構築されたモデルを<span>Data 360</span>に接続できます。BYOM では、外部 ML プラットフォームで Salesforce データに直接アクセスでき、データの重複を排除できるゼロコピーのアプローチが使用されます。モデルを接続したら、予測を簡単に消費できます。モデルの作成、トレーニング、リリースには、外部プラットフォームでの設定に関するコーディングの専門知識が必要ですが、Salesforce へのモデルの接続は簡単です。</li><li class="slds-p-bottom_small"><strong><a href="ai_models-2.html#c360_a_ai_salesforce_enabled_models">Salesforce 対応大規模言語モデル</a></strong><br>Salesforce対応の基盤モデルを使用して、プロンプトビルダーで生成AIエクスペリエンスを強化します。一部のモデルでは、データレジデンシー要件に対応するために地理対応要求ルーティングを使用します。そのため、プロバイダーは、Einstein Trust Layerの境界内で作業しながら、複数の地域でモデルをホストできます。</li><li class="slds-p-bottom_small"><strong><a href="ai_models-1.html#c360_a_ai_foundation_models">Bring Your Own Large Language Model (独自の大規模言語モデル)</a></strong><br>BYOLLM(Bring Your Own Large Language Model)機能を使用すると、外部プラットフォームでホストされる基盤モデルを追加して、AIモデル(旧称Einstein Studio)に接続できます。基盤モデルを使用して、生成 AI を強化するモデル設定を作成できます。モデルを本番にリリースする前に、モデル Playground でさまざまな設定を使用してプロンプトに対するモデルの応答を評価します。</li><li class="slds-p-bottom_small"><strong><a href="ai_models-1.html#c360_a_ai_foundation_models_test">モデル Playground でのモデルの設定とテスト</a></strong><br>モデル Playground でモデル設定を作成、編集、評価します。設定や専門的な専門知識は必要ありません。Playgroundモデルでは、データのプライバシーとセキュリティを確保するTrustレイヤーを使用します。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="権限セットは、Data 360 のデータと機能に対する Salesforce ユーザーのアクセスレベルと表示レベルを定義します。ライセンスに応じて、Data 360 にはいくつかの標準権限セットが用意されています。 Salesforce システム管理者が権限セットをユーザーに割り当てます。Data 360 アクセス用のカスタム権限セットを作成することはお勧めしませんが、権限セットを他の Salesforce 権限セットと組み合わせることはできます。" href="https://help.salesforce.com/s/articleView?id=data.c360_a_userpermissions.htm&amp;language=ja&amp;type=5">Data 360 標準権限セット</a></li><li><a title="ガイドラインでは、Customer Data Platform のお客様が Data 360 を最適に採用して最高のパフォーマンスを得るためのベストプラクティスの推奨事項を定義します。制限は、それを超えると機能が利用不可になったり、パフォーマンスが調整されたり、使用量の請求料金が適用されたりする境界線です。この記事では、購入できなくなった従来の Customer Data Platform ライセンスについて説明します。" href="getstarted-2.html#c360_a_limits_and_guidelines_cdp">Customer Data Platform の制限とガイドライン</a></li><li><a title="特定の Data 360 機能の使用は、クレジット消費に影響します。2026 年 2 月 24 日より前にクレジットを購入した場合、組織は Data 360 サービスのデータサービスクレジットを消費します。2026 年 2 月 24 日以降に購入または更新する組織には、データサービスまたは Flex Credit のいずれかを使用できます。これらのデータ サービス使用状況カテゴリの使用状況を監視するには、組織の Digital Wallet にアクセスします。組織に Data 360 Profiles タイプのライセンスがある場合、一部の使用量種別は消費されません。使用量の請求方法についての詳細は、契約書を参照いただくか、アカウントエグゼクティブにお問い合わせください。" href="billing.html#c360_a_data_usage_types">Data 360 のデータサービス請求可能利用状況種別</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_byom_connect_your_external_model_databricks">
+<h1 class="slds-text-heading_large">Databricks モデルの接続</h1>
+  
+  <p>Salesforceで予測を使用するには、Databricksモデルを<span>Data 360</span>に接続し、使用事例の予測条件を定義します。</p>
+
+    <div><p>モデルエンドポイントと認証の詳細に関する情報を収集します。</p></div><ol><li><span>AIモデル(旧称Einstein Studio)の[予測]タブで、[<strong class="uicontrol">予測モデルを追加</strong>]をクリックします。<div><img alt="SageMaker モデル種別が表示されたモデルビルダー。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_byom_connect_databricks_model_predictive.png" style="width:800px;"></div></span></li><li><span>モデル種別を選択するには、<strong class="uicontrol">[Databricks モデルを接続する]</strong> をクリックします。続いて、<strong class="uicontrol">[次へ]</strong> をクリックします。<div><img alt="さまざまなモデルに接続できるタイルが表示されているモデルビルダービュー。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_byom_connect_databricks_model_choose_type.png" style="width:800px;"></div></span></li><li><span>エンドポイントを接続してモデル推測にアクセスするには、次の詳細を指定します。次に、<strong class="uicontrol">[次へ]</strong> をクリックします。</span><div><ul><li>Name — エンドポイント名</li>
+<li>URL — エンドポイント URL</li>
+<li>認証 — キーベースと JWT (両方に API ゲートウェイが必要)</li>
+<li>認証ヘッダー — 認証ヘッダー</li>
+<li>秘密鍵 — ベアラー &lt;個人アクセストークン&gt;</li>
+<li>要求形式 — アプリケーションまたはサーバーからデータを要求する形式<ul><li>DataFrame 分割</li>
+</ul>
+</li>
+<li>応答形式 — サーバー応答からデータを提供する形式。<ul><li>JSON</li>
+</ul>
+</li>
+</ul>
+</div></li><li><span>スキーマを追加するには、[<strong class="uicontrol">入力および出力</strong>を入力します] をクリックします。<a name="c360_a_ai_byom_connect_your_external_model_databricks__image_d1n_vjz_k1c"></a><div><img alt="モデルスキーマを表示するモデルビルダービュー。ここで入力と出力を追加します。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_byom_connect_model_builder_schema.png" id="c360_a_ai_byom_connect_your_external_model_databricks__image_d1n_vjz_k1c" style="width:800px;"></div></span><ol><li><span>予測に影響する入力 (変数) を追加するには、[<strong class="uicontrol">入力を追加</strong>] をクリックします。次に、名前と API 参照名を指定し、データ型を選択します。&nbsp;入力を追加するときに作業を保存します。</span></li>
+<li><span>出力を追加するには、<strong class="uicontrol">[Add Output</strong> (出力を追加)] をクリックします。次に、「$.predictions」のような形式で名前、API 参照名、データ型、JSON キーを指定します。&nbsp;出力を追加するときに作業を保存します。</span><div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> Databricks Select クエリに一致する順序で入力を配置する必要があります。入力を移動するには、[入力] セクションの目的の位置までドラッグします。</div></div></div>
+</div></li>
+</ol></li><li><span><strong class="uicontrol">[次へ]</strong> をクリックします。</span></li><li><span>モデル設定を確認します。</span></li><li><span>モデル設定を更新するには、変更するセクションをクリックします。次に、フロー内を移動してすべての設定を確認します。</span></li><li><span>設定に問題がなければ、[<strong class="uicontrol">保存] を</strong>クリックします。</span></li><li><span>モデルに名前を付け、[<strong class="uicontrol">Save &amp; Connect</strong> (保存して接続)] をクリックします。モデルが接続されたら、[予測モデル] タブのモデルリストビューで確認できます。</span></li><li><span>モデルの詳細を表示するには、モデルをクリックします。このページでは、モデルを有効化、編集、削除できます。</span></li><li><span>モデルが有効になったら、[利用状況] タブに移動して予測ジョブを作成し、予測を消費します。</span></li><li><span>一括予測を作成した場合は、<strong class="uicontrol">[実行]</strong> をクリックして予測スコアを更新します。</span><div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> ストリーミング予測では、データモデルオブジェクト (DMO) の入力が変更された場合にのみ新しい推測が開始されます。</div></div></div>
+</div></li></ol>
+
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="予測モデルから返される予測、処方、上位の要素は、さまざまな方法で使用できます。" href="ai_models-2.html#c360_a_get_predictions_from_your_model">予測モデルからの出力の使用</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_byom_connect_your_external_model_endpoint">
+<h1 class="slds-text-heading_large">モデルエンドポイント形式</h1>
+  <p>予測モデルを接続して推測を取得するには、関連するエンドポイント要求および応答形式を使用する必要があります。</p>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">要求形式</h2><p>データを要求するエンドポイント形式。要求は、クライアントから特定の URL またはサーバー上のエンドポイントへの要求です。この要求には、HTTP メソッド、ヘッダー、パラメーター、およびリクエストボディ (該当する場合) が含まれます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">回答形式</h2><p>クライアント要求への応答を要求するエンドポイント形式。応答には、要求の成功または失敗を示す HTTP 状況コードと、応答に関するメタデータを提供するヘッダーが含まれます。該当する場合は、要求されたデータまたは追加情報を含むレスポンスボディが含まれます。</p><div style="text-align:left;">
+        <img alt="サポートされるモデルとサポートされる形式がリストされた [Request and Response Formats (要求と応答の形式)] テーブル。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_ec_request_and_response_formats.png" style="width:700px;">
+      </div></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_byom_connect_your_external_model_google_vertex">
+<h1 class="slds-text-heading_large">Vertex AI モデルの接続</h1>
+  
+  <p>SalesforceでVertex AIモデルからの予測を使用するには、<span>Data 360</span>に接続して、使用事例の予測条件を定義します。</p>
+
+    <div><p>モデルエンドポイントと認証の詳細に関する情報を収集します。</p></div>
+    <ol><li>
+        <span>AIモデル(旧称Einstein Studio)の[予測]タブで、[<strong class="uicontrol">予測モデルを追加</strong>]をクリックします。<div><img alt="[予測] タブがあるモデルビルダービュー。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_byom_connect_google_cloud_vertex_ai_model_predictive.png" style="width:800px;"></div></span>
+      </li><li>
+        <span>モデル種別を選択するには、<strong class="uicontrol">[Google Cloud Vertex AI モデルを接続する]</strong> をクリックします。続いて、<strong class="uicontrol">[次へ]</strong> をクリックします。<div><img alt="Vertex AI モデル種別が表示されたモデルビルダー。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_byom_connect_google_vertex_model_choose_type.png" style="width:800px;"></div></span>
+      </li><li>
+        <span>エンドポイントを接続してモデル推測にアクセスするには、次の詳細を指定します。次に、<strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+        <div>
+          <ul>
+            <li>Name — エンドポイント名</li>
+
+            <li>URL — エンドポイント URL</li>
+
+            <li>認証 — Google サービスアカウントのログイン情報または鍵ベース </li>
+
+            <li>サービスアカウントメール — Google サービスアカウントのメール</li>
+
+            <li>非公開鍵 ID — 一意の ID</li>
+
+            <li>非公開鍵 — 鍵</li>
+
+            <li>認証ヘッダー — 認証ヘッダー </li>
+
+            <li>秘密鍵 — 英数字文字列または組み合わせ</li>
+
+            <li>Request Format (要求形式) — アプリケーションまたはサーバーからデータを要求するための形式。<ul><li>インスタンスが関連する NumPy</li>
+<li>入力のある NumPy</li>
+<li>JSON dense</li>
+</ul>
+</li>
+
+            <li>応答形式 — サーバー応答からデータを提供する形式。<ul><li>JSON</li>
+</ul>
+</li>
+
+          </ul>
+
+        </div>
+      </li><li>
+        <span>スキーマを追加するには、[<strong class="uicontrol">入力および出力</strong>を入力します] をクリックします。<div><img alt="モデルスキーマを表示するモデルビルダービュー。ここで入力と出力を追加します。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_byom_connect_model_builder_schema.png" style="width:800px;"></div></span>
+        <ol>
+          <li>
+            <span>予測に影響する入力 (変数) を追加するには、[<strong class="uicontrol">入力を追加</strong>] をクリックします。次に、名前と API 参照名を指定し、データ型を選択します。&nbsp;入力を追加するときに作業を保存します。</span>
+          </li>
+
+          <li>
+            <span> 出力を追加するには、<strong class="uicontrol">[Add Output</strong> (出力を追加)] をクリックします。次に、「$.predictions」のような形式で名前、API 参照名、データ型、JSON キーを指定します。&nbsp;出力を追加するときに作業を保存します。</span>
+            <div>
+              <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> Vertex AI 選択クエリに一致する順序で入力を配置する必要があります。入力を移動するには、[入力] セクションの目的の位置までドラッグします。</div></div></div>
+
+            </div>
+          </li>
+
+        </ol>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>モデル設定を確認します。</span>
+      </li><li>
+        <span>モデル設定を更新するには、変更するセクションをクリックします。次に、フロー内を移動してすべての設定を確認します。</span>
+      </li><li>
+        <span>設定に問題がなければ、[<strong class="uicontrol">保存] を</strong>クリックします。</span>
+      </li><li>
+        <span>モデルに名前を付け、[<strong class="uicontrol">Save &amp; Connect</strong> (保存して接続)] をクリックします。モデルが接続されたら、[予測モデル] タブのモデルリストビューで確認できます。</span>
+      </li><li>
+        <span>モデルの詳細を表示するには、モデルをクリックします。このページでは、モデルを有効化、編集、削除できます。</span>
+      </li><li>
+        <span>モデルが有効になったら、[利用状況] タブに移動して予測ジョブを作成し、予測を消費します。</span>
+      </li><li>
+        <span>一括予測を作成した場合は、<strong class="uicontrol">[実行]</strong> をクリックして予測スコアを更新します。</span>
+        <div>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> ストリーミング予測では、データモデルオブジェクト (DMO) の入力が変更された場合にのみ新しい推測が開始されます。</div></div></div>
+
+        </div>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="予測モデルから返される予測、処方、上位の要素は、さまざまな方法で使用できます。" href="ai_models-2.html#c360_a_get_predictions_from_your_model">予測モデルからの出力の使用</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_byom_set_up_your_data_databricks">
+<h1 class="slds-text-heading_large">Databricks でのデータの設定 </h1>
+  <p>Databricks ノートブックで Salesforce データにアクセスするには、Python コネクタを使用します。使いやすいインターフェースにより、<span>Data 360</span> のデータに対してクエリをすばやく実行できるため、必要なデータを Python に抽出できます。</p>
+
+    <ol><li>
+        <span>Databricksノートブックで、CDP Pythonコネクタをインストールして、<span>Data 360</span>オブジェクトにアクセスし、SalesforceデータをDatabricksに取り込みます。</span>
+      </li><li>
+        <span>Python コネクタ設定の一環として、外部クライアントアプリケーションまたは接続アプリケーションを作成します。</span>
+        <div>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> Spring '26 以降、接続アプリケーションの作成は制限されます。 Spring '26 中およびそれ以降も、既存の接続アプリケーションを使用できます。 ただし、代わりに<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.external_client_apps.htm&amp;language=ja&amp;type=5">外部クライアントアプリケーション</a>を使用することをお勧めします。引き続き接続アプリケーションを作成する必要がある場合は、Salesforce サポートにお問い合わせください。<p>詳細については、「Spring '26 で<a target="_blank" href="https://help.salesforce.com/s/articleView?id=005228017&amp;language=ja&amp;type=1">新しい接続アプリケーション</a>を作成できなくなりました」を参照してください。</p></div></div></div>
+
+        </div>
+      </li><li>
+        <span>IP アドレスへのアクセスを制限して、データへのアクセスを管理します。</span>
+      </li><li>
+        <span>鍵ベースの認証を使用してデータに安全にアクセスします。</span>
+      </li><li>
+        <span><span>Data 360</span> でデータソースに接続し、Databricks でデータセットを照会します。たとえば、メールエンゲージメントデータを取得するには、Marketing Cloud Engagement のメールエンゲージメントオブジェクトへのアクセス権が必要です。</span>
+      </li><li>
+        <span><span>Data 360</span> で推測を使用するには、Python ファイルをノートブックにアップロードします。</span>
+      </li><li>
+        <span>モデルのエンドポイントを取得するには、[Registered Models - Serving (登録済みモデル - 提供)] セクションの Databricks ダッシュボードに移動します。モデルを Salesforce に接続するには次の詳細が必要なため、URL をメモします。</span>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.connected_app_create.htm&amp;language=ja&amp;type=5">Salesforce ヘルプ: 接続アプリケーションの作成</a></li><li><a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.c360a_api.meta/c360a_api/c360a_api_python_connector.htm">Salesforce 開発者: CDP Python コネクタ</a></li><li><a target="_blank" href="https://docs.databricks.com/en/machine-learning/model-serving/create-manage-serving-endpoints.html">外部: モデル提供エンドポイントの作成と設定</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_byom_set_up_your_endpoint_databricks">
+<h1 class="slds-text-heading_large">Databricks でのエンドポイントの設定 </h1>
+  <p>Databricksと<span>Data 360</span>間のエンドポイント接続を設定して、データへのアクセスを制御します。</p>
+
+    <ol><li>
+        <span>設定する前に、Databricks 許可リストに地域の IP アドレスが含まれていることを確認します。</span>
+      </li><li>
+        <span>Databricks ワークスペースを開きます。</span>
+      </li><li>
+        <span>[管理者] セクションで、サービスプリンシパルを設定します。</span>
+      </li><li>
+        <span>モデル提供エンドポイントを設定します。</span>
+        <div>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> モデル提供にはサーバーレスコンピューティングが必要であり、プレミアム層で使用できます。</div></div></div>
+
+        </div>
+      </li><li>
+        <span>ロールと Unity カタログを使用して、サービスプリンシパルに倉庫とテーブルへのアクセス権を付与します。</span>
+      </li><li>
+        <span>サービスプリンシパルのアクセストークンを生成します。</span>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Data 360 では、これらの IP アドレスを使用して Amazon S3、Google Cloud Storage、Azure Blob Storage、Snowflake、SFTP などの外部サービスと通信します。セキュリティポリシーで厳格なネットワーク ACL (アクセス制御リスト) が要求されている場合は、必ず次の IP アドレスを許可リストに含めてください。" href="getstarted-1.html#c360_a_data_cloud_ip_address_allowlist">Data 360 サービスで使用される IP アドレス</a></li><li><a target="_blank" href="https://learn.microsoft.com/en-us/azure/databricks/resources/supported-regions#--supported-regions-list">外部: サポートされる地域リスト</a></li><li><a target="_blank" href="https://docs.databricks.com/en/resources/supported-regions.html#ip-domain-aws">外部: IP アドレスとドメイン</a></li><li><a target="_blank" href="https://docs.databricks.com/en/resources/supported-regions.html#ip-domain-aws">外部: サービスプリンシパルのロールの付与</a></li><li><a target="_blank" href="https://docs.databricks.com/en/administration-guide/users-groups/service-principals.html#manage-tokens-for-a-service-principal">外部: サービスプリンシパルのトークンの管理</a></li><li><a target="_blank" href="https://docs.databricks.com/en/data-governance/unity-catalog/index.html">外部: Unity カタログとは?</a></li><li><a target="_blank" href="https://docs.databricks.com/en/administration-guide/users-groups/service-principals.html">外部: サービスプリンシパルの管理</a></li><li><a target="_blank" href="https://docs.databricks.com/en/machine-learning/model-serving/create-manage-serving-endpoints.html">外部: モデル提供エンドポイントの作成と設定</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_byom_use_databricks_models">
+<h1 class="slds-text-heading_large">Databricks AI モデルの使用</h1>
+  <p>Databricks とデータを使用して、Salesforce でカスタム機械学習モデルを構築、トレーニングして、リリースできます。Databricksでモデルを登録したら、予測条件を定義し、モデルを<span>Data 360</span>に接続して、使用事例の予測とインサイトを取得します。このインサイトを使用して、顧客プロファイルの強化、セグメントの作成、さまざまなチャネルのエクスペリエンスのパーソナライズを行うことができます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Developer Edition</strong>、<strong>Enterprise Edition</strong>、<strong>Performance Edition</strong>、および <strong>Unlimited Edition</strong></td>
+
+          </tr>
+        </tbody></table>
+    <p>Salesforce のデータで Databricks モデルを使用すると、次のような利点があります。</p>
+    <ul>
+      <li>Customer 360 全体で、厳選され、ハーモナイズされたほぼリアルタイムのデータにアクセスできます。 この機能により、よりインテリジェントな予測を提供するエキスパートモデルが創出されます。</li>
+
+      <li>Databricksでモデルを作成し、<span>Data 360</span>に簡単に接続して、ビジネス プロセスの最適化と予測インサイトを取得し、価値を高めます。使用事例には、購入の傾向、リードの取引開始、離脱の傾向などがあります。</li>
+
+      <li>Salesforceでモデルと推測を簡単に運用できます。<span>Data 360</span>は、ビジネスプロセスからの結果の消費をシンプルにし、価値を高めます。</li>
+
+      <li>データへのゼロコピーの方法により、Databricks の複雑で、コストのかかる、ミスが発生しやすい抽出、変換、読み込み (ETL) ジョブが排除されます。この方法では、コストが削減され、効率が向上します。</li>
+
+      <li>Vertex AI モデルを統合し、Salesforce で予測を取得します。ワークフロー自動化スイートであるフローを使用して、データに対するリアルタイムの更新に基づいて進化できる AI 主導の意思決定を可能にします。</li>
+
+    </ul>
+
+    <p>Salesforce で Databricks モデルを使用する手順は、次のとおりです。</p>
+    <a name="c360_a_ai_byom_use_databricks_models__ul_kck_42l_dxb"></a><ul id="c360_a_ai_byom_use_databricks_models__ul_kck_42l_dxb">
+      <li>Databricksで<span>Data 360</span>データにアクセスして、モデルを作成、トレーニング、リリースします。</li>
+
+      <li>Databricksモデルを<span>Data 360</span>に接続して、Salesforce全体のさまざまなワークフローで予測とインサイトの推測を消費します。</li>
+
+    </ul>
+
+    <div>
+      
+      <img alt="Databricks と Salesforce 間のデータフローを表示するダイアグラム" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_byom_databricks_data_flow.png" style="width:800px;">
+    </div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#c360_a_ai_byom_set_up_your_data_databricks">Databricks でのデータの設定</a></strong><br>Databricks ノートブックで Salesforce データにアクセスするには、Python コネクタを使用します。使いやすいインターフェースにより、<span>Data 360</span> のデータに対してクエリをすばやく実行できるため、必要なデータを Python に抽出できます。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_ai_byom_set_up_your_endpoint_databricks">Databricks でのエンドポイントの設定</a></strong><br>Databricksと<span>Data 360</span>間のエンドポイント接続を設定して、データへのアクセスを制御します。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_ai_byom_connect_your_external_model_databricks">Databricks モデルの接続</a></strong><br>Salesforceで予測を使用するには、Databricksモデルを<span>Data 360</span>に接続し、使用事例の予測条件を定義します。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_create_connect_activate_models">
+<h1 class="slds-text-heading_large">モデルの作成、接続、有効化</h1>
+  <p>コーディングせずに数クリックの操作で独自の予測モデルを作成できます。Salesforce 外のモデルから生成 AI と予測 AI を活用できるように接続を確立します。次に、データで明らかにされた推測とインサイトを使用するようにモデルを有効化します。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="ai_models-2.html#c360_a_ai_predictive_models_access_runtime_settings">モデルランタイム設定へのアクセス</a></strong><br>新しいデフォルトランタイムは、Data 360 の [AI モデル] タブですべての新しい予測モデルを作成するための基盤です。 この機能強化により、従来のランタイムが、拡張予測モデリング機能の長期的なプラットフォームに置き換えられます。</li><li class="slds-p-bottom_small"><strong><a href="ai_models-1.html#c360_a_ai_ec_create_model">ゼロからの予測 AI モデルの作成</a></strong><br>モデルを作成してデータを分析し、機械学習に基づいて AI を活用した予測を取得します。サポートされる使用事例と倫理的なモデル構築について説明します。そして、手順に従ってモデルを作成し、モデル品質を評価します。</li><li class="slds-p-bottom_small"><strong><a href="ai_models-2.html#c360_a_ai_predictive_model_clustering">構造化クラスタリング</a></strong><br>Data 360 のクラスタリングを使用して、隠れたパターンを明らかにし、選択した項目の類似点に基づいて構造化データの自然なグルーピングを検出します。クラスター化では、新しい顧客プロファイル、定期的なサポートパターン、予期しない行動トレンドを特定します。</li><li class="slds-p-bottom_small"><strong><a href="ai_models-2.html#c360_a_ai_predictive_model_forecast">売上予測</a></strong><br>Data 360 の売上予測を使用して、履歴データから将来の値を予測します。売上予測モデルでは、データサイエンスの専門知識がなくても、トレンドと季節のパターンを自動的に特定して予測を生成します。</li><li class="slds-p-bottom_small"><strong><a href="ai_models-2.html#c360_a_ai_predictive_model_sentiment">センチメント分析</a></strong><br>Data 360 のセンチメント分析を使用して、構造化されていないテキストを評価し、顧客がブランド、商品、サービスについてどのように感じているかを確認します。モデルでは、顧客レビューやアンケートへの回答などのレコードごとに、肯定的、否定的、または中立的な表示ラベルと信頼スコアが割り当てられます。利用者を絞り込み、ダッシュボードを作成し、自動化をトリガーするには、モデル出力を適用します。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_ai_predictive_model_classify">トピック分類</a></strong><br>Data 360 のトピック分類を使用して、レビュー、ケースコメント、アンケートへの回答などの非構造化テキストを意味のあるカテゴリに整理します。分類するレコードを評価するために、モデルではトレーニング済み言語モデルが選択した項目に適用されます。モデルでは、レコードごとにトピックの表示ラベルと信頼度スコアが割り当てられます。Data 360 では、次の出力がデータセットに追加されます。レポートとクエリでトピック分類を適用します。</li><li class="slds-p-bottom_small"><strong><a href="ai_models-2.html#c360_a_ai_predictive_model_monitor">予測モデル監視</a></strong><br>AIモデル(旧称Einstein Studio)のモデル監視を使用して、リリースされた予測モデルの精度、安定性、信頼性を維持します。この継続的なプロセスにより、モデルのパフォーマンスに関する詳細なインサイトが得られ、データ品質や接続の問題を特定できます。Data 360 で一貫した監視を行わないと、モデルのパフォーマンスが低下し、不正確な予測、予期しない結果、結果の信頼性の低下を招く可能性があります。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_ai_byom_connect_model">モデルの接続</a></strong><br>Salesforce の外部で作成された予測および生成 AI モデルを接続し、Salesforce のデータを使用して将来の結果を予測します。データソースを選択して予測条件を定義し、AI と機械学習を使用して予測推測とインサイトを明らかにするモデルをトレーニングします。</li><li class="slds-p-bottom_small"><strong><a href="ai_models-1.html#c360_a_ai_mm_activate_models">モデルの有効化</a></strong><br>予測モデル設定を保存すると、モデルを有効化できます。予測を消費するには、まずモデルを有効化する必要があります。</li><li class="slds-p-bottom_small"><strong><a href="ai_models-2.html#c360_a_ai_predictive_data_cloud_one">コンパニオン組織の予測モデル</a></strong><br>Data Cloud One コンパニオン組織から、ホーム組織でトレーニングおよび有効化された予測モデルにアクセスします。Data Cloud One ではマルチ組織アクセスがサポートされるため、さまざまなチーム、国、またはブランドにビジネスが分散している場合に最適です。また、ホーム組織のモデルガバナンスにより、モデル管理が簡素化され、エコシステム全体で予測 AI を拡張できます。</li><li class="slds-p-bottom_small"><strong><a href="governance-1.html#c360_a_ai_predictive_model_lineage">AI モデルのモデル系統</a></strong><br>モデルの系統により、トレーニングデータ、バージョン管理、リリース、ライブデータでの使用に至るまで、AI モデルのライフサイクルの追跡可能な履歴が提供されます。Data 360は、この機能をAIモデル(旧Einstein Studio)とガバナンスに統合しています。</li><li class="slds-p-bottom_small"><strong><a href="ai_models-1.html#c360_a_ai_mm_show_hide_models">設定の非表示による大規模言語モデル (LLM) アクセスの管理</a></strong><br>プロンプトビルダーのユーザーがプロンプトテンプレートで別のモデルに変更する場合は、LLM 設定を非表示にします。新しい LLM バージョンまたは別のプロバイダーの別の LLM を選択できます。テストが完了するまで、新しい LLM へのアクセスを一時停止できます。必要に応じて、非表示の LLM 設定を後で表示して選択できるようにすることもできます。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_batch_transform_connect_nodes_and_branches">
+<h1 class="slds-text-heading_large">一括処理データ変換のノードまたは分岐の接続と再編成</h1>
+  
+  <p>一括処理データ変換で、切断されたノードまたは分岐を接続して、任意のノードから他のノードにデータを追加します。中間ノードに分岐を作成し、一括処理データ変換の別のパスにその分岐を追加することもできます。</p>
+
+    <ol><li>
+        <span>分岐を作成し、別のパスに結合または追加するには、ノードにマウスポインターを置いて分岐ボタン (<span style="vertical-align:text-bottom;display:inline-block;"><img alt="分岐ボタン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/resources-global/analytics/images/bi_button_branch.png" style="margin-bottom:0;"></span>) を表示します。次に、分岐ボタンを別のパスのノードの上にドラッグします。 <div style="text-align:left;"><img alt="分岐ボタンをノードの上にドラッグします。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_batch_transform_connect_branch.png"></div></span>
+        <ol>
+          <li>
+            <span>[ノードを接続] ボックスで、データを追加するように選択します。 <div style="text-align:left;"><img alt="[ノードを接続] ボックスに [結合] と [追加] のオプションが表示されています。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_batch_transform_connect_nodes.png"></div></span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>別のノードにデータを追加するには、ノードの [ノードを追加] ボタン (<span style="vertical-align:text-bottom;display:inline-block;"><img alt="[ノードを追加] ボタン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/resources-global/analytics/images/bi_button_Add.png" style="margin-bottom:0;"></span>) または分岐ボタンを先行ノードの上にドラッグします。 <div style="text-align:left;"><img alt="[ノードを追加] ボタンを先行の [Account (取引先)] ノードの上にドラッグします。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_batch_transform_connect_predecessor.png"></div></span>
+        <ol>
+          <li>
+            <span>次に、[ノードを接続] ボックスでデータを追加するように選択します。このキャンバスでは、集計された取引先データを取引先レコードに結合します。 <div style="text-align:left;"><img alt="[Aggregate (集計)] ノードが先行の [Account (取引先)] ノードに結合されます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_batch_transform_predecessor_result.png"></div></span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>データのフローを見やすくするには、キャンバスのデータ変換ノードを再配置します。個々のノードを選択して移動するか、マウスをドラッグして必要な数のノードを選択します。ノードのグループをドラッグして再配置したり、一度にすべて削除したりします。<div style="text-align:left;"><img alt="複数のノードを同時に選択して、グループとして移動または削除します。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_batch_transform_integrate_canvas_grab_multiple.png"></div></span>
+        <div>たとえば、キャンバスで下流ノードの後に上流ノードを移動できます。この場合、ノードは右から左に流れます。<div style="text-align:left;"><img alt="入力ノードからのデータは左へ流れ、残りのノードは右へ流れます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_batch_transform_canvas_backward.png"></div></div>
+      </li></ol>
+
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_byol_data_federation">
+<h1 class="slds-text-heading_large">Zero Copy Data Federation (ゼロコピーデータ統合)</h1>
+  
+  <p><span>Data 360</span>のゼロ コピー データ統合は、物理的に異なる複数のデータソースからデータを照会するプロセスです。このアプローチにより、ユーザーは、異なるシステムを統合と呼ばれる 1 つの論理システムとして扱い、各システムの自律性を維持できます。重要なのは、データ統合により、システム境界を越えてデータが重複することを回避できることです。<span>Data 360</span>。</p>
+
+    <div><div style="text-align:left;">
+                                <img alt="ゼロコピーデータフェデレーションフロー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_byol_data_federation.png" style="width:800px;">
+                        </div><p>データ統合に関連する各システムは、ストレージコンポーネントとコンピューティングコンポーネントの2つの主要コンポーネントで構成されます。ストレージ コンポーネントはデータの保存を担当し、コンピューティング コンポーネントはストレージ コンポーネントに保存されているデータのクエリを担当します。一部のシステムでは、基礎となるデータはオープンテーブル形式を使用して編成されます。</p><p>Data 360 では、次の 2 つの方法でデータ統合がサポートされます。</p><a name="c360_a_byol_data_federation__ul_edx_lgy_4gc"></a><ul id="c360_a_byol_data_federation__ul_edx_lgy_4gc">
+                                <li>クエリ統合 (コンピューティング): 外部システムのデータを必要とするワークフローを起動すると、Data 360 は SQL クエリを外部システムのコンピューティングエンジンに送信します。外部システムはクエリを実行し、Data 360 のワークフローに関連レコードを返します。 ワークフローの完了後、レコードは保持されません。</li>
+
+                                <li>ファイルフェデレーション(ストレージ): サポートされているオープンテーブル形式でデータが構成されている場合、Data 360は外部ストレージシステムを直接照会します。Data 360 は独自のクエリエンジン (および計算) を使用して、ワークフローに必要なレコードを取得します。クエリ統合と同様に、ワークフローの完了後はレコードは保持されません。</li>
+
+                        </ul>
+<p>データが取り込まれているか統合されているかに関係なく、Data 360 はデータレークオブジェクト (DLO) を作成します。ただし、ゼロコピーコネクタを使用する場合、DLO には実際のデータが含まれず、外部物理テーブルへのポインターとして機能します。そのため、ゼロコピーコネクタを介して作成された DLO は、外部 DLO または仮想 DLO と呼ばれます。</p></div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="model_mapping-1.html#c360_a_accelerated_data_lake_objects">データフェデレーションでのキャッシュまたはアクセラレーション</a></strong><br>キャッシュでは、外部ソースからデータを取得し、<span>Data 360</span> のデータレークオブジェクトに一時的に保存します。データストリームの作成時にアクセラレーションを有効にすると、キャッシュが有効になります。大きなデータセットにアクセスする場合や、データが頻繁に変更される場合は、キャッシュすることをお勧めします。キャッシュされたデータは、任意の頻度で更新できます。</li><li class="slds-p-bottom_small"><strong><a href="#c260_a_data_federation_compare_methods">データ統合方法の比較</a></strong><br>データは、ライブ クエリ、ローカル データ キャッシュへの高速クエリ、またはファイルフェデレーションを介して統合できます。各オプションは異なる使用事例をサポートします。パフォーマンス、データの新鮮度、クレジット消費に関する考慮事項は異なります。</li><li class="slds-p-bottom_small"><strong><a href="getstarted-1.html#c360_a_billing_considerations_for_data_federation">データ統合の請求に関する考慮事項</a></strong><br>データフェデレーションを使用すると、Data Cloud ライセンスで Data 360 を運用している組織の請求に使用するクレジットの消費に影響します。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://developer.salesforce.com/docs/data/data-cloud-int/guide/c360-a-data-cloud-integrations.html">Salesforce 開発者: Data 360 インテグレーションガイド</a></li><li><a target="_blank" href="https://developer.salesforce.com/docs/data/data-cloud-int/guide/c360-a-redshift-connector.html">Salesforce 開発者: Amazon Redshift</a></li><li><a target="_blank" href="https://developer.salesforce.com/docs/data/data-cloud-int/guide/c360-a-databricks-connector.html">Salesforce 開発者: Databricks</a></li><li><a target="_blank" href="https://developer.salesforce.com/docs/data/data-cloud-int/guide/c360-a-bigquery-connector.html">Salesforce 開発者: Google BigQuery</a></li><li><a target="_blank" href="https://developer.salesforce.com/docs/data/data-cloud-int/guide/c360-a-snowflake-connector.html">Salesforce 開発者: Snowflake</a></li><li><a target="_blank" href="https://developer.salesforce.com/docs/data/data-cloud-int/guide/c360-a-apacheiceberg-connector.html">Salesforce 開発者: Apache Iceberg</a></li><li><a target="_blank" href="https://developer.salesforce.com/docs/data/data-cloud-int/guide/c360-a-watsonx-connector.html">Salesforce 開発者: IBM watsonx.data</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_byol_data_federation_data_type_compatability">
+<h1 class="slds-text-heading_large">データフェデレーションでのデータ型の互換性</h1>
+  <p>外部ソースからデータを統合する場合、ソースデータは対応する <span>Data 360</span> データ型に変換されます。ソースデータに <span>Data 360</span> でサポートされていないデータ型が含まれている場合、その列は無視されます。データストリームの作成時に、<span>Data 360</span> でサポートされていないデータ型のフィールドが [サポートされないフィールド] タブに表示されます。配列、構造体、およびその他のネストされたデータ型は、データフェデレーションではサポートされません。</p>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Snowflake データ型と Data 360 データ型の対応付け </h2><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+              <tr class="">
+                <th id="d136984e49" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Snowflake データ型</th>
+                <th id="d136984e52" style="vertical-align:top;" class="slds-cell-wrap" scope="col"><span>Data 360</span> データ型</th>
+              </tr>
+            </thead><tbody>
+              <tr class="">
+                <td headers="d136984e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="Snowflake データ型">NUMBER、DECIMAL、NUMERIC</td>
+
+                <td headers="d136984e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">数値</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="Snowflake データ型">INT、INTEGER、SMALLINT、TINYINT、BYTEINT</td>
+
+                <td headers="d136984e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">数値</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="Snowflake データ型">BIGINT</td>
+
+                <td headers="d136984e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">数値</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="Snowflake データ型">FLOAT、FLOAT4、FLOAT8、DOUBLE、DOUBLE PRECISION、REAL</td>
+
+                <td headers="d136984e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">数値</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="Snowflake データ型">VARCHAR、CHAR、CHARACTER、STRING、TEXT </td>
+
+                <td headers="d136984e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">テキスト</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="Snowflake データ型">DATETIME、TIMESTAMP、TIMESTAMP_LTZ、TIMESTAMP_NTZ、TIMESTAMP_TZ</td>
+
+                <td headers="d136984e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">DateTime</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="Snowflake データ型">DATE</td>
+
+                <td headers="d136984e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">Date</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="Snowflake データ型">BOOLEAN</td>
+
+                <td headers="d136984e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">Boolean</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="Snowflake データ型">TIME</td>
+
+                <td headers="d136984e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">未サポート</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="Snowflake データ型">バリエーション、オブジェクト、配列、地理、ジオメトリ</td>
+
+                <td headers="d136984e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">未サポート</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="Snowflake データ型">BINARY、VARBINARY</td>
+
+                <td headers="d136984e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">未サポート</td>
+
+              </tr>
+            </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Google BigQuery データ型と Data 360 データ型の対応付け </h2><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+              <tr class="">
+                <th id="d136984e182" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Google BigQuery データ型</th>
+                <th id="d136984e185" style="vertical-align:top;" class="slds-cell-wrap" scope="col"><span>Data 360</span> データ型</th>
+              </tr>
+            </thead><tbody>
+              <tr class="">
+                <td headers="d136984e182" style="vertical-align:top;" class="slds-cell-wrap" data-label="Google BigQuery データ型">BIGNUMERIC</td>
+
+                <td headers="d136984e185" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">数値</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e182" style="vertical-align:top;" class="slds-cell-wrap" data-label="Google BigQuery データ型">FLOAT64</td>
+
+                <td headers="d136984e185" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">数値</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e182" style="vertical-align:top;" class="slds-cell-wrap" data-label="Google BigQuery データ型">INT64</td>
+
+                <td headers="d136984e185" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">数値</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e182" style="vertical-align:top;" class="slds-cell-wrap" data-label="Google BigQuery データ型">NUMERIC</td>
+
+                <td headers="d136984e185" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">数値</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e182" style="vertical-align:top;" class="slds-cell-wrap" data-label="Google BigQuery データ型">STRING</td>
+
+                <td headers="d136984e185" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">Text</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e182" style="vertical-align:top;" class="slds-cell-wrap" data-label="Google BigQuery データ型">DATE</td>
+
+                <td headers="d136984e185" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">Date</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e182" style="vertical-align:top;" class="slds-cell-wrap" data-label="Google BigQuery データ型">日時</td>
+
+                <td headers="d136984e185" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">DateTime</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e182" style="vertical-align:top;" class="slds-cell-wrap" data-label="Google BigQuery データ型">TIMESTAMP</td>
+
+                <td headers="d136984e185" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">DateTime</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e182" style="vertical-align:top;" class="slds-cell-wrap" data-label="Google BigQuery データ型">BOOL</td>
+
+                <td headers="d136984e185" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">Boolean</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e182" style="vertical-align:top;" class="slds-cell-wrap" data-label="Google BigQuery データ型">BYTES</td>
+
+                <td headers="d136984e185" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">サポートされていません</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e182" style="vertical-align:top;" class="slds-cell-wrap" data-label="Google BigQuery データ型">TIME</td>
+
+                <td headers="d136984e185" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">サポートされていません</td>
+
+              </tr>
+            </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Redshift データ型と Data 360 データ型の対応付け </h2><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+              <tr class="">
+                <th id="d136984e315" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Redshift データ型</th>
+                <th id="d136984e318" style="vertical-align:top;" class="slds-cell-wrap" scope="col"><span>Data 360</span> データ型</th>
+              </tr>
+            </thead><tbody>
+              <tr class="">
+                <td headers="d136984e315" style="vertical-align:top;" class="slds-cell-wrap" data-label="Redshift データ型">SMALLINT</td>
+
+                <td headers="d136984e318" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">数値</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e315" style="vertical-align:top;" class="slds-cell-wrap" data-label="Redshift データ型">INTEGER</td>
+
+                <td headers="d136984e318" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">数値</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e315" style="vertical-align:top;" class="slds-cell-wrap" data-label="Redshift データ型">BIGINT</td>
+
+                <td headers="d136984e318" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">Number</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e315" style="vertical-align:top;" class="slds-cell-wrap" data-label="Redshift データ型">DECIMAL</td>
+
+                <td headers="d136984e318" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">Number</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e315" style="vertical-align:top;" class="slds-cell-wrap" data-label="Redshift データ型">REAL</td>
+
+                <td headers="d136984e318" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">数値</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e315" style="vertical-align:top;" class="slds-cell-wrap" data-label="Redshift データ型">倍精度</td>
+
+                <td headers="d136984e318" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">数値</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e315" style="vertical-align:top;" class="slds-cell-wrap" data-label="Redshift データ型">CHAR</td>
+
+                <td headers="d136984e318" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">Text</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e315" style="vertical-align:top;" class="slds-cell-wrap" data-label="Redshift データ型">VARCHAR</td>
+
+                <td headers="d136984e318" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">Text</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e315" style="vertical-align:top;" class="slds-cell-wrap" data-label="Redshift データ型">DATE</td>
+
+                <td headers="d136984e318" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">Date</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e315" style="vertical-align:top;" class="slds-cell-wrap" data-label="Redshift データ型">TIMESTAMP</td>
+
+                <td headers="d136984e318" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">DateTime</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e315" style="vertical-align:top;" class="slds-cell-wrap" data-label="Redshift データ型">TIMESTAMPZ</td>
+
+                <td headers="d136984e318" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">DateTime</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e315" style="vertical-align:top;" class="slds-cell-wrap" data-label="Redshift データ型">BOOL</td>
+
+                <td headers="d136984e318" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">Boolean</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e315" style="vertical-align:top;" class="slds-cell-wrap" data-label="Redshift データ型">ジオメトリ</td>
+
+                <td headers="d136984e318" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">サポートされていません</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e315" style="vertical-align:top;" class="slds-cell-wrap" data-label="Redshift データ型">GEOGRAPHY</td>
+
+                <td headers="d136984e318" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">サポートされていません</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e315" style="vertical-align:top;" class="slds-cell-wrap" data-label="Redshift データ型">HLLKEITCH</td>
+
+                <td headers="d136984e318" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">サポートされていません</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e315" style="vertical-align:top;" class="slds-cell-wrap" data-label="Redshift データ型">TIME</td>
+
+                <td headers="d136984e318" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">サポートされていません</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e315" style="vertical-align:top;" class="slds-cell-wrap" data-label="Redshift データ型">TIMETZ</td>
+
+                <td headers="d136984e318" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">サポートされていません</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e315" style="vertical-align:top;" class="slds-cell-wrap" data-label="Redshift データ型">VARBYTE</td>
+
+                <td headers="d136984e318" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">サポートされていません</td>
+
+              </tr>
+            </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Databricks データ型と Data 360 データ型の対応付け </h2><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+              <tr class="">
+                <th id="d136984e513" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Databricks データ型</th>
+                <th id="d136984e516" style="vertical-align:top;" class="slds-cell-wrap" scope="col"><span>Data 360</span> データ型</th>
+              </tr>
+            </thead><tbody>
+              <tr class="">
+                <td headers="d136984e513" style="vertical-align:top;" class="slds-cell-wrap" data-label="Databricks データ型">BIGINT</td>
+
+                <td headers="d136984e516" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">Number</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e513" style="vertical-align:top;" class="slds-cell-wrap" data-label="Databricks データ型">SMALLINT</td>
+
+                <td headers="d136984e516" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">Number</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e513" style="vertical-align:top;" class="slds-cell-wrap" data-label="Databricks データ型">INT</td>
+
+                <td headers="d136984e516" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">Number</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e513" style="vertical-align:top;" class="slds-cell-wrap" data-label="Databricks データ型">TINYINT</td>
+
+                <td headers="d136984e516" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">Number</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e513" style="vertical-align:top;" class="slds-cell-wrap" data-label="Databricks データ型">DECIMAL(p,s)</td>
+
+                <td headers="d136984e516" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">Number</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e513" style="vertical-align:top;" class="slds-cell-wrap" data-label="Databricks データ型">DOUBLE</td>
+
+                <td headers="d136984e516" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">Number</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e513" style="vertical-align:top;" class="slds-cell-wrap" data-label="Databricks データ型">FLOAT</td>
+
+                <td headers="d136984e516" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">Number</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e513" style="vertical-align:top;" class="slds-cell-wrap" data-label="Databricks データ型">STRING</td>
+
+                <td headers="d136984e516" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">Text</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e513" style="vertical-align:top;" class="slds-cell-wrap" data-label="Databricks データ型">DATE</td>
+
+                <td headers="d136984e516" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">Date</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e513" style="vertical-align:top;" class="slds-cell-wrap" data-label="Databricks データ型">日時</td>
+
+                <td headers="d136984e516" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">DateTime</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e513" style="vertical-align:top;" class="slds-cell-wrap" data-label="Databricks データ型">TIMESTAMP</td>
+
+                <td headers="d136984e516" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">DateTime</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e513" style="vertical-align:top;" class="slds-cell-wrap" data-label="Databricks データ型">INTERVAL</td>
+
+                <td headers="d136984e516" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">サポートされていません</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e513" style="vertical-align:top;" class="slds-cell-wrap" data-label="Databricks データ型">ARRAY</td>
+
+                <td headers="d136984e516" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">サポートされていません</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e513" style="vertical-align:top;" class="slds-cell-wrap" data-label="Databricks データ型">BOOL</td>
+
+                <td headers="d136984e516" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">Boolean</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e513" style="vertical-align:top;" class="slds-cell-wrap" data-label="Databricks データ型">構造</td>
+
+                <td headers="d136984e516" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">サポートされていません</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d136984e513" style="vertical-align:top;" class="slds-cell-wrap" data-label="Databricks データ型">MAP</td>
+
+                <td headers="d136984e516" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data 360 データ型">サポートされていません</td>
+
+              </tr>
+            </tbody></table></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Data 360のゼロ コピー データ統合は、物理的に異なる複数のデータソースからデータを照会するプロセスです。このアプローチにより、ユーザーは、異なるシステムを統合と呼ばれる 1 つの論理システムとして扱い、各システムの自律性を維持できます。重要なのは、データ統合により、システム境界を越えてデータが重複することを回避できることです。Data 360。" href="#c360_a_byol_data_federation">Zero Copy Data Federation (ゼロコピーデータ統合)</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_byol_data_federation_supportability">
+<h1 class="slds-text-heading_large">Zero Copy データ統合のサポート</h1>
+  <p>ゼロコピーデータ統合を使用する場合、<span>Data 360</span> でサポートされる機能とサポートされない機能のリストを参照してください。</p>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">サポート</h2><p><span>Data 360</span> の次の機能は、外部ソースからデータを統合するときにサポートされます。</p><ul>
+        <li>データスペース</li>
+
+        <li>一括処理データ変換</li>
+
+        <li>計算済みインサイト (バッチ)</li>
+
+        <li>関連オブジェクトのストリーミングインサイトのみ</li>
+
+        <li>ID 解決</li>
+
+        <li>セグメンテーション</li>
+
+        <li>有効化</li>
+
+        <li>データアクション <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 外部データレイクオブジェクト (DLO) を、データアクションまたはデータ共有が関連付けられている個人またはリードデータモデルオブジェクト (DMO) にマッピングすることはできません。</div></div></div>
+</li>
+
+        <li>Bring Your Own Model (BYOM) での一括予測</li>
+
+        <li>Data 360 関連リスト</li>
+
+        <li>データエクスプローラーとクエリ API を使用した外部 DLO のクエリ</li>
+
+        <li>関連リスト</li>
+
+        <li>項目強化</li>
+
+        <li>検索インデックス <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 検索インデックスで DMO を使用するには、アクセラレーションまたはキャッシュが有効になっている外部 DLO からマッピングする必要があります。ネイティブ DLO と外部 DLO のマッピングがある DMO は使用できません。</div></div></div>
+</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">サポートされていません</h2><p>外部ソースからデータを統合している場合、<span>Data 360</span> の次の機能は使用できません。</p><ul>
+        <li>数式項目またはデータ型の変更によるスキーマの拡張</li>
+
+        <li>データ型の変更</li>
+
+        <li>外部データレイクとの外部 DLO および DMO のデータ共有</li>
+
+        <li>迅速なセグメンテーションと有効化</li>
+
+        <li>ストリーミングデータ変換</li>
+
+        <li>ほぼリアルタイムの ID 解決</li>
+
+        <li>BYOM でのストリーミング予測</li>
+
+        <li>ソーステーブルスキーマの変更 (項目名の変更、大文字/小文字の変更)</li>
+
+      </ul>
+<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 現在、ゼロコピーデータフェデレーションでは、計算済みインサイトとセグメントを作成するための述語セットが制限されています。</div></div></div>
+</div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Data 360のゼロ コピー データ統合は、物理的に異なる複数のデータソースからデータを照会するプロセスです。このアプローチにより、ユーザーは、異なるシステムを統合と呼ばれる 1 つの論理システムとして扱い、各システムの自律性を維持できます。重要なのは、データ統合により、システム境界を越えてデータが重複することを回避できることです。Data 360。" href="#c360_a_byol_data_federation">Zero Copy Data Federation (ゼロコピーデータ統合)</a></li><li><a title="Data 360 に関連付けられた用語の定義について説明します。" href="data360_general-1.html#c360_a_glossary_guide">Data 360 用語集</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_check_connector_status">
+<h1 class="slds-text-heading_large">コネクタの状況の確認</h1>
+ 
+ <p>Web コンテンツ (クローラーまたはサイトマップ) コネクタの現在の状況を取得します。</p>
+
+  <div><p>コネクタによっては、コンテンツの取り込みに時間がかかる場合があります。この手順を使用して、コネクタの状況を確認し、コンテンツが継続的に取り込まれるかどうかを確認します。</p></div>
+  <ol><li>
+    <span>アプリケーションランチャーで、[<strong>Data Cloud]</strong> を選択します。</span>
+   </li><li>
+    <span>[<strong>データストリーム]</strong> タブを開きます。</span>
+   </li><li>
+    <span>関連するデータストリーム名 (DLO 名) を見つけ、右側のドロップダウンメニューから [<strong>Update Status (</strong>状況の更新)] を選択して、コネクタの最新の状況を更新および表示します。</span>
+   </li></ol>
+
+ 
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Data Cloud の [データストリーム] タブとクエリエディターを使用して、Web コンテンツ (クローラーおよびサイトマップ) コネクタによって取り込まれたデータの状況を監視できます。" href="ingest_connect-3.html#c360_a_monitor_the_status_of_unstructured_connectors_data_ingestion">非構造化コネクタデータ取り込みの状況の監視</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_commerce_cloud_connector">
+<h1 class="slds-text-heading_large">B2C Commerce コネクタ</h1>
+  <p>B2C Commerce インスタンスを本番サイトに接続し、B2C Commerce データストリームを作成します。データストリームは、保護されているまたは保護されていない有効な本番サイトからすべてのデータを取り込みます。このコネクタは本番サイト専用です。テストサイト、Sandbox サイト、または本番以外のサイトに B2C Commerce コネクタを設定することはできません。</p>
+
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> このコネクタは推奨されなくなりました。最新の B2C Commerce コネクタオプションについては、「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=cc.b2c_datacloud_connectors.htm&amp;language=ja&amp;type=5">Data 360 Connectors for</a> B2C Commerce」を参照してください。</div></div></div>
+<p>B2C Commerce 注文バンドルでは、連絡先種別データモデルオブジェクト (DMO) とのマッピングがリリースされます。ID 解決では、DMO を使用して複数のレコードをリンクし、それらを 1 つの統合顧客プロファイルにまとめます。</p><p>B2C Commerce では、大文字と小文字を区別する同じ名前のカスタム属性 (Sustainability と sustainability など) を作成できます。ただし、<span>Data 360</span> では大文字と小文字を区別する項目名がサポートされず、すべての項目の表示ラベルが小文字に変換されるため、競合が発生する可能性があります。大文字と小文字を区別するカスタム商品属性名がある場合、データの競合を回避するために、このデータを <span>Data 360</span> に取り込む前に B2C Commerce で項目名を変更します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">予約項目名</h2><p>次の標準項目名は予約されており、Data Cloud にインポートするときに B2C Commerce カスタム属性として使用できません。予約項目名を使用するカスタム属性が検出されると、データが不正確になり、数式項目の作成など、その項目のデータを変換する必要があります。</p><ul>
+        <li>version </li>
+
+        <li>productId </li>
+
+        <li>tenantId </li>
+
+        <li>masterProductId </li>
+
+        <li>simpleProduct </li>
+
+        <li>optionProduct </li>
+
+        <li>mastered </li>
+
+        <li>bundledProduct</li>
+
+        <li>名前 </li>
+
+        <li>shortDescription </li>
+
+        <li>longDescription </li>
+
+        <li>minOrderQuantityValue </li>
+
+        <li>minOrderQuantityUnit </li>
+
+        <li>stepQuantityValue </li>
+
+        <li>stepQuantityUnit </li>
+
+        <li>unit </li>
+
+        <li>unitQuantityValue </li>
+
+        <li>unitQuantityUnit </li>
+
+        <li>unitMeasure </li>
+
+        <li>taxClassID </li>
+
+        <li>sku </li>
+
+        <li>manufacturerName </li>
+
+        <li>manufacturerSKU </li>
+
+        <li>brand (ブランド) </li>
+
+        <li>upc </li>
+
+        <li>ean </li>
+
+        <li>validFrom </li>
+
+        <li>validTo </li>
+
+        <li>createdDate </li>
+
+        <li>modifiedDate </li>
+
+      </ul>
+</div>
+    <div><p>B2C Commerce と <span>Data 360</span> 間の接続を初めて確立すると、B2C Commerce コネクタによって過去 30 日間の履歴データが取り込まれます。たとえば、5 月 1 日に接続を確立した場合、B2C Commerce コネクタは 4 月 2 日から 5 月 1 日までの履歴データを取り込みます。 これ以降、B2C Commerce コネクタは引き続きデータを取り込みます。</p><p>B2C Commerce 注文バンドルでは次のデータストリームもリリースされます。</p><ul>
+        <li>商品オプション</li>
+
+        <li>商品商品オプション</li>
+
+        <li>商品オプション値 </li>
+
+        <li>販売注文商品オプション値 </li>
+
+      </ul>
+<p>B2C Commerce インスタンス内でこれらのオブジェクトを使用する場合は、<span>Data 360</span> のカスタムデータモデルオブジェクトにマッピングし、適切なデータモデルリレーションを設定します。</p></div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#c360_a_connect_commerce_cloud_instance">B2C Commerce 接続の設定</a></strong><br>Data 360 インスタンスを作成したら、B2C Commerce 接続を設定できます。これにより、B2C Commerce からデータを取得する範囲を制御できます。B2C Commerce コネクタでは、B2C Commerce の本番インスタンスへの接続のみがサポートされています。</li><li class="slds-p-bottom_small"><strong><a href="model_mapping-2.html#c360_a_order_bundle_data_mappings">B2C Commerce 注文バンドルデータマッピング</a></strong><br>B2C Commerce 注文バンドルでは、取得元オブジェクト別に整理された主なマッピングのサンプルを示しています。すべてのマッピングは、バンドルがリリースされた後にデータストリームを表示することで表示できます。</li><li class="slds-p-bottom_small"><strong><a href="ingest_connect-2.html#c360_a_create_commerce_cloud_starter_bundle">B2C Commerce データストリームの作成</a></strong><br>B2C Commerce データストリームを作成してマッピングする唯一の方法は、B2C Commerce Order Bundle というデータバンドルを作成することです。このデータバンドルには特定のエンティティが含まれており、データモデルオブジェクト (DMO) へのマッピング用のカスタム項目属性がサポートされているものもあります。また、個別のデータストリームのリリースは許可されていません。このリリースでは、<span>Data 360</span> 管理者である必要があります。</li><li class="slds-p-bottom_small"><strong><a href="ingest_connect-3.html#c360_a_req_commerce_cloud_connector_activation_data_field_mappings">B2C Commerce に対する有効化に必要な項目のマッピング</a></strong><br>B2C Commerce に対してセグメントを有効化する場合、B2C Commerce データソースと B2C Commerce 以外のデータソースで特定のデータ項目のマッピングが必要になります。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Data 360 インスタンスを作成したら、B2C Commerce 接続を設定できます。これにより、B2C Commerce からデータを取得する範囲を制御できます。B2C Commerce コネクタでは、B2C Commerce の本番インスタンスへの接続のみがサポートされています。" href="#c360_a_connect_commerce_cloud_instance">B2C Commerce 接続の設定</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_companion_connection_delete">
+<h1 class="slds-text-heading_large">コンパニオン接続の削除</h1>
+  
+  <p>コンパニオン組織のエラーを回避するには、コンパニオン接続を削除する前にマルチ組織のデータの連動関係に対処します。連動関係のあるコンパニオン組織を切断しようとすると、Data 360 に既存の連動関係が表示されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d89353e67" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d89353e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">コンパニオン接続を削除する </td>
+
+              <td headers="d89353e67" style="vertical-align:top;" class="slds-cell-wrap"><p>権限セット</p><ul>
+                  <li>Data Cloud アーキテクト</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div><ol><li>
+        <span>[<strong class="uicontrol">Data Cloud 設定</strong>] で、[<strong class="uicontrol">Data Cloud One]</strong> を選択します。</span>
+      </li><li><span>削除するコンパニオン接続を選択します。</span></li><li>
+        <span>共有データスペースごとに、[<strong class="uicontrol">共有解除]</strong> をクリックします。</span>
+      </li><li>
+        <span>削除するコンパニオン接続で、<strong class="uicontrol">［Disconnect］</strong> をクリックします。</span>
+        <div>コンパニオン組織に連動機能やプロセスがない場合、組織は切断されます。それ以外の場合は、解決する連動関係のリストが表示されます。</div>
+      </li></ol>
+<div><p>各 Data 360 インスタンスには複数のコンパニオン組織を含めることができますが、ホーム組織は 1 つのみです。Data 360 からコンパニオン組織を切断することはできますが、ホーム組織を Data 360 から切断することはできません。</p></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_companion_connection_shared_objects">
+<h1 class="slds-text-heading_large">コンパニオン組織と共有するオブジェクト</h1>
+  <p>共有データスペースのデータモデルオブジェクト (DMO) と計算済みインサイトオブジェクト (CIO) は、コンパニオン組織と共有されます。Data 360 機能でこれらのオブジェクトのデータを参照し、フローや関連リスト強化などのプラットフォーム機能でデータを使用できます。</p>
+
+    <p>Data Cloud One アプリケーションへのアクセス権を持つコンパニオン組織ユーザーは、データエクスプローラーとプロファイルエクスプローラーで DMO データを表示できます。CIO にはデータエクスプローラーまたはプロファイルエクスプローラーでアクセスできます。</p>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_companion_connection_statuses">
+<h1 class="slds-text-heading_large">Data Cloud One コンパニオンの接続状況</h1>
+  <p>コンパニオン接続がどのように機能しているかを示す像を理解します。</p>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">接続状況</h2><p>Data 360 ホーム組織とコンパニオン組織の接続状況を示します。</p><ul>
+        <li>接続中 — 初期接続が進行中です。後でもう一度確認して、更新された状況を確認します。</li>
+
+        <li>Incomplete — 接続が設定されましたが、データスペースが共有されていません。データスペースが共有されるまで、接続は有効化されません。</li>
+
+        <li>Active — 接続が完了して機能しています。</li>
+
+        <li>無効 — ホーム組織の Data 360 ライセンスが期限切れになったか、コンパニオン組織が有効でなくなったため、接続が機能しなくなりました。たとえば、コンパニオン組織が期限切れのトライアル組織の場合、接続は無効になります。この状況を解決するには、ホーム組織の Data 360 ライセンスを更新するか、コンパニオン組織を再有効化するか、コンパニオン組織を切断します。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">初期化状況</h2><p>初期化状況は、コンパニオン組織と共有されているデータスペースに固有です。この状況は、Data 360 ホーム組織がコンパニオン組織にデータスペースを正常に作成し、初期同期を完了したかどうかを示します。</p><ul>
+        <li>有効化 — Data 360 とコンパニオン組織間の初期同期が進行中です。初回同期には時間がかかる場合があります。</li>
+
+        <li>Active — 初回同期が正常に完了しました。</li>
+
+        <li>エラー — 最初の同期中にエラーが発生しました。そのため、同期が完了していません。サポート用のサポートチケットを作成します。</li>
+
+        <li>共有の削除 — データスペースがコンパニオン組織から削除されています。データスペースの共有を解除すると、そのデータスペースのデータはコンパニオン組織からも削除されます。データスペースの削除には最大 30 分かかります。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">メタデータ同期状況</h2><p>Data 360 ホーム組織とコンパニオン組織間の定期的なメタデータ同期の状況を示します。</p><ul>
+        <li>エラー — 前回の同期が失敗し、メタデータの同期が一時停止しています。同期を再開するには、エラーログをダウンロードしてエラーを解決します。メタデータの競合がある場合は、競合を解決してもう一度お試しください。</li>
+
+        <li>進行中 — ページが読み込まれたときに同期が進行中でした。</li>
+
+        <li>Succeeded — 最後の同期セットが正常に完了しました。</li>
+
+        <li>待機中 — 次の同期ラウンドで同期される変更の数。この状況は、メタデータの変更後に表示され、同期が完了するまで保持されます。同期のタイミングは異なります。</li>
+
+      </ul>
+</div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_companion_connections">
+<h1 class="slds-text-heading_large">Data Cloud One コンパニオン接続</h1>
+  <p>Data 360 コンパニオン接続では、1 つの Data 360 と 1 つ以上の Salesforce 組織間の双方向接続を作成できます。コンパニオン接続は標準接続の機能に基づいて構築され、統合データをコンパニオン Salesforce 組織に同期します。コンパニオン接続を使用すると、Salesforce 組織は、会社のすべてのデータのデータを使用して構築された顧客の全体像を把握できます。</p>
+
+    <p>Data 360 コンパニオン接続を作成すると、標準の Salesforce CRM 組織接続も作成されます。接続先の組織への標準 CRM 接続がすでにある場合は、標準接続の名前がコンパニオン接続の名前と一致するように更新されます。</p>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="transform_prep-2.html#c360_a_prepare_home_org_for_dcone">Data Cloud ホーム組織から Data Cloud One コンパニオン組織への変換</a></strong><br>ホーム組織をコンパニオン組織に変換するには、まず組織からすべての Data Cloud データを削除してから、コンパニオン組織として別の Data Cloud インスタンスに接続します。Data Cloud が有効になっている組織を変換することはできません。</li><li class="slds-p-bottom_small"><strong><a href="setup_admin-1.html#c360_a_companion_connection_setup">Data Cloud One コンパニオン接続の設定</a></strong><br>Data 360 と別の Salesforce 組織間の双方向接続を確立します。すでにコンパニオン接続を介して別の Data 360 に接続されている Salesforce 組織へのコンパニオン接続を作成することはできません。Sandbox 組織を本番組織に接続することはできません。</li><li class="slds-p-bottom_small"><strong><a href="getstarted-2.html#c360_a_data_cloud_one_monitoring">Data 360 コンパニオン接続の監視</a></strong><br>Data 360 の接続状況を確認し、各コンパニオン組織と共有されているデータスペースを確認します。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_companion_connection_delete">コンパニオン接続の削除</a></strong><br>コンパニオン組織のエラーを回避するには、コンパニオン接続を削除する前にマルチ組織のデータの連動関係に対処します。連動関係のあるコンパニオン組織を切断しようとすると、Data 360 に既存の連動関係が表示されます。</li><li class="slds-p-bottom_small"><strong><a href="getstarted-2.html#c360_a_data_cloud_one_sandboxes">Sandbox 組織の Data 360 One に関する考慮事項</a></strong><br><span>Data 360</span> One クラスタを設定する前に次の考慮事項を確認して、よくある間違いを回避します。<span>Data 360</span> One 接続を確立する前に本番組織から Sandbox 組織を作成するか、<span>Data 360</span> One クラスタを再作成する前に <span>Data 360</span> メタデータをクリーンアップします。<span>Data 360</span> One を使用して Sandbox 組織を本番組織に接続することはできません。</li><li class="slds-p-bottom_small"><strong><a href="getstarted-2.html#c360_a_data_cloud_one_app">コンパニオン組織からの Data Cloud One へのアクセス</a></strong><br>コンパニオン組織では、Data 360 アプリケーションの代わりに Data Cloud One アプリケーションを使用できます。これを使用して、プロファイルエクスプローラーなどの Data 360 機能にアクセスします。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_companion_org_connection_details">
+<h1 class="slds-text-heading_large">コンパニオン組織の Data 360 接続の詳細</h1>
+  <p>コンパニオン組織では、[設定] でホーム組織を特定し、組織と共有されているデータスペースを確認し、コンパニオン組織の接続状態を確認できます。接続済み組織名とインスタンスの詳細を使用して、組織が接続されている Data 360 と、組織が配置されている地域を特定します。</p>
+
+    <p>[設定] で、「<samp class="parmname">Data Cloud 接続</samp>」を検索し、[<strong class="uicontrol">Data Cloud 接続</strong>] を選択します。</p>
+    <p>Data Cloud の [設定] の [Data Cloud One] ページには、Data 360 および共有データスペースへのコンパニオン組織の接続の状況と健全性に関する情報が表示されます。接続済み組織名とインスタンスの詳細を使用して、組織が接続されている Data 360 と、組織が配置されている地域を特定します。</p>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="#c360_a_companion_connection_statuses">Salesforce ヘルプ: Data Cloud One コンパニオンの接続状況</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_compare_salesforce_connections">
+<h1 class="slds-text-heading_large">標準の Salesforce CRM と Data Cloud One コンパニオン接続の比較</h1>
+  <p>Salesforce 組織を Data 360 に接続するには、標準の Salesforce CRM 接続を使用するか、Data Cloud One コンパニオン接続を標準接続と組み合わせて使用します。次の表に、これらの接続種別の違いを示します。</p>
+
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d130270e37" style="vertical-align:top;" class="slds-cell-wrap" scope="col">機能</th>
+            <th id="d130270e40" style="vertical-align:top;" class="slds-cell-wrap" scope="col">標準接続のみ</th>
+            <th id="d130270e43" style="vertical-align:top;" class="slds-cell-wrap" scope="col">標準接続とペアになったコンパニオン接続</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d130270e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="機能">Data 360 を Salesforce 組織に接続する</td>
+
+            <td headers="d130270e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="標準接続のみ">
+              <a name="c360_a_compare_salesforce_connections__image_tfw_zjk_1dc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="はい" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/mc_dat_allow_circle.png" id="c360_a_compare_salesforce_connections__image_tfw_zjk_1dc" style="height:16px;margin-bottom:0;"></span>
+            </td>
+
+            <td headers="d130270e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="標準接続とペアになったコンパニオン接続">
+              <a name="c360_a_compare_salesforce_connections__image_nxl_zjk_1dc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="はい" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/mc_dat_allow_circle.png" id="c360_a_compare_salesforce_connections__image_nxl_zjk_1dc" style="height:16px;margin-bottom:0;"></span>
+            </td>
+
+          </tr>
+          <tr class="">
+            <td headers="d130270e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="機能">Data 360 で CRM データを取り込むことができる</td>
+
+            <td headers="d130270e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="標準接続のみ">
+              <a name="c360_a_compare_salesforce_connections__image_umr_zjk_1dc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="はい" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/mc_dat_allow_circle.png" id="c360_a_compare_salesforce_connections__image_umr_zjk_1dc" style="height:16px;margin-bottom:0;"></span>
+            </td>
+
+            <td headers="d130270e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="標準接続とペアになったコンパニオン接続">
+              <a name="c360_a_compare_salesforce_connections__image_oc4_zjk_1dc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="はい" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/mc_dat_allow_circle.png" id="c360_a_compare_salesforce_connections__image_oc4_zjk_1dc" style="height:16px;margin-bottom:0;"></span>
+            </td>
+
+          </tr>
+          <tr class="">
+            <td headers="d130270e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="機能">Data 360 がメタデータを Salesforce 組織と同期できるようにします。</td>
+
+            <td headers="d130270e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="標準接続のみ">
+              <a name="c360_a_compare_salesforce_connections__image_a1w_xjk_1dc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="なし" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/mc_dat_deny_circle.png" id="c360_a_compare_salesforce_connections__image_a1w_xjk_1dc" style="height:16px;margin-bottom:0;"></span>
+            </td>
+
+            <td headers="d130270e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="標準接続とペアになったコンパニオン接続">
+              <a name="c360_a_compare_salesforce_connections__image_avh_zjk_1dc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="はい" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/mc_dat_allow_circle.png" id="c360_a_compare_salesforce_connections__image_avh_zjk_1dc" style="height:16px;margin-bottom:0;"></span>
+            </td>
+
+          </tr>
+          <tr class="">
+            <td headers="d130270e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="機能">接続組織が Data 360 の機能を使用できるようにします。</td>
+
+            <td headers="d130270e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="標準接続のみ">
+              <a name="c360_a_compare_salesforce_connections__image_bkt_xjk_1dc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="なし" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/mc_dat_deny_circle.png" id="c360_a_compare_salesforce_connections__image_bkt_xjk_1dc" style="height:16px;margin-bottom:0;"></span>
+            </td>
+
+            <td headers="d130270e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="標準接続とペアになったコンパニオン接続">
+              <a name="c360_a_compare_salesforce_connections__image_hb2_zjk_1dc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="はい" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/mc_dat_allow_circle.png" id="c360_a_compare_salesforce_connections__image_hb2_zjk_1dc" style="height:16px;margin-bottom:0;"></span>
+            </td>
+
+          </tr>
+          <tr class="">
+            <td headers="d130270e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="機能">接続組織が Data Cloud One アプリケーションの Data 360 機能にアクセスできるようにします。</td>
+
+            <td headers="d130270e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="標準接続のみ">
+              <a name="c360_a_compare_salesforce_connections__image_dbs_xjk_1dc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="なし" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/mc_dat_deny_circle.png" id="c360_a_compare_salesforce_connections__image_dbs_xjk_1dc" style="height:16px;margin-bottom:0;"></span>
+            </td>
+
+            <td headers="d130270e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="標準接続とペアになったコンパニオン接続">
+              <a name="c360_a_compare_salesforce_connections__image_rzb_1kk_1dc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="はい" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/mc_dat_allow_circle.png" id="c360_a_compare_salesforce_connections__image_rzb_1kk_1dc" style="height:16px;margin-bottom:0;"></span>
+            </td>
+
+          </tr>
+          <tr class="">
+            <td headers="d130270e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="機能">接続組織がプラットフォーム機能で Data 360 データを使用できるようにします。</td>
+
+            <td headers="d130270e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="標準接続のみ">
+              <span style="vertical-align:text-bottom;display:inline-block;"><img alt="なし" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/mc_dat_deny_circle.png" style="height:16px;margin-bottom:0;"></span>
+            </td>
+
+            <td headers="d130270e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="標準接続とペアになったコンパニオン接続">
+              <span style="vertical-align:text-bottom;display:inline-block;"><img alt="はい" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/mc_dat_allow_circle.png" style="height:16px;margin-bottom:0;"></span>
+            </td>
+
+          </tr>
+          <tr class="">
+            <td headers="d130270e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="機能">[一括処理データパイプライン] 請求使用量種別のクレジット消費に影響する</td>
+
+            <td headers="d130270e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="標準接続のみ">
+              <a name="c360_a_compare_salesforce_connections__image_flt_yjk_1dc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="はい" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/mc_dat_allow_circle.png" id="c360_a_compare_salesforce_connections__image_flt_yjk_1dc" style="height:16px;margin-bottom:0;"></span>
+            </td>
+
+            <td headers="d130270e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="標準接続とペアになったコンパニオン接続">
+              <a name="c360_a_compare_salesforce_connections__image_drz_yjk_1dc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="はい" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/mc_dat_allow_circle.png" id="c360_a_compare_salesforce_connections__image_drz_yjk_1dc" style="height:16px;margin-bottom:0;"></span>
+            </td>
+
+          </tr>
+          <tr class="">
+            <td headers="d130270e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="機能">Data 360 ライセンスを持つ Data 360 組織で使用可能</td>
+
+            <td headers="d130270e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="標準接続のみ">
+              <a name="c360_a_compare_salesforce_connections__image_qdq_yjk_1dc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="はい" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/mc_dat_allow_circle.png" id="c360_a_compare_salesforce_connections__image_qdq_yjk_1dc" style="height:16px;margin-bottom:0;"></span>
+            </td>
+
+            <td headers="d130270e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="標準接続とペアになったコンパニオン接続">
+              <a name="c360_a_compare_salesforce_connections__image_gky_yjk_1dc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="はい" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/mc_dat_allow_circle.png" id="c360_a_compare_salesforce_connections__image_gky_yjk_1dc" style="height:16px;margin-bottom:0;"></span>
+            </td>
+
+          </tr>
+          <tr class="">
+            <td headers="d130270e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="機能">Data Cloud ライセンスを持つ Data 360 組織で使用可能</td>
+
+            <td headers="d130270e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="標準接続のみ">
+              <a name="c360_a_compare_salesforce_connections__image_utv_yjk_1dc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="はい" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/mc_dat_allow_circle.png" id="c360_a_compare_salesforce_connections__image_utv_yjk_1dc" style="height:16px;margin-bottom:0;"></span>
+            </td>
+
+            <td headers="d130270e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="標準接続とペアになったコンパニオン接続">
+              <a name="c360_a_compare_salesforce_connections__image_fvg_bkk_1dc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="なし" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/mc_dat_deny_circle.png" id="c360_a_compare_salesforce_connections__image_fvg_bkk_1dc" style="height:16px;margin-bottom:0;"></span>
+            </td>
+
+          </tr>
+        </tbody></table>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_conf_connect_dc4sales">
+<h1 class="slds-text-heading_large">ユーザーの設定と Sales Cloud データバンドルのインストール</h1>
+  
+  <p>Data Cloud ユーザーを設定し、適切な権限セットを追加して、Sales Cloud データバンドルをインストールします。これらの手順はすべて Data Cloud の [設定] 内で実行します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d100797e61" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d100797e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Data Cloud 設定にアクセスする</td>
+
+              <td headers="d100797e61" style="vertical-align:top;" class="slds-cell-wrap"><p>システム管理者プロファイルまたは </p><p style="margin-bottom:0;">「Data Cloud アーキテクト」権限セット</p></td>
+
+            </tr>
+          </tbody></table></div>
+  
+  <div id="task_syx_tcq_vdc" aria-labelledby="ariaid-title2" class="nested1"><a name="task_syx_tcq_vdc"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">Data Cloud での Salesforce 接続の設定</h2>
+    
+    <p>データソースとデータアクションターゲットは、Data Cloud を設定した組織で自動的に作成されます。Sandbox 組織を含む他の Salesforce 組織を接続するには、手動で接続を設定する必要があります。このステップが不要な場合は、このセクションをスキップできます。</p>
+
+      <a name="task_syx_tcq_vdc__steps_e4d_4vz_pcc"></a><ol id="task_syx_tcq_vdc__steps_e4d_4vz_pcc"><li>
+          <span>[<strong class="uicontrol">Data Cloud 設定</strong>] に移動し、[Salesforce Integrations] で [<strong class="uicontrol">Salesforce CRM]</strong> を選択します。</span>
+        </li><li>
+          <span><strong class="uicontrol">[新規]</strong> をクリックします。</span>
+        </li><li>
+          <span>[<strong class="uicontrol">Salesforce 組織に接続</strong>] または [<strong class="uicontrol">Sandbox 組織に接続</strong>] をクリックします。</span>
+        </li><li>
+          <span>Data Cloud Sandbox または Salesforce Sandbox 組織にデータソース組織として接続できます。<strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+        </li><li>
+          <span>最大 15 文字の英数字を使用して、組織の別名を作成します。エイリアスは後で変更できません。<strong class="uicontrol">[保存]</strong> をクリックします。</span>
+        </li><li>
+          <span>Salesforce ログイン情報を使用して組織にログインします。Salesforce 本番組織または開発者組織のログインは https://salesforce.com です。Sandbox 組織のログインは https://test.salesforce.com です。</span>
+        </li><li>
+          <span>[アクセスを許可] メニューで [<strong class="uicontrol">許可]</strong> をクリックします。</span>
+        </li></ol>
+
+      <div><p>これで、Salesforce CRM コネクタページから組織を使用できるようになります。</p></div>
+    
+  </div>
+
+  <div id="task_pgk_sxz_pcc" aria-labelledby="ariaid-title3" class="nested1"><a name="task_pgk_sxz_pcc"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">ユーザーと権限セットの追加</h2>
+    
+    <p>Data Cloud 権限を持つユーザーを作成したり、既存のユーザーを更新して Data Cloud 権限セットを持つことができるようになりました。</p>
+
+      <ol><li>
+          <span>Data Cloud の [設定] に移動し、[ユーザー管理] で [<strong class="uicontrol">ユーザー] を</strong>クリックします。</span>
+        </li><li>
+          <span>新規ユーザーを追加するか、既存のユーザーを編集します。</span>
+        </li><li>
+          <span>ユーザーを選択し、[権限セットの割り当て] をクリックし<strong class="uicontrol">ます。</strong>
+          </span>
+          <div>
+            <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Data Cloud <a target="_blank" href="https://help.salesforce.com/s/articleView?id=data.c360_a_userpermissions.htm&amp;language=ja&amp;type=5">標準権限セット</a>について説明します。</div></div></div>
+
+          </div>
+        </li><li>
+          <span><strong class="uicontrol">[割り当ての編集]</strong> をクリックします。</span>
+        </li><li>
+          <span>適切なData Cloud権限セットを選択し、[<strong class="uicontrol">追加]を</strong>クリックします。</span>
+        </li><li>
+          <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+        </li></ol>
+
+      <div><p> Data Cloud 機能にアクセスする必要があるすべてのユーザーに対してこの手順を繰り返します。</p></div>
+    
+  </div>
+
+  <div id="st1installdatabundles" aria-labelledby="ariaid-title4" class="nested1"><a name="st1installdatabundles"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">Sales Cloud データバンドルのインストール</h2>
+    
+    <p><span>Data 360</span> を Salesforce CRM 組織に接続したら、標準 (スターターとも呼ばれる) データバンドルをインストールして、<span>Data 360</span> 内にデータをすばやくリリースします。データバンドルは、Salesforce オブジェクトを Data Cloud データモデルオブジェクト (DMO) に対応付けます。</p>
+
+      <a name="st1installdatabundles__steps_j5w_kby_fcc"></a><ol id="st1installdatabundles__steps_j5w_kby_fcc"><li>
+          <span>[設定] から、<strong class="uicontrol">[Data Cloud 設定]</strong> を選択します。</span>
+        </li><li>
+          <span>[Salesforce Integrations (Salesforce インテグレーション)] で、[<strong class="uicontrol">Salesforce CRM</strong>] を選択します。</span>
+        </li><li>
+          <span>[Standard Data Bundles (標準データバンドル)] で、Sales Cloud のドロップダウン矢印をクリックし、[<strong class="uicontrol">Install (インストール</strong>)] をクリックします。
+          </span>
+        </li><li>
+          <span>データキットインストールインターフェースで、[<strong class="uicontrol">Install for Admins Only</strong> (管理者のみのインストール)] を選択し、[<strong class="uicontrol">インストール] を</strong>クリックします。</span>
+        </li><li>
+          <span>インストールが完了したら、[<strong class="uicontrol">完了] を</strong>クリックします。</span>
+        </li></ol>
+
+    
+  </div>
+
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_conf_connect_dc4service">
+<h1 class="slds-text-heading_large">ユーザーの設定と Service Cloud データバンドルのインストール</h1>
+  
+  <p>Data Cloud ユーザーを設定し、適切な権限セットを追加して、Service Cloud データバンドルをインストールします。これらの手順はすべて Data Cloud の [設定] 内で実行します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d153310e69" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d153310e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Data Cloud 設定にアクセスする</td>
+
+              <td headers="d153310e69" style="vertical-align:top;" class="slds-cell-wrap"><p>システム管理者プロファイルまたは </p><p style="margin-bottom:0;">「Data Cloud アーキテクト」権限セット</p></td>
+
+            </tr>
+          </tbody></table></div>
+  
+  <div id="task_qyg_4cq_vdc" aria-labelledby="ariaid-title2" class="nested1"><a name="task_qyg_4cq_vdc"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">Data Cloud での Salesforce 接続の設定</h2>
+    
+    <p>データソースとデータアクションターゲットは、Data Cloud を設定した組織で自動的に作成されます。Sandbox 組織を含む他の Salesforce 組織を接続するには、手動で接続を設定する必要があります。このステップが不要な場合は、このセクションをスキップできます。</p>
+
+      <a name="task_qyg_4cq_vdc__steps_e4d_4vz_pcc"></a><ol id="task_qyg_4cq_vdc__steps_e4d_4vz_pcc"><li>
+          <span>[<strong class="uicontrol">Data Cloud 設定</strong>] に移動し、[Salesforce Integrations] で [<strong class="uicontrol">Salesforce CRM]</strong> を選択します。</span>
+        </li><li>
+          <span><strong class="uicontrol">[新規]</strong> をクリックします。</span>
+        </li><li>
+          <span>[<strong class="uicontrol">Salesforce 組織に接続</strong>] または [<strong class="uicontrol">Sandbox 組織に接続</strong>] をクリックします。</span>
+        </li><li>
+          <span>Data Cloud Sandbox または Salesforce Sandbox 組織にデータソース組織として接続できます。<strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+        </li><li>
+          <span>最大 15 文字の英数字を使用して、組織の別名を作成します。エイリアスは後で変更できません。<strong class="uicontrol">[保存]</strong> をクリックします。</span>
+        </li><li>
+          <span>Salesforce ログイン情報を使用して組織にログインします。Salesforce 本番組織または開発者組織のログインは https://salesforce.com です。Sandbox 組織のログインは https://test.salesforce.com です。</span>
+        </li><li>
+          <span>[アクセスを許可] メニューで [<strong class="uicontrol">許可]</strong> をクリックします。</span>
+        </li></ol>
+
+      <div><p>これで、Salesforce CRM コネクタページから組織を使用できるようになります。</p></div>
+    
+  </div>
+
+  <div id="task_msq_n2q_vdc" aria-labelledby="ariaid-title3" class="nested1"><a name="task_msq_n2q_vdc"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">ユーザーと権限セットの追加</h2>
+    
+    <p>Data Cloud 権限を持つユーザーを作成したり、既存のユーザーを更新して Data Cloud 権限セットを持つことができるようになりました。</p>
+
+      <ol><li>
+          <span>Data Cloud の [設定] に移動し、[ユーザー管理] で [<strong class="uicontrol">ユーザー] を</strong>クリックします。</span>
+        </li><li>
+          <span>新規ユーザーを追加するか、既存のユーザーを編集します。</span>
+        </li><li>
+          <span>ユーザーを選択し、[権限セットの割り当て] をクリックし<strong class="uicontrol">ます。</strong>
+          </span>
+          <div>
+            <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Data Cloud <a target="_blank" href="https://help.salesforce.com/s/articleView?id=data.c360_a_userpermissions.htm&amp;language=ja&amp;type=5">標準権限セット</a>について説明します。</div></div></div>
+
+          </div>
+        </li><li>
+          <span><strong class="uicontrol">[割り当ての編集]</strong> をクリックします。</span>
+        </li><li>
+          <span>適切なData Cloud権限セットを選択し、[<strong class="uicontrol">追加]を</strong>クリックします。</span>
+        </li><li>
+          <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+        </li></ol>
+
+      <div><p> Data Cloud 機能にアクセスする必要があるすべてのユーザーに対してこの手順を繰り返します。</p></div>
+    
+  </div>
+
+  <div id="task_bxj_jdq_vdc" aria-labelledby="ariaid-title4" class="nested1"><a name="task_bxj_jdq_vdc"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">Service Cloud データバンドルのインストール</h2>
+    
+    <p><span>Data 360</span> を Salesforce CRM 組織に接続したら、標準 (スターターとも呼ばれる) データバンドルをインストールして、<span>Data 360</span> 内にデータをすばやくリリースします。データバンドルは、Salesforce オブジェクトを Data Cloud データモデルオブジェクト (DMO) に対応付けます。</p>
+
+      <a name="task_bxj_jdq_vdc__steps_j5w_kby_fcc"></a><ol id="task_bxj_jdq_vdc__steps_j5w_kby_fcc"><li>
+          <span>[設定] から、<strong class="uicontrol">[Data Cloud 設定]</strong> を選択します。</span>
+        </li><li>
+          <span>[Salesforce Integrations (Salesforce インテグレーション)] で、[<strong class="uicontrol">Salesforce CRM</strong>] を選択します。</span>
+        </li><li>
+          <span>[標準データバンドル] で、Service Cloud のドロップダウン矢印をクリックし、[<strong class="uicontrol">インストール] を</strong>クリックします。
+          </span>
+        </li><li>
+          <span>データキットインストールインターフェースで、[<strong class="uicontrol">Install for Admins Only</strong> (管理者のみのインストール)] を選択し、[<strong class="uicontrol">インストール] を</strong>クリックします。</span>
+        </li><li>
+          <span>インストールが完了したら、[<strong class="uicontrol">完了] を</strong>クリックします。</span>
+        </li></ol>
+
+    
+  </div>
+
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_configure_periodic_full_refresh_schedule">
+<h1 class="slds-text-heading_large">定期的なフル更新スケジュールの設定 </h1>
+  <p>Salesforce CRM コネクタデータストリームの定期的なフル更新スケジュールは、フル更新間隔など、さまざまな変数によって決まります。フル更新間隔は、フル更新がトリガーされるタイミングを決定するために設定できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col style="width:100%"></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。
+            </td>
+
+          </tr>
+        </tbody></table>
+    <p>フル更新スケジュールは、いくつかの変数に基づきます。</p>
+    <ul>
+      <li>最新のフル更新の日時。</li>
+
+    </ul>
+
+    <ul>
+      <li>フル更新を設定できる間隔。デフォルトでは、この間隔は無効になっていますが ([なし] として設定)、バンドルデータストリームの設定時、または既存のデータストリームの値を設定できます。<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Developer Edition組織の既存のデータ ストリームでは、更新が不要な場合のコストを節約するために、定期的なフル更新がデフォルトで無効になりました。フル更新時間をカスタマイズするには、定期的なフル更新間隔の値を設定します。
+        </div></div></div>
+</li>
+
+    </ul>
+
+    <ul>
+      <li>金曜日の午後 11 時 (サーバー時刻) までの日数。</li>
+
+    </ul>
+
+    <ul>
+      <li>ランダムな 0.5 ～ 1 時間の追加。</li>
+
+    </ul>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> 
+      <p>フル更新が 12 月 4 日に実行され、フル更新間隔が 10 日に設定されているとします。次の定期的なフル更新は、この計算に基づいて 12 月 20 日に実行されます。</p>
+      <div><ul>
+          <li>前回のフル更新: 12 月 4 日 (水曜日) </li>
+
+        </ul>
+<ul>
+          <li>プラス 10 日間: 12 月 14 日 (土) </li>
+
+        </ul>
+<ul>
+          <li>Plus 6 days until Friday: 12月20日 (金) </li>
+
+        </ul>
+<ul>
+          <li>さらにランダムな 0.5 ～ 1 時間 </li>
+
+        </ul>
+</div>
+      <div>
+        <p><strong>フル更新スケジュール</strong></p>
+        <img alt="フル更新スケジュールの例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/Full_Refresh_Interval_Doc_image_L_(3).png">
+      </div>
+    </div></div></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Salesforce CRM コネクタデータストリームの定期的なフル更新スケジュールは、フル更新間隔など、さまざまな変数によって決まります。フル更新間隔は、フル更新がトリガーされるタイミングを決定するために設定できます。デフォルトでは、フル更新設定可能な間隔は無効になっています ([なし] に設定)。バンドルまたはマルチオブジェクトデータストリームのリリース時、または既存のデータストリームに対してその値を設定できます。" href="ingest_connect-2.html#c360_a_crm_data_full_refresh_interval">定期的なフル更新間隔の設定</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_connect_commerce_cloud_instance">
+<h1 class="slds-text-heading_large">B2C Commerce 接続の設定</h1>
+  
+  <p>Data 360 インスタンスを作成したら、B2C Commerce 接続を設定できます。これにより、B2C Commerce からデータを取得する範囲を制御できます。B2C Commerce コネクタでは、B2C Commerce の本番インスタンスへの接続のみがサポートされています。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d42060e60" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d42060e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">接続を作成する</td>
+
+              <td headers="d42060e60" style="vertical-align:top;" class="slds-cell-wrap"><p>システム管理者プロファイルまたは </p><p style="margin-bottom:0;">「Data Cloud アーキテクト」権限セット</p></td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>開始する前に、B2C Commerce にログインし、Business Manager にログインするために使用する URL を手元に用意しておいてください。</p></div>
+    <ol><li>
+        <span>Data Cloud の [設定] から、[Salesforce インテグレーション] の下の [<strong class="uicontrol">B2C Commerce]</strong> を選択します。</span>
+      </li><li>
+        <span>B2C Commerce インスタンスからデータをインポートするには、[<strong class="uicontrol">新規]</strong> をクリックします。</span>
+      </li><li>
+        <span>ログインしているすべての Business Manager インスタンスからログアウトします。</span>
+      </li><li>
+        <span>新しいタブで、B2C Commerce 接続に使用している Business Manager インスタンスにログインします。</span>
+      </li><li>
+        <span>[Data Cloud] タブに戻ります。</span>
+      </li><li>
+        <span>[Commerce Business Manager と同期] ダイアログに、Business Manager で使用する URL (末尾のスラッシュを除く) を入力します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>Data 360 が B2C Commerce インスタンスに接続してそのすべてのデータにアクセスできるようにするには、[<strong class="uicontrol">許可] を</strong>クリックします。</span>
+      </li><li>
+        <span>データを取り込むサイトを選択し、右矢印をクリックします。</span>
+        <div>サイトを選択すると、[選択したサイト] の下に表示されます。</div>
+      </li></ol>
+
+    <div><p>これで、接続された B2C Commerce インスタンスのデータストリームを作成できます。</p></div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="ingest_connect-3.html#c360_a_edit_site_selection_commerce_cloud_connector">B2C Commerce サイトの選択項目の追加または削除</a></strong><br><span>Data 360</span> では、接続を設定した後に B2C Commerce がデータを取り込むサイトを変更できます。サイトを編集する前に、B2C Commerce 接続があることを確認します。</li><li class="slds-p-bottom_small"><strong><a href="ingest_connect-2.html#c360_a_disconnect_a_cloud_instance_connection">B2C Commerce インスタンス接続の切断</a></strong><br>B2C Commerce インスタンスへの接続を削除できます。接続を削除すると、B2C Commerce インスタンスから <span>Data 360</span> へのデータの取り込みが停止します。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="B2C Commerce インスタンスへの接続を削除できます。接続を削除すると、B2C Commerce インスタンスから Data 360 へのデータの取り込みが停止します。" href="ingest_connect-2.html#c360_a_disconnect_a_cloud_instance_connection">B2C Commerce インスタンス接続の切断</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_connect_data_task_steps">
+<h1 class="slds-text-heading_large">Data 360 への Salesforce データの接続</h1>
+  
+  <p>データは<span>Data 360</span>の機能を促進します。<span>Data 360</span> では、多くのデータソースに接続できます。標準接続の使用を開始するには、<span>Data 360</span> を Salesforce CRM 組織に接続し、標準データバンドルをインストールします。次に、データを取り込んでさらにマッピングし、絞り込みます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div id="c360_a_connect_data_task_steps__context_h5w_kby_fcc"><a name="c360_a_connect_data_task_steps__context_h5w_kby_fcc"></a><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><p>この複数ステップのソリューションには、<span>Data 360</span> のステップを完了するための複数のロールと権限セットが含まれます。<a name="c360_a_connect_data_task_steps__image_w4z_n25_gdc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ブックマークアイコン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/bookmark_60.png" id="c360_a_connect_data_task_steps__image_w4z_n25_gdc" style="width:20px;margin-bottom:0;"></span>このページをブックマークするか、別のウィンドウで開いたままにしてこのトピックを参照してください。</p></div>
+  
+  <div id="task_eht_fdq_vdc" aria-labelledby="ariaid-title2" class="nested1"><a name="task_eht_fdq_vdc"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">タスク 1: データバンドルのインストール</h2>
+    
+    <p><span>Data 360</span> を Salesforce CRM 組織に接続すると、Data Cloud アーキテクトは標準 (スターターとも呼ばれる) データバンドルをインストールして、<span>Data 360</span> 内にデータをすばやくリリースできます。データバンドルは、Salesforce オブジェクトを Data 360 データモデルオブジェクト (DMO) 構造に対応付けます。バンドルをカスタマイズすることもできます。</p>
+
+      <a name="task_eht_fdq_vdc__steps_j5w_kby_fcc"></a><ol id="task_eht_fdq_vdc__steps_j5w_kby_fcc"><li>
+          <span>[設定] から、<strong class="uicontrol">[Data Cloud 設定]</strong> を選択します。</span>
+        </li><li>
+          <span>[Salesforce Integrations (Salesforce インテグレーション)] で、[<strong class="uicontrol">Salesforce CRM</strong>] を選択します。</span>
+        </li><li>
+          <span>[Standard Data Bundles (標準データバンドル)] で、Sales Cloud または Service Cloud のいずれかのドロップダウン矢印をクリックし、[<strong class="uicontrol">Install (インストール</strong>)] をクリックします。</span>
+        </li><li>
+          <span>データキットのインストールウィンドウで、[<strong class="uicontrol">Install for Admins Only</strong> (管理者のみのインストール)] を選択し、[<strong class="uicontrol">インストール] を</strong>クリックします。</span>
+        </li><li>
+          <span>インストールが完了したら、[<strong class="uicontrol">完了] を</strong>クリックします。</span>
+        </li></ol>
+
+    
+  </div>
+
+  <div id="task_ptf_gdq_vdc" aria-labelledby="ariaid-title3" class="nested1"><a name="task_ptf_gdq_vdc"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">タスク 2: Salesforce CRM データストリームの作成</h2>
+    
+    <p>データキットがインストールされたので、Salesforce CRM ソースからデータを流すデータストリームを作成できます。</p>
+
+      <div class="p">
+               <span>Data 360 での <a target="_blank" href="ingest_connect-2.html#c360_a_create_crm_data_stream">Salesforce CRM データストリームの作成</a> (「Data Cloud Architect」権限セット: 5 分未満)。</span>
+            </div>
+
+    
+  </div>
+
+  <div id="task_vkr_gdq_vdc" aria-labelledby="ariaid-title4" class="nested1"><a name="task_vkr_gdq_vdc"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">タスク 3: データのマッピング</h2>
+    
+    <p>データの取り込み時に、データはそのまま取り込まれます。つまり、項目とそのデータ型は変換されずにインポートされます。前のタスクでは、<span>Data 360</span> にデータを取り込むための Salesforce CRM データストリームを作成しました。すべてのデータストリームによって取り込まれたデータは、データレークオブジェクト (DLO) に書き込まれます。データバンドルでは標準項目を対応付けますが、電話番号項目など、ID 解決に必要な項目を手動で作成して対応付ける必要がある場合があります。この項目は、同じ名前と電話番号を持つ複数の取引先または個人に一致します。Data Cloud アーキテクトは、次の手順を実行します。</p>
+
+      <a name="task_vkr_gdq_vdc__steps_l5w_kby_fcc"></a><ol id="task_vkr_gdq_vdc__steps_l5w_kby_fcc"><li>
+               <span>Data Cloud の [データストリーム] タブで、[<strong class="uicontrol">取引先責任者</strong>] データストリームを選択します。</span>
+            </li><li>
+          <span> [データマッピング] セクションで、[<strong class="uicontrol">確認]</strong> をクリックします。</span>
+          <div>選択したデータレイクオブジェクト (DLO) とオブジェクトが画面の片側に表示されます。検索可能なデータモデルオブジェクト (DMO) が反対側に表示されます。</div>
+        </li><li>
+          <span>[Data Lake Objects] で、[<strong class="uicontrol">Business Phone</strong>] フィールドをクリックします。</span>
+        </li><li>
+          <span>[データモデルエンティティ] で、検索ボックスを使用して連絡先電話オブジェクトの [書式設定された E164 電話番号] 項目を見つけます。セクションを展開するには、<strong class="uicontrol">［Unmapped］</strong> をクリックします。</span>
+        </li><li>
+          <span>[<strong class="uicontrol">Formatted E164 Phone Number</strong>] フィールドをクリックして、左側の [Business Phone] に対応付けます。</span>
+          <div>実線は 2 つの項目を接続します。</div>
+        </li><li>
+          <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+          <div>ビジネスの使用事例とその他の必須項目に基づいて、この手順を続行します。</div>
+          <div>
+            <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div id="task_vkr_gdq_vdc__note_l4x_3ky_fcc" style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><a name="task_vkr_gdq_vdc__note_l4x_3ky_fcc"></a><span class="slds-text-title_caps">メモ</span> [データストリーム] タブからデータストリームの状況を表示します。状況が表示されない場合は、ドロップダウンをクリックし、[<strong class="uicontrol">今すぐ更新</strong>] を選択します。</div></div></div>
+
+          </div>
+        </li></ol>
+
+      <div id="task_vkr_gdq_vdc__postreq_g3j_bty_hcc"><a name="task_vkr_gdq_vdc__postreq_g3j_bty_hcc"></a><p>これで、Data 360 を Salesforce CRM 組織に接続し、標準バンドルをインストールして、データを取り込んでマッピングできました。この取り込まれたデータを使用して、パーソナライズとエンゲージメントを促進し、Salesforce Customer 360アプリケーション全体およびそれ以降のインサイトを引き出すことができます。</p></div>
+    
+  </div>
+
+  <div id="rel_content" aria-labelledby="ariaid-title5" class="nested1"><a name="rel_content"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">関連コンテンツ</h2>
+    
+      <div><a name="rel_content__ul_qtz_51t_pcc"></a><ul id="rel_content__ul_qtz_51t_pcc">
+          <li>Salesforce ヘルプ: ID 解決の<a target="_blank" href="https://help.salesforce.com/s/articleView?id=data.c360_a_identity_resolution_data_modeling_requirements.htm&amp;language=ja&amp;type=5">データモデリング要件</a></li>
+
+          <li>Salesforce ヘルプ: <a target="_blank" href="identity-1.html#c360_a_identity_resolution_ruleset_create">ID 解決ルールセット</a>の作成</li>
+
+          <li>Salesforce ヘルプ: <a target="_blank" href="insights_query-3.html#c360_a_insights">Enhance Data with Insights</a></li>
+
+          <li>Salesforce ヘルプ: <a target="_blank" href="segment_activation-3.html#c360_a_segments">セグメントの作成および</a>有効化</li>
+
+          <li>Trailhead: Data 360 でのデータストリーム<a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/projects/create-a-data-stream-in-data-cloud">の作成</a></li>
+
+        </ul>
+</div>
+    
+  </div>
+
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_connect_external_activation_platform">
+<h1 class="slds-text-heading_large">外部有効化プラットフォームの設定</h1>
+  <p>外部有効化プラットフォームを <span>Data 360</span> に接続して、より多くの顧客にリーチします。AppExchange またはパッケージ URL から外部有効化プラットフォームをインストールします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d226961e63" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d226961e63" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Data Cloud 設定にアクセスする</td>
+
+              <td headers="d226961e63" style="vertical-align:top;" class="slds-cell-wrap"><p>システム管理者プロファイルまたは </p><p style="margin-bottom:0;">「Data Cloud アーキテクト」権限セット</p></td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>[設定] から、<strong class="uicontrol">[Data Cloud 設定]</strong> を選択します。</span>
+      </li><li>
+        <span>[外部インテグレーション] で、[<strong class="uicontrol">External Activation Targets</strong> (外部有効化対象)] を選択します。</span>
+      </li><li>
+        <span>外部有効化プラットフォームを選択します。</span>
+        <div>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 有効化にはセグメント名が含まれています。外部有効化プラットフォームに送信するメタデータファイル内のセグメント名を除外するには、<strong class="uicontrol">[このプラットフォームに対する有効化にセグメント名を含める]</strong> をオフにします。</div></div></div>
+
+        </div>
+      </li><li>
+        <span>データプライバシー要件による絞り込みを有効にするには、プライバシー種別を選択して、カリフォルニア州プライバシー権法 (CPRA) による顧客への影響を示します。</span>
+        <div>CPRA によって顧客が影響を受けない場合 (<a target="_blank" href="https://cppa.ca.gov/">「California Privacy Protection Agency (米カリフォルニア州プライバシー保護局)」</a>を参照)、<strong class="uicontrol">[該当なし]</strong> を選択します。</div>
+      </li><li>
+        <span>ISV で作成された JSON ベースの外部有効化プラットフォームの場合、[ID 種別の対応付け] タブを確認します。ISV でサポートされる ID が設定されている場合、[ID 種別] 項目を更新して、対応するパートナーがサポートする ID に対応付けます。ID 種別の対応付けによって ID 種別が正規化され、出力が<code>PER_USER</code> (ユーザー識別子) でグループ化されるときにレコードが適切な対象フォルダに有効化されます。ID 種別の値は大文字と小文字が区別されます。たとえば、Google をカンマ区切り値として GAID、GoogleId、または GId に対応付けます。&nbsp;</span>
+        <div>
+          <p>有効化時に、最終的な計算には、左列にパートナーがサポートする ID 種別 (Google など) と右列にマッピングされたすべての別名 (GID、gid、GAid など) の両方が含まれます。この例では、<code>DigitalIdType</code>値が Google、GID、gid、または GAid の <code>ContactPointDigitalId</code> DMO のレコードは、対応する対象に対してアクティブ化されます。</p>
+        </div>
+      </li><li>
+        <span>変更内容を保存します。</span>
+      </li><li>
+        <span>プラットフォームを有効化に使用するには、<strong class="uicontrol">［Enable］</strong> をクリックします。</span>
+        <div>外部有効化プラットフォームを無効にできます。ただし、無効なプラットフォームに関連付けられた有効化は処理されません。</div>
+      </li></ol>
+
+    <div id="c360_a_connect_external_activation_platform__postreq_et1_f5t_42c"><a name="c360_a_connect_external_activation_platform__postreq_et1_f5t_42c"></a><p><strong class="uicontrol">JSON を使用して ISV パートナーが作成した外部有効化プラットフォームに関する考慮事項</strong></p><a name="c360_a_connect_external_activation_platform__ul_h4y_bvw_j2c"></a><ul id="c360_a_connect_external_activation_platform__ul_h4y_bvw_j2c">
+        <li>ID 値を対応付けて有効化定義の連絡先デジタル ID 検索条件に含めると、有効化の実行時に、これらの連絡先絞り込み値を持つすべてのレコードが ISV パートナーの S3 バケットに対して有効化されます。</li>
+
+        <li>パッケージのアップグレード中に ISV パートナーが識別子のサポートを終了した場合、アップグレード中に ISV パートナーが行った変更を反映するように有効化を更新する必要があります。</li>
+
+        <li>ISV パートナーでサポートされている ID の可能なすべての値を対応付けていて、追加の連絡先デジタル ID 検索条件が適用されていない場合、サポートされている識別子にリンクされている連絡先デジタル ID DMO のすべてのレコードが有効になります。ただし、検索条件を適用すると、有効化に含めるレコードをより詳細に制御できます。</li>
+
+        <li>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div id="c360_a_connect_external_activation_platform__note_knp_5ct_p3c" style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><a name="c360_a_connect_external_activation_platform__note_knp_5ct_p3c"></a><span class="slds-text-title_caps">メモ</span>  デジタル識別子をモデル化して ContactPointDigitalId DMO にマッピングし、外部プラットフォーム用の有効化ツールキットを正常に使用する方法については、「JSON ベースの外部有効化対象のデジタル識別子の<a title="標準 ContactPointDigitalId データモデルオブジェクト (DMO) を使用して、デジタル識別子データを取り込んでモデル化します。独立系ソフトウェアベンダー (ISV) は、有効化ツールキットを使用して、この DMO を照会し、デジタルメディアプラットフォーム全体でデジタル ID を解決する有効化を構築します。" href="segment_activation-3.html#c360_a_map_digital_identifiers_activation_toolkit">取り込みとモデル</a>」を参照してください。</div></div></div>
+
+        </li>
+
+      </ul>
+</div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="segment_activation-2.html#c360_a_create_external_activation_platform_activation_target">Salesforce ヘルプ: Data 360 での外部有効化対象の作成</a></li><li><a target="_blank" href="segment_activation-2.html#c360_a_create_external_activation_platform_activations">Salesforce ヘルプ: 外部プラットフォームの有効化の作成</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_connect_salesforce_orgs">
+<h1 class="slds-text-heading_large">Data 360 への Salesforce CRM 組織の接続</h1>
+  <p>Salesforce 組織を Data 360 に接続して、Data 360 で処理と統合するために Salesforce オブジェクトからデータを取り込みます。選択した接続の種別に応じて、データアクションまたはハーモナイズされた Data 360 データのみを送信できます。Salesforce CRM 組織の Data 360 のデータと機能にアクセスするには、Salesforce コンパニオン接続を設定します。フロー、Apex、CRM、データ強化などのプラットフォーム コンポーネントも、コンパニオン組織全体のData 360データにアクセスできます。</p>
+
+    <p>標準 CRM 接続を使用する組織と Data Cloud One コンパニオン接続を使用する組織を同じアーキテクチャで接続できます。プロファイルの統合と統合データ共有に関する会社のニーズに最適な接続種別を選択します。</p>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">例</h2><p> NTO Sales は組織で Data 360 をプロビジョニングしました。NTO カスタマーサービス組織と NTO Sporting Goods Retail 組織はコンパニオン接続を介して Data 360 に接続され、これらの組織と Data 360 間で選択したデータスペースの双方向データ共有が可能になります。Data 360 を利用した機能と Data Cloud One アプリケーションへのアクセスを設定できます。NTO Materials Research は、標準の Salesforce CRM 接続を介して接続されます。そのデータはData 360に取り込まれ、NTOのサービス組織や小売組織のデータと共に統合されますが、資料調査組織はデータアクションのみを受け取ることができます。<span style="vertical-align:text-bottom;display:inline-block;"><img alt="次の図は、NTO Customer Service 組織と NTO Sporting Goods Retail 組織へのコンパニオン接続と、NTO Materials Research 組織への標準 CRM 接続を使用した NTO Sales &amp;amp; Marketing 組織を示しています。カスタマーサービスおよび Sporting Goods Retail 組織には Data Cloud One アプリケーションがあり、Data 360 を利用するいくつかの機能を有効にしています。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/data_cloud_multi_org_architecture.png" style="width:800px;margin-bottom:0;"></span></p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">自宅組織</h2><p>ホーム組織は、Data 360 がプロビジョニングされている Salesforce 組織です。Data 360 に自動的に接続されます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">コンパニオン組織</h2><p>コンパニオン組織とは、Data 360 コンパニオン接続を介して Data 360 に接続されている組織です。ホーム組織はデフォルトで接続されているため、コンパニオン組織にすることはできません。コンパニオン組織のユーザーは、Data Cloud One アプリケーションの Data 360 機能のサブセットにアクセスできます。Data 360 データは、フローや強化などのプラットフォーム機能を強化するコンパニオン組織で使用できます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">標準 Salesforce CRM コネクタ</h2><p>Data 360 から Salesforce 組織への標準の Salesforce CRM 接続により、Data 360 でデータを取り込んでデータアクションを送信できます。標準接続では、メタデータは接続組織に同期されず、接続組織に Data 360 の機能またはデータへのアクセス権は付与されません。組織が標準接続を介してのみ Data 360 に接続されている場合、Data 360 の機能を設定することはできません。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Data 360 コンパニオン接続</h2><p>Data 360 コンパニオン接続を使用して、1 つの Data 360 と 1 つ以上の Salesforce 組織間の双方向接続を作成します。コンパニオン接続は、統合メタデータをコンパニオン組織に同期し直すことで、標準の Salesforce CRM 接続の機能に基づいて構築されます。組織がコンパニオン接続を介して Data 360 に接続されている場合、Data 360 の機能を設定できます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Data Cloud One アプリケーション</h2><p>Data Cloud One アプリケーションは、任意のコンパニオン組織で使用できます。Data Cloud One アプリケーションでは、コンパニオン組織のユーザーが Data 360 の一部の機能にアクセスできます。Data Cloud One では、一部の Data 360 機能にアクセスできません。</p></div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#c360_a_compare_salesforce_connections">標準の Salesforce CRM と Data Cloud One コンパニオン接続の比較</a></strong><br>Salesforce 組織を Data 360 に接続するには、標準の Salesforce CRM 接続を使用するか、Data Cloud One コンパニオン接続を標準接続と組み合わせて使用します。次の表に、これらの接続種別の違いを示します。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="getstarted-1.html#c360_a_data_cloud_architecture_strategy">Salesforce ヘルプ: 複数組織のアーキテクチャ戦略</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_connect_your_external_model">
+<h1 class="slds-text-heading_large">SageMaker モデルの接続 </h1>
+  
+  <p>Salesforceで予測を使用するには、SageMakerモデルを<span>Data 360</span>に接続し、使用事例の予測条件を定義します。</p>
+
+    <div><p>モデルエンドポイントと認証の詳細に関する情報を収集します。</p></div>
+    <ol><li>
+        <span>AIモデル(旧称Einstein Studio)の[予測]タブで、[<strong class="uicontrol">予測モデルを追加</strong>]をクリックします。<div><img alt="[予測] タブがあるモデルビルダービュー。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_byom_connect_amazon_sagemaker_model_predictive.png" style="width:800px;"></div></span>
+      </li><li>
+        <span>モデル種別を選択するには、<strong class="uicontrol">[Amazon SageMaker モデルを接続する]</strong> をクリックします。次に、[<strong class="uicontrol">次へ</strong>] をクリックします。 <div><img alt="SageMaker モデル種別が表示されたモデルビルダー。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_byom_connect_amazon_sagemaker_model_choose_type.png" style="width:800px;"></div></span>
+      </li><li>
+        <span>エンドポイントを接続してモデル推測にアクセスするには、次の詳細を指定します。続いて、<strong class="uicontrol">[次へ]</strong> をクリックします。<div><img alt="さまざまな SageMaker エンドポイントパラメータを定義できるモデルビルダーページ。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_byom_connect_amazon_sagemaker_model_endpoint.jpg" style="width:800px;"></div>
+        </span>
+        <div>
+          <ul>
+            <li>Name — エンドポイント名</li>
+
+            <li>URL — エンドポイント URL</li>
+
+            <li>認証 — キーベースまたは JWT (両方に API ゲートウェイが必要)</li>
+
+            <li>Audience — JWT 認証用の英数字文字列または組み合わせ。</li>
+
+            <li>認証ヘッダー — 認証ヘッダー </li>
+
+            <li>秘密鍵 — 英数字文字列または組み合わせ。</li>
+
+            <li>Request Format (要求形式) — アプリケーションまたはサーバーからデータを要求するための形式。<ul><li>JSON dense</li>
+<li>CSV</li>
+</ul>
+</li>
+
+            <li>応答形式 — サーバー応答からデータを提供する形式。<ul><li>JSON</li>
+<li>CSV</li>
+</ul>
+</li>
+
+          </ul>
+
+        </div>
+      </li><li>
+        <span>スキーマを追加するには、[<strong class="uicontrol">入力および出力</strong>を入力します] をクリックします。<div><img alt="モデルスキーマを表示するモデルビルダービュー。ここで入力と出力を追加します。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_ai_byom_connect_model_builder_schema.png" style="width:800px;"></div></span>
+        <ol>
+          <li>
+            <span>予測に影響する入力 (変数) を追加するには、[<strong class="uicontrol">入力を追加</strong>] をクリックします。次に、名前と API 参照名を指定し、データ型を選択します。&nbsp;入力を追加するときに作業を保存します。</span>
+          </li>
+
+          <li>
+            <span>出力を追加するには、<strong class="uicontrol">[Add Output</strong> (出力を追加)] をクリックします。次に、「$.predictions」のような形式で名前、API 参照名、データ型、JSON キーを指定します。&nbsp;出力を追加するときに作業を保存します。</span>
+            <div>
+              <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> 入力は、SageMaker Select クエリに一致する順序で配置する必要があります。入力を移動するには、[入力] セクションの目的の位置までドラッグします。</div></div></div>
+
+            </div>
+          </li>
+
+        </ol>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>モデル設定を確認します。続いて作業を保存します。</span>
+      </li><li>
+        <span>設定を更新するには、変更するセクションをクリックします。次に、フロー内を移動してすべての設定を確認します。</span>
+      </li><li>
+        <span>問題がなければ、<strong class="uicontrol">［Save］</strong> をクリックします。</span>
+      </li><li>
+        <span>モデルに名前を付けます。次に、[<strong class="uicontrol">保存 &amp; 接続</strong>] をクリックします。モデルが接続されたら、モデルリストビューの [予測モデル] タブでモデルを確認できます。</span>
+      </li><li>
+        <span>モデルの詳細を表示するには、モデルをクリックします。このページでは、モデルを有効化、編集、削除できます。</span>
+      </li><li>
+        <span>モデルを有効化したら、[利用状況] タブに移動します。ここで、モデルから予測を消費できる予測ジョブを作成できます。</span>
+      </li><li>
+        <span>一括予測を作成した場合は、<strong class="uicontrol">[実行]</strong> をクリックして予測スコアを更新します。</span>
+        <div>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> ストリーミング予測では、データモデルオブジェクト (DMO) の入力が変更された場合にのみ新しい推測が開始されます。</div></div></div>
+
+        </div>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://developer.salesforce.com/blogs/2023/08/bring-your-own-ai-models-to-salesforce-with-einstein-studio">外部: Data Cloud への独自の AI モデルの取り込み</a></li><li><a title="予測モデルから返される予測、処方、上位の要素は、さまざまな方法で使用できます。" href="ai_models-2.html#c360_a_get_predictions_from_your_model">予測モデルからの出力の使用</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_connection_tasks">
+<h1 class="slds-text-heading_large">Data 360 のデータソース設定</h1>
+  <p>データソースを接続するには、先に完了する必要がある管理者の作業がないかを確認します。Data Cloud の [設定] で設定したら、データソースごとにデータストリームを作成できます。[データを接続] で、さまざまなデータソースコネクタ、その設定、データストリーム設定に関する情報を確認できます。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="setup_admin-2.html#c360_a_setup_oauth_google">Google OAuth を使用したコネクタの設定</a></strong><br>パスワードを共有せずに Data Cloud で接続を安全に作成するために、一部の外部コネクタでは OAuth (Open Authorization) を使用したアクセスが許可されています。OAuth を使用する場合、ソースを Data Cloud に接続する前に、いくつかの前提条件の実装手順を完了する必要があります。</li><li class="slds-p-bottom_small"><strong><a href="setup_admin-2.html#c360_a_setup_oauth_linkedin">LinkedIn OAuth を使用したコネクタの設定</a></strong><br>パスワードを共有せずに Data Cloud で接続を安全に作成するために、一部の外部コネクタでは OAuth (Open Authorization) を使用したアクセスが許可されています。LinkedIn OAuth を使用する場合、ソースを Data Cloud に接続する前に、いくつかの前提条件の実装手順を完了する必要があります。</li><li class="slds-p-bottom_small"><strong><a href="setup_admin-2.html#c360_a_setup_oauth_microsoft">Microsoft OAuth を使用したコネクタの設定</a></strong><br>パスワードを共有せずに Data Cloud で接続を安全に作成するために、一部の外部コネクタでは OAuth (Open Authorization) を使用したアクセスが許可されています。OAuth を使用する場合、ソースを Data Cloud に接続する前に、いくつかの前提条件の実装手順を完了する必要があります。     </li><li class="slds-p-bottom_small"><strong><a href="setup_admin-2.html#c360_a_setup_oauth_openid">OpenId Connect OAuth を使用したコネクタの設定</a></strong><br>パスワードを共有せずに Data Cloud で接続を安全に作成するために、一部の外部コネクタでは OAuth (Open Authorization) を使用したアクセスが許可されています。OAuth を使用する場合、ソースを Data Cloud に接続する前に、いくつかの前提条件の実装手順を完了する必要があります。        </li><li class="slds-p-bottom_small"><strong><a href="ingest_connect-2.html#c360_a_disconnect_a_data_source">データソースの切断</a></strong><br>必要に応じて、データソースを切断して <span>Data 360</span> から削除できます。この切断により、提供されたすべてのデータが削除されます。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_connectors">
+<h1 class="slds-text-heading_large">Data 360 のデータソース</h1>
+  <p>データ ソースは、データ ストリームを作成する前に管理者が設定する特定の要件とステップを使用して、さまざまな方法で <span>Data 360</span> に取り込まれるか、Data 360 に接続されます。</p>
+
+    <p>データソースは、Marketing Cloud Engagement コネクタや CRM コネクタなどの Salesforce コネクタになります。Salesforce コネクタには、データストリームをすばやく設定できるようにオブジェクトとマッピングを事前定義するスターターデータバンドルが用意されています。</p>
+    <p>他のサービスで SDK や取り込み API を使用してデータソースを接続することもできます。MuleSoft Anypoint コネクタまたはサードパーティインテグレーションを使用して、データソースの可能性を拡大することもできます。新しいコネクタは定期的に追加され、Data 360 に取り込めるデータが拡張されるため、データを統合する際の価値が高まります。</p>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="ingest_connect-3.html#c360_a_salesforce_connectors">Data Cloud 用 Salesforce コネクタ</a></strong><br><span>Data Cloud</span> では、他の Salesforce データソースに接続できます。これらのデータソースの多くのコネクタには、データストリームをすばやく設定するためのスターターデータバンドルがあります。スターターデータバンドルは、Salesforce で定義された、Data Cloud DMO 構造へのマッピングを含むデータストリーム定義です。バンドルをカスタマイズすることもできます。一部のコネクタでは、複数のデータバンドルオプションが提供されます。</li><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=data.c360_a_web_mobile_app_connector.htm&amp;language=ja&amp;type=5">Web およびモバイルアプリケーションコネクタ</a></strong><br>Web およびモバイルアプリケーションを Data Cloud に接続して、顧客エンゲージメントデータを収集します。このデータは、メッセージのカスタマイズ、オートメーションの作成、AI プロジェクトのサポートなどに役立ちます。接続したら、データを Data Cloud に取り込むようにデータストリームを設定することで、さまざまな用途でこのデータにアクセスおよび照会できるようになります。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_byol_data_federation">Zero Copy Data Federation (ゼロコピーデータ統合)</a></strong><br><span>Data 360</span>のゼロ コピー データ統合は、物理的に異なる複数のデータソースからデータを照会するプロセスです。このアプローチにより、ユーザーは、異なるシステムを統合と呼ばれる 1 つの論理システムとして扱い、各システムの自律性を維持できます。重要なのは、データ統合により、システム境界を越えてデータが重複することを回避できることです。<span>Data 360</span>。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_create_a_data_extension_in_data_cloud">
+<h1 class="slds-text-heading_large">Data 360 でのデータエクステンションの作成</h1>
+ 
+ <p><span>Data 360</span> で直接、データアクションの Journey Builder API イベントのデータエクステンションをすばやく作成します。この自動化プロセスにより、Marketing Cloud Engagement にアクセスする必要がなくなります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+  <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d68935e71" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限セット</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d68935e71" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限セット">データアクションでデータエクステンションを作成する</td>
+
+       <td headers="d68935e71" style="vertical-align:top;" class="slds-cell-wrap"><p>次のいずれかの権限セット:</p><ul>
+         <li>Data Cloud アーキテクト</li>
+
+         <li>Data Cloud 有効化マネージャー</li>
+
+         <li>Data Cloud 有効化スペシャリスト </li>
+
+        </ul>
+</td>
+
+      </tr>
+     </tbody></table></div>
+  <ol><li>
+    <span><span>Data 360</span> で、[データアクション] タブに移動します。</span>
+   </li><li>
+    <span>ドラフト状況のデータアクションを開き、[<strong class="uicontrol">Create Data Extension</strong> (データエクステンションを作成)] をクリックします。</span>
+   </li><li>
+    <span><strong class="uicontrol">[作成]</strong> をクリックします。データエクステンションは、Marketing Cloud Engagement の [<samp class="filepath">Data Extensions] -&gt;</samp> [Salesforce CDP] -&gt; [Data Actions Data Extensions] のフォルダパスに作成されます。</span>
+   </li><li>
+    <span>Marketing Cloud で、このデータエクステンション名を使用する <a target="_blank" href="https://help.salesforce.com/s/articleView?id=mktg.mc_jb_api_entry_source_use_case_1.htm&amp;language=ja&amp;type=5"><u>Journey Builder API イベント</u></a>を作成します。</span>
+   </li><li>
+    <span><span>Data 360</span> で、対応するデータアクションターゲットを編集し、作成した Journey Builder API イベントを選択します。保存すると、データアクション対象とデータアクションの状況が有効になります。</span>
+    <div>
+     <ul>
+      <li>データエクステンションの作成後に DMO または CIO 属性のスキーマが更新された場合、[<strong class="uicontrol">Sync Data Extension</strong> (データエクステンションを同期)] をクリックしてデータエクステンションの最新の変更を取得します。</li>
+
+      <li>対応するデータアクションとデータアクションターゲットが削除されても、<span>Data 360</span> 内で作成されたデータエクステンションは削除されません。</li>
+
+     </ul>
+
+    </div>
+   </li></ol>
+
+ 
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="ingest_connect-2.html#c360_a_data_extension_data_action_payload">Salesforce ヘルプ: データアクションペイロードを保存するデータエクステンションの設定</a></li><li><a target="_blank" href="segment_activation-2.html#c360_a_create_a_data_action_in_customer_data_platform">Salesforce ヘルプ: Data Cloud でのデータアクションの作成</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_create_a_streaming_insight_using_sql">
+<h1 class="slds-text-heading_large">SQL を使用したストリーミングインサイトの作成</h1>
+  
+  <p>SQL 式を記述して、ほぼリアルタイムのデータソースからディメンション全体のストリーミング評価指標を計算します。ストリーミングインサイトでは、特定の時点のデータが分析されます。ストリーミング インサイトは、ほぼリアルタイムで時系列集計を作成し、<span>Data 360</span>内のデータをオーケストレーションして最適化するのに役立ちます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d163240e64" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限セット</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d163240e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限セット">ストリーミングインサイトを作成する</td>
+
+              <td headers="d163240e64" style="vertical-align:top;" class="slds-cell-wrap"><p>権限セット</p><ul>
+                  <li>Data Cloud アーキテクト</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table><p>ストリーミングインサイトを設定するには、いくつかの前提条件と手順が必要です。最適な結果を得るには、次のアクションフローに従います。</p><div id="c360_a_create_a_streaming_insight_using_sql__fig_j5p_tkc_v2c" style="text-align:left;"><a name="c360_a_create_a_streaming_insight_using_sql__fig_j5p_tkc_v2c"></a>
+        <a name="c360_a_create_a_streaming_insight_using_sql__image_k5p_tkc_v2c"></a><img alt="ストリーミングインサイトのデータフロー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/streaming_insights_and_data_actions_flow.png" id="c360_a_create_a_streaming_insight_using_sql__image_k5p_tkc_v2c" style="width:600px;">
+      </div><a name="c360_a_create_a_streaming_insight_using_sql__ul_l5p_tkc_v2c"></a><ul id="c360_a_create_a_streaming_insight_using_sql__ul_l5p_tkc_v2c">
+        <li>データソース — Web および Mobile SDK、取り込み API、Marketing Cloud Personalization データストリームからさまざまなオブジェクトにソースをマッピングします。</li>
+
+        <li>ID解決とデータ マッピング — データを<span>Data 360</span>に取り込み、ID解決を使用して統合個人を作成します。</li>
+
+        <li>インサイト — ストリーミングインサイトは計算済みインサイトに似ていますが、ストリーミングデータを管理するための専用の関数があります。</li>
+
+        <li>一致ルール — 顧客からの統合個人データで強化します。</li>
+
+        <li>強化 — プロファイル関連の属性でデータアクションを拡張します。</li>
+
+        <li>データアクション — ストリーミングインサイトにデータアクションを適用し、そのアクションが必要かどうかを評価します。</li>
+
+        <li>DMO — ストリーミングインサイトでは、エンゲージメント DMO のみをプライマリ DMO として使用できます。プロファイルとその他の DMO は、右テーブル結合として使用できます。</li>
+
+        <li>ウィンドウ関数 — ストリーミングインサイトには、ウィンドウ関数集計が必要です。<code>window.start</code> と <code>window.end</code> を使用して、 <code>SELECT</code> ステートメントでウィンドウ枠を定義します 。 </li>
+
+      </ul>
+</div>
+    <ol><li>
+        <span>Data Cloud で、[計算済みインサイト] タブに移動し、<strong class="uicontrol">[新規]</strong> をクリックします。</span>
+      </li><li><span>[データスペース] ドロップダウンから、データスペースを選択します。</span><div>使用できるのは、アクセスできるデータスペースのみです。</div></li><li>
+        <span>[<strong class="uicontrol">ストリーミングインサイト]</strong> をクリックします。</span>
+      </li><li>
+        <span>[<strong class="uicontrol">Use SQL Authoring</strong> (SQL オーサリングを使用)] をクリックし、<strong class="uicontrol">[次へ</strong>] をクリックします。</span>
+      </li><li><span>ストリーミングインサイト名を入力し、[<strong class="uicontrol">次へ]</strong> をクリックします。</span><div>[ストリーミングインサイト API 参照名] 項目は自動入力されます。</div></li><li><span>最大 131,021 文字の SQL クエリ式を入力します。</span></li><li>
+        <span>インサイトに通貨基準が含まれる場合、<code>TRY_CONVERT_CURRENCY</code> 関数を使用する必要があります。</span>
+      </li><li><span>SQL 式が有効かどうかを確認するには、<strong class="uicontrol">[構文を確認]</strong> をクリックします。</span><div>無効な場合、続行できません。</div></li><li><span><strong class="uicontrol">[保存して実行]</strong> をクリックします。</span></li></ol>
+
+    <div><p>ストリーミングインサイトがレコードホームページに表示されます。ストリーミングインサイトの最終実行状況は常に [処理中] です。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/modules/customer-data-platform-insights?trail_id=enhance-data-in-customer-data-platform">Trailhead: Data 360 インサイト</a></li></ul></div>
+</div></div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="governance-2.html">&larr; ガバナンス・セキュリティ・同意・分類（2/2）</a><a href="ingest_connect-2.html">取り込み・接続・ストリーム・フェデレーション・Zero Copy（2/3） &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=data.c360_a_data_cloud.htm&type=5&language=ja">help.salesforce.com — Data 360（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>

@@ -1,0 +1,2082 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>インシデント管理・スウォーミング（2/3） | Service Cloud ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（34）</h2>
+    <ol>
+      <li><a href="#incident_mgmt_create_presence_status">インシデントプレゼンス状況の設定</a></li>
+      <li><a href="#incident_mgmt_create_problem">問題の作成</a></li>
+      <li><a href="#incident_mgmt_create_queue">インシデントキューの作成</a></li>
+      <li><a href="#incident_mgmt_create_skill">スキルベースルーティングのインシデントスキルの作成</a></li>
+      <li><a href="#incident_mgmt_create_work_plan">作業プランの作成</a></li>
+      <li><a href="#incident_mgmt_create_work_plan_template">作業プランテンプレートの作成</a></li>
+      <li><a href="#incident_mgmt_deactivate_broadcast_site_banner">ブロードキャストサイトバナーの無効化</a></li>
+      <li><a href="#incident_mgmt_delete_broadcast_slack">ブロードキャスト Slack メッセージの削除</a></li>
+      <li><a href="#incident_mgmt_diagnose_problem">問題の診断</a></li>
+      <li><a href="#incident_mgmt_enable_alerts">ブロードキャストアラートの有効化</a></li>
+      <li><a href="#incident_mgmt_enable_emails">ブロードキャストメールの有効化</a></li>
+      <li><a href="#incident_mgmt_enable_incident_management">カスタマーサービスインシデント管理の有効化</a></li>
+      <li><a href="#incident_mgmt_enable_site_banners">ブロードキャストサイトバナーの有効化</a></li>
+      <li><a href="#incident_mgmt_enable_slack">ブロードキャスト Slack メッセージの有効化</a></li>
+      <li><a href="#incident_mgmt_example">インシデントライフサイクルの例: インシデントチームの一日</a></li>
+      <li><a href="#incident_mgmt_flow_considerations">カスタマーサービスインシデント管理フローに関する考慮事項</a></li>
+      <li><a href="#incident_mgmt_flows">カスタマーサービスインシデント管理フロー</a></li>
+      <li><a href="#incident_mgmt_identify_incident">インシデントの特定</a></li>
+      <li><a href="#incident_mgmt_identify_problems">問題に関連する問題の特定</a></li>
+      <li><a href="#incident_mgmt_integrations">カスタマーサービスインシデント管理のインテグレーションの設定</a></li>
+      <li><a href="#incident_mgmt_manage_slas">エンタイトルメントとマイルストーンを使用したインシデント SLA の管理</a></li>
+      <li><a href="#incident_mgmt_notify_external_stakeholders">ブロードキャスト通信を使用した外部関係者への通知</a></li>
+      <li><a href="#incident_mgmt_notify_internal_stakeholders">ブロードキャスト通信を使用した内部関係者への通知</a></li>
+      <li><a href="#incident_mgmt_objects">カスタマーサービスインシデント管理のオブジェクトと項目</a></li>
+      <li><a href="#incident_mgmt_related_change_requests">変更要求に関連する問題の特定</a></li>
+      <li><a href="#incident_mgmt_related_incidents">インシデントに関連する問題の特定</a></li>
+      <li><a href="#incident_mgmt_reporting">カスタマーサービスインシデント管理のレポート</a></li>
+      <li><a href="#incident_mgmt_resolve_incident">インシデントの解決</a></li>
+      <li><a href="#incident_mgmt_respond_to_a_broadcast_alert">ブロードキャストアラートへの応答</a></li>
+      <li><a href="#incident_mgmt_roll_out_fix">作業プランを使用した修正のロールアウト</a></li>
+      <li><a href="#incident_mgmt_route_incidents">オムニチャネルを使用した適切なチームへのインシデントの転送</a></li>
+      <li><a href="#incident_mgmt_sample_flows">カスタマーサービスインシデント管理のサンプルフロー</a></li>
+      <li><a href="#incident_mgmt_send_a_broadcast_alert">ブロードキャストアラートの送信</a></li>
+      <li><a href="#incident_mgmt_send_a_broadcast_email">ブロードキャストメールの送信</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>インシデント管理・スウォーミング（2/3）</h1>
+      <div class="meta">Salesforce Service Cloud ヘルプ · 34 記事 · 生成 2026-08-13</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="incident-1.html">&larr; インシデント管理・スウォーミング（1/3）</a><a href="incident-3.html">インシデント管理・スウォーミング（3/3） &rarr;</a></div>
+<section class="article" id="incident_mgmt_create_presence_status">
+<h1 class="slds-text-heading_large">インシデントプレゼンス状況の設定</h1>
+  <p>インシデントチャネルに割り当てられたサポート担当者がインシデントを解決できるとマークできるようにします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d95461e54" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d95461e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">オムニチャネルを設定する</td>
+
+              <td headers="d95461e54" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d95461e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">権限セットを変更する</td>
+
+              <td headers="d95461e54" style="vertical-align:top;" class="slds-cell-wrap">「プロファイルと権限セットの管理」</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>[設定] から、[クイック検索] ボックスに<kbd>「プレゼンス状況」</kbd>と入力し、<strong class="uicontrol">[プレゼンス状況]</strong> を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[新規]</strong> をクリックします。</span>
+      </li><li>
+        <span>状況と API 参照名を入力します。</span>
+      </li><li>
+        <span>状況を [<strong class="uicontrol">オンライン]</strong> に設定して、サポート担当者が新しいインシデント作業を受けられるようにします。</span>
+      </li><li>
+        <span>チャネルとして <strong class="uicontrol">[インシデント]</strong> を選択します。</span>
+      </li><li>
+        <span>変更内容を保存します。</span>
+      </li><li>
+        <span>オムニチャネルプレゼンス状況へのアクセス権をユーザーに付与します。</span>
+        <ol>
+          <li>
+            <span>[設定] の [クイック検索] ボックスに<kbd>「権限セット」</kbd>と入力し、<strong class="uicontrol">[権限セット]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[新規]</strong> をクリックします。</span>
+          </li>
+
+          <li>
+            <span>表示ラベルと API 参照名を入力します。</span>
+          </li>
+
+          <li>
+            <span>変更内容を保存します。</span>
+          </li>
+
+          <li>
+            <span>権限セットの [アプリケーション] セクションで、<strong class="uicontrol">[サービスプレゼンス状況のアクセス権]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[編集]</strong> をクリックします。</span>
+          </li>
+
+          <li>
+            <span>インシデントのプレゼンス状況を追加して保存します。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[割り当ての管理]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[割り当てを追加]</strong> をクリックし、Service Cloud ユーザーライセンスを持つユーザーを追加します。<strong class="uicontrol">[割り当て]</strong> をクリックします。</span>
+          </li>
+
+          <li>
+            <span>変更内容を保存します。</span>
+          </li>
+
+        </ol>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_create_problem">
+<h1 class="slds-text-heading_large">問題の作成</h1>
+  <p>インシデントの根本原因を調査し、エキスパートとコラボレーションするには、問題を作成します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>サービスコンソールでドロップダウンをクリックし、[<strong class="uicontrol">問題]</strong> を選択します。<div style="text-align:left;"><img alt="ナビゲーションバーの問題" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_problem_nav.png"></div></span>
+      </li><li>
+        <span>[<strong class="uicontrol">新規]</strong> を選択します。<div style="text-align:left;"><img alt="[新規問題] ウィンドウ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_new_problem.png"></div></span>
+      </li><li>
+        <span>情報を入力し、変更を保存します。</span>
+      </li></ol>
+
+    <div><p>問題を作成したら、関係者とコラボレーションして問題を解決できます。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_create_queue">
+<h1 class="slds-text-heading_large">インシデントキューの作成</h1>
+  <p>インシデントを特定のキューに自動的に転送します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d59760e54" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d59760e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">オムニチャネルを設定する</td>
+
+              <td headers="d59760e54" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>[設定] から、[クイック検索] ボックスに<kbd>「キュー」</kbd>と入力し、<strong class="uicontrol">[キュー]</strong> を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[新規]</strong> をクリックします。</span>
+      </li><li>
+        <span>表示ラベルとキュー名を入力します。</span>
+      </li><li>
+        <span>カスタマーサービスインシデント管理ルーティング設定を選択します。</span>
+      </li><li>
+        <span>オブジェクトとして <strong class="uicontrol">[インシデント]</strong> を選択します。</span>
+      </li><li>
+        <span>インシデントオムニチャネル権限セットを持つユーザーをキューに追加します。</span>
+      </li><li>
+        <span>変更内容を保存します。</span>
+      </li></ol>
+
+    <div><p>インシデントが作成されたら、サポート担当者はインシデントキューにインシデントを割り当てることができます。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_create_skill">
+<h1 class="slds-text-heading_large">スキルベースルーティングのインシデントスキルの作成</h1>
+  <p>適切なスキルを持つサポート担当者がインシデントを解決できるように、スキルに基づいてインシデントをサポート担当者に転送します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d110191e54" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d110191e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">オムニチャネルを設定する</td>
+
+              <td headers="d110191e54" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d110191e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">サービスリソースを作成する</td>
+
+              <td headers="d110191e54" style="vertical-align:top;" class="slds-cell-wrap">サービスリソースに対する「作成」</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d110191e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">サービスリソースにスキルを割り当てる</td>
+
+              <td headers="d110191e54" style="vertical-align:top;" class="slds-cell-wrap">サービスリソースに対する「編集」</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>スキルに基づいてインシデントをサポート担当者に転送する手順は、次のとおりです。</p></div>
+    <ol><li>
+        <span><a target="_blank" href="omnichannel-3.html#omnichannel_skills_based_routing_enable">スキルベースのルーティングを有効</a>にします。</span>
+      </li><li>
+        <span><a target="_blank" href="omnichannel-3.html#omnichannel_skills_based_routing_create_skills">インシデントスキルを作成</a>します。</span>
+      </li><li>
+        <span><a target="_blank" href="omnichannel-3.html#omnichannel_skills_based_routing_create_service_resources">インシデントエージェントのサービスリソースを作成</a>します。</span>
+      </li><li>
+        <span><a target="_blank" href="omnichannel-3.html#omnichannel_skills_based_routing_assign_skills">サービスリソースにインシデントスキルを割り当て</a>ます。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_create_work_plan">
+<h1 class="slds-text-heading_large">作業プランの作成</h1>
+  <p>インシデントの問題を特定して変更要求を作成したら、作業プランを作成して解決に必要なステップの概要を決定します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>指示ステップを使用して作業プランテンプレートから作業プランを作成します。</span>
+        <ol>
+          <li>
+            <span>変更要求から、ドロップダウンをクリックし、[<strong class="uicontrol">作業プランを追加</strong>] を選択します。<div style="text-align:left;"><img alt="[作業プランを追加] ボタン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_add_work_plan.png"></div></span>
+          </li>
+
+          <li>
+            <span>作業プランテンプレートを選択して、<strong class="uicontrol">[追加]</strong> をクリックします。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>テンプレートを使用せずに作業プランを作成します。</span>
+        <ol>
+          <li>
+            <span>変更要求から、作業プランコンポーネントの横にあるドロップダウンを選択して、[<strong class="uicontrol">新規]</strong> をクリックします。<div style="text-align:left;"><img alt="作業プランコンポーネント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_work_plan_component.png"></div></span>
+          </li>
+
+          <li>
+            <span>情報を入力し、変更を保存します。デフォルトでは、親レコードは現在の変更要求に設定されます。<div style="text-align:left;"><img alt="[新規作業プラン] ウィンドウ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_new_work_plan.png"></div></span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>既存の作業ステップセットから作業ステップを作業プランに追加するには、作業プランの横にあるドロップダウンをクリックし、[作業ステップを追加] を選択します。<div style="text-align:left;"><img alt="[作業ステップを追加] ボタン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_add_work_steps.png"></div></span>
+        <ol>
+          <li>
+            <span>プランに追加する作業ステップを選択し、<strong class="uicontrol">[追加]</strong> をクリックします。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>作業プランに新しい作業ステップを追加するには、変更要求の [関連] タブに移動して [作業ステップ] を見つけて <strong class="uicontrol">[新規]</strong> をクリックします。</span>
+        <ol>
+          <li>
+            <span>情報を入力し、変更を保存します。</span>
+          </li>
+
+        </ol>
+      </li></ol>
+
+    <div><p>作業プランを変更要求に追加したら、レコードから作業ステップの概要を確認し、進行時にステップを完了としてマークできます。</p><div style="text-align:left;"><img alt="強調表示されている作業プランコンポーネント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_work_plans_record_layout.png"></div></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_create_work_plan_template">
+<h1 class="slds-text-heading_large">作業プランテンプレートの作成</h1>
+  <p>作業プランテンプレートを使用して、インシデント管理担当者の作業プランを簡素化します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d156220e54" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d156220e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">作業プランテンプレートを作成する</td>
+
+              <td headers="d156220e54" style="vertical-align:top;" class="slds-cell-wrap">作業プランテンプレートに対する「作成」および「参照」</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d156220e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">作業プランテンプレートを表示する</td>
+
+              <td headers="d156220e54" style="vertical-align:top;" class="slds-cell-wrap">作業プランテンプレートに対する「参照」</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d156220e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">作業プランテンプレートを更新する</td>
+
+              <td headers="d156220e54" style="vertical-align:top;" class="slds-cell-wrap">作業プランテンプレートに対する「編集」および「参照」</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d156220e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">作業プランテンプレートを削除する</td>
+
+              <td headers="d156220e54" style="vertical-align:top;" class="slds-cell-wrap">作業プランテンプレートに対する「削除」および「参照」</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d156220e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">作業ステップテンプレートを作成する</td>
+
+              <td headers="d156220e54" style="vertical-align:top;" class="slds-cell-wrap">作業ステップテンプレートに対する「作成」および「参照」</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d156220e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">作業ステップテンプレートを表示する</td>
+
+              <td headers="d156220e54" style="vertical-align:top;" class="slds-cell-wrap">作業ステップテンプレートに対する「参照」</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d156220e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">作業ステップテンプレートを更新する</td>
+
+              <td headers="d156220e54" style="vertical-align:top;" class="slds-cell-wrap">作業ステップテンプレートに対する「編集」および「参照」</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d156220e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">作業ステップテンプレートを削除する</td>
+
+              <td headers="d156220e54" style="vertical-align:top;" class="slds-cell-wrap">作業ステップテンプレートに対する「削除」および「参照」</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>アプリケーションランチャーから、<strong class="uicontrol">[作業プランテンプレート]</strong> を見つけ選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[新規]</strong> をクリックします。</span>
+      </li><li>
+        <span>名前を入力してテンプレートを <strong class="uicontrol">[有効]</strong> に設定し、変更を保存します。</span>
+      </li><li>
+        <span>作業ステップのリストの概要を決定するには、[作業ステップ] 関連リストを作業プランテンプレートに追加します。</span>
+        <ol>
+          <li>
+            <span>作業プランテンプレートで <strong class="uicontrol">[設定]</strong> をクリックし、<strong class="uicontrol">[オブジェクトを編集]</strong> をクリックします。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[ページレイアウト]</strong> を選択し、<strong class="uicontrol">[作業プランテンプレートレイアウト]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[関連リスト] で、[作業プランテンプレートエントリ] と [作業プランテンプレート履歴] を [関連リスト] セクションに追加します。<div style="text-align:left;"><img alt="作業プランテンプレートエントリレイアウト" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_work_plan_template_entries.png"></div></span>
+          </li>
+
+          <li>
+            <span>変更内容を保存します。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>作業プランテンプレートの [関連] タブから、[作業プランテンプレートエントリ] を見つけます。</span>
+      </li><li>
+        <span>既存の作業ステップを作業プランテンプレートに関連付けるには、<strong class="uicontrol">[管理]</strong> をクリックして、<strong class="uicontrol">[追加]</strong> をクリックします。</span>
+      </li><li>
+        <span>作業ステップテンプレートを作成するには、<strong class="uicontrol">[新規]</strong> をクリックして、<strong class="uicontrol">[新規作業プランステップテンプレート]</strong> をクリックします。</span>
+        <ol>
+          <li>
+            <span>作業ステップテンプレートを必要なだけ追加します。</span>
+          </li>
+
+          <li>
+            <span>変更を保存します。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>作業ステップテンプレートを並び替えるには、[作業プランテンプレートエントリ] から <strong class="uicontrol">[管理]</strong> をクリックし、<strong class="uicontrol">[並び替え]</strong> をクリックします。</span>
+      </li><li>
+        <span>変更内容を保存します。</span>
+      </li></ol>
+
+    <div><p>作業プランテンプレートと作業ステップテンプレートを作成すると、サポート担当は変更要求から標準ステップを使用して作業プランを生成できます。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_deactivate_broadcast_site_banner">
+<h1 class="slds-text-heading_large">ブロードキャストサイトバナーの無効化</h1>
+  <p>インシデントが解決したら、バナーを無効にしてサイトから削除します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table><p>ブロードキャストサイトバナーが有効でなければ、無効化することはできません。</p></div>
+    <ol><li>
+        <span>[インシデント] 関連リストに移動し、[ブロードキャスト通信] 関連リストを見つけます。</span>
+      </li><li>
+        <span>ブロードキャストサイトバナーを見つけて、ブロードキャスト通信レコードを開きます。</span>
+      </li><li>
+        <span>ブロードキャスト通信レコードの [関連] タブから、ブロードキャスト通信利用者レコードを見つけます。</span>
+      </li><li>
+        <span>レコードのドロップダウンをクリックし、<strong class="uicontrol">[バナーを無効化]</strong> を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[バナーを無効化]</strong> をクリックして、<strong class="uicontrol">[完了]</strong> をクリックします。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_delete_broadcast_slack">
+<h1 class="slds-text-heading_large">ブロードキャスト Slack メッセージの削除</h1>
+  <p>インシデントが解決された場合や関連性がなくなった場合には、サービスコンソールを離れることなく、ブロードキャスト Slack メッセージを Slack チャンネルから削除します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table><ul>
+        <li>カスタマーサービスインシデント管理が有効になっている必要があります。</li>
+
+        <li>ブロードキャスト Slack メッセージが有効である必要があります。</li>
+
+        <li>ブロードキャストトピックを Slack チャンネルに割り当てる必要があります。</li>
+
+      </ul>
+</div>
+    <div><p>削除されていないブロードキャスト Slack メッセージや、以前に送信、更新、削除に失敗していないブロードキャスト Slack メッセージのみを削除できます。</p><p>ブロードキャスト Slack メッセージを削除しても、そのブロードキャスト通信レコードは削除されません。</p></div>
+    <ol><li>
+        <span>[インシデント] 関連リストに移動し、[ブロードキャスト通信] 関連リストを見つけます。</span>
+      </li><li>
+        <span>削除するブロードキャスト Slack メッセージを見つけます。ブロードキャスト通信のドロップダウンから、<strong class="uicontrol">[ブロードキャスト Slack メッセージを削除]</strong> を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックし、<strong class="uicontrol">[完了]</strong> をクリックします。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_diagnose_problem">
+<h1 class="slds-text-heading_large">問題の診断</h1>
+  <p>インシデントの根本原因を見つけます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#incident_mgmt_create_problem">問題の作成</a></strong><br>インシデントの根本原因を調査し、エキスパートとコラボレーションするには、問題を作成します。</li><li class="slds-p-bottom_small"><strong><a href="#incident_mgmt_identify_problems">問題に関連する問題の特定</a></strong><br>問題を診断し、インシデントを解決する作業をするときには、全体像を念頭に置いて連動関係を追跡し、関連リストを使用して可能性のある波及効果を把握します。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_enable_alerts">
+<h1 class="slds-text-heading_large">ブロードキャストアラートの有効化</h1>
+  <p>ブロードキャストアラートを有効にすると、インシデントが発生したときにインシデントマネージャーが中断を伴うアプリケーション内通知を送信できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>[設定] の [クイック検索] ボックスに<kbd>「カスタマーサービスインシデント管理」</kbd>と入力し、<strong class="uicontrol">[カスタマーサービスインシデント管理]</strong> をクリックします。</span>
+      </li><li>
+        <span>[ブロードキャスト設定] タブで、ブロードキャストアラートを有効化します。</span>
+      </li></ol>
+
+    <div><p>ブロードキャストアラートを有効にしたら、カスタムアプリケーションを使用している場合はインシデントアラートウィジェットを追加し、<a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.user_groups.htm&amp;language=ja&amp;type=5">必要に応じてグループを作成または管理</a>して、1 つ以上のブロードキャストトピックを作成し、グループに割り当てます。次に、ブロードキャスト通信に対するアクセス権をユーザーに付与します。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_enable_emails">
+<h1 class="slds-text-heading_large">ブロードキャストメールの有効化</h1>
+  <p>ブロードキャストメールを有効にして、ユーザーが重要な情報を影響を受ける顧客に送信できるようにします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>[設定] の [クイック検索] ボックスに<kbd>「カスタマーサービスインシデント管理」</kbd>と入力し、<strong class="uicontrol">[カスタマーサービスインシデント管理]</strong> をクリックします。</span>
+      </li><li>
+        <span>[ブロードキャスト設定] タブで、ブロードキャストメールを有効化します。</span>
+      </li></ol>
+
+    <div><p>ブロードキャストメールを有効にしたら、<a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/modules/contacts-list-view-step-by-step/work-with-contact-list-views">必要に応じて取引先責任者リストビューを作成または管理</a>し、ブロードキャスト通信へのアクセス権をユーザーに付与します。ブロードキャストメールを作成するときに、ユーザーはあらかじめ定められた取引先責任者リストビューか、インシデントに関連するケースまたは商品の取引先責任者に送信することを選択できます。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_enable_incident_management">
+<h1 class="slds-text-heading_large">カスタマーサービスインシデント管理の有効化</h1>
+  <p>いくつかのステップを行うことでカスタマーサービスインシデント管理を有効にして、サービスチームがサービスの中断を追跡して診断し、再発を防止できるようにします。これらをすべて Salesforce 内で実行できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table><p>既存の Salesforce 組織でカスタマーサービスインシデント管理を有効にします。カスタマーサービスインシデント管理が有効になっている場合、オブジェクトマネージャーから、新しいオブジェクト (問題、インシデント、変更要求) に関する詳細情報を参照できます。[カスタマーサービスインシデント管理] 設定ページでこの機能を無効にすることができます。カスタマーサービスインシデント管理を無効にしても、Salesforce によってデータが削除されることはありませんが、関連付けられているすべてのオブジェクトも無効になります。</p><ol>
+        <li>[設定] の [クイック検索] ボックスに<kbd>「カスタマーサービスインシデント管理」</kbd>と入力し、<strong class="uicontrol">[カスタマーサービスインシデント管理]</strong> をクリックします。</li>
+
+        <li>カスタマーサービスインシデント管理を有効にします。</li>
+
+      </ol><p>カスタマーサービスインシデント管理オブジェクトがユーザーに表示されない場合、ユーザープロファイルオブジェクトのタブが非表示になることがあります。ユーザーにカスタマーサービスインシデント管理オブジェクトへのアクセス権を付与するには、プロファイルレベルで権限を有効にします。</p><ol>
+        <li>[設定] の [クイック検索] ボックスに<kbd>「プロファイル」</kbd>と入力し、<strong class="uicontrol">[プロファイル]</strong> をクリックします。</li>
+
+        <li>カスタマーサービスインシデント管理オブジェクトにアクセスできるようにするプロファイルを選択します。</li>
+
+        <li><strong class="uicontrol">[編集]</strong> をクリックします。</li>
+
+        <li>[標準オブジェクト権限] セクションで、インシデント、問題、または変更要求オブジェクトを見つけて、オブジェクトへのアクセス権をユーザープロファイルに付与します。ユーザーがカスタマーサービスインシデント管理レコードを表示して編集するには、「編集」以上の権限が必要です。</li>
+
+        <li>[タブの設定] で、<strong class="uicontrol">[デフォルトで表示]</strong> を選択します。</li>
+
+        <li>変更内容を保存します。</li>
+
+        <li>他の 2 つのカスタマーサービスインシデント管理オブジェクトに対してステップ 4 ～ 6 を繰り返します。</li>
+
+        <li>必要に応じて、他のユーザープロファイルに対してステップ 1 ～ 8 を繰り返します。</li>
+
+      </ol></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_enable_site_banners">
+<h1 class="slds-text-heading_large">ブロードキャストサイトバナーの有効化</h1>
+  <p>ブロードキャストサイトバナーを有効にして、ユーザーが重要な情報を表示するバナーを Aura および LWR サイトに追加できるようにします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table><p>ブロードキャストサイトバナーを有効化する前に、<a target="_blank" href="https://help.salesforce.com/s/articleView?id=experience.networks_enable.htm&amp;language=ja&amp;type=5">デジタルエクスペリエンスを有効化</a>します。</p></div>
+    <ol><li>
+        <span>[設定] の [クイック検索] ボックスに<kbd>「カスタマーサービスインシデント管理」</kbd>と入力し、<strong class="uicontrol">[カスタマーサービスインシデント管理]</strong> をクリックします。</span>
+      </li><li>
+        <span>[ブロードキャスト設定] タブで、ブロードキャストサイトバナーを有効化します。</span>
+      </li></ol>
+
+    <div><p>ブロードキャストサイトバナーを有効にしたら、1 つ以上のブロードキャストトピックを作成してネットワークサイトに割り当てます。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_enable_slack">
+<h1 class="slds-text-heading_large">ブロードキャスト Slack メッセージの有効化</h1>
+  <p>ブロードキャストアラートを有効にすると、インシデントが発生したときにインシデントマネージャーが中断を伴うアプリケーション内通知を送信できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>[設定] の [クイック検索] ボックスに<kbd>「カスタマーサービスインシデント管理」</kbd>と入力し、<strong class="uicontrol">[カスタマーサービスインシデント管理]</strong> をクリックします。</span>
+      </li><li>
+        <span><a title="段階的なサポートを排除して、数ステップでスウォーミングを開始できます。Salesforce レコードでスウォームコラボレーションを保持するか、Slack でスウォームするのかを選択できます。" href="incident-3.html#set_up_swarming">Service for Slack アプリケーションとスウォーミングの設定</a>を完了します。</span>
+      </li><li>
+        <span>カスタマーサービスインシデント管理の [ブロードキャスト設定] タブで、ブロードキャスト Slack メッセージを有効にします。</span>
+      </li></ol>
+
+    <div><p>ブロードキャスト Slack メッセージを有効にしたら、必要に応じてブロードキャストに使用する Slack チャンネルを確認し、1 つ以上のブロードキャストトピックを作成して Slack チャンネルに割り当てます。次に、ブロードキャスト通信に対するアクセス権をユーザーに付与します。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_example">
+<h1 class="slds-text-heading_large">インシデントライフサイクルの例: インシデントチームの一日</h1>
+  <p>Take-Out のインシデントマネージャーは、メール、チャット、メッセージング、電話など、複数のチャネルで、新しいマーケティング割引コードのエラーに関する顧客ケースが急増していることに気が付きます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table><div style="text-align:center;">
+        <img alt="メール、チャットボット、電話、Web を介した割引コードに関する問題の例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_takeout_channels.png">
+      </div><ol>
+        <li>インシデントマネージャーが新規ケースとオープンケースを調べると、正常に機能しない割引コードに関するケースが多数あることがわかりました。<div style="text-align:left;"><img alt="ケースリストビュー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_takeout_cases.png"></div></li>
+
+        <li>インシデントマネージャーがインシデントレコードを作成します。インシデントレコードには、割引コードのエラー、影響を受けるサービステリトリー、緊急度に関する情報が含まれます。</li>
+
+        <li>インシデントの調査中に関連ケースを追跡し、サポート担当者キューからインシデント関連の問題を削除するために、インシデントマネージャーが [ケース関連の問題] 関連リストからケースをリンクします。<div style="text-align:left;"><img alt="インシデントページレイアウト" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_takeout_incident_layout.png"></div></li>
+
+        <li>割引コードの問題に関する専門知識に基づいて、インシデント解決チームのメンバーに、オムニチャネルを介してインシデントが割り当てられます。</li>
+
+        <li>リンクされたすべてのケースを所有するために、インシデント所有者が [アクション &amp; おすすめ] コンポーネントから [ケース所有者をインシデント所有者に変更] フローを起動します。以前のケース所有者は新しい顧客ケースの処理に戻ることができます。これでインシデントに関連するケースに取られることがなくなります。</li>
+
+        <li>インシデント所有者は、Knowledgeコンポーネントで関連するKnowledge記事を検索しますが、既知の回避策は見つかりません。<div style="text-align:left;"><img alt="該当する結果が表示されないナレッジコンポーネント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_takeout_kb_articles.png"></div></li>
+
+        <li>インシデント所有者は、[スウォーミングを開始] フローとエキスパートファインダーを使用して、Slack で他の専門分野エキスパートとスウォームを開始することにします。割引コードのエキスパートがスウォーム内でチームとして協力して問題を突き止め、影響を受けるすべての顧客を特定し、解決策に関するコラボレーションに DevOps チームメンバーを招待します。</li>
+
+        <li>DevOps チームのメンバーが Salesforce に問題レコードを作成し、問題の詳細を取得して根本原因を調査します。DevOps チームは、問題のデバッグを行い、影響を受けるアセットを特定し、問題をインシデントにリンクし、インシデント所有者が顧客に最新情報を提供できるようにします。</li>
+
+        <li>インシデント所有者は、認証済みユーザーにインシデントを通知して、さらにケースが発生しないように代わりの割引コードを提供するために、ブロードキャストバナーを Take-Out サイトに追加します。<div style="text-align:left;"><img alt="Take-Out サイトのバナー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_takeout_banner_site.png"></div></li>
+
+        <li>DevOps チームが割引コードエラーの原因となっているバグを特定するとすぐに、チームメンバーが解決へのステップを取得するために変更要求を作成します。</li>
+
+        <li>変更要求から、DevOps メンバーがインシデントを解決して割引コードを修復するために必要なステップをまとめた作業プランを作成します。<div style="text-align:left;"><img alt="作業プランコンポーネント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_takeout_change_request.png"></div></li>
+
+        <li>すべてのステップを完了して確認したら、変更アドバイザリボードから緊急修正のサインオフを得るために、インシデント対応チームが承認フローを起動します。</li>
+
+        <li>修正が承認され、インシデントが解決されたら、インシデントチームが [アクション &amp; おすすめ] コンポーネントから [変更要求および関連問題をクローズする] フローを起動します。このフローで、変更要求とそれに関連する問題、インシデント、ケースが自動的にクローズされます。<div style="text-align:left;"><img alt="クローズした関連問題の成功メッセージ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_takeout_close_related.png"></div></li>
+
+        <li>インシデント所有者は Take-Out サイトからバナーを削除し、影響を受けたすべての顧客に割引コードが機能するようになったことを知らせるブロードキャストメールを送信します。</li>
+
+        <li>インシデント所有者はスウォームをクローズし、チームは Slack を活用したとっさの判断とコラボレーションをお祝いします。<div style="text-align:left;"><img alt="Slack の祝福メッセージ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_takeout_slack_celebration.png"></div></li>
+
+      </ol></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_flow_considerations">
+<h1 class="slds-text-heading_large">カスタマーサービスインシデント管理フローに関する考慮事項</h1>
+  <p>カスタマーサービスインシデント管理のサンプルフローを使用するときは、以下の考慮事項に留意してください。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+      <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table>
+    <div><ul>
+        <li>
+          <a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.flow_considerations.htm&amp;language=ja&amp;type=5">フローの制限および考慮事項</a>
+        </li>
+
+        <li>実行中のユーザーには「フローを実行」ユーザー権限が必要です。</li>
+
+        <li>カスタマーサービスインシデント管理フローを使用するには、インシデント管理を有効にする必要があります。</li>
+
+        <li>[ケース所有者をインシデント所有者に変更] フローはインシデントでのみ機能します。[変更要求および関連問題をクローズする] フローは変更要求でのみ機能します。</li>
+
+        <li>[変更要求および関連問題をクローズする] フローでクローズされるのは、変更要求とその関連したケース、問題、インシデントのみです。</li>
+
+        <li>[クローズ済み] 選択リスト値が [状況] 項目から削除されると、[変更要求および関連問題をクローズする] フローは失敗します。</li>
+
+        <li>[ケース所有者をインシデント所有者に変更] フローはケースがインシデントに関連とマークされている場合のみ機能します。</li>
+
+        <li>カスタマーサービスインシデント管理フローは、レコード ID が指定されたコンポーネントまたは Lightning ページでのみ機能します。 たとえば、カスタマーサービスインシデント管理フローを Experience Cloud 側またはユーティリティ バーから使用することはできません。</li>
+
+        <li>[変更要求および関連問題をクローズする] フローでは部分的な更新はサポートされません。たとえば、実行中のユーザーに少なくとも 1 つの関連問題へのアクセス権がない場合、フローは失敗します。</li>
+
+        <li>[ケース所有者をインシデント所有者に変更] フローで、ケース所有者を変更できるのは実行中のユーザーにそのケースへのアクセス権がある場合のみです。</li>
+
+        <li>トリガーまたは入力規則エラーのためにフローが失敗する場合があります。フローに関連するすべてのレコードに入力規則エラーがあるかどうかを確認してください。</li>
+
+        <li>[ケース所有者をインシデント所有者に変更] フローで、ケース所有者を変更できるのはインシデント所有者がユーザーである場合のみです。</li>
+
+      </ul>
+</div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_flows">
+<h1 class="slds-text-heading_large">カスタマーサービスインシデント管理フロー</h1>
+  <p>フローを使用してカスタマーサービスインシデント管理プロセスを自動化します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#incident_mgmt_sample_flows">カスタマーサービスインシデント管理のサンプルフロー</a></strong><br>カスタマーサービスインシデント管理には、インシデント解決プロセスを合理化するためにカスタマイズおよび有効化できる一連のサンプルフローが用意されています。</li><li class="slds-p-bottom_small"><strong><a href="#incident_mgmt_flow_considerations">カスタマーサービスインシデント管理フローに関する考慮事項</a></strong><br>カスタマーサービスインシデント管理のサンプルフローを使用するときは、以下の考慮事項に留意してください。</li><li class="slds-p-bottom_small"><strong><a href="incident-3.html#incident_mgmt_setup_flows">カスタマーサービスインシデント管理フローの設定</a></strong><br>[ケース所有者をインシデント所有者に変更] や [変更要求および関連問題をクローズする] などのカスタマーサービスインシデント管理のサンプルフローを使用するには、設定を完了してください。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_identify_incident">
+<h1 class="slds-text-heading_large">インシデントの特定</h1>
+  <p>複数のチームの関係者が関与する広範な顧客の問題が発生したときに迅速に特定し、インシデントの解決に向けて取り組みます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="incident-1.html#incident_mgmt_create_incident">インシデントの作成</a></strong><br>インシデントレコードを作成し、多くの顧客に関与する中断を追跡して特定します。インシデントは、複数のチームがコラボレーションする必要がある広範な顧客の問題を解決する場合に最適です。</li><li class="slds-p-bottom_small"><strong><a href="#incident_mgmt_related_incidents">インシデントに関連する問題の特定</a></strong><br>インシデントを特定して解決する作業をするときには、全体像を念頭に置いて連動関係を追跡し、関連リストを使用して可能性のある波及効果を把握します。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_identify_problems">
+<h1 class="slds-text-heading_large">問題に関連する問題の特定</h1>
+  <p>問題を診断し、インシデントを解決する作業をするときには、全体像を念頭に置いて連動関係を追跡し、関連リストを使用して可能性のある波及効果を把握します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">
+        問題の影響を受ける納入商品の追跡
+      </h2><p>問題の [関連] タブから、広範な問題の影響を受ける納入商品を追加し、[関連納入商品] で影響を定義します。</p><div style="text-align:left;">
+        <img alt="[新規問題関連項目] ウィンドウ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_problem_asset.png">
+      </div></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">
+        問題に関連する問題およびインシデントの追跡
+      </h2><p>問題の [関連] タブから、問題の原因となるまたは類似するインシデントや問題を追加します。</p><div style="text-align:left;">
+        <img alt="新規関連する問題とインシデント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_related_problem.png">
+      </div></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">
+        問題に関連するケースの追跡
+      </h2><p>問題の [関連] タブから、問題の根本原因となるまたは類似するケースを追加します。関連する問題とインシデントは、ケースの関連問題にも表示されます。</p><div style="text-align:left;">
+        <img alt="[新規ケース関連の問題]" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_related_problem_case.png">
+      </div></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">
+        問題に関連する変更要求の追跡
+      </h2><p>問題の [関連] タブから、問題を解決した変更要求を追加します。カスタム値を使用して変更要求の影響を測定することもできます。</p><div style="text-align:left;">
+        <img alt="新規変更要求関連の問題" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_related_problem_change_request.png">
+      </div></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">
+        問題に関連するスウォームおよびスウォームメンバーの追跡
+      </h2><p>問題の [関連] タブから、問題に関連する Slack スウォームおよびスウォームメンバーを確認します。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_integrations">
+<h1 class="slds-text-heading_large">カスタマーサービスインシデント管理のインテグレーションの設定</h1>
+  <p>カスタマーサービスインシデント管理をパートナーシステムと統合し、潜在的な問題を特定して、致命的な問題になる前に問題に積極的に対応します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> カスタマーサービスインシデント管理とのインテグレーションはパートナーが所有しています。パートナーインテグレーションに関連する問題が発生した場合は、パートナーのサポートチームにお問い合わせください。Salesforce 機能に関連する問題については、Salesforce サポートにお問い合わせください。</div></div></div>
+<table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: 標準の Agentforce Service (旧 Service Cloud) ライセンスを使用する Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Unlimited</strong> Edition、<strong>Developer</strong> Edition</td>
+
+            </tr>
+          </tbody></table><p>カスタマーサービスインシデント管理では、次のインテグレーションがサポートされています。</p><ul>
+        <li>自動カスタマーサービスインシデント管理</li>
+
+        <li>Cadalys Service Management</li>
+
+        <li>Datadog</li>
+
+        <li>MuleSoft Composer を介した Jira (ベータ)</li>
+
+        <li>PagerDuty</li>
+
+        <li>Salesforce 重大インシデントセンター</li>
+
+        <li>MuleSoft Composer を介した ServiceNow (ベータ)</li>
+
+      </ul>
+</div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://support.pagerduty.com/docs/salesforce-service-cloud-integration-guide">PagerDuty ヘルプ: Salesforce サービスインテグレーションガイド </a></li><li><a target="_blank" href="https://www.youtube.com/watch?v=9VzHCLbWn_Y">Cadalys 動画: Native ITSM for Salesforce (Salesforce のネイティブ ITSM) </a></li></ul></div>
+<div id="incident_mgmt_integrations_setup" lang="ja-jp" aria-labelledby="ariaid-title2" class="nested1"><a name="incident_mgmt_integrations_setup"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">AppExchange インテグレーションのインストール</h2>
+  <p>カスタマーサービスインシデント管理用の AppExchange パッケージを使用して、Salesforce から直接外部システムの機能を活用します。</p>
+
+    <ol><li>
+        <span>[設定] の [クイック検索] ボックスに<kbd>「カスタマーサービスインシデント管理」</kbd>と入力し、<strong class="uicontrol">[カスタマーサービスインシデント管理]</strong> をクリックします。</span>
+      </li><li>
+        <span>[インテグレーション] でインテグレーションを選択して管理パッケージをインストールします。</span>
+      </li></ol>
+
+  
+</div>
+<div id="incident_mgmt_mulesoft_integrations" lang="ja-jp" aria-labelledby="ariaid-title3" class="nested1"><a name="incident_mgmt_mulesoft_integrations"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">MuleSoft Composer によるインテグレーションのインストール</h2>
+  <p>カスタマーサービスインシデント管理を最大限に活用するには、Agentforce Service（旧称Service Cloud）をMuleSoft Composerテンプレートを利用したJiraやServiceNowなどのサードパーティインテグレーションと統合します。</p>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Service Cloud は Agentforce Service になりました。Salesforce アプリケーションおよびドキュメントで Service Cloud を参照することがあります。</div></div></div>
+
+    <p>ServiceNowのCMDBとカスタマーサービスインシデント管理間で同期されたインシデントを使用して、Agentforceサービスでサポート担当者の生産性を維持します。MuleSoft Composer ServiceNow テンプレート (ベータ) を使用すると、Salesforce のアセットとインシデントを ServiceNow CMDB と同期できます。その逆も同様です。</p>
+    <p>また、MuleSoft Composer Jira テンプレート (ベータ) を使用することで、エンジニアは Jira のエピック、ストーリー、タスクをカスタマーサービスインシデント管理に合わせて調整し、効率的にインシデントを解決できます。Jira の問題とカスタマーサービスインシデント管理レコード間の接続を作成して、エンジニアリングチームとカスタマーサービスチームが常に同期できるようにします。たとえば、Jira で問題が作成された場合、対応する変更要求が Salesforce で作成され、Jira の問題 ID が添付されます。</p>
+    <p>MuleSoft Composer を使用するカスタマーサービスインシデント管理インテグレーションの使用を開始するには、<a target="_blank" href="https://docs.mulesoft.com/composer-salesforce/ms_composer_build_a_flow_using_templates">MuleSoft Composer テンプレート</a>の使用方法を確認してください。次に、Salesforce アカウントエグゼクティブにお問い合わせください。</p>
+  
+</div>
+</div>
+
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_manage_slas">
+<h1 class="slds-text-heading_large">エンタイトルメントとマイルストーンを使用したインシデント SLA の管理</h1>
+  <p>インシデントが発生したときのサポートサービスレベル契約を把握します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table>
+    <div><p>次のツールを使用して、解決までの時間を追跡します。</p><ul><li>マイルストーン<ul><li>インシデントレコードからインシデントのマイルストーンを表示します。<div style="text-align:left;"><img alt="インシデントページレイアウト" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_page_layout.png"></div></li>
+</ul>
+</li>
+<li>エンタイトルメント<ul><li>エンタイトルメントをインシデントに割り当てて、マイルストーンカウンターを開始します。</li>
+<li><strong class="uicontrol">[インシデントが一時停止]</strong> をクリックして、マイルストーンカウンターを一時停止します。</li>
+</ul>
+</li>
+</ul>
+</div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_notify_external_stakeholders">
+<h1 class="slds-text-heading_large">ブロードキャスト通信を使用した外部関係者への通知</h1>
+  <p>進行中のインシデントを顧客に通知するには、サイトバナーやメールなどの外部ブロードキャスト通信を使用します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#incident_mgmt_send_a_broadcast_email">ブロードキャストメールの送信</a></strong><br>インシデントの影響を受けた顧客にメールを送信します。定義済みの取引先責任者リストにメールを送信できます。ケースまたは商品がインシデントに添付されている場合は、ケースまたは商品の取引先責任者にブロードキャストメールを送信できます。</li><li class="slds-p-bottom_small"><strong><a href="incident-1.html#incident_mgmt_add_a_broadcast_site_banner">ヘルプサイトへのブロードキャストサイトバナーの追加</a></strong><br>バナーを Web サイトに追加して、処理中のインシデントについて事前に顧客に通知します。ブロードキャストサイトバナーは、有効なバナーがないサイトにのみ追加できます。</li><li class="slds-p-bottom_small"><strong><a href="#incident_mgmt_deactivate_broadcast_site_banner">ブロードキャストサイトバナーの無効化</a></strong><br>インシデントが解決したら、バナーを無効にしてサイトから削除します。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_notify_internal_stakeholders">
+<h1 class="slds-text-heading_large">ブロードキャスト通信を使用した内部関係者への通知</h1>
+  <p>インシデントチームや内部関係者に進行中のインシデントを通知するには、ブロードキャストアラートまたは Slack メッセージを使用します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#incident_mgmt_send_a_broadcast_alert">ブロードキャストアラートの送信</a></strong><br>インシデントが発生したら、直接アクションを実行して問題をすばやく解決できるように、適切なチームメンバーにアラートを送信します。アラートは、グループに割り当てられたトピックに基づいてチームに転送されます。たとえば、ハードウェアの問題に関連するインシデントが発生した場合、ブロードキャストトピックとして [Hardware Issue (ハードウェアの問題)] を選択します。ハードウェアの問題を処理するインシデントグループに通知されます。</li><li class="slds-p-bottom_small"><strong><a href="#incident_mgmt_respond_to_a_broadcast_alert">ブロードキャストアラートへの応答</a></strong><br>ブロードキャストアラートに対処できるように、インシデントアラートユーティリティで、最近発生したインシデントと現在のインシデントに関連ケースを添付します。インシデントを開いて詳細を確認することもできます。インシデントアラートユーティリティを使用するには、システム管理者がこのユーティリティをサービスアプリケーションに追加する必要があります。</li><li class="slds-p-bottom_small"><strong><a href="incident-3.html#incident_mgmt_send_a_broadcast_slack_message">ブロードキャスト Slack メッセージの送信</a></strong><br>インシデントが発生したときに、ブロードキャスト Slack メッセージで関係者とリーダーチームに最新情報を提供します。ブロードキャスト Slack メッセージは、関連付けられた Slack チャンネルへのアクセス権を持つすべてのユーザーに表示されます。</li><li class="slds-p-bottom_small"><strong><a href="incident-3.html#incident_mgmt_update_slack_message">ブロードキャスト Slack メッセージの更新</a></strong><br>新しいブロードキャスト Slack メッセージを送信せずに関係者に最新情報を通知するには、ブロードキャスト Slack メッセージのインシデント項目を更新して、最新の変更を反映します。</li><li class="slds-p-bottom_small"><strong><a href="#incident_mgmt_delete_broadcast_slack">ブロードキャスト Slack メッセージの削除</a></strong><br>インシデントが解決された場合や関連性がなくなった場合には、サービスコンソールを離れることなく、ブロードキャスト Slack メッセージを Slack チャンネルから削除します。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_objects">
+<h1 class="slds-text-heading_large">カスタマーサービスインシデント管理のオブジェクトと項目 </h1>
+  <p>カスタマーサービスインシデント管理を使用すると、サービスチームは、可視性の向上と中断への迅速な対応のために必要なツールとワークフローを取得できます。手順は次のとおりです。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">
+        カスタマーサービスインシデント管理のオブジェクト
+      </h2><div><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"></colgroup><thead class="slds-text-title_caps">
+              <tr class="">
+                <th id="d20452e66" style="vertical-align:top;" class="slds-cell-wrap" scope="col">オブジェクト</th>
+                <th id="d20452e69" style="vertical-align:top;" class="slds-cell-wrap" scope="col">サービスステップ</th>
+                <th id="d20452e72" style="vertical-align:top;" class="slds-cell-wrap" scope="col">ツールと機能</th>
+              </tr>
+            </thead><tbody>
+              <tr class="">
+                <td headers="d20452e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="オブジェクト"><p>
+                    <strong>インシデント</strong>
+                  </p><p style="margin-bottom:0;">インシデントレコードを作成し、多くの顧客に影響する中断を追跡して特定する。</p></td>
+
+                <td headers="d20452e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="サービスステップ">問題を特定する。</td>
+
+                <td headers="d20452e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="ツールと機能"><ul>
+                    <li><strong>サービスの確認の簡略化。</strong>サービスチームと運用チームが統合ワークスペース (サービスコンソール) を使用して共同で作業できるようにし、全員がインシデント、ケース、顧客データを確認できるようにします。</li>
+
+                    <li><strong>重大インシデントの迅速な特定。</strong>インシデントを重大インシデントとしてマークすることでエスカレーションプロセスを簡略化します。</li>
+
+                  </ul>
+</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d20452e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="オブジェクト"><p>
+                    <strong>問題</strong>
+                  </p><p style="margin-bottom:0;">マネージャーとエキスパートが根本原因分析についてコラボレーションする問題レコードを作成する。</p></td>
+
+                <td headers="d20452e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="サービスステップ">問題を調査および診断する。</td>
+
+                <td headers="d20452e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="ツールと機能"><ul>
+                    <li><strong>関連リソースへの接続の追跡。</strong>問題を影響を受けるリソースに接続し、インシデントの根本原因の納入商品の役割を判断します。</li>
+
+                    <li><strong>コミュニティの知識の活用。</strong>Knowledgeを問題に統合することで、サポート担当者は関連するKnowledge記事を検索して問題をすばやく解決できます。</li>
+
+                  </ul>
+</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d20452e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="オブジェクト"><p>
+                    <strong>変更要求</strong>
+                  </p><p style="margin-bottom:0;">根本原因が特定されたら、変更またはリリース要求レコードを作成して、修正をリリースし、問題を解決する。</p></td>
+
+                <td headers="d20452e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="サービスステップ">ソリューションを実装する。</td>
+
+                <td headers="d20452e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="ツールと機能"><ul>
+                    <li><strong>修正の文書化とリリース。</strong>Slack から解決策を実装するステップを取得し、修正をリリースするための適切な承認を取得します。</li>
+
+                    <li><strong>Field Service を使用した派遣作業員の派遣。</strong>フィールドサービス技術者が実行するステップを管理します。</li>
+
+                  </ul>
+</td>
+
+              </tr>
+              <tr class="">
+                <td headers="d20452e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="オブジェクト"><p style="margin-bottom:0;">
+                    <strong>変更要求</strong>
+                  </p></td>
+
+                <td headers="d20452e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="サービスステップ">継続的に学習する。</td>
+
+                <td headers="d20452e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="ツールと機能"><ul>
+                    <li><strong>分析結果に対するアクションの実行。</strong>修正の内容と、類似する問題の再発を防止する方法に関する最新情報をチームに提供します。すべての関連するインシデント、問題、およびケースを自動的にクローズし、影響を受けた顧客に問題が解決されたことを通知するフローを作成します。</li>
+
+                    <li><strong>チャネルによる解決策の公開。</strong>メール、メッセージング、モバイルアプリケーション、セルフサービスポータルなど、いずれかのサービスチャネルでインシデントとその解決策に関するナレッジ記事を共有します。</li>
+
+                  </ul>
+</td>
+
+              </tr>
+            </tbody></table></div></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">
+        インシデントの項目とコンポーネント
+      </h2><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" scope="col">名前</th>
+              <th id="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" scope="col">型</th>
+              <th id="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">アクション &amp; おすすめ</td>
+
+              <td headers="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">コンポーネント</td>
+
+              <td headers="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">アクションのリストを表示します。推奨アクションを表示し、Einstein Next Best Action 戦略の結果を提供します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">営業時間</td>
+
+              <td headers="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">エスカレーションアクションまたはエンタイトルメントプロセスがインシデントに対して実行された時刻を示します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">カテゴリ</td>
+
+              <td headers="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">インシデントの種別。システム管理者が項目値を設定します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">作成者</td>
+
+              <td headers="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">インシデントを作成したユーザー。作成日時も含まれます。この項目は参照のみです。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">説明</td>
+
+              <td headers="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">インシデントの説明。この項目には最大 32 KB のデータを保存できますが、レポートに表示されるのは最初の 255 文字のみです。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">検出日時</td>
+
+              <td headers="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">インシデントが最初に検出された時間。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">終了日時</td>
+
+              <td headers="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">インシデントの終了時間。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">エンタイトルメント名</td>
+
+              <td headers="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">インシデントに追加されるエンタイトルメントの名前。エンタイトルメントが設定されている場合にのみ使用できます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">エンタイトルメント処理開始時刻</td>
+
+              <td headers="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>インシデントがエンタイトルメントプロセスを開始した時刻。インシデントに対する「編集」権限を持っている場合、時刻を更新またはリセットできます。時刻をリセットする場合、次のようになります。</p><ul><li>完了したマイルストーンは影響を受けません。</li>
+<li>完了していないマイルストーンは、新しい開始時刻に基づいて調整されます。</li>
+</ul>
+<p style="margin-bottom:0;">エンタイトルメントプロセスがインシデントに適用される場合、この項目が表示されます。</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">エンタイトルメント処理終了時刻</td>
+
+              <td headers="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">インシデントがエンタイトルメントプロセスを終了した時刻。エンタイトルメントプロセスがケースに適用される場合、この項目が表示されます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">影響</td>
+
+              <td headers="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">インシデントによるカスタマーエクスペリエンスと業務への影響。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">インシデントが完了</td>
+
+              <td headers="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">インシデントが解決されて、待機中のマイルストーンが完了したことを示します。インシデントが [クローズ] に設定されたときに自動的に選択されます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">インシデント番号</td>
+
+              <td headers="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">インシデントに割り当てられる一意の番号。番号は 1 から開始します。参照のみですが、システム管理者は形式を変更できます。ほとんどの場合、インシデント番号は連続して増えていきますが、連続した番号をスキップすることもあります。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">インシデント所有者</td>
+
+              <td headers="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">インシデントを所有するように割り当てられたユーザーまたはキュー。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">インシデントが一時停止</td>
+
+              <td headers="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">インシデントのエンタイトルメントプロセスを一時停止します。これは、顧客の回答を待機しているときに必要になる場合があります。エンタイトルメントプロセスは、最大 300 回一時停止できます。エンタイトルメントプロセスがインシデントに適用される場合、この項目が表示されます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">インシデントが一時停止した日</td>
+
+              <td headers="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">インシデントのエンタイトルメントプロセスが一時停止した日時を表示します。エンタイトルメントプロセスがインシデントに適用される場合、この項目が表示されます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">最終更新者</td>
+
+              <td headers="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">インシデントを最後に更新したユーザー。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">最終更新日</td>
+
+              <td headers="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">インシデントが最後に更新された日時。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">重大インシデント</td>
+
+              <td headers="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">インシデントが広範囲でビジネスに不可欠であることを示します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">マイルストーン</td>
+
+              <td headers="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">コンポーネント</td>
+
+              <td headers="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">インシデントにリンクされているすべての有効なマイルストーンと完了したマイルストーンを表示します。有効なマイルストーンにはカウントダウンが表示されます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">マイルストーン状況</td>
+
+              <td headers="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">マイルストーンは、エンタイトルメントプロセスの 1 ステップです。エンタイトルメントプロセスがインシデントに適用される場合、この項目が表示されます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">親インシデント</td>
+
+              <td headers="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">インシデント階層で、1 つ以上の関連インシデントより上位にあるインシデント。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">優先度</td>
+
+              <td headers="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">[緊急] 項目と [影響] 項目によって決定されるインシデントの優先度。システム管理者が項目値を設定します。各値には最大 20 文字を入力できます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">優先度の上書きの理由</td>
+
+              <td headers="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">優先度を変更または編集する必要がある理由。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">レポート方法</td>
+
+              <td headers="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">インシデントがカスタマーサービスにレポートされた方法を示します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">解決日時</td>
+
+              <td headers="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">インシデントが解決された日時。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">解決者</td>
+
+              <td headers="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">インシデントを解決したユーザーを示します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">開始日時</td>
+
+              <td headers="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">インシデントの開始時間。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">状況</td>
+
+              <td headers="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">インシデントの状況 (オープン、クローズ済みなど)。システム管理者が項目値を設定します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">状況コード</td>
+
+              <td headers="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">インシデントの状況 (オープン、クローズ済みなど)。[状況] 項目に連動します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">サブカテゴリ</td>
+
+              <td headers="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">インシデントの種別。カテゴリよりも 1 つ深いレベルです。システム管理者が項目値を設定します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">件名</td>
+
+              <td headers="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">インシデントの簡単な説明。[件名] 項目は、デフォルトでインシデントリストビューに表示されます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">種別</td>
+
+              <td headers="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">インシデントの種別 (質問、問題など)。システム管理者が項目値を設定します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e236" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">緊急度</td>
+
+              <td headers="d20452e239" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e242" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">インシデントの緊急度。システム管理者が項目値を設定します。各値には最大 20 文字を入力できます。</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">
+        問題の項目とコンポーネント
+      </h2><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d20452e691" style="vertical-align:top;" class="slds-cell-wrap" scope="col">名前</th>
+              <th id="d20452e694" style="vertical-align:top;" class="slds-cell-wrap" scope="col">型</th>
+              <th id="d20452e697" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d20452e691" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">アクション &amp; おすすめ</td>
+
+              <td headers="d20452e694" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">コンポーネント</td>
+
+              <td headers="d20452e697" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">アクションのリストを表示します。推奨アクションを表示し、Einstein Next Best Action 戦略の結果を提供します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e691" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">カテゴリ</td>
+
+              <td headers="d20452e694" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e697" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">問題の種別。システム管理者が項目値を設定します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e691" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">作成者</td>
+
+              <td headers="d20452e694" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e697" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">問題を作成したユーザー。作成日時も含まれます。この項目は参照のみです。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e691" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">作成日</td>
+
+              <td headers="d20452e694" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e697" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">問題が作成された日時。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e691" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">説明</td>
+
+              <td headers="d20452e694" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e697" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">問題の説明。この項目には最大 32 KB のデータを保存できますが、レポートに表示されるのは最初の 255 文字のみです。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e691" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">影響</td>
+
+              <td headers="d20452e694" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e697" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">問題によるカスタマーエクスペリエンスと業務への影響。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e691" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">最終更新者</td>
+
+              <td headers="d20452e694" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e697" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">問題を最後に更新したユーザー。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e691" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">最終更新日</td>
+
+              <td headers="d20452e694" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e697" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">問題が最後に更新された日時。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e691" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">親問題</td>
+
+              <td headers="d20452e694" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e697" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">問題階層で、1 つ以上の関連問題より上位にある問題。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e691" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">優先度</td>
+
+              <td headers="d20452e694" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e697" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">問題の優先度。システム管理者が項目値を設定します。各値には最大 20 文字を入力できます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e691" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">優先度の上書きの理由</td>
+
+              <td headers="d20452e694" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e697" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">優先度を変更または編集する必要がある理由。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e691" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">問題番号</td>
+
+              <td headers="d20452e694" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e697" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">問題に割り当てられる一意の番号。数字は 1 から始まり、参照のみです。ほとんどの場合、問題番号は連続して増えていきますが、連続した番号をスキップすることもあります。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e691" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">問題所有者</td>
+
+              <td headers="d20452e694" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e697" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">問題を所有するように割り当てられたユーザー。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e691" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">解決日</td>
+
+              <td headers="d20452e694" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e697" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">問題が解決された日時。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e691" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">解決者</td>
+
+              <td headers="d20452e694" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e697" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">問題を解決したユーザーを示します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e691" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">根本原因概要</td>
+
+              <td headers="d20452e694" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e697" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">問題の解決策または根本原因の説明。この項目には最大 32 KB のデータを保存できますが、レポートに表示されるのは最初の 255 文字のみです。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e691" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">状況</td>
+
+              <td headers="d20452e694" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e697" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">問題の状況 (オープン、クローズ済みなど)。システム管理者が項目値を設定します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e691" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">状況コード</td>
+
+              <td headers="d20452e694" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e697" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">問題の状況 (オープン、クローズ済みなど)。[状況] 項目に連動します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e691" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">サブカテゴリ</td>
+
+              <td headers="d20452e694" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e697" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">問題の種別。カテゴリよりも 1 つ深いレベルです。システム管理者が項目値を設定します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e691" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">件名</td>
+
+              <td headers="d20452e694" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e697" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">問題の簡単な説明。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e691" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">緊急度</td>
+
+              <td headers="d20452e694" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e697" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">問題の緊急度。システム管理者が項目値を設定します。各値には最大 20 文字を入力できます。</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">
+        変更要求の項目とコンポーネント
+      </h2><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d20452e982" style="vertical-align:top;" class="slds-cell-wrap" scope="col">名前</th>
+              <th id="d20452e985" style="vertical-align:top;" class="slds-cell-wrap" scope="col">型</th>
+              <th id="d20452e988" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d20452e982" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">アクション &amp; おすすめ</td>
+
+              <td headers="d20452e985" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">コンポーネント</td>
+
+              <td headers="d20452e988" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">アクションのリストを表示します。推奨アクションを表示し、Einstein Next Best Action 戦略の結果を提供します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e982" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">ビジネスの正当性</td>
+
+              <td headers="d20452e985" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e988" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">変更を実装するビジネス上の理由の説明。この項目には最大 32 KB のデータを保存できますが、レポートに表示されるのは最初の 255 文字のみです。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e982" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">ビジネスの理由</td>
+
+              <td headers="d20452e985" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e988" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ビジネスの正当性のテーマまたは種別。システム管理者が項目値を設定します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e982" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">カテゴリ</td>
+
+              <td headers="d20452e985" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e988" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">変更要求の種別。システム管理者が項目値を設定します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e982" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">変更要求番号</td>
+
+              <td headers="d20452e985" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e988" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">変更要求に割り当てられる一意の番号。数字は 1 から始まり、参照のみです。ほとんどの場合、変更要求番号は連続して増えていきますが、連続した番号をスキップすることもあります。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e982" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">変更要求所有者</td>
+
+              <td headers="d20452e985" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e988" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">変更要求を所有するように割り当てられたユーザー。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e982" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">作成者</td>
+
+              <td headers="d20452e985" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e988" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">変更要求を作成したユーザー。作成日時も含まれます。この項目は参照のみです。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e982" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">作成日</td>
+
+              <td headers="d20452e985" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e988" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">変更要求が作成された日時。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e982" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">説明</td>
+
+              <td headers="d20452e985" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e988" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">変更要求の説明。この項目には最大 32 KB のデータを保存できますが、レポートに表示されるのは最初の 255 文字のみです。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e982" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">終了時刻 (推定)</td>
+
+              <td headers="d20452e985" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e988" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">変更要求が実装される予定の日時。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e982" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">最終確認メモ</td>
+
+              <td headers="d20452e985" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e988" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">変更要求確認者が残したメモ。この項目には最大 32 KB のデータを保存できますが、レポートに表示されるのは最初の 255 文字のみです。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e982" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">影響</td>
+
+              <td headers="d20452e985" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e988" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">変更要求によるカスタマーエクスペリエンスと業務への影響。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e982" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">影響分析</td>
+
+              <td headers="d20452e985" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e988" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ビジネスと顧客への影響の説明。この項目には最大 32 KB のデータを保存できますが、レポートに表示されるのは最初の 255 文字のみです。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e982" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">最終更新者</td>
+
+              <td headers="d20452e985" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e988" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">変更要求を最後に更新したユーザー。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e982" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">最終更新日</td>
+
+              <td headers="d20452e985" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e988" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">変更要求が最後に更新された日時。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e982" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">優先度</td>
+
+              <td headers="d20452e985" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e988" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">変更要求の優先度。システム管理者が項目値を設定します。各値には最大 20 文字を入力できます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e982" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">改善プラン</td>
+
+              <td headers="d20452e985" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e988" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">インシデントの解決に必要なステップの説明。この項目には最大 32 KB のデータを保存できますが、レポートに表示されるのは最初の 255 文字のみです。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e982" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">確認日時</td>
+
+              <td headers="d20452e985" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e988" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">変更要求が確認された日時。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e982" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">確認者</td>
+
+              <td headers="d20452e985" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e988" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">変更要求を確認したユーザー。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e982" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">リスクレベル</td>
+
+              <td headers="d20452e985" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e988" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">変更要求の実装に伴うリスクの評価。システム管理者が項目値を設定します。各値には最大 20 文字を入力できます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e982" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">開始時刻 (推定)</td>
+
+              <td headers="d20452e985" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e988" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">変更要求が実装される予定の日時。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e982" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">状況</td>
+
+              <td headers="d20452e985" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e988" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">変更要求の状況 (オープン、クローズ済みなど)。システム管理者が項目値を設定します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e982" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">状況コード</td>
+
+              <td headers="d20452e985" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e988" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">変更要求の状況 (オープン、クローズ済みなど)。[状況] 項目に連動します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e982" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">件名</td>
+
+              <td headers="d20452e985" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e988" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">変更要求の簡単な説明。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e982" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">変更の種別</td>
+
+              <td headers="d20452e985" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">項目</td>
+
+              <td headers="d20452e988" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">実装する必要がある変更の種別。システム管理者が項目値を設定します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d20452e982" style="vertical-align:top;" class="slds-cell-wrap" data-label="名前">作業プラン</td>
+
+              <td headers="d20452e985" style="vertical-align:top;" class="slds-cell-wrap" data-label="型">コンポーネント</td>
+
+              <td headers="d20452e988" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">変更要求の作業プランとそれに関連付けられた作業ステップのリストを表示します。</td>
+
+            </tr>
+          </tbody></table></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_related_change_requests">
+<h1 class="slds-text-heading_large">変更要求に関連する問題の特定</h1>
+  <p>インシデントを解決する作業をするときには、全体像を念頭に置いて連動関係を追跡し、関連リストを使用して可能性のある波及効果を把握します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">
+        変更要求に関連する問題およびインシデントの追跡
+      </h2><p>変更要求の [関連] タブから、変更要求の原因となるまたは変更要求によって解決されたインシデントや問題を追加します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">
+        変更要求の影響を受ける納入商品の追跡
+      </h2><p>変更要求の [関連] タブから、変更要求の影響を受ける納入商品を追加し、[関連納入商品] で影響を定義します。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_related_incidents">
+<h1 class="slds-text-heading_large">インシデントに関連する問題の特定</h1>
+  <p>インシデントを特定して解決する作業をするときには、全体像を念頭に置いて連動関係を追跡し、関連リストを使用して可能性のある波及効果を把握します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">
+        子インシデントの追跡
+      </h2><p>インシデントの [関連] タブから、親インシデントに関連する子インシデントを追加します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">
+        インシデントの影響を受ける納入商品の追跡
+      </h2><p>インシデントの [関連] タブから、広範な問題に関与する納入商品を追加し、[関連納入商品] で影響を定義します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">
+        インシデントに関連する問題およびインシデントの追跡
+      </h2><p>インシデントの [関連] タブから、インシデントの原因となるまたは類似するインシデントや問題を追加します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">
+        インシデントに関連するケースの追跡
+      </h2><p>インシデントの [関連] タブから、インシデントの根本原因となるまたは類似するケースを追加します。関連するインシデントと問題は、ケースの関連問題にも表示されます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">
+        インシデントに関連する商品とアセットの追跡
+      </h2><p>インシデントの [関連] タブから、インシデントの影響を受ける商品やアセットを追加します。</p><p>インシデント関連の項目を使用するときは、次の点に留意してください。</p><ul>
+        <li>[関連納入商品] または [商品] 関連リストの [新規] ボタンは、インシデントページレイアウトでのみ使用できます。[障害関連項目] 関連リストがレイアウトに追加されている場合、他のオブジェクトページにこのボタンを追加したり、そのページから削除したりできません。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">
+        インシデントに関連する変更要求の追跡
+      </h2><p>インシデントの [関連] タブから、インシデントを解決した変更要求を追加します。カスタム値を使用して変更要求の影響を測定することもできます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">
+        インシデントに関連するスウォームおよびスウォームメンバーの追跡
+      </h2><p>インシデントの [関連] タブから、インシデントに関連する Slack スウォームおよびスウォームメンバーを確認します。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_reporting">
+<h1 class="slds-text-heading_large">カスタマーサービスインシデント管理のレポート</h1>
+  <p>[カスタマーサービスインシデント管理ダッシュボード] 管理パッケージを使用してチームがインシデントを解決する方法を確認します。作成されたインシデント、問題、変更要求の数と、完了したそれらの数を追跡します。また、月次の有効ユーザー数を使用してユーザーの採用を測定します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>[設定] の [クイック検索] ボックスに<kbd>「カスタマーサービスインシデント管理」</kbd>と入力し、<strong class="uicontrol">[カスタマーサービスインシデント管理]</strong> をクリックします。</span>
+      </li><li>
+        <span>[インテグレーション] で [最適化とレポート] を探して、[カスタマーサービスインシデント管理ダッシュボード] 管理パッケージをインストールします。</span>
+        <div>
+          <div>
+            <a name="incident_mgmt_reporting__image_zsx_gtc_tcc"></a><img alt="インシデント管理ダッシュボード" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_insights.png" id="incident_mgmt_reporting__image_zsx_gtc_tcc" style="width:800px;">
+          </div>
+        </div>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_resolve_incident">
+<h1 class="slds-text-heading_large">インシデントの解決</h1>
+  <p>インシデント管理チームは、問題を診断して解決策を見つけた後に変更要求を使用できます。これにより、サービスチームは必要なステップを簡単に決めることができ、問題またはインシデントが再発生しないようにできます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="incident-1.html#incident_mgmt_create_change_request">変更要求の作成</a></strong><br>問題にソリューションをロールアウトし、インシデントを解決するには、変更要求を作成します。</li><li class="slds-p-bottom_small"><strong><a href="#incident_mgmt_roll_out_fix">作業プランを使用した修正のロールアウト</a></strong><br>作業プランとその作業ステップを使用して、変更要求を送信し、インシデントを解決するために必要な一連のステップの概要を決定します。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_respond_to_a_broadcast_alert">
+<h1 class="slds-text-heading_large">ブロードキャストアラートへの応答</h1>
+  <p>ブロードキャストアラートに対処できるように、インシデントアラートユーティリティで、最近発生したインシデントと現在のインシデントに関連ケースを添付します。インシデントを開いて詳細を確認することもできます。インシデントアラートユーティリティを使用するには、システム管理者がこのユーティリティをサービスアプリケーションに追加する必要があります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table><ul>
+        <li>カスタマーサービスインシデント管理が有効になっている必要があります。</li>
+
+        <li>ブロードキャストアラートが有効である必要があります。</li>
+
+        <li>ブロードキャストトピックをグループに割り当てる必要があります。</li>
+
+      </ul>
+</div>
+    <ol><li>
+        <span>インシデントアラートユーティリティを開きます。</span>
+      </li><li>
+        <span>最近のブロードキャストアラートを表示して管理するには、[最新] タブに移動します。このタブで、インシデントを開いたり、ケースを添付したりできます。<div style="text-align:left;"><img alt="[最新] タブで開かれたインシデントアラートボックス。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_broadcast_alert_newest.png"></div></span>
+      </li><li>
+        <span>すべてのインシデントのリストを表示してアクションを実行するには、[すべて] タブに移動します。<div style="text-align:left;"><img alt="[すべて] タブで開かれたインシデントアラートボックス。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_broadcast_alert_all.png"></div></span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_roll_out_fix">
+<h1 class="slds-text-heading_large">作業プランを使用した修正のロールアウト</h1>
+  <p>作業プランとその作業ステップを使用して、変更要求を送信し、インシデントを解決するために必要な一連のステップの概要を決定します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="incident-1.html#incident_mgmt_admin_setup_work_plan">システム管理者による設定</a></strong><br>インシデント管理チーム用の合理化された作業プランプロセスを設定します。</li><li class="slds-p-bottom_small"><strong><a href="incident-1.html#incident_mgmt_agent_work_plans">サポート担当者の作業プラン</a></strong><br>作業プランを使用して、迅速にインシデントを解決します。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_route_incidents">
+<h1 class="slds-text-heading_large">オムニチャネルを使用した適切なチームへのインシデントの転送</h1>
+  <p>インシデントが発生したら、オムニチャネルのキューベースまたはスキルベースのルーティングを使用して、インシデントを適切なチームに転送します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table>
+    <p>インシデントのオムニチャネルを設定する前に、オムニチャネルを有効にします。インシデントのスキルベースのルーティングルールを設定する場合、スキルベースのルーティングを有効にします。</p>
+  
+<ol><li class="slds-p-bottom_small"><strong><a href="incident-1.html#incident_mgmt_create_incident_channel">インシデントチャネルの作成</a></strong><br>オムニチャネルを介してインシデントをサポート担当者に転送します。</li><li class="slds-p-bottom_small"><strong><a href="#incident_mgmt_create_presence_status">インシデントプレゼンス状況の設定</a></strong><br>インシデントチャネルに割り当てられたサポート担当者がインシデントを解決できるとマークできるようにします。</li><li class="slds-p-bottom_small"><strong><a href="#incident_mgmt_create_queue">インシデントキューの作成</a></strong><br>インシデントを特定のキューに自動的に転送します。</li><li class="slds-p-bottom_small"><strong><a href="#incident_mgmt_create_skill">スキルベースルーティングのインシデントスキルの作成</a></strong><br>適切なスキルを持つサポート担当者がインシデントを解決できるように、スキルに基づいてインシデントをサポート担当者に転送します。</li><li class="slds-p-bottom_small"><strong><a href="omnichannel-1.html#incident_mgmt_setup_routing">インシデントのルーティング設定の定義</a></strong><br>サポート担当者をインシデントに転送します。</li></ol>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_sample_flows">
+<h1 class="slds-text-heading_large">カスタマーサービスインシデント管理のサンプルフロー</h1>
+  <p>カスタマーサービスインシデント管理には、インシデント解決プロセスを合理化するためにカスタマイズおよび有効化できる一連のサンプルフローが用意されています。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">
+        変更要求および関連問題をクローズする
+      </h2><p>インシデントを解決するときの反復作業を排除するために、変更要求と、ケースや問題、インシデントなどの関連問題を自動的にクローズします。</p><div><p>たとえば、サポート担当者が変更要求を完了とマークする準備ができたら、サポート担当者は変更要求の [アクション &amp; おすすめ] コンポーネントから「変更要求および関連問題をクローズする」フローを使用できます。</p><div style="text-align:left;"><img alt="[アクション &amp;amp; おすすめ] コンポーネントの [変更要求をクローズする] フロー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_close_change_request_arcomponent.png"></div></div><div><p>フローを起動したら、クローズする関連問題を選択するよう要求する画面が表示されます。</p><div style="text-align:left;"><img alt="[変更要求および関連問題をクローズする] 画面" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_close_change_request_screen.png"></div></div></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">
+        ケース所有者をインシデント所有者に変更
+      </h2><p>ケースが包括的なインシデントの一部として特定された場合に重複作業を避けるために、ケース所有者を自動的にインシデント所有者に変更します。</p><div><p>たとえば、サポート担当者が、進行中のインシデントに関連するとマークされたケースの流入を確認したが、ケース所有者とインシデント所有者が異なることに気付いたとします。サポート担当者はインシデントの [アクション &amp; おすすめ] コンポーネントから [ケース所有者をインシデント所有者に変更] フローを使用できます。</p><div style="text-align:left;"><img alt="[アクション &amp;amp; おすすめ] コンポーネントの [ケース所有者を変更] フロー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_change_case_owner_arcomponent.png"></div></div><div><p>フローを起動したら、ケースの所有者をインシデント所有者に変更することを確認する画面が表示されます。</p><div><img alt="[ケース所有者をインシデント所有者に変更] 画面" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_change_case_owner_screen.png"></div></div></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_send_a_broadcast_alert">
+<h1 class="slds-text-heading_large">ブロードキャストアラートの送信</h1>
+  <p>インシデントが発生したら、直接アクションを実行して問題をすばやく解決できるように、適切なチームメンバーにアラートを送信します。アラートは、グループに割り当てられたトピックに基づいてチームに転送されます。たとえば、ハードウェアの問題に関連するインシデントが発生した場合、ブロードキャストトピックとして [Hardware Issue (ハードウェアの問題)] を選択します。ハードウェアの問題を処理するインシデントグループに通知されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table><ul>
+        <li>カスタマーサービスインシデント管理が有効になっている必要があります。</li>
+
+        <li>ブロードキャストアラートが有効である必要があります。</li>
+
+        <li>ブロードキャストトピックをグループに割り当てる必要があります。</li>
+
+      </ul>
+</div>
+    <ol><li>
+        <span>[インシデント] 関連リストに移動し、[ブロードキャスト通信] 関連リストを見つけます。</span>
+      </li><li>
+        <span><strong class="uicontrol">[新規ブロードキャストアラート]</strong> をクリックします。</span>
+      </li><li>
+        <span>関連性の高いブロードキャストトピックを選択して、<strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>アラートを確認して、[<strong class="uicontrol">送信]</strong> をクリックします。<div style="text-align:left;"><img alt="ブロードキャストアラートのプレビューボックス。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_broadcast_alert_preview.png"></div></span>
+      </li></ol>
+
+    <div><p>ブロードキャストアラートを送信すると、アラートのグループのチームメンバーのインシデントアラートユーティリティの [最新] タブに表示されます。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="ブロードキャストアラートに対処できるように、インシデントアラートユーティリティで、最近発生したインシデントと現在のインシデントに関連ケースを添付します。インシデントを開いて詳細を確認することもできます。インシデントアラートユーティリティを使用するには、システム管理者がこのユーティリティをサービスアプリケーションに追加する必要があります。" href="#incident_mgmt_respond_to_a_broadcast_alert">ブロードキャストアラートへの応答</a></li><li><a title="インシデントが発生したときにユーザーがアプリケーション内アラートを送信できるようにするには、ブロードキャストアラートを有効にして、ブロードキャストトピックを作成し、グループに割り当てます。次に、カスタム Lightning コンソールアプリケーションを使用している場合は、インシデントアラートウィジェットをコンソールに追加します。" href="incident-3.html#incident_mgmt_setup_broadcast_alerts">ブロードキャストアラートの設定</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_send_a_broadcast_email">
+<h1 class="slds-text-heading_large">ブロードキャストメールの送信</h1>
+  <p>インシデントの影響を受けた顧客にメールを送信します。定義済みの取引先責任者リストにメールを送信できます。ケースまたは商品がインシデントに添付されている場合は、ケースまたは商品の取引先責任者にブロードキャストメールを送信できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table><ul>
+        <li>カスタマーサービスインシデント管理が有効になっている必要があります。</li>
+
+        <li>ブロードキャストメールが有効である必要があります。</li>
+
+      </ul>
+</div>
+    <ol><li>
+        <span>[インシデント] 関連リストに移動し、[ブロードキャスト通信] 関連リストを見つけます。</span>
+      </li><li>
+        <span>ブロードキャストメールの送信方法を選択して、<strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[新規ブロードキャストメール]</strong> をクリックします。</span>
+      </li><li>
+        <span>メールを作成し、<strong class="uicontrol">[プレビューして送信]</strong> をクリックします。</span>
+      </li><li>
+        <span>メールを送信するには、[<strong class="uicontrol">送信]</strong> をクリックします。<div style="text-align:left;"><img alt="ブロードキャストメールのプレビューボックス。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_broadcast_email_preview.png"></div></span>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="インシデントが発生したときにユーザーがブロードキャストメールを送信できるようにするには、ブロードキャストメールを有効化し、取引先責任者リストビューを作成/管理するか、ユーザーがインシデントに関連するケースまたは商品の取引先責任者にブロードキャストメールを送信できるようにします。" href="incident-3.html#incident_mgmt_setup_broadcast_emails">ブロードキャストメールの設定</a></li></ul></div>
+</div></div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="incident-1.html">&larr; インシデント管理・スウォーミング（1/3）</a><a href="incident-3.html">インシデント管理・スウォーミング（3/3） &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=service.service_cloud.htm&type=5&language=ja">help.salesforce.com — Salesforce Service Cloud（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>

@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Salesforce Maps Advanced・テリトリープランニング（2/2） | Salesforce Maps ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（24）</h2>
+    <ol>
+      <li><a href="#salesforce_maps_adv_visitplan_datasets">データセットを作成して優先度を付ける</a></li>
+      <li><a href="#salesforce_maps_adv_visitplan_datasets_create">ルート生成用データセットを作成する</a></li>
+      <li><a href="#salesforce_maps_adv_visitplan_datasets_create_assign">ルーティング可能レコードを選択してユーザーを割り当てる</a></li>
+      <li><a href="#salesforce_maps_adv_visitplan_datasets_create_defaultoutput">出力レコードのデフォルト値を指定する</a></li>
+      <li><a href="#salesforce_maps_adv_visitplan_datasets_create_events">事前にスケジュールされた訪問に対応する</a></li>
+      <li><a href="#salesforce_maps_adv_visitplan_datasets_create_missedvisits">対応できなかった訪問を Salesforce Maps Advanced で再スケジュールする</a></li>
+      <li><a href="#salesforce_maps_adv_visitplan_datasets_create_name">データセットに名前を付けてルーティング可能オブジェクトを選択する</a></li>
+      <li><a href="#salesforce_maps_adv_visitplan_datasets_create_promotion">プロモーション期間を指定する</a></li>
+      <li><a href="#salesforce_maps_adv_visitplan_datasets_create_requirements">訪問の頻度、訪問時間、訪問期間を指定する</a></li>
+      <li><a href="#salesforce_maps_adv_visitplan_datasets_create_tooltips">Maps にウェイポイントツールチップを表示する</a></li>
+      <li><a href="#salesforce_maps_adv_visitplan_datasets_prioritize">Salesforce Maps Advanced でデータセットに優先度を付ける</a></li>
+      <li><a href="#salesforce_maps_adv_visitplan_name">訪問計画の名前と説明を入力する</a></li>
+      <li><a href="#salesforce_maps_adv_visitplan_options">訪問および最適化のパラメーターの指定</a></li>
+      <li><a href="#salesforce_maps_adv_visitplan_settings">訪問計画の必須設定を定義する</a></li>
+      <li><a href="#salesforce_maps_adv_visitplan_users">訪問計画にユーザーを割り当てる</a></li>
+      <li><a href="#salesforce_maps_advanced_concepts">Salesforce Maps Advanced の基本</a></li>
+      <li><a href="#salesforce_maps_advanced_concepts_implementation_guidelines">ロールアウトに関するガイドライン</a></li>
+      <li><a href="#salesforce_maps_advanced_concepts_minmaxdays">訪問間の日数</a></li>
+      <li><a href="#salesforce_maps_advanced_concepts_route_planning">医薬品担当者のルート計画と対象範囲</a></li>
+      <li><a href="#salesforce_maps_advanced_concepts_scenarios">Salesforce Maps Advanced ルーティングのサンプルシナリオ</a></li>
+      <li><a href="#salesforce_maps_advanced_concepts_tasks_and_roles">ルート最適化におけるタスクと役割の概要</a></li>
+      <li><a href="#salesforce_maps_advanced_concepts_terms">Salesforce Maps Advanced ルーティングの主要な用語と概念</a></li>
+      <li><a href="#salesforce_maps_advanced_concepts_visit_frequencies">消費財担当者向けの複雑な訪問頻度と期間</a></li>
+      <li><a href="#salesforce_maps_advanced_concepts_visit_plans">レストラン取引先担当者用の訪問の優先度付け</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>Salesforce Maps Advanced・テリトリープランニング（2/2）</h1>
+      <div class="meta">Salesforce Maps ヘルプ · 24 記事 · 生成 2026-08-13</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="advanced-1.html">&larr; Salesforce Maps Advanced・テリトリープランニング（1/2）</a><a href="usage.html">活用・ルート最適化・Esri 連携 &rarr;</a></div>
+<section class="article" id="salesforce_maps_adv_visitplan_datasets">
+<h1 class="slds-text-heading_large">データセットを作成して優先度を付ける</h1>
+  <p>Salesforce Maps Advanced では、データセットとはルーティングのための場所データを含む顧客レコードを集めたものです。訪問計画にデータセットを使用し、ルートに配置された顧客、ルートに割り当てられる担当者、顧客訪問の頻度を決定します。ビジネスの優先事項に沿ったルートを作成するには、訪問計画のデータセットに優先度を付けます。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_adv_visitplan_datasets_create">ルート生成用データセットを作成する</a></strong><br>Salesforce Maps Advanced でルートを生成するには、各訪問計画に 1 つ以上のデータセットが必要です。訪問計画に訪問の要件が異なる顧客グループがある場合、それらの顧客を示すデータセットを追加で作成します。たとえば、リードと取引先の両方を訪問する担当者がいる場合、訪問計画ではそれぞれを示す別のデータセットを作成します。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_adv_visitplan_datasets_prioritize">Salesforce Maps Advanced でデータセットに優先度を付ける</a></strong><br>特定の顧客訪問に他と区別する優先度を付ければ、訪問スケジュールがより近い日程で設定され、担当者が訪問目標をより早く達成できる可能性が高まります。たとえば、リードとは異なる訪問目標が設定された取引先がある場合は、別のデータセットを作成し、最も高い優先度を付けます。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_adv_visitplan_datasets_create">
+<h1 class="slds-text-heading_large">ルート生成用データセットを作成する</h1>
+  <p>Salesforce Maps Advanced でルートを生成するには、各訪問計画に 1 つ以上のデータセットが必要です。訪問計画に訪問の要件が異なる顧客グループがある場合、それらの顧客を示すデータセットを追加で作成します。たとえば、リードと取引先の両方を訪問する担当者がいる場合、訪問計画ではそれぞれを示す別のデータセットを作成します。</p>
+<ol><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_adv_visitplan_datasets_create_name">データセットに名前を付けてルーティング可能オブジェクトを選択する</a></strong><br>Salesforce Maps Advanced でルートを生成するには、訪問計画の各データセットにルーティング可能オブジェクトが必要です。ルーティング可能オブジェクトレコードは、取引先など、担当者が訪問する顧客の場所を示します。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_adv_visitplan_datasets_create_assign">ルーティング可能レコードを選択してユーザーを割り当てる</a></strong><br>Salesforce Maps Advanced データセットでルーティングするレコードを選択し、顧客ロケーションの訪問担当ユーザーを決定する項目を指定します。たとえば、取引先担当者やマーチャンダイザーユーザーです。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_adv_visitplan_datasets_create_requirements">訪問の頻度、訪問時間、訪問期間を指定する</a></strong><br>Salesforce Maps Advanced では、訪問の要件を手動で指定するか、ルーティング可能オブジェクトの項目から取得します。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_adv_visitplan_datasets_create_events">事前にスケジュールされた訪問に対応する</a></strong><br>担当者のカレンダーに Salesforce Maps Advanced が生成していない予定がある場合は、ルートの生成時にその予定を入力できます。訪問計画に事前にスケジュールされた訪問を入力すれば、担当者の訪問目標に確実に近づくことができます。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_adv_visitplan_datasets_create_missedvisits">対応できなかった訪問を Salesforce Maps Advanced で再スケジュールする</a></strong><br>ルート最適化中に対応できなかった訪問を再スケジュールするには、担当者が完了した訪問を記録する方法を指定します。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_adv_visitplan_datasets_create_tooltips">Maps にウェイポイントツールチップを表示する</a></strong><br>担当者が Salesforce Maps Advanced でルートを表示するときに、ウェイポイントツールチップで追加情報を表示できます。ウェイポイントとは、担当者のスケジュールやルートに表示される訪問レコードなどの出力レコードのことです。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_adv_visitplan_datasets_create_defaultoutput">出力レコードのデフォルト値を指定する</a></strong><br>より包括的で詳細な出力レコードを作成するには、Salesforce Maps Advanced で訪問計画によって作成されるレコードのデフォルトの項目値を指定します。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_adv_visitplan_datasets_create_promotion">プロモーション期間を指定する</a></strong><br>Salesforce Maps Advanced で顧客プロモーションをサポートするには、特定の時間枠内の顧客訪問に優先度を付けます。この時間枠は、データセットで指定される訪問の頻度の要件に追加されるものです。デフォルトでは、プロモーション期間中に 1 回、顧客ロケーションを訪問するようスケジュールされます。</li></ol>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_adv_visitplan_datasets_create_assign">
+<h1 class="slds-text-heading_large">ルーティング可能レコードを選択してユーザーを割り当てる</h1>
+  <p>Salesforce Maps Advanced データセットでルーティングするレコードを選択し、顧客ロケーションの訪問担当ユーザーを決定する項目を指定します。たとえば、取引先担当者やマーチャンダイザーユーザーです。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>データセットウィザードの [割り当て済みユーザー項目の対応付け] リストから、データセット内のロケーションの訪問を担当するユーザーを示す参照項目を選択します。たとえば、[Route Driver (ルート運転者)] 項目です。</span>
+      </li><li>
+        <span>ルーティング可能オブジェクトに関連する子オブジェクトにユーザー項目がある場合、<strong class="uicontrol">[関連オブジェクトからの担当者の割り当てを使用]</strong> を選択し、以下の項目を入力します。</span>
+        <div>
+          <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:33.11258278145696%"><col style="width:66.88741721854305%"></colgroup><thead class="slds-text-title_caps">
+                <tr class="">
+                  <th id="d11530e78" style="vertical-align:top;" class="slds-cell-wrap" scope="col">項目</th>
+                  <th id="d11530e81" style="vertical-align:top;" class="slds-cell-wrap" scope="col">内容</th>
+                </tr>
+              </thead><tbody>
+                <tr class="">
+                  <td headers="d11530e78" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">子オブジェクト</td>
+
+                  <td headers="d11530e81" style="vertical-align:top;" class="slds-cell-wrap" data-label="内容">担当者などのユーザー項目を含むオブジェクト。</td>
+
+                </tr>
+                <tr class="">
+                  <td headers="d11530e78" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">リレーション項目</td>
+
+                  <td headers="d11530e81" style="vertical-align:top;" class="slds-cell-wrap" data-label="内容">子オブジェクトをルーティング可能オブジェクトに関連付ける項目。</td>
+
+                </tr>
+                <tr class="">
+                  <td headers="d11530e78" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">割り当て項目</td>
+
+                  <td headers="d11530e81" style="vertical-align:top;" class="slds-cell-wrap" data-label="内容">データセット内の場所の訪問を担当するユーザーを示す項目。</td>
+
+                </tr>
+                <tr class="">
+                  <td headers="d11530e78" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">割り当て条件</td>
+
+                  <td headers="d11530e81" style="vertical-align:top;" class="slds-cell-wrap" data-label="内容">レコードの割り当てに使用するユーザーを絞り込むためのフィルター条件。</td>
+
+                </tr>
+              </tbody></table>
+        </div>
+      </li><li>
+        <span>[項目の絞り込み] の下に、データセット内でルーティングするレコードを絞り込むためのフィルター条件を追加します。たとえば、データセットをオーストラリアのシドニーに住む顧客に限定する場合、[市区郡 (請求先)] 項目にフィルター条件を追加します。フィルターを追加しない場合は、指定したユーザー条件を満たすすべてのレコードがデータセットに含まれます。</span>
+        <div>
+          <span style="vertical-align:text-bottom;display:inline-block;"><img alt="[Route Driver (ルート運転者)] 項目の対応付けの割り当て、[市区郡 (請求先)] フィルター条件が表示されたデータセットページ。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/dataset2.png" style="margin-bottom:0;"></span>
+        </div>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+        <div>訪問の要件がデータセットウィザードに表示されます。</div>
+      </li></ol>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> 
+      <p>データセットのルーティング可能オブジェクトには、取引先オブジェクトを使用します。関連取引先チームメンバーオブジェクトレコードは、取引先ユーザーを示します。取引先ごとに複数のチームメンバーが存在する場合があるため、データセットで使用するには、ユーザーレコードを [チーム内の役割] 項目が <kbd>[取引先マネージャー]</kbd> と等しいレコードに絞り込みます。</p>
+    </div></div></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_adv_visitplan_datasets_create_defaultoutput">
+<h1 class="slds-text-heading_large">出力レコードのデフォルト値を指定する</h1>
+  <p>より包括的で詳細な出力レコードを作成するには、Salesforce Maps Advanced で訪問計画によって作成されるレコードのデフォルトの項目値を指定します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>データセットウィザードの [行動] で担当者がルートを生成した後、出力レコードにデフォルトで設定する項目とそれに対応する値を選択します。</span>
+        <div>
+          <span style="vertical-align:text-bottom;display:inline-block;"><img alt="[件名] 項目が、出力レコードのデフォルト項目値である「店舗訪問」になっている [行動] ページ。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/dataset7.png" style="margin-bottom:0;"></span>
+        </div>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+        <div>プロモーション期間を示すオブジェクト、項目、日付が、データセットウィザードに表示されます。</div>
+      </li></ol>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> 
+      <p>訪問計画のカスタム出力オブジェクトは Consumer Goods Visit オブジェクトに基づいています。担当者がルートを生成すると、出力は訪問になります。出力レコードで、[活動種別] のデフォルト値を <kbd>[訪問]</kbd> に、[状況] のデフォルト値を <kbd>[計画済み]</kbd> に指定します。</p>
+    </div></div></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_adv_visitplan_datasets_create_events">
+<h1 class="slds-text-heading_large">事前にスケジュールされた訪問に対応する</h1>
+  <p>担当者のカレンダーに Salesforce Maps Advanced が生成していない予定がある場合は、ルートの生成時にその予定を入力できます。訪問計画に事前にスケジュールされた訪問を入力すれば、担当者の訪問目標に確実に近づくことができます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>訪問計画の出力オブジェクトで、手動でスケジュールされた訪問を追跡します。たとえば、出力 (カレンダー) オブジェクトとして行動オブジェクトを使用すると、手動でスケジュールされた訪問は行動レコードとして表示されます。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> OAuth ユーザーを指定した場合、OAuth ユーザーには他のユーザーの非公開イベントへのアクセス権がないため、ルート最適化時に非公開イベントは考慮されません。</div></div></div>
+</div>
+    <ol><li>
+        <span>データセットウィザードの [項目の絞り込み] で検索条件を追加し、データセットに含めるための、スケジュールされた訪問を示すレコードを絞り込みます。</span>
+        <div>
+          <span style="vertical-align:text-bottom;display:inline-block;"><img alt="[件名] 項目の検索条件が「スケジュール済み」になっている [行動] ページ。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/dataset4.png" style="margin-bottom:0;"></span>
+        </div>
+        <div>たとえば、担当者はルーティング可能オブジェクトの [訪問種別] 項目を使用して、顧客の訪問がバーチャルかオンサイトかを示すことができます。[項目の絞り込み] で [訪問種別] を <kbd>[On-Site Meeting (オンサイトミーティング)]</kbd> に設定すると、ルート生成時にオンサイトミーティングのレコードのみを含めることができます。</div>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+        <div>完了した訪問を示すオブジェクトと項目が、データセットウィザードに表示されます。</div>
+      </li></ol>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> 
+      <p>訪問計画のカスタム出力オブジェクトは Consumer Goods Visit オブジェクトに基づいています。担当者は手動で訪問を作成することもできます。担当者が訪問を作成する場合は、[活動種別] を <kbd>[訪問]</kbd> に、[状況] を <kbd>[計画済み]</kbd> に設定します。この条件をフィルターとして設定しておけば、担当者がルートを生成するときに、これらの訪問が入力されるようになります。</p>
+    </div></div></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_adv_visitplan_datasets_create_missedvisits">
+<h1 class="slds-text-heading_large">対応できなかった訪問を Salesforce Maps Advanced で再スケジュールする</h1>
+  <p>ルート最適化中に対応できなかった訪問を再スケジュールするには、担当者が完了した訪問を記録する方法を指定します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>データセットウィザードの [訪問オブジェクト] リストから、スケジュールされた訪問が完了したことを示すオブジェクトを選択します。このオブジェクトには、出力 (カレンダー) オブジェクト、またはルーティング可能オブジェクトと参照関係を持つその他のオブジェクトを選択できます。</span>
+      </li><li>
+        <span>[訪問済みオブジェクトへの参照項目] リストから、ルーティング可能オブジェクトにオブジェクトを関連付ける項目を選択します。</span>
+        <div>
+          <span style="vertical-align:text-bottom;display:inline-block;"><img alt="[訪問オブジェクト] が [タスク] に設定され、完了した訪問レコードの絞り込みに関連するその他の項目が表示されているページ。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/dataset5.png" style="margin-bottom:0;"></span>
+        </div>
+      </li><li>
+        <span>[訪問日] リストから、訪問が完了した日を示す日付またはタイムスタンプ項目を選択します。</span>
+      </li><li>
+        <span>[割り当て項目] リストから、訪問を完了したユーザーを示す項目を選択します。</span>
+        <div>複数の担当者が同じ取引先を訪問しているが、訪問の頻度が異なる場合は、割り当て項目として [作成者 ID] を選択します。[作成者 ID] を選択すると、Salesforce Maps Advanced が担当者とその担当者に割り当てられている訪問計画を照合し、その訪問を適切な訪問の要件に適用します。</div>
+        <div>たとえば、営業担当者とマーチャンダイザーが、異なる時間枠に同じ取引先を訪問するとします。営業担当者の訪問は、マーチャンダイザーの訪問目標ではなく、営業担当者の訪問目標に含まれるようにする必要があります。訪問をユーザー別に追跡するには、割り当て項目に [作成者 ID] を選択します。</div>
+      </li><li>
+        <span>[項目の絞り込み] で検索条件を追加し、データセットに含めるための、完了した訪問を示すレコードを絞り込みます。</span>
+        <div>たとえば、訪問を記録した後に、担当者が「チェックイン時間:」で始まる件名のタスクを作成するとします。その場合、訪問オブジェクトには [タスク] を指定します。ルーティング可能オブジェクトを参照する [関連先 ID] 項目があるため、参照項目には [関連先 ID] を指定します。[項目の絞り込み] で、「<kbd>チェックイン時間:</kbd>」を含む [件名] を指定します。</div>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+        <div>ツールチップの設定が、データセットウィザードに表示されます。</div>
+      </li></ol>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> 
+      <p>訪問計画のカスタム出力オブジェクトは Consumer Goods Visit オブジェクトに基づいています。訪問を完了すると、担当者は [状況] を <kbd>[完了]</kbd> に設定します。この条件をフィルターとして設定すれば、担当者がルートを生成するときに、これらの訪問が訪問目標に含まれるようになります。</p>
+    </div></div></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_adv_visitplan_datasets_create_name">
+<h1 class="slds-text-heading_large">データセットに名前を付けてルーティング可能オブジェクトを選択する</h1>
+  <p>Salesforce Maps Advanced でルートを生成するには、訪問計画の各データセットにルーティング可能オブジェクトが必要です。ルーティング可能オブジェクトレコードは、取引先など、担当者が訪問する顧客の場所を示します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>Salesforce Maps で 1 つ以上のベースオブジェクトが作成されていることを確認します。</span>
+      </li><li>
+        <span>[Maps Advanced Visit Plans] タブの [新規計画] ウィザードで、<strong class="uicontrol">[データセットの優先度付け]</strong> をクリックします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[データセットを作成]</strong> をクリックします。</span>
+      </li><li>
+        <span>データセットウィザードで、データセットの名前と説明を入力します。</span>
+      </li><li>
+        <span>[ベースオブジェクト] で、訪問計画で使用する場所データを含むルーティング可能オブジェクトを選択します。必要なルーティング可能オブジェクトがない場合は、カスタムルーティング可能オブジェクトを作成できます。</span>
+        <div>
+          <span style="vertical-align:text-bottom;display:inline-block;"><img alt="取引先名とベースオブジェクトが選択されているデータセットウィザードページ。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/dataset.png" style="margin-bottom:0;"></span>
+        </div>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+        <div>ユーザー割り当てとレコードフィルターが、データセットウィザードに表示されます。</div>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Salesforce Maps Advanced には、取引先、ケース、取引先責任者、リード、商談などのルーティング可能オブジェクトが標準で備わっています。顧客の場所データを含む別のオブジェクトを使用する場合は、カスタムルーティング可能オブジェクトを作成します。" href="advanced-1.html#salesforce_maps_adv_prepare_customroutable">カスタムルーティング可能オブジェクトを作成する</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_adv_visitplan_datasets_create_promotion">
+<h1 class="slds-text-heading_large">プロモーション期間を指定する</h1>
+  <p>Salesforce Maps Advanced で顧客プロモーションをサポートするには、特定の時間枠内の顧客訪問に優先度を付けます。この時間枠は、データセットで指定される訪問の頻度の要件に追加されるものです。デフォルトでは、プロモーション期間中に 1 回、顧客ロケーションを訪問するようスケジュールされます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>ルーティング可能オブジェクト、またはルーティング可能オブジェクトを参照するオブジェクトに、プロモーションの開始日と終了日を示す項目が含まれていることを確認します。プロモーション中に 1 回以上の追加訪問が必要な場合は、オブジェクトにプロモーション訪問間の最小日数と最大日数を示す数値項目が含まれていることを確認します。</span>
+      </li><li>
+        <span>データセットウィザードの [プロモーション期間] で、使用する開始日と終了日の項目を含むルーティング可能オブジェクトを選択します。</span>
+        <div>
+          <span style="vertical-align:text-bottom;display:inline-block;"><img alt="何も選択されていないデータセットウィザードの [プロモーション期間] ページ。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/dataset8.png" style="margin-bottom:0;"></span>
+        </div>
+      </li><li>
+        <span>[項目] リストから、プロモーション期間オブジェクトをルーティング可能オブジェクトに関連付ける項目を選択します。前のステップでルーティング可能オブジェクトを選択した場合は、この項目は空白のままにします。</span>
+      </li><li>
+        <span>[開始日] と [終了日] のリストから、プロモーション期間の開始日と終了日に対応する項目を選択します。</span>
+      </li><li>
+        <span>プロモーション期間中に複数回の追加訪問が必要な場合は、<strong class="uicontrol">[プロモーション期間内に複数の訪問が必要です]</strong> を選択します。</span>
+        <ol>
+          <li>
+            <span>プロモーション期間オブジェクトに、プロモーション訪問間の最小日数と最大日数を示す 2 つの数値項目があることを確認します。</span>
+          </li>
+
+          <li>
+            <span>[訪問間の最小日数] と [訪問間の最大日数] で、それらの項目を選択します。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+        <div>訪問計画ウィザードに [データセットの優先度付け] が表示されます。</div>
+      </li></ol>
+
+    <div><p>担当者がルートを作成すると、Salesforce Maps Advanced によってプロモーション期間内に追加の訪問がスケジュールされます。担当者がすでに訪問間の最小日数を満たしている、または訪問目標を超えている場合も、システムはその場所への訪問をプロモーション期間内にスケジュールしようと試みます。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_adv_visitplan_datasets_create_requirements">
+<h1 class="slds-text-heading_large">訪問の頻度、訪問時間、訪問期間を指定する</h1>
+  <p>Salesforce Maps Advanced では、訪問の要件を手動で指定するか、ルーティング可能オブジェクトの項目から取得します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>データセットウィザードの [訪問の要件] で、<strong class="uicontrol">[Minimum Days (最小日数)]</strong> と <strong class="uicontrol">[Maximum Days (最大日数)]</strong> に訪問間の日数を入力します。[推奨頻度] リストから頻度を選択すると、簡単に入力できます。</span>
+        <div>たとえば、1 つの取引先につき、90 日間に 3 回、または 1 か月に 1 回の訪問が必要であるとします。期間中の合計日数を予想される訪問数で割り、[Maximum Days (最大日数)] を 30 日、[Minimum Days (最小日数)] を 27 日に設定します。</div>
+      </li><li>
+        <span>オブジェクト項目に訪問の頻度が含まれている場合は、<strong class="uicontrol">[選択された項目の値]</strong> から項目を選択します。項目に値が含まれていない場合、ルートは <strong class="uicontrol">[Minimum Days (最小日数)]</strong> と <strong class="uicontrol">[Maximum Days (最大日数)]</strong> の値を使用します。</span>
+        <div>
+          <span style="vertical-align:text-bottom;display:inline-block;"><img alt="カスタム訪問の頻度が 5 ～ 7 日になっている [訪問の要件] ページ。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/dataset3_frequency.png" style="margin-bottom:0;"></span>
+        </div>
+      </li><li>
+        <span>訪問期間とバッファ時間を分単位で入力するか、<strong class="uicontrol">[選択された項目の値]</strong> から項目を選択します。</span>
+        <div>バッファ時間とは、交通渋滞などの予期せぬ遅延を考慮し、Salesforce が算出した訪問間の移動時間に追加される時間です。担当者がメモを取ったり、広い駐車場を歩いて移動したりする時間でもあります。</div>
+      </li><li>
+        <span>[訪問期間] で、このデータセットの顧客訪問の曜日と時間を指定します。</span>
+        <ol>
+          <li>
+            <span>ルーティング可能オブジェクトの項目に訪問期間が含まれている場合は、<strong class="uicontrol">[Advanced 訪問期間に関連付けられた項目]</strong> リストからその項目を選択します。</span>
+          </li>
+
+          <li>
+            <span>同じ日に訪問期間が 2 つある場合は、期間を追加できます。</span>
+            <div>
+              <span style="vertical-align:text-bottom;display:inline-block;"><img alt="平日の午前 9 時～午後 5 時と表示されている [訪問期間] ページ。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/dataset3_visitwindow.png" style="margin-bottom:0;"></span>
+            </div>
+            <div>たとえば、店舗フランチャイズの顧客が、午前 9 時～午前 11 時と午後 1 時～午後 4 時に訪問を希望する場合です。</div>
+          </li>
+
+        </ol>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+        <div>データセットウィザードに、今後の訪問項目の絞り込みが表示されます。</div>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="レコードページのレイアウトに参照関係とメニューオプションを作成すれば、担当者は簡単かつ直感的に訪問期間を顧客にリンクできます。担当者がレコードレベルで訪問期間を設定しない場合、Salesforce Maps Advanced はルート生成時に訪問計画の訪問期間を使用します。" href="advanced-1.html#salesforce_maps_adv_finetune_visitwindows_lookup">特定のルーティング可能オブジェクトレコードの訪問期間の選択肢を設定する</a></li><li><a title="Salesforce Maps Advanced が、訪問間の最小日数と最大日数を使用して、顧客訪問の日付を決定する方法について説明します。" href="#salesforce_maps_advanced_concepts_minmaxdays">訪問間の日数</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_adv_visitplan_datasets_create_tooltips">
+<h1 class="slds-text-heading_large">Maps にウェイポイントツールチップを表示する</h1>
+  <p>担当者が Salesforce Maps Advanced でルートを表示するときに、ウェイポイントツールチップで追加情報を表示できます。ウェイポイントとは、担当者のスケジュールやルートに表示される訪問レコードなどの出力レコードのことです。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>データセットウィザードの [ツールチップ] で、担当者がルートマップ上のウェイポイントを操作するときに表示させる、ルーティング可能オブジェクト項目を選択します。</span>
+        <div>
+          <span style="vertical-align:text-bottom;display:inline-block;"><img alt="[ツールチップ] ページで、取引先名項目がツールチップとして選択されている。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/dataset6.png" style="margin-bottom:0;"></span>
+        </div>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+        <div>データセットウィザードに出力レコードのデフォルトの項目値が表示されます。</div>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_adv_visitplan_datasets_prioritize">
+<h1 class="slds-text-heading_large">Salesforce Maps Advanced でデータセットに優先度を付ける</h1>
+  <p>特定の顧客訪問に他と区別する優先度を付ければ、訪問スケジュールがより近い日程で設定され、担当者が訪問目標をより早く達成できる可能性が高まります。たとえば、リードとは異なる訪問目標が設定された取引先がある場合は、別のデータセットを作成し、最も高い優先度を付けます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>訪問計画に 2 つ以上のデータセットが作成されていることを確認します。(データセットの横にある縦に並んだ 3 つの点をクリックし、<strong class="uicontrol">[コピー]</strong> を選択すると、既存のデータセットをコピーできます)。</span>
+      </li><li>
+        <span>データセットごとに、優先度を示す項目でレコードが絞り込まれていることを確認します。たとえば、小売店ルーティング可能オブジェクトに階層項目があるとします。3 つのデータセットを作成し、それぞれに階層が 1、2、3 のレコードのみを含む検索条件を設定します。</span>
+      </li><li>
+        <span>[Maps Advanced Visit Plans] タブの [新規計画] ウィザードで、<strong class="uicontrol">[データセットの優先度付け]</strong> をクリックします。</span>
+      </li><li>
+        <span>データセットをドラッグして、希望する優先度を反映する位置に移動します。データセットの優先度を同じにするには、同じ行に並べます。</span>
+        <div>
+          <span style="vertical-align:text-bottom;display:inline-block;"><img alt="[データセットの優先度付け] ページ。取引先データセットが標準取引先データセットよりも優先度が高くなっている。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/datasets_prioritize.png" style="margin-bottom:0;"></span>
+        </div>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+        <div>訪問計画ウィザードに [ユーザーを割り当て] が表示されます。</div>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Salesforce Maps Advanced でルートを生成するには、訪問計画の各データセットにルーティング可能オブジェクトが必要です。ルーティング可能オブジェクトレコードは、取引先など、担当者が訪問する顧客の場所を示します。" href="#salesforce_maps_adv_visitplan_datasets_create_name">データセットに名前を付けてルーティング可能オブジェクトを選択する</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_adv_visitplan_name">
+<h1 class="slds-text-heading_large">訪問計画の名前と説明を入力する</h1>
+  <p>訪問計画の名前と説明は、Salesforce Maps Advanced の [訪問計画] ページに表示されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span id="salesforce_maps_adv_visitplan_name__step_permset_admin"><a name="salesforce_maps_adv_visitplan_name__step_permset_admin"></a>Maps Admin、SF Maps、SF Maps Advanced の権限セットが自分に割り当てられていることを確認します。</span>
+      </li><li>
+        <span>アプリケーションランチャーから、<strong class="uicontrol">[Maps Advanced Visit Plans]</strong> を見つけて選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[新規訪問計画]</strong> をクリックします。</span>
+      </li><li>
+        <span>[新規計画] ウィザードの [Name Your Plan (計画に名前を付ける)] で、訪問計画の名前と説明を入力します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+        <div>訪問計画ウィザードに [カレンダーを設定] が表示されます。</div>
+      </li></ol>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> 
+      <p>訪問計画で、12 月に優先度の高い顧客を訪問する担当者のルートを生成します。計画名を「<kbd>12 月のルート</kbd>」とし、「<kbd>この計画は、シーズンリリース向けのプラチナ取引先に焦点を当てています</kbd>」という説明を追加します。</p>
+    </div></div></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_adv_visitplan_options">
+<h1 class="slds-text-heading_large">訪問および最適化のパラメーターの指定</h1>
+  <p>シフトの期間内に複数の訪問をスケジュールしないようにして、シフトの長さを制限しているときには、Salesforce Maps Advanced によってルートが調整されます。訪問の間の最大移動時間を指定し、優先速度を選択することで、バッチ化されていないルートが最適化されます。これらの制約を設定することによって、最適化の効率が悪くなり、担当者に提供されるルートが少なくなる場合もあります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table><p>たとえば、訪問間の移動時間を 10 分と指定すると、10 分間の移動に該当しない他の顧客訪問が延期されることがあります。</p></div>
+    <ol><li>
+        <span>[Maps Advanced Visit Plans] タブの [新規計画] ウィザードで、<strong class="uicontrol">[追加オプションを設定]</strong> をクリックします。</span>
+      </li><li>
+        <span>シフト中に顧客を 1 回訪問すれば済むようにすることで、営業担当は訪問間隔の要件を遵守できます。同一シフトでの複数訪問を防止するようにオプションを設定します。これは、頻繁な訪問が必要な取引先が多数ある場合に特に有効です。</span>
+        <div><div style="text-align:left;"><img alt="訪問間の最大運転時間を 15 分と設定した [追加オプションを設定] ページ。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/visitoptions.png"></div>たとえば、顧客が毎日の訪問を必要としているが、営業担当が出張するのは 1 週間のうち 2 日であるとします。このオプションでは、営業担当がこの 2 日のそれぞれの日に同じ顧客を複数回訪問するようスケジュールするのではなく、この 2 日のそれぞれの日に 1 回訪問するようスケジュールします。</div>
+      </li><li>
+        <span>担当者やマネージャーが許容できないほどの時間をスケジュールしないように、休憩時間を含め、1 日にスケジュールできる最大時間を入力します。</span>
+        <div>たとえば、担当者が毎日訪問を完了できるようにバッファ時間を設定しながら、担当者の残業も管理する場合は、[シフトの最大長] を 10 時間に設定します。別の例として、パートタイム従業員が丸一日勤務することがないようにスケジュールする場合は、[シフトの最大長] を 5 時間に設定します。</div>
+      </li><li>
+        <span>合計移動時間を短縮し、訪問をまとめる場合は、推奨される移動時間を分単位で指定します。</span>
+        <div>たとえば、担当者の顧客ロケーションがテリトリー内に分散しており、1 日の訪問間の移動時間を減らしたいとします。[訪問間の希望最大移動時間] を 60 分に設定すると、移動時間を可能な限り抑えられるように、顧客の訪問先同士が近いルートが Salesforce Maps Advanced で生成されます。</div>
+      </li><li>
+        <span>担当者が [Maps Advanced ルート] タブで <strong class="uicontrol">[私の訪問を計画]</strong> をクリックする場合など、一括処理されない最適化のルート生成をより高速化するには、希望の最適化時間を指定します。</span>
+        <div>最大時間を設定すると、Salesforce Maps Advanced が最も理想的なルートを検索する時間が短くなるため、ルートの品質が低下する場合があります。</div>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+        <div>訪問計画ウィザードに [確認して保存] が表示されます。</div>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_adv_visitplan_settings">
+<h1 class="slds-text-heading_large">訪問計画の必須設定を定義する</h1>
+  <p>Salesforce Maps Advanced でルートを生成するときに、ルートの計画期間と、ルート生成時に含めるルート数を設定します。また、計画期間中にルートを再生成 (最適化) する頻度を指定します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>[設定] でスケジュール済みバッチが有効化されていることを確認します。有効化されていない場合、訪問計画で有効になっていても、ステップ 6 で指定した最適化バッチは実行されません。</span>
+      </li><li>
+        <span>[Maps Advanced Visit Plans] タブの [新規計画] ウィザードで、<strong class="uicontrol">[訪問計画の設定を定義]</strong> をクリックします。</span>
+      </li><li>
+        <span>[訪問計画の設定を定義] ページで、この訪問計画の時間枠の開始日と終了日を指定します。最大で 3 か月間の訪問計画を設定できます。</span>
+        <div>
+          <span style="vertical-align:text-bottom;display:inline-block;"><img alt="[訪問計画の設定を定義] ページに、開始日と終了日、最適化に含めるルート、スケジュール済みバッチが表示されている。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/visitsettings.png" style="margin-bottom:0;"></span>
+        </div>
+      </li><li>
+        <span>終了日以降も同じ時間で訪問計画のルートを生成する場合は、<strong class="uicontrol">[終了日後に訪問計画を再開]</strong> を選択します。</span>
+        <div>たとえば、訪問計画の時間枠が 90 日であるとします。90 日を経過すると、訪問計画の時間枠は新しい 90 日の期間を開始します。この 90 日間のロールオーバーは、訪問計画が無効化されるまで実行されます。</div>
+      </li><li>
+        <span>[最適化に含めるルートの数] で、各最適化で生成するルートに相当する週数または月数を選択します。</span>
+        <div>Salesforce では、この時間値を訪問計画の期間と一致させることを推奨しています。</div>
+        <div>たとえば、担当者に 2 週間分のルートを表示させたいが、訪問計画の時間枠が 3 か月である場合に、この機能を使用します。</div>
+      </li><li>
+        <span>Salesforce Maps Advanced ルーティングとのデータの送受信を行うための最適化バッチをスケジュールします。Salesforce Maps Advanced では、選択した頻度と時間で、訪問計画のルートとスケジュールのデータが更新されます。</span>
+        <div>たとえば、先週の金曜日に担当者のルートを生成したとします。月曜日に、担当者の 1 人が火曜日に休暇を取ることにしてスケジュールにマークしました。最適化バッチは毎週月曜日に実行されるようにスケジュールされているため、ルートは自動的に更新され、その担当者の火曜日の訪問は別の日に移されます。</div>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+        <div>訪問計画ウィザードに [追加オプション] が表示されます。</div>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Salesforce Maps Advanced ルーティングとのデータの送受信を行うためのバッチをスケジュールします。" href="advanced-1.html#salesforce_maps_adv_prepare_batch">Salesforce のデータを最新の状態に保つ</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_adv_visitplan_users">
+<h1 class="slds-text-heading_large">訪問計画にユーザーを割り当てる</h1>
+  <p>訪問計画にユーザーまたはユーザープロファイルを割り当てると、そのユーザー用のルートを生成できます。訪問計画を保存すると、Salesforce Maps Advanced でルートを生成する方法を説明するメールが、割り当てられたユーザーに送信されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>担当者ユーザーに SF Maps および SF Maps Advanced の権限セットが割り当てられていることを確認します。</span>
+      </li><li>
+        <span>訪問計画のデータセットで定義された 1 つ以上のルーティング可能レコードを、担当者ユーザーが所有していることを確認します。たとえば、1 つ以上の取引先レコードに担当者を取引先マネージャーとして割り当てたとします。</span>
+      </li><li>
+        <span>[Maps Advanced Visit Plans] タブの [新規計画] ウィザードで、<strong class="uicontrol">[ユーザーの割り当て]</strong> をクリックします。</span>
+      </li><li>
+        <span>[ユーザーの割り当て] ページで、ルートを生成するユーザープロファイルまたは個別のユーザーを選択します。</span>
+        <div>
+          <span style="vertical-align:text-bottom;display:inline-block;"><img alt="訪問計画の [ユーザーの割り当て] ページに、選択したユーザーが表示されている。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/assignusers.png" style="margin-bottom:0;"></span>
+        </div>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。訪問計画の設定が訪問計画ウィザードに表示されます。</span>
+        <div>訪問計画を保存すると、割り当てられたユーザー、または選択したプロファイルを持つユーザーに、Salesforce Maps Advanced にアクセスしてスケジュールを更新し、ルートを生成するように指示するメールが届きます。</div>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_advanced_concepts">
+<h1 class="slds-text-heading_large">Salesforce Maps Advanced の基本</h1>
+  <p>Salesforce Maps Advanced を使用すると、営業担当者やサービス担当者のスケジュールやルートを最大 3 か月間自動化できます。主要なユースケースを確認すれば、自身の実装やロールアウトのためのアイデアを得ることができます。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_advanced_concepts_tasks_and_roles">ルート最適化におけるタスクと役割の概要</a></strong><br>Salesforce Maps Advanced における営業マネージャーとサービスマネージャー、そのマネージャーが管理するフィールド営業担当者の役割について説明します。マネージャーや担当者が実行するタスクについても説明します。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_advanced_concepts_terms">Salesforce Maps Advanced ルーティングの主要な用語と概念</a></strong><br>Salesforce Maps Advanced の実装前に、Salesforce Maps Advanced で目にする用語や概念について説明します。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_advanced_concepts_scenarios">Salesforce Maps Advanced ルーティングのサンプルシナリオ</a></strong><br>Salesforce Maps Advanced ルーティングは、製薬、消費財、フードサービスなどの業界における複雑なユースケースをサポートします。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_advanced_concepts_implementation_guidelines">
+<h1 class="slds-text-heading_large">ロールアウトに関するガイドライン</h1>
+  <p>Salesforce Maps Advanced の実装とロールアウトを計画します。入念に準備をすればするほど、担当者はより多くの顧客とより少ない時間で面会できるようになります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">実装戦略</h2><p>Salesforce Maps Advanced では数多くの設定が必要なため、実装時には専任のプロジェクトマネージャーの選任を検討してください。</p><ul>
+        <li>ユースケースの要件を確認するには、「<a title="Salesforce Maps Advanced ルーティングは、製薬、消費財、フードサービスなどの業界における複雑なユースケースをサポートします。" href="#salesforce_maps_advanced_concepts_scenarios">Salesforce Maps Advanced ルーティングのサンプルシナリオ</a>」の実装前チェックリストを参照してください。</li>
+
+        <li>訪問計画のためのオブジェクト、項目、ビジネスロジックを収集するときには、「<a title="Salesforce Maps Advanced では営業マネージャーおよびサービスマネージャーが、担当者のルートが入力された訪問計画を作成します。" href="advanced-1.html#salesforce_maps_adv_visitplan">訪問計画を作成する</a>」の訪問計画チェックリストを使用します。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">テスト戦略</h2><p>テスト戦略を作成すれば、ロールアウトを成功させ、担当者の採用を増やすことができます。リリース前にチームで製品機能をテストします。次に例を示します。</p><ul>
+        <li>Sandbox でルート最適化を実行する練習をします。</li>
+
+        <li>小規模で始め、定義済みのレコードを所有する 1 人の担当者の訪問を計画します。その後に、エラーログで設定やユーザーの問題を特定します。他のユーザーにも同様のプロセスを繰り返し、チームの訪問計画を作成します。</li>
+
+      </ul>
+</div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Salesforce Maps Advanced ルーティングで訪問計画を作成する前に、システム、プロセス、人員を調整します。開始する前に Salesforce Maps をインストールし、ユーザーに Salesforce Maps Advanced へのアクセス権が付与されていることを確認します。" href="advanced-1.html#salesforce_maps_adv_prepare">ルーティングを自動化するための準備</a></li><li><a title="Salesforce Maps Advanced では営業マネージャーおよびサービスマネージャーが、担当者のルートが入力された訪問計画を作成します。" href="advanced-1.html#salesforce_maps_adv_visitplan">訪問計画を作成する</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_advanced_concepts_minmaxdays">
+<h1 class="slds-text-heading_large">訪問間の日数</h1>
+  <p>Salesforce Maps Advanced が、訪問間の最小日数と最大日数を使用して、顧客訪問の日付を決定する方法について説明します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table>
+    <p>次の顧客訪問の日程は、訪問間の最小日数と最大日数、または訪問の頻度によって決まります。訪問計画を作成するときに、日数を入力するか、日数を含むオブジェクト項目を指定して訪問の頻度を指定します。</p>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> 取引先には、3 か月の計画期間中に 3 回、または 1 か月に 1 回の訪問が必要であるとします。期間内の合計日数 (90 日) を予想される訪問回数 (3 回) で割ると、訪問間の最大日数は 30 日になります。訪問計画で訪問間の最大日数を 30 日と指定します。 その 30 日間に訪問する可能性を高めるためには、訪問間隔の最小日数を 27 日に設定します。<p>訪問間隔の最小日数と最大日数を順守できるように、訪問可能な時間を示す長方形が表示されます。丸印は、Salesforce Maps Advanced によって訪問がスケジューリングされた日を示します。</p><span style="vertical-align:text-bottom;display:inline-block;"><img alt="60 日分のカレンダーに 3 つの丸印と、長方形で示された 2 つの訪問期間が表示されている。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/minmax_days.png" style="margin-bottom:0;"></span></div></div></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Salesforce Maps Advanced では、訪問の要件を手動で指定するか、ルーティング可能オブジェクトの項目から取得します。" href="#salesforce_maps_adv_visitplan_datasets_create_requirements">訪問の頻度、訪問時間、訪問期間を指定する</a></li><li><a title="チェーンやフランチャイズに共有の訪問期間を作成すれば、営業担当者は時間を節約できるとともに、顧客の訪問期間を順守できます。たとえば、営業およびサービス業務マネージャーが Salesforce Maps Advanced に期間を作成すると、特定の時間枠に訪問が開始および終了するように制限できます。担当者はそれらの訪問期間を販売先やサービス提供先の取引先に適用します。" href="advanced-1.html#salesforce_maps_adv_finetune_visitwindows">個々のルーティング可能オブジェクトレコードに共有の訪問期間を作成する</a></li><li><a title="レコードページのレイアウトに参照関係とメニューオプションを作成すれば、担当者は簡単かつ直感的に訪問期間を顧客にリンクできます。担当者がレコードレベルで訪問期間を設定しない場合、Salesforce Maps Advanced はルート生成時に訪問計画の訪問期間を使用します。" href="advanced-1.html#salesforce_maps_adv_finetune_visitwindows_lookup">特定のルーティング可能オブジェクトレコードの訪問期間の選択肢を設定する</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_advanced_concepts_route_planning">
+<h1 class="slds-text-heading_large">医薬品担当者のルート計画と対象範囲</h1>
+  <p>あなたはある製薬会社のセールスオペレーションマネージャーで、25 人のフィールド営業担当者を新しくオンボーディングすることになったとします。Salesforce Maps Advanced ルーティングを使用すると、サポートする医療機関の訪問目標を確実に達成できるように、フィールド営業担当者の最初の月のルートを作成できます。ルートを生成する前に、以下のチェックリストを使用してデータと条件を作成します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Salesforce Maps Advanced では、担当者の対面訪問のみがスケジュールされます。</div></div></div>
+
+    <p>
+      <strong class="uicontrol">実装前チェックリスト</strong>
+    </p>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:20.32520325203252%"><col style="width:79.67479674796748%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d10272e66" style="vertical-align:top;" class="slds-cell-wrap" scope="col">要件</th>
+            <th id="d10272e69" style="vertical-align:top;" class="slds-cell-wrap" scope="col">シナリオの詳細</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d10272e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="要件">カレンダーオブジェクト</td>
+
+            <td headers="d10272e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオの詳細">担当者の訪問を示すオブジェクトです。このシナリオでは、担当者の訪問は担当者の Salesforce カレンダーに行動として表示されるため、カレンダーオブジェクトは行動オブジェクトになります。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d10272e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="要件">場所データ用のルーティング可能オブジェクト</td>
+
+            <td headers="d10272e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオの詳細"><p>医療機関の取引先の場所を含むオブジェクトです。このシナリオでは、取引先オブジェクトに場所データが含まれていると仮定します。含まれていない場合は、場所データを含むカスタムオブジェクトを作成します。</p><p style="margin-bottom:0;">場所データを使用すると、担当者にとって最も効率的なルートを生成できます。</p></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d10272e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="要件">訪問の頻度と訪問期間</td>
+
+            <td headers="d10272e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオの詳細">このシナリオでは、訪問間の最小日数と最大日数はそれぞれ 10 日と 30 日です。オフィスの営業時間は午前 9 時～午後 5 時です。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d10272e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="要件">訪問オブジェクト</td>
+
+            <td headers="d10272e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオの詳細">担当者が訪問を完了したかどうかに関するデータを含むオブジェクトです。このシナリオでは、訪問オブジェクトはタスクオブジェクトになります。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d10272e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="要件">割り当てられた取引先</td>
+
+            <td headers="d10272e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオの詳細">取引先はルーティング可能オブジェクトのユーザー参照項目を通じて、担当者に割り当てられます。このシナリオでは、取引先所有者が医療機関の訪問を担当します。ルートを生成すると、最適化プロセスが実行され、担当者のスケジュールに自身が所有する取引先への訪問が追加されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d10272e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="要件">訪問の時間枠</td>
+
+            <td headers="d10272e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオの詳細">1 月分のルートを生成するため、開始日は 1 月 1 日、終了日は 1 月 30 日とします。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d10272e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="要件">シフトの最大長などの設定</td>
+
+            <td headers="d10272e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオの詳細">フィールド営業担当者のシフトは最大 8 時間です。</td>
+
+          </tr>
+        </tbody></table>
+    <p>休日など担当者のカレンダーに競合する行動があれば、Salesforce Maps Advanced でルートを作成するときに考慮されます。担当者の再スケジュールや会社の休日などの変更に合わせて、ルートはいつでも再生成できます。</p>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_advanced_concepts_scenarios">
+<h1 class="slds-text-heading_large">Salesforce Maps Advanced ルーティングのサンプルシナリオ</h1>
+  <p>Salesforce Maps Advanced ルーティングは、製薬、消費財、フードサービスなどの業界における複雑なユースケースをサポートします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_advanced_concepts_route_planning">医薬品担当者のルート計画と対象範囲</a></strong><br>あなたはある製薬会社のセールスオペレーションマネージャーで、25 人のフィールド営業担当者を新しくオンボーディングすることになったとします。Salesforce Maps Advanced ルーティングを使用すると、サポートする医療機関の訪問目標を確実に達成できるように、フィールド営業担当者の最初の月のルートを作成できます。ルートを生成する前に、以下のチェックリストを使用してデータと条件を作成します。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_advanced_concepts_visit_frequencies">消費財担当者向けの複雑な訪問頻度と期間</a></strong><br>たとえば、小売営業マネージャーが Consumer Goods を使用して、実店舗アカウントと季節性のある小売ポップアップストアをサポートしているとします。顧客満足度を維持し、訪問目標を達成するためのルートのバランスを取ることは簡単なことではありません。さらに、担当者のバーンアウトも避けなければなりません。Salesforce Maps Advanced でルートを生成する前に、以下のチェックリストを使用してデータと条件を作成します。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_advanced_concepts_visit_plans">レストラン取引先担当者用の訪問の優先度付け</a></strong><br>たとえば、あなたがレストラン営業マネージャーで、飲食料品業界の取引先を担当する担当者がいるとします。担当地域では 11 月にレストランウィークのプロモーションが開催されます。プロモーションに参加するクライアントには、より頻繁な訪問が必要です。そのため、その週は他のクライアントよりもレストランウィークのクライアントの優先度を高くします。課題は、担当者の作業負荷を最適化し、休日を考慮したルートを手動で作成することなく、優先度に合わせて顧客に対応することです。Salesforce Maps Advanced でルートを生成する前に、以下のチェックリストを使用してデータと条件を作成します。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_advanced_concepts_tasks_and_roles">
+<h1 class="slds-text-heading_large">ルート最適化におけるタスクと役割の概要</h1>
+  <p>Salesforce Maps Advanced における営業マネージャーとサービスマネージャー、そのマネージャーが管理するフィールド営業担当者の役割について説明します。マネージャーや担当者が実行するタスクについても説明します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table>
+    <p>マネージャーは本製品や、ルートのテンプレートとなる訪問計画を設定します。フィールド営業担当者のルートは、休日やシフト時間などを入力することで自動的に生成されます。</p>
+    <div>
+      <img alt="4 つの主なタスクを示す矢印と、その実行者 (マネージャーまたはフィールド営業担当者)" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/mapsadvanced_overall.png" style="width:800px;">
+    </div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:15.503875968992247%"><col style="width:40%"><col style="width:44.49612403100775%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d18964e71" style="vertical-align:top;" class="slds-cell-wrap" scope="col">タスクの概要</th>
+            <th id="d18964e74" style="vertical-align:top;" class="slds-cell-wrap" scope="col">詳細</th>
+            <th id="d18964e77" style="vertical-align:top;" class="slds-cell-wrap" scope="col">例</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d18964e71" style="vertical-align:top;" class="slds-cell-wrap" data-label="タスクの概要">インストールおよび設定</td>
+
+            <td headers="d18964e74" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">一般的に、営業マネージャーやサービスマネージャーが会社のビジネスルールやプロセスに関する知識を使用して、Salesforce Maps Advanced を設定します。</td>
+
+            <td headers="d18964e77" style="vertical-align:top;" class="slds-cell-wrap" data-label="例">サービスマネージャーが、すべてのサービス担当者がアクセスできるように本製品を設定します。サービスマネージャーは、ルートの場所データに使用される ServiceAccount というカスタムルーティング可能オブジェクトを作成します。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d18964e71" style="vertical-align:top;" class="slds-cell-wrap" data-label="タスクの概要">訪問計画の作成</td>
+
+            <td headers="d18964e74" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">フィールド営業担当者がルートを作成する前に、マネージャーが訪問計画 (テンプレート) を作成します。訪問計画には、データ、ユーザー、条件が含まれ、訪問期間を含めて可能な限りルートを最適化します。</td>
+
+            <td headers="d18964e77" style="vertical-align:top;" class="slds-cell-wrap" data-label="例">小売店の営業マネージャーが、取引先と場所データ、週単位の訪問の頻度、午前 10 時～午後 12 時までのカスタム訪問期間を含む、店舗取引先担当者用の訪問計画を作成します。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d18964e71" style="vertical-align:top;" class="slds-cell-wrap" data-label="タスクの概要">ルートの生成</td>
+
+            <td headers="d18964e74" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">カレンダーとスケジュール情報を指定して、フィールド営業担当者がルートを作成します。その後、訪問計画によって最適なルートが決定します。</td>
+
+            <td headers="d18964e77" style="vertical-align:top;" class="slds-cell-wrap" data-label="例">あるレストランの営業担当者が金曜日に休暇を取ることにしましたが、担当者は 1 週間の訪問目標を達成しなければなりません。担当者がルートを作成すると、金曜日の休暇を避けて、月曜日から木曜日までの取引先訪問スケジュールが設定されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d18964e71" style="vertical-align:top;" class="slds-cell-wrap" data-label="タスクの概要">ベストプラクティスの使用</td>
+
+            <td headers="d18964e74" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">ルート生成のライフサイクル中は、マネージャーが Salesforce Maps Advanced でメンテナンスと最適化が必要な領域を特定します。</td>
+
+            <td headers="d18964e77" style="vertical-align:top;" class="slds-cell-wrap" data-label="例">Salesforce データを最新の状態に保つため、セールスオペレーションマネージャーが定期的なデータ同期のバッチジョブをスケジュールします。別の例では、レストランの営業マネージャーがレストランウィークのプロモーション期間に合わせて訪問計画を更新します。</td>
+
+          </tr>
+        </tbody></table>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_advanced_concepts_terms">
+<h1 class="slds-text-heading_large">Salesforce Maps Advanced ルーティングの主要な用語と概念</h1>
+  <p>Salesforce Maps Advanced の実装前に、Salesforce Maps Advanced で目にする用語や概念について説明します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">ルーティング可能オブジェクトとは</h2><p>マッピング可能な場所データを含む標準またはカスタムのオブジェクトです。Salesforce Maps Advanced には、取引先、ケース、取引先責任者、リード、商談などの Salesforce の標準的なルーティング可能オブジェクトが用意されています。フィールド営業担当者は、取引先の場所などのルート上にある場所を訪問します。</p></div>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> 小売店や歯科医院の場所データを含むカスタムルーティング可能オブジェクトを作成できます。</div></div></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">訪問計画とは</h2><p>ルートを作成するためのテンプレートです。ルートの要件が 1 か所に集められるため、訪問計画を使用すれば、カレンダーが変わった場合でも同じ条件で簡単にルートを再生成できます。訪問計画には取引先や訪問を示すルーティング可能オブジェクト、訪問を実行する担当者のリスト、開始日と終了日、シフト時間などの設定が含まれます。</p></div>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> 
+      <p>製薬会社の営業チームの四半期用の訪問計画を作成できます。この計画には、訪問を必要とするすべてのプロバイダーと、10 月から 12 月までの各訪問目標とケイデンスが含まれます。</p>
+    </div></div></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">訪問期間とは</h2><p>担当者が顧客または見込み客を訪問できる時間枠です。訪問期間には、1 週間のうちの特定の曜日や、1 日のうちの特定の時間帯を設定できます。訪問期間は訪問計画で指定します。訪問期間が設定されると、Salesforce Maps Advanced がその期間内で今後のすべての訪問スケジュールを設定します。訪問計画で訪問期間を指定しない場合、Salesforce Maps Advanced は、担当者の勤務時間および訪問計画の開始日と終了日の範囲内で訪問のスケジュールを設定します。</p></div>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> ある医院の訪問期間は、月曜日から木曜日の午後 2 時から 4 時までです。あるレストランでは、午前 10 時から 11 時 30 分までのアイドルタイムを訪問期間に設定しています。</div></div></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">訪問計画とルートの関係とは</h2><p>訪問計画を出力したものが、最適化されたルートになります。フィールド営業担当者が Salesforce Maps Advanced でルートを生成するときには、訪問計画によってルートの要件が指示されます。担当者は顧客の訪問期間や休暇など、スケジュールや条件が変わるたびに、訪問計画からルートを再生成できます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">出力オブジェクトとは</h2></div>
+    <div><p>担当者がルートを生成した後のスケジュール済み訪問を示す、標準またはカスタムのオブジェクトです。デフォルトでは、担当者の Salesforce カレンダーに行動が出力されます。</p></div>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> Consumer Goods の訪問を表すカスタム出力オブジェクトを作成できます。</div></div></div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_advanced_concepts_minmaxdays">訪問間の日数</a></strong><br>Salesforce Maps Advanced が、訪問間の最小日数と最大日数を使用して、顧客訪問の日付を決定する方法について説明します。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Salesforce Maps Advanced には、取引先、ケース、取引先責任者、リード、商談などのルーティング可能オブジェクトが標準で備わっています。顧客の場所データを含む別のオブジェクトを使用する場合は、カスタムルーティング可能オブジェクトを作成します。" href="advanced-1.html#salesforce_maps_adv_prepare_customroutable">カスタムルーティング可能オブジェクトを作成する</a></li><li><a title="Salesforce Maps Advanced では営業マネージャーおよびサービスマネージャーが、担当者のルートが入力された訪問計画を作成します。" href="advanced-1.html#salesforce_maps_adv_visitplan">訪問計画を作成する</a></li><li><a title="チェーンやフランチャイズに共有の訪問期間を作成すれば、営業担当者は時間を節約できるとともに、顧客の訪問期間を順守できます。たとえば、営業およびサービス業務マネージャーが Salesforce Maps Advanced に期間を作成すると、特定の時間枠に訪問が開始および終了するように制限できます。担当者はそれらの訪問期間を販売先やサービス提供先の取引先に適用します。" href="advanced-1.html#salesforce_maps_adv_finetune_visitwindows">個々のルーティング可能オブジェクトレコードに共有の訪問期間を作成する</a></li><li><a title="ルート作成の出力として担当者のカレンダーに行動が作成されるように、Salesforce Maps Advanced を設定します。訪問を表示するのに行動を使用しない場合は、カスタム出力オブジェクトを作成します。たとえば、Consumer Goods の訪問に基づいてカスタム出力オブジェクトを作成できます。" href="advanced-1.html#salesforce_maps_adv_prepare_customoutput">訪問のためのカスタム出力オブジェクトを作成する</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_advanced_concepts_visit_frequencies">
+<h1 class="slds-text-heading_large">消費財担当者向けの複雑な訪問頻度と期間</h1>
+  <p>たとえば、小売営業マネージャーが Consumer Goods を使用して、実店舗アカウントと季節性のある小売ポップアップストアをサポートしているとします。顧客満足度を維持し、訪問目標を達成するためのルートのバランスを取ることは簡単なことではありません。さらに、担当者のバーンアウトも避けなければなりません。Salesforce Maps Advanced でルートを生成する前に、以下のチェックリストを使用してデータと条件を作成します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Salesforce Maps Advanced では、担当者の対面訪問のみがスケジュールされます。</div></div></div>
+<p>
+        <strong class="uicontrol">実装前チェックリスト</strong>
+      </p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:20.32520325203252%"><col style="width:79.67479674796748%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d3798e68" style="vertical-align:top;" class="slds-cell-wrap" scope="col">要件</th>
+              <th id="d3798e71" style="vertical-align:top;" class="slds-cell-wrap" scope="col">シナリオの詳細</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d3798e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="要件">カレンダーオブジェクト</td>
+
+              <td headers="d3798e71" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオの詳細">担当者の訪問を示すオブジェクトです。このシナリオでは、営業担当の訪問は Consumer Goods の訪問レコードで表されるため、[設定] の [ルート &amp; スケジュール] で訪問オブジェクトに参照関係を追加します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d3798e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="要件">場所データ用のルーティング可能オブジェクト</td>
+
+              <td headers="d3798e71" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオの詳細"><p>小売店の取引先の場所を含むオブジェクトです。このシナリオでは小売店オブジェクトを使用し、そのオブジェクトに位置情報を追加します。</p><p style="margin-bottom:0;">場所データを使用すると、担当者にとって最も効率的なルートを生成できます。</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d3798e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="要件">訪問の頻度と訪問期間</td>
+
+              <td headers="d3798e71" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオの詳細">このシナリオでは小売店オブジェクトに、四半期ごとの訪問の要件から取得される、訪問間の最小および最大日数の計算式項目が含まれます。この小売店オブジェクトは、標準的な営業時間と季節性のあるビジネス用に、一時的な訪問期間を含む訪問期間を検索します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d3798e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="要件">訪問オブジェクト</td>
+
+              <td headers="d3798e71" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオの詳細">担当者が訪問を完了したかどうかに関するデータを含むオブジェクトです。このシナリオでは、訪問オブジェクトは Consumer Goods の訪問オブジェクトです。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d3798e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="要件">割り当てられた取引先</td>
+
+              <td headers="d3798e71" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオの詳細">取引先はルーティング可能オブジェクトのユーザー参照項目を通じて、担当者に割り当てられます。このシナリオでは取引先所有者が店舗訪問を担当します。ルートを生成すると、最適化プロセスが実行され、担当者のスケジュールに自身が所有する取引先への訪問が追加されます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d3798e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="要件">訪問の時間枠</td>
+
+              <td headers="d3798e71" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオの詳細">暦年の第 4 四半期のルートを生成することになるため、開始日は 10 月 1 日、終了日は 12 月 31 日です。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d3798e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="要件">シフトの最大長などの設定</td>
+
+              <td headers="d3798e71" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオの詳細">フィールド営業担当者のシフトは最大 7 時間です。</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">訪問間の日数を決定する具体例</h2><p>顧客は四半期ごとに 3 回の訪問を希望しています。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:17.452006980802793%"><col style="width:82.54799301919721%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d3798e168" style="vertical-align:top;" class="slds-cell-wrap" scope="col">決定する項目 </th>
+              <th id="d3798e171" style="vertical-align:top;" class="slds-cell-wrap" scope="col">使用するメソッド</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d3798e168" style="vertical-align:top;" class="slds-cell-wrap" data-label="決定する項目">最大日数</td>
+
+              <td headers="d3798e171" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用するメソッド"><p>四半期の日数を計算します。</p><p style="margin-bottom:0;">90 日 ÷ 3 か月 = 最大 30 日間の訪問間隔</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d3798e168" style="vertical-align:top;" class="slds-cell-wrap" data-label="決定する項目">最小日数</td>
+
+              <td headers="d3798e171" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用するメソッド">訪問間の日数を 30 日以内に設定することで、最適化により訪問スケジュールが調整され、すべてをカバーする可能性を高めることができます。</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">特別な訪問スケジュールが必要な顧客</h2><p>顧客の訪問の要件が異なる場合、同じ地域の担当者が何度も行き来できるようにします。担当者が同じ地域を別の日に繰り返し訪問するのを避けるために、訪問を地理的にまとめるようにします。そのためには、7 日、14 日、21 日、28 日など、訪問間の最小日数の分母をそろえておきます。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=ind.retail_concept_user_field_reps.htm&amp;language=ja&amp;type=5">Salesforce ヘルプ: 営業マネージャーのリテールエグゼキューション</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_advanced_concepts_visit_plans">
+<h1 class="slds-text-heading_large">レストラン取引先担当者用の訪問の優先度付け</h1>
+  <p>たとえば、あなたがレストラン営業マネージャーで、飲食料品業界の取引先を担当する担当者がいるとします。担当地域では 11 月にレストランウィークのプロモーションが開催されます。プロモーションに参加するクライアントには、より頻繁な訪問が必要です。そのため、その週は他のクライアントよりもレストランウィークのクライアントの優先度を高くします。課題は、担当者の作業負荷を最適化し、休日を考慮したルートを手動で作成することなく、優先度に合わせて顧客に対応することです。Salesforce Maps Advanced でルートを生成する前に、以下のチェックリストを使用してデータと条件を作成します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Salesforce Maps Advanced では、担当者の対面訪問のみがスケジュールされます。</div></div></div>
+
+    <p>
+      <strong class="uicontrol">実装前チェックリスト</strong>
+    </p>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:20.32520325203252%"><col style="width:79.67479674796748%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d16246e66" style="vertical-align:top;" class="slds-cell-wrap" scope="col">要件</th>
+            <th id="d16246e69" style="vertical-align:top;" class="slds-cell-wrap" scope="col">シナリオの詳細</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d16246e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="要件">カレンダーオブジェクト</td>
+
+            <td headers="d16246e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオの詳細">担当者の訪問を示すオブジェクトです。このシナリオでは、担当者の訪問は担当者の Salesforce カレンダーに行動として表示されるため、カレンダーオブジェクトは行動オブジェクトになります。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d16246e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="要件">場所データ用のルーティング可能オブジェクト</td>
+
+            <td headers="d16246e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオの詳細"><p>飲食料品の取引先の場所を含むオブジェクトです。このシナリオでは、取引先オブジェクトに場所データが含まれていると仮定します。含まれていない場合は、場所データを含むカスタムオブジェクトを作成します。</p><p style="margin-bottom:0;">また、レストランウィークの取引先ロケーションのみを含むカスタムルーティング可能オブジェクト、RW_Accounts があります。担当者のルートを作成するときには、取引先オブジェクトよりも RW_Accounts オブジェクトを優先します。優先度付けをすることで、スケジュールされている最大訪問数を満たすか、それを上回るようにするために、Salesforce Maps Advanced でレストランウィークの顧客の方がより早く担当者のカレンダーにスケジュールされます。</p></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d16246e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="要件">訪問の頻度と訪問期間</td>
+
+            <td headers="d16246e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオの詳細">このシナリオでは、取引先オブジェクトには、四半期の訪問目標数とレストランウィークの訪問目標数の項目が含まれます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d16246e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="要件">訪問オブジェクト</td>
+
+            <td headers="d16246e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオの詳細">担当者が訪問を完了したかどうかに関するデータを含むオブジェクトです。このシナリオでは、訪問オブジェクトはタスクオブジェクトになります。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d16246e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="要件">割り当てられた取引先</td>
+
+            <td headers="d16246e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオの詳細">取引先はルーティング可能オブジェクトのユーザー参照項目を通じて、担当者に割り当てられます。このシナリオでは、取引先所有者がレストランの訪問を担当します。ルートを生成すると、最適化プロセスが実行され、担当者のスケジュールに自身が所有する取引先への訪問が追加されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d16246e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="要件">訪問の時間枠</td>
+
+            <td headers="d16246e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオの詳細">11 月分のルートを生成するため、開始日は 11 月 1 日、終了日は 11 月 30 日とします。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d16246e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="要件">シフトの最大長などの設定</td>
+
+            <td headers="d16246e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオの詳細">フィールド営業担当者のシフトは最大 8 時間です。</td>
+
+          </tr>
+        </tbody></table>
+  
+</div></div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="advanced-1.html">&larr; Salesforce Maps Advanced・テリトリープランニング（1/2）</a><a href="usage.html">活用・ルート最適化・Esri 連携 &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=sales.salesforce_maps_setup_maps.htm&type=5&language=ja">help.salesforce.com — Salesforce Maps（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>

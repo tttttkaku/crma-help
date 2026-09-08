@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>ApexGuru（概要・ワークフロー・FAQ） | スケーラビリティ ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（7）</h2>
+    <ol>
+      <li><a href="#apexguru_antipatterns">ApexGuru Antipatterns</a></li>
+      <li><a href="#apexguru_code_duplicates">ApexGuru Code Duplicates</a></li>
+      <li><a href="#apexguru_faq">ApexGuru FAQ</a></li>
+      <li><a href="#apexguru_overview">ApexGuru Insights</a></li>
+      <li><a href="#apexguru_salesforce_dx_mcp">Use ApexGuru in Agentic IDEs with DX MCP</a></li>
+      <li><a href="#apexguru_test_case_antipatterns">ApexGuru Test Case Antipatterns</a></li>
+      <li><a href="#apexguru_workflow">Activate and Use ApexGuru for Apex Code Analysis</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>ApexGuru（概要・ワークフロー・FAQ）</h1>
+      <div class="meta">Salesforce スケーラビリティ ヘルプ · 7 記事 · 生成 2026-08-17</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="agentforce_for_scale.html">&larr; Agentforce for Scale</a><a href="apexguru_antipatterns.html">ApexGuru アンチパターン集 &rarr;</a></div>
+<section class="article" id="apexguru_antipatterns">
+<h1 class="slds-text-heading_large">ApexGuru Antipatterns</h1>
+  <p>The antipatterns highlighted in ApexGuru help you detect avoidable inefficiencies in
+    your Apex code. Where practical, we also share recommendations for revising your approach to
+    improve the efficiency of your code.</p>
+
+<ul><li class="slds-p-bottom_small"><strong><a href="apexguru_antipatterns.html#apexguru_antipattern_aggregating_in_apex">ApexGuru Antipattern: Aggregating Records in Apex</a></strong><br>SOQL queries that manually compute aggregate functions in Apex are inefficient and lead   to performance issues. This approach wastes CPU resources and results in bloated, less readable   code that's harder to maintain. Instead, use SOQL’s built-in aggregate functions like SUM(),   AVG(), COUNT(), and COUNT_DISTINCT() to perform the work at the database level.</li><li class="slds-p-bottom_small"><strong><a href="apexguru_antipatterns.html#apexguru_antipattern_busy_loop_delay">ApexGuru Antipattern: Busy Loop Delay</a></strong><br>Busy loops that introduce a delay aren’t efficient and lead to performance issues. They   waste CPU resources due to continuous loop execution. Governor limit breaches cause transaction   failures. For delayed execution, use Salesforce alternatives like scheduling systems in Apex. If   the delay is due to an async job, use System.enqueueJob with a delay parameter.</li><li class="slds-p-bottom_small"><strong><a href="apexguru_antipatterns.html#apexguru_antipattern_copying_elements_with_for_loop">ApexGuru Antipattern: Copying List or Set Elements Using a For Loop</a></strong><br>Using a For loop to copy parts of a list or set takes more CPU time and can cause   governor limit breaches, especially with large datasets. Instead, Apex provides the addAll()   method to copy elements efficiently in a single operation, improving both performance and code   clarity.</li><li class="slds-p-bottom_small"><strong><a href="apexguru_antipatterns.html#apexguru_antipattern_dml_in_loop">ApexGuru Antipattern: DML in a Loop</a></strong><br>Executing DML operations (insert, update, and delete) inside loops causes excessive   resource consumption and can hit governor limits. Instead, batch DML operations by storing records   in a list and performing the DML operation one time outside of the loop.</li><li class="slds-p-bottom_small"><strong><a href="apexguru_antipatterns.html#apexguru_antipattern_expensive_debug_statements">ApexGuru Antipattern: Expensive Debug Statements</a></strong><br>Overusing System.debug() slows down execution, especially in production environments.   Writing large amounts of data to logs increases the execution time and affects performance. Plus,   the logs fill, making it harder to identify important issues.</li><li class="slds-p-bottom_small"><strong><a href="apexguru_antipatterns.html#apexguru_antipattern_expensive_methods">ApexGuru Antipattern: Expensive Methods</a></strong><br>Hot methods that consume over 5% of CPU time can cause performance bottlenecks, breach   governor limits, and decrease system performance. Expensive methods consume more than 2% but less   than 5% of CPU time. Critically expensive methods consume more than 5% of CPU time. To reduce CPU   consumption, refactor expensive methods.</li><li class="slds-p-bottom_small"><strong><a href="apexguru_antipatterns.html#apexguru_antipattern_expensive_string_comparison">ApexGuru Antipattern: Expensive String Comparison</a></strong><br>The == operator for string comparison invokes java.text.Collator.compare(), which is   slower than using String.equals() or String.equalsIgnoreCase(). Longer strings and larger loops   increase overhead.</li><li class="slds-p-bottom_small"><strong><a href="apexguru_antipatterns.html#apexguru_antipattern_limits_getheapsize_methods">ApexGuru Antipattern: Limits.getHeapsize() Methods</a></strong><br>The Limits.getHeapSize() method monitors memory consumption during execution. This   operation increases resource consumption, especially when used in production environments. When   used in debug statements or logs, this method is evaluated even if the logs aren’t printed in   production and this causes more performance degradation.</li><li class="slds-p-bottom_small"><strong><a href="apexguru_antipatterns.html#apexguru_antipattern_redundant_soql">ApexGuru Antipattern: Redundant SOQL</a></strong><br>Executing multiple SOQL queries on the same sObject with identical or nearly identical   filter conditions creates inefficiencies. This practice wastes governor limits and increases   transaction time because it requires more database round-trips. Processing separate query   responses wastes CPU time and heap space. </li><li class="slds-p-bottom_small"><strong><a href="apexguru_antipatterns.html#apexguru_antipattern_schema_getglobaldescribe_called_multiple_times">ApexGuru Antipattern: Schema.getGlobalDescribe() Called Multiple Times Within a Class</a></strong><br>Multiple calls to Schema.getGlobalDescribe() in a class cause performance issues and are   computationally expensive. Calling this method multiple times within the same method results in   redundant schema retrieval. Increased CPU usage can cause you to go over your governor   limits.</li><li class="slds-p-bottom_small"><strong><a href="apexguru_antipatterns.html#apexguru_antipattern_schema_getglobaldescribe_in_loop">ApexGuru Antipattern: Schema.getGlobalDescribe() In a Loop</a></strong><br>The Schema.getGlobalDescribe() method collects schema information on all SObjects,         which is computationally expensive. Using Schema.getGlobalDescribe() inside a loop can lead         to performance issues, including breaking governor limits.</li><li class="slds-p-bottom_small"><strong><a href="apexguru_antipatterns.html#apexguru_antipattern_schema_getglobaldescribe_not_efficient">ApexGuru Antipattern: Schema.getGlobalDescribe() Not Efficient</a></strong><br>Using Schema.getGlobalDescribe() to retrieve metadata for a single known SObject         isn’t efficient. This method causes unnecessary overhead, decreases performance, and         increases the latency of the associated entry point.</li><li class="slds-p-bottom_small"><strong><a href="apexguru_antipatterns.html#apexguru_antipattern_sobject_map_in_for_loop">ApexGuru Antipattern: SObject Map in a For Loop</a></strong><br>Building Map&lt;Id, sObject&gt; in a For loop inserts one record at a time. This query   fetches all Custom Object__c records without filtering, which causes extra CPU usage. Filtering   later in Apex boosts memory use, risks overflow, and slows performance. Instead, use Apex's map   constructor or putAll().</li><li class="slds-p-bottom_small"><strong><a href="apexguru_antipatterns.html#apexguru_antipattern_soql_in_loop">ApexGuru Antipattern: SOQL in a Loop</a></strong><br>Executing SOQL queries inside loops can quickly exhaust the governor limits and decrease   system performance. Salesforce enforces a limit on the number of queries per transaction. Instead,   batch SOQL queries outside of loops.</li><li class="slds-p-bottom_small"><strong><a href="apexguru_antipatterns.html#apexguru_antipattern_soql_in_loop_one_hop">ApexGuru Antipattern: SOQL in a Loop (One Hop)</a></strong><br>The SOQL query is placed in a method in one class and the loop that invokes this method   is in a different class. This structure leads to excessive SOQL queries, potentially hitting   governor limits. Repeated query execution across class boundaries causes performance bottlenecks.   Refactor the code to batch SOQL queries outside the loop, even if they’re spread across multiple   classes.</li><li class="slds-p-bottom_small"><strong><a href="apexguru_antipatterns.html#apexguru_antipattern_soql_with_apex_filter">ApexGuru Antipattern: SOQL with Apex Filter</a></strong><br>Executing SOQL queries without a WHERE clause or LIMIT statement and filtering them in   Apex retrieves unnecessary data. This process increases memory and CPU usage and can lead to   overall system performance and governor limit issues.</li><li class="slds-p-bottom_small"><strong><a href="apexguru_antipatterns.html#apexguru_antipattern_soql_with_negative_expressions">ApexGuru Antipattern: SOQL with Negative Expressions</a></strong><br>SOQL queries that use negative expressions such as NOT IN or != don't index         effectively, leading to full-table scans. Less-efficient database operations increase query         time and CPU usage. Avoid negative expressions. Use positive expressions wherever         possible.</li><li class="slds-p-bottom_small"><strong><a href="apexguru_antipatterns.html#apexguru_antipattern_soql_with_unused_fields">ApexGuru Antipattern: SOQL with Unused Fields</a></strong><br>Retrieving unused fields in SOQL queries increases overhead, resource consumption,         and query execution time. It also increases heap size and causes governor limits to be         exceeded, especially with large datasets or complex objects. Only include fields directly         required by your logic. Regularly review and improve SOQL queries to remove unused         fields.</li><li class="slds-p-bottom_small"><strong><a href="apexguru_antipatterns.html#apexguru_antipattern_soql_with_wildcard_filter">ApexGuru Antipattern: SOQL with Wildcard Filter</a></strong><br>Using a wildcard such as LIKE '%term in SOQL queries prevents the use of indexes and         causes full-table scans. Full-table scans increase query execution time and CPU usage. Use         indexed fields for filtering and optimized search strategies.</li><li class="slds-p-bottom_small"><strong><a href="apexguru_antipatterns.html#apexguru_antipattern_soql_without_where_clause_or_limit_statement">ApexGuru Antipattern: SOQL Without a WHERE Clause or LIMIT Statement</a></strong><br>Executing SOQL queries without a WHERE clause or LIMIT statement can retrieve too         many records, leading to governor-limit breaches for the number of rows returned. To         restrict the amount of data returned, include a WHERE clause or LIMIT statement in SOQL         queries.</li><li class="slds-p-bottom_small"><strong><a href="apexguru_antipatterns.html#apexguru_antipattern_soql_without_platform_cache">ApexGuru Antipattern: SOQL Without Platform Cache</a></strong><br>Running the same SOQL query repeatedly during a transaction or across requests can slow   down performance and put an unnecessary load on the database. Instead, use Platform Cache to   eliminate the need for custom settings or persistent storage.</li><li class="slds-p-bottom_small"><strong><a href="apexguru_antipatterns.html#apexguru_antipattern_sorting_in_apex">ApexGuru Antipattern: Sorting in Apex</a></strong><br>Sorting records in Apex code uses more central processing unit (CPU) time and can exceed   governor limits. This is especially true for large datasets. Using Apex to sort can also lead to   heap-size overflows and degraded query performance.</li><li class="slds-p-bottom_small"><strong><a href="apexguru_antipatterns.html#apexguru_antipattern_unused_classes_and_methods">ApexGuru Antipattern: Unused Methods</a></strong><br>Unused Apex methods contribute to code bloat and increase the cognitive load for     developers. These pieces of code make it harder to maintain the system and can also increase the     size of the deployment package, making it more difficult to stay within the Salesforce Apex code     size limits. Identify and remove unused methods to improve code clarity and     performance.</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="apexguru_code_duplicates">
+<h1 class="slds-text-heading_large">ApexGuru Code Duplicates</h1>
+  
+  <p>Identify exact and near-duplicate Apex code across your org to reduce maintenance burden and free up governor limit headroom.</p>
+
+    <div><p><strong>What's Analyzed</strong></p><ul>
+        <li>Custom Apex code in your org</li>
+
+        <li>Exact matches (identical code) and near duplicates (95% or greater similarity)</li>
+
+        <li>File-level, method-level, and block-level duplicates</li>
+
+      </ul>
+<p><strong>What's Excluded</strong></p><ul>
+        <li>Test classes (files ending in <code>Test.cls</code> or <code>Tests.cls</code>, or with @IsTest annotation)</li>
+
+        <li>Managed package code</li>
+
+        <li>Platform-required boilerplate (constructors, Batch Apex interface methods, Schedulable/Queueable execute methods, trigger handler methods)</li>
+
+        <li>Code blocks under 5 lines or under 200 characters of non-comment code</li>
+
+        <li>Fuzzy matches (80-95% similarity)</li>
+
+      </ul>
+<p><strong>Limitations</strong></p><ul>
+        <li>Apex classes only (LWC, Aura, VF, Flows not analyzed)</li>
+
+        <li>Test classes excluded (files ending in Test.cls/Tests.cls or with @IsTest)</li>
+
+        <li>Managed package code excluded</li>
+
+        <li>Platform-required boilerplate filtered (constructors, Batch/Schedulable/Queueable
+          interface methods, trigger handlers)</li>
+
+        <li>Minimum thresholds: 5 lines / 200 characters of non-comment code</li>
+
+        <li>Only Exact + Near-duplicate (≥95%) reported — Fuzzy (80–95%) excluded</li>
+
+        <li>Results capped at top 100 findings</li>
+
+        <li>Multi-org not available this release</li>
+
+        <li>Read-only, no code modification </li>
+
+      </ul>
+<p>The report organizes duplicate groups by priority (High, Medium, Low Effort) and shows total Apex characters reducible through consolidation.</p></div>
+    <ol><li>
+        <span>From Setup, in the Quick Find box, enter <kbd>Scale Insights</kbd>, then
+          click <strong class="uicontrol">ApexGuru Insights</strong>.</span>
+      </li><li>
+        <span>Select a <strong>Report Creation Date</strong>.</span>
+      </li><li>
+        <span>Click the <strong class="uicontrol">Code Duplicates</strong> tab.</span>
+      </li></ol>
+
+    <div><p>Each finding displays:</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:35.46099290780141%"><col style="width:64.53900709219857%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d4091e160" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Element</th>
+              <th id="d4091e163" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Description</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d4091e160" style="vertical-align:top;" class="slds-cell-wrap" data-label="Element">Group Title</td>
+
+              <td headers="d4091e163" style="vertical-align:top;" class="slds-cell-wrap" data-label="Description">Apex class or method name with file count.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d4091e160" style="vertical-align:top;" class="slds-cell-wrap" data-label="Element">Stats</td>
+
+              <td headers="d4091e163" style="vertical-align:top;" class="slds-cell-wrap" data-label="Description">The number of copies and characters reducible.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d4091e160" style="vertical-align:top;" class="slds-cell-wrap" data-label="Element">Diagnosis</td>
+
+              <td headers="d4091e163" style="vertical-align:top;" class="slds-cell-wrap" data-label="Description">What the duplicate is and why it matters.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d4091e160" style="vertical-align:top;" class="slds-cell-wrap" data-label="Element">Resolution Pattern</td>
+
+              <td headers="d4091e163" style="vertical-align:top;" class="slds-cell-wrap" data-label="Description">Suggested consolidation action.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d4091e160" style="vertical-align:top;" class="slds-cell-wrap" data-label="Element">Match Type</td>
+
+              <td headers="d4091e163" style="vertical-align:top;" class="slds-cell-wrap" data-label="Description">Exact (identical) or Near Duplicate (similar with minor differences).</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d4091e160" style="vertical-align:top;" class="slds-cell-wrap" data-label="Element">Duplicate Instances</td>
+
+              <td headers="d4091e163" style="vertical-align:top;" class="slds-cell-wrap" data-label="Description">Specific files or methods with character counts.</td>
+
+            </tr>
+          </tbody></table><p><strong>Working with the Report</strong></p><p>Filter findings by <strong>Scope</strong> (File, Method, Block), <strong>Effort</strong> (Low, Medium, High),
+        or <strong>Match Type</strong> (Exact or Near Duplicate).</p><p>The <strong>Characters Reducible</strong> metric shows how many characters you can eliminate by
+        consolidating duplicates. The calculation is the size of one copy times (number of copies −
+        1). For example, 3 copies of a 5,000-character method is calculated as 5,000 times 2, which
+        equals 10,000 characters reducible (you keep one copy, remove the rest).</p><p>Click <strong class="uicontrol">Download PDF</strong> to export findings with character counts,
+        recommended fixes, and effort classifications.</p></div>
+    <div><p><strong>Best Practices</strong></p><ul>
+        <li>Start with <strong>Low Effort</strong> groups for quick wins. Sort by <strong>Characters Reducible</strong>
+          for maximum impact.</li>
+
+        <li>Review Exact duplicates first. They are safest to consolidate.</li>
+
+        <li>Share PDF reports with your development team.</li>
+
+        <li>Rerun scans after consolidation to track progress.</li>
+
+      </ul>
+</div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="apexguru_faq">
+<h1 class="slds-text-heading_large">ApexGuru FAQ</h1>
+  
+  <p>Get answers to common questions about ApexGuru.</p>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">What is ApexGuru?</h2><p>ApexGuru is an AI-powered tool that analyzes your Apex code to find and fix
+        performance-related issues. ApexGuru provides insights within 24 hours of opt-in and
+        refreshes weekly. Retrieve insights for the last 30 days.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">How does ApexGuru analyze my code?</h2><p>ApexGuru requires read-only access to your Apex code. It makes an encrypted copy for
+        analysis and then immediately deletes it. It doesn't store your code long-term.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Are there any usage limits for ApexGuru?</h2><p>Insight generation is limited to <strong>3</strong> per rolling week. If you're using the ApexGuru
+        integration with Code Analyzer, you're limited to <strong>50</strong> scans per org per hour.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">What does ApexGuru evaluate my code for?</h2><p>ApexGuru checks for various governor limits, including CPU time, SOQL queries and statement
+        length, DML statements, and the total Apex character limit. It also identifies antipatterns
+        like SOQL and DML statements within loops.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Why is a DML operation flagged as an expensive method?</h2><p>DML operations typically impact database limits, but they can appear as CPU "hot spots" due
+        to execution grouping. This occurs when the analysis engine aggregates processing time from
+        related sources into the DML entry point. The time includes pre-DML logic like intensive
+        data transformations or list sorting performed before the operation. Downstream CPU demands
+        result from before-save triggers, validation rules, and flows started by the operation.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">How do I investigate flagged DML statements?</h2><ul>
+        <li>Review the code leading up to the DML call. The bottleneck is often in the data
+          preparation phase.</li>
+
+        <li>Check for heavy logic in triggers or automation associated with the sObject.</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">How should I configure my network security for ApexGuru?</h2><p>To ensure uninterrupted connectivity, we recommend that you use domain-based allowlisting
+        (for example, salesforce.com) instead of IP-based restrictions. This approach is more
+        reliable for cloud apps. In most configurations, ApexGuru traffic appears as standard
+        Salesforce traffic. Make sure that your network allows traffic from the standard Salesforce
+        IP ranges.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Can I allowlist specific IP addresses?</h2><p>No, ApexGuru doesn't support strict IP allowlisting for individual app instances. Because
+        our cloud infrastructure is dynamic, it assigns and rotates addresses without notice. Even
+        providing static ranges can create a false sense of security and lead to service
+        interruptions. If you hard code dynamic IP addresses into a firewall, connectivity will
+        break whenever the infrastructure automatically scales or updates.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">What is the Test Case Insights feature?</h2><p>Test Case Insights analyzes your codebase to identify gaps in test coverage, detect test
+        antipatterns, and provide AI-generated recommendations to strengthen your Apex test
+        suite.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">How does Test Case Insights work?</h2><p>Test Case Insights evaluates your Apex methods and generates recommendations to improve
+        them. Instead of using severity levels, it categorizes methods based on test quality:</p><ul>
+        <li><strong>Untested</strong>: No test coverage. This category has the highest priority.</li>
+
+        <li><strong>Unasserted</strong>: Tests execute code but don't validate outcomes.</li>
+
+        <li><strong>Undertested</strong>: Limited test data or missing boundary and edge cases.</li>
+
+      </ul>
+<p>To help you focus on the most critical gaps, Test Case Insights surfaces only prioritized
+        categories.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">How does prioritization work?</h2><p>To help you address the most critical issues first, Test Case Insights surfaces up to
+        <strong>50</strong> high-impact methods per analysis:</p><ul>
+        <li><strong>Untested methods</strong>: Highest risk with no validation coverage.</li>
+
+        <li><strong>Expensive methods</strong>: High runtime impact areas such as hot methods.</li>
+
+        <li><strong>Methods with detected antipatterns</strong>: Issues such as unasserted and undertested
+          scenarios.</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Is ApexGuru available in Hyperforce?</h2><p>Yes, ApexGuru is available in Hyperforce. If it was enabled before migration, it remains
+        active afterward.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Does enabling ApexGuru affect my org's performance?</h2><p>No, ApexGuru uses logs that are collected without any impact on your org's performance. It
+        also doesn't count towards platform limits.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Is ApexGuru available in all Salesforce orgs?</h2><p>No. ApexGuru is available only in Production and Full Copy Sandbox orgs for Unlimited,
+        Enterprise, Professional, and Signature Editions. It's not available in Developer Edition
+        orgs.</p><p>ApexGuru Insights are available via Code Analyzer in orgs that have already activated
+        ApexGuru (Prod or Full Copy). You can see these insights in the following org types:</p><ul>
+        <li>Developer Sandbox</li>
+
+        <li>Partial Copy Sandbox</li>
+
+        <li>Scratch Orgs (where the Developer Hub is Prod or Full Copy)</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">How do I use ApexGuru with Salesforce Code Analyzer?</h2><p>ApexGuru's automated code optimization features are directly integrated into the Code
+        Analyzer VS Code extension. To learn more and get started, see <a target="_blank" href="https://developer.salesforce.com/docs/platform/salesforce-code-analyzer/guide/analyze-vscode.html#scan-your-apex-code-for-performance-issues-using-apexguru">Scan Your Apex Code for Performance Issues Using
+          ApexGuru</a>.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">What does Code Duplicates do?</h2><p>Code Duplicates identifies exact and near-duplicate Apex code across your org's custom code (managed packages excluded). It displays the top 100 duplicate groups ranked by characters reducible—the number of characters you can consolidate. An Exact duplicate is identical after normalization; a Near Duplicate has minor differences like renamed variables.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">How are characters reducible calculated?</h2><p>The calculation is the size of one copy times (number of copies − 1). For example, 3 copies
+        of a 5,000-character method = 5,000 × (3 − 1) = 10,000 characters reducible.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Does Code Duplicates impact my org?</h2><p>No. Code Duplicates uses static analysis with no impact on org performance, storage limits, or API usage.</p></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="apexguru_overview">
+<h1 class="slds-text-heading_large">ApexGuru Insights</h1>
+  
+  <p>Use AI and machine learning models to analyze your Apex code, surface performance
+    antipatterns, detect unused and duplicated code, and generate prescriptive optimization
+    recommendations.</p>
+
+    <div><p>Enable ApexGuru in your org before generating reports.</p></div>
+    <div><p><strong>What You Need to Know</strong></p><ul>
+        <li><strong>Editions and eligibility</strong>: ApexGuru is available only in Production and Full Copy
+          Sandbox orgs for Unlimited, Enterprise, Professional, and Signature Editions. It's not
+          available in Developer Edition orgs. Assign the <code>Salesforce ApexGuru + Platform
+            Integration User</code> permission set.</li>
+
+        <li><strong>Data retention and trust</strong>: ApexGuru retains your data for 30 days, then purges it.
+          Processing uses the Einstein Trust Layer (US-hosted) with logical org isolation. Your Apex
+          code never trains AI models and isn't retained at the LLM level.</li>
+
+        <li><strong>Scan frequency and processing</strong>: Scan your org up to three times per week.
+          Processing typically completes within a few hours depending on org size and
+          complexity.</li>
+
+        <li><strong>Antipattern coverage</strong>: ApexGuru detects more than 24 performance antipatterns
+          across SOQL, DML, CPU, memory, and string operations, with new patterns added each
+          release.</li>
+
+        <li><strong>Unused Methods false positives</strong>: ApexGuru uses static analysis only (not
+          runtime-tracked). False positives can occur for
+            <code>System.PageReference</code> methods, interface implementations,
+          dynamically invoked methods (e.g., via <code>Type.newInstance()</code>), and internal
+          calls in managed packages. For comprehensive limitations, see <a title="Get answers to common questions about ApexGuru." href="#apexguru_faq">ApexGuru FAQ</a>.</li>
+
+        <li><strong>Government Cloud and Hyperforce</strong>: Supported in Hyperforce (orgs enabled before
+          migration retain access). Government Cloud isn't supported.</li>
+
+      </ul>
+<p><strong>ApexGuru Surfaces</strong></p><p>Access ApexGuru through multiple surfaces:</p><ul>
+        <li><strong>Setup</strong>: Navigate to Scale Insights, then ApexGuru Insights for comprehensive
+          reports.</li>
+
+        <li><strong>Scale Center</strong>: Access ApexGuru from the Health Map or ApexGuru tab.</li>
+
+        <li><strong>Code Analyzer IDE (VS Code)</strong>: Scan Apex code directly in your IDE. See <a target="_blank" href="https://developer.salesforce.com/docs/platform/salesforce-code-analyzer/guide/analyze-vscode.html#scan-your-apex-code-for-performance-issues-using-apexguru">Scan Your Apex Code for Performance Issues Using
+            ApexGuru</a>.</li>
+
+        <li><strong>Code Analyzer CLI</strong>: Scan Apex classes from the command line.</li>
+
+        <li><strong>DX MCP and Agentic IDEs</strong>: Use ApexGuru in Agentforce-powered environments like
+          Cursor and VS Code. See <a title="Resolve Apex performance issues directly in environments like VS Code, Agentforce Vibes, and Cursor without switching to the Salesforce UI." href="#apexguru_salesforce_dx_mcp">Use
+            ApexGuru in Agentic IDEs with DX MCP</a>.</li>
+
+        <li><strong>Lightning Experience Insights</strong>: When you access a Lightning Experience Performance
+          report, it automatically links relevant ApexGuru recommendations. Click a hyperlinked
+          action name to open an ApexGuru Insights tab for that action within the <a title="Use on-demand insights to identify, analyze, and improve the performance of your custom Lightning pages and Lightning components. Lightning Experience Insights provides a high-level overview of your users’ experience, and detailed metrics to identify bottlenecks and optimize page load times. You can find this data inside the Performance Insights and Usage Insights dashboards." href="insights.html#lex_insights_overview">Lightning Experience Insights</a>
+          dashboard. Review Code Recommendations and SOQL/DML Analysis for slow Apex actions and
+          revise them to improve Lightning Experience performance.</li>
+
+      </ul>
+<p>To generate recommendations in Setup:</p></div>
+    <ol><li>
+        <span>From Setup, in the Quick Find box, enter <kbd>Scale Insights</kbd>, then
+          click <strong class="uicontrol">ApexGuru Insights</strong>.</span>
+      </li><li>
+        <span>Select a <strong>Report Creation Date</strong>. ApexGuru analyzes your code and consolidates
+     different categories of recommended fixes.</span>
+      </li></ol>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="ApexGuru Insight Categories" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-scalability-262-0-0-production-enus/10fed30e-b440-4267-91a6-b6264993ae50/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ApexGuru Insight Categories</span> 
+      
+      <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:35.46099290780141%"><col style="width:64.53900709219857%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d6686e191" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Insight</th>
+              <th id="d6686e194" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Definition</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d6686e191" style="vertical-align:top;" class="slds-cell-wrap" data-label="Insight">Code Recommendations</td>
+
+              <td headers="d6686e194" style="vertical-align:top;" class="slds-cell-wrap" data-label="Definition">Ranked by expected impact, prescriptive recommendations for optimizing sObject
+                types, methods, and memory.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d6686e191" style="vertical-align:top;" class="slds-cell-wrap" data-label="Insight">SOQL/DML Analysis</td>
+
+              <td headers="d6686e194" style="vertical-align:top;" class="slds-cell-wrap" data-label="Definition">Ways to optimize your SOQL and avoid performance issues.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d6686e191" style="vertical-align:top;" class="slds-cell-wrap" data-label="Insight">Expensive Methods</td>
+
+              <td headers="d6686e194" style="vertical-align:top;" class="slds-cell-wrap" data-label="Definition">Expensive methods consume 2–5% of CPU time, and critically expensive methods
+                consume at least 5% of CPU time.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d6686e191" style="vertical-align:top;" class="slds-cell-wrap" data-label="Insight">Unused Methods</td>
+
+              <td headers="d6686e194" style="vertical-align:top;" class="slds-cell-wrap" data-label="Definition">Methods that your currently deployed Apex code doesn’t call.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d6686e191" style="vertical-align:top;" class="slds-cell-wrap" data-label="Insight">Test Case Insights</td>
+
+              <td headers="d6686e194" style="vertical-align:top;" class="slds-cell-wrap" data-label="Definition">Intelligent Test Coverage Classification (Untested, Unasserted, Undertested),
+                AI-generated test methods with side-by-side Current vs Recommended code, and test
+                antipattern detection to improve test quality and reduce coverage inflation.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d6686e191" style="vertical-align:top;" class="slds-cell-wrap" data-label="Insight">Code Duplicates</td>
+
+              <td headers="d6686e194" style="vertical-align:top;" class="slds-cell-wrap" data-label="Definition">Exact and near-duplicate Apex code detected across your org at file, method,
+                and block levels, ranked by characters reducible to help you consolidate and free up
+                governor limit headroom. The calculation is the size of one copy times (number of
+                copies − 1).</td>
+
+            </tr>
+          </tbody></table>
+    </div></div></div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#apexguru_code_duplicates">ApexGuru Code Duplicates</a></strong><br>Identify exact and near-duplicate Apex code across your org to reduce maintenance burden and free up governor limit headroom.</li><li class="slds-p-bottom_small"><strong><a href="#apexguru_antipatterns">ApexGuru Antipatterns</a></strong><br>The antipatterns highlighted in ApexGuru help you detect avoidable inefficiencies in     your Apex code. Where practical, we also share recommendations for revising your approach to     improve the efficiency of your code.</li><li class="slds-p-bottom_small"><strong><a href="#apexguru_test_case_antipatterns">ApexGuru Test Case Antipatterns</a></strong><br>The test cases highlighted in ApexGuru help you find places in your Apex test code that     aren’t valid, maintainable, or production-ready.</li><li class="slds-p-bottom_small"><strong><a href="#apexguru_workflow">Activate and Use ApexGuru for Apex Code Analysis</a></strong><br>Learn how to activate ApexGuru and analyze your Salesforce org’s Apex code securely     using the Einstein Trust Layer.</li><li class="slds-p-bottom_small"><strong><a href="#apexguru_salesforce_dx_mcp">Use ApexGuru in Agentic IDEs with DX MCP</a></strong><br>Resolve Apex performance issues directly in environments like VS Code, Agentforce Vibes,   and Cursor without switching to the Salesforce UI.</li><li class="slds-p-bottom_small"><strong><a href="#apexguru_faq">ApexGuru FAQ</a></strong><br>Get answers to common questions about ApexGuru.</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">See Also</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://developer.salesforce.com/blogs/2024/02/get-ai-powered-insights-for-your-apex-code-with-apexguru">Get AI-Powered Insights for Your Apex Code with ApexGuru</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=005132418&amp;language=en_US&amp;type=1">Limitation: ApexGuru "Unused Methods"</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="apexguru_salesforce_dx_mcp">
+<h1 class="slds-text-heading_large">Use ApexGuru in Agentic IDEs with DX MCP</h1>
+ 
+ <p>Resolve Apex performance issues directly in environments like VS Code, Agentforce Vibes,
+  and Cursor without switching to the Salesforce UI.</p>
+
+  <div><p>In <a target="_blank" href="https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_mcp.htm">Salesforce DX MCP Server and Tools</a>, ApexGuru analyzes
+    your Apex classes within your preferred IDE to identify performance antipatterns and production
+    run-time impact. It provides prioritized recommendations including the antipattern type, line
+    number, code snippet, and fix.</p></div>
+  <ol><li>
+    <span>Review the <a target="_blank" href="https://github.com/salesforcecli/mcp/blob/main/packages/mcp-provider-scale-products/README.md">GitHub README</a> file for detailed setup instructions,
+     commands, and code samples.</span>
+   </li><li>
+    <span>Install Node.js (v18 or later).</span>
+   </li><li>
+    <span>Authenticate your org: <code>sf org login web</code>.</span>
+   </li><li>
+    <span>Set your default org: <code>sf config set target-org &lt;alias&gt;</code>.</span>
+   </li><li>
+    <span>Configure the Scale Products toolset: Add the <code>@salesforce/mcp server</code> to
+     your IDE’s MCP settings using the <code>--toolsets scale-products</code> argument. </span>
+   </li><li>
+    <span>Ask your IDE agent to scan a class. For example: Scan OrderHandler.cls for performance
+     antipatterns using scan_apex_class_for_antipatterns.</span>
+   </li></ol>
+
+  <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="Key Tasks" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-scalability-262-0-0-production-enus/10fed30e-b440-4267-91a6-b6264993ae50/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">Key Tasks</span> 
+   
+   <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:35.46099290780141%"><col style="width:64.53900709219857%"></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d2657e107" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Task</th>
+       <th id="d2657e110" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Description</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d2657e107" style="vertical-align:top;" class="slds-cell-wrap" data-label="Task">Scan for Antipatterns</td>
+
+       <td headers="d2657e110" style="vertical-align:top;" class="slds-cell-wrap" data-label="Description">Use <code>scan_apex_class_for_antipatterns</code> to detect issues like SOQL
+        without WHERE clauses or expensive <code>getGlobalDescribe()</code> calls.</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d2657e107" style="vertical-align:top;" class="slds-cell-wrap" data-label="Task">Get Run-time Insights</td>
+
+       <td headers="d2657e110" style="vertical-align:top;" class="slds-cell-wrap" data-label="Description">Enable ApexGuru in your Production or Full Copy org. The tool uses production data to
+        prioritize issues.</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d2657e107" style="vertical-align:top;" class="slds-cell-wrap" data-label="Task">Use Best Practices</td>
+
+       <td headers="d2657e110" style="vertical-align:top;" class="slds-cell-wrap" data-label="Description">Limit enabled toolsets to <code>scale-products</code> for better performance.
+        Reference the tool name explicitly in prompts.</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d2657e107" style="vertical-align:top;" class="slds-cell-wrap" data-label="Task">Troubleshoot</td>
+
+       <td headers="d2657e110" style="vertical-align:top;" class="slds-cell-wrap" data-label="Description">Verify your org authentication. Configure the <code>scale-products</code> toolset
+        in your IDE's MCP settings.</td>
+
+      </tr>
+     </tbody></table>
+  </div></div></div>
+ 
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="apexguru_test_case_antipatterns">
+<h1 class="slds-text-heading_large">ApexGuru Test Case Antipatterns</h1>
+  <p>The test cases highlighted in ApexGuru help you find places in your Apex test code that
+    aren’t valid, maintainable, or production-ready.</p>
+
+<ul><li class="slds-p-bottom_small"><strong><a href="apexguru_antipatterns.html#apexguru_test_case_antipattern_using_testmethod">ApexGuru Test Case Antipattern: Using the testMethod Keyword</a></strong><br>The testMethod syntax is outdated. Avoid using it to preserve confidence in your test   suite and deployment quality.</li><li class="slds-p-bottom_small"><strong><a href="apexguru_antipatterns.html#apexguru_test_case_antipattern_filler_statements">ApexGuru Test Case Antipattern: Writing Filler Statements</a></strong><br>Using meaningless code to inflate test coverage undermines code quality. Filler   statements cause technical debt, missed bugs, and false code confidence. Focus on quality over   quantity. Write meaningful tests for actual business logic and use coverage as a guide, not the   goal.</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="apexguru_workflow">
+<h1 class="slds-text-heading_large">Activate and Use ApexGuru for Apex Code Analysis</h1>
+  
+  <p>Learn how to activate ApexGuru and analyze your Salesforce org’s Apex code securely
+    using the Einstein Trust Layer.</p>
+
+    <div><div><img alt="ApexGuru workflow diagram for code analysis and recommendations." src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-scalability-262-0-0-production-enus/10fed30e-b440-4267-91a6-b6264993ae50/scalability/images/apexguru_workflow_image.png" style="width:800px;"></div></div>
+    <ol><li>
+        <span>Review the legal terms for ApexGuru and click <strong>I Agree</strong> to activate the
+          service.</span>
+      </li><li>
+        <span>Allow ApexGuru to securely retrieve your org’s Apex code in read-only mode for dynamic
+          grounding.</span>
+      </li><li>
+        <span>Let the Einstein Trust Layer provide data masking, secure gateway, and zero data
+          retention during the analysis process.</span>
+        <ol>
+          <li>
+            <span>ApexGuru scans and reviews the uploaded Apex code to identify inefficiencies and
+              areas of optimization.</span>
+            <div>
+              <p>These hotspots and performance bottlenecks can impact overall performance.</p>
+            </div>
+          </li>
+
+          <li>
+            <span>A Salesforce-owned LLM within the Einstein Trust Layer detects common antipatterns
+              in the code and prioritizes recommendations based on their potential impact.</span>
+          </li>
+
+          <li>
+            <span>Ensure that the data is immediately deleted after the analysis is complete.</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>Allow ApexGuru to retrieve data while maintaining the confidentiality and integrity of
+          the Apex code during processing and transmission.</span>
+      </li><li>
+        <span>Review the recommendations generated by the model in the ApexGuru interface for further
+          analysis.</span>
+      </li></ol>
+
+    <div><p>You have securely activated ApexGuru, analyzed your Apex code, and received prioritized
+        recommendations for optimization in your ApexGuru interface.</p></div>
+  
+</div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="agentforce_for_scale.html">&larr; Agentforce for Scale</a><a href="apexguru_antipatterns.html">ApexGuru アンチパターン集 &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.scalability_overview.htm&type=5&language=ja">help.salesforce.com — Salesforce スケーラビリティ（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>

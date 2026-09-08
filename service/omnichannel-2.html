@@ -1,0 +1,1599 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>オムニチャネル・ルーティング（2/4） | Service Cloud ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（37）</h2>
+    <ol>
+      <li><a href="#omnichannel_create_cases_with_omni_flow">オムニチャネルフローテンプレートを使用した着信通話のケースの作成</a></li>
+      <li><a href="#omnichannel_create_chat_button_for_flow">[チャット] ボタンへのオムニチャネルフローの割り当て</a></li>
+      <li><a href="#omnichannel_create_input_record">input_record の作成</a></li>
+      <li><a href="#omnichannel_create_reasonfornotrouting">reasonForNotRouting の作成</a></li>
+      <li><a href="#omnichannel_create_recordid">recordId の作成</a></li>
+      <li><a href="#omnichannel_create_skilllist">skillList の作成</a></li>
+      <li><a href="#omnichannel_create_supervisor_configuration">Command Center for Service でのスーパーバイザーの表示の変更</a></li>
+      <li><a href="#omnichannel_create_variable_prechat">事前チャットの作成</a></li>
+      <li><a href="#omnichannel_custom_action_create_screen_flow">Command Center for Service カスタムアクションの画面フローの作成</a></li>
+      <li><a href="#omnichannel_custom_report_types">オムニチャネルのカスタムレポートタイプの作成</a></li>
+      <li><a href="#omnichannel_einstein_case_routing">Einstein ケースルーティングを使用した作業の転送</a></li>
+      <li><a href="#omnichannel_enable">オムニチャネルの有効化と設定</a></li>
+      <li><a href="#omnichannel_enable_omni_inbox_for_agents">サービス担当者向けのオムニモバイルの有効化</a></li>
+      <li><a href="#omnichannel_enable_work_notifications">オーディオデバイスと受信した作業通知の設定</a></li>
+      <li><a href="#omnichannel_flow_considerations">オムニチャネルフローを使用する場合の考慮事項</a></li>
+      <li><a href="#omnichannel_flows">オムニチャネルフローを使用した高度なルーティング</a></li>
+      <li><a href="#omnichannel_go_mobile">オムニチャネルを使用したモバイルへの移行</a></li>
+      <li><a href="#omnichannel_how_skills_based_routing_works">スキルベースのルーティングのしくみ</a></li>
+      <li><a href="#omnichannel_install_reports">事前作成済みレポートおよびダッシュボードのインストール</a></li>
+      <li><a href="#omnichannel_interruptible_capacity">中断可能な業務量を使用した優先度の設定</a></li>
+      <li><a href="#omnichannel_intro">オムニチャネルによる作業の転送</a></li>
+      <li><a href="#omnichannel_manage_with_omni_supervisor">サポート担当者、キュー、スキルの管理</a></li>
+      <li><a href="#omnichannel_manage_work_on_the_go">外出中のオムニチャネル作業の管理</a></li>
+      <li><a href="#omnichannel_monitor_service_agents">Agentforce サービスエージェントの監視</a></li>
+      <li><a href="#omnichannel_multiple_screen_pop_actions">オムニチャネルフローでの複数の [画面ポップを追加] アクションの使用</a></li>
+      <li><a href="#omnichannel_omni_inbox_how_it_works">オムニモバイルのしくみ</a></li>
+      <li><a href="#omnichannel_omni_inbox_limitations">オムニモバイルの制限事項</a></li>
+      <li><a href="#omnichannel_omni_inbox_manage_work">Omni Inbox を使用した作業の管理</a></li>
+      <li><a href="#omnichannel_optimized_routing_for_ai_agents">Agentforce エージェントおよび拡張ボット用に最適化されたルーティング</a></li>
+      <li><a href="#omnichannel_prioritize_work_items_with_custom_request_date">カスタム要求日を使用した作業項目の優先順位付け</a></li>
+      <li><a href="#omnichannel_psr_lifecycle">ルーティングライフサイクルの詳細の理解</a></li>
+      <li><a href="#omnichannel_rep_capacity">作業業務量について</a></li>
+      <li><a href="#omnichannel_reporting">サービスレポート</a></li>
+      <li><a href="#omnichannel_route_calls_to_queue">キューへの通話の転送</a></li>
+      <li><a href="#omnichannel_route_calls_with_omni_flow">電話チャネルへのオムニチャネルフローの割り当て</a></li>
+      <li><a href="#omnichannel_route_chats_to_queue">キューへのチャットの転送</a></li>
+      <li><a href="#omnichannel_route_destination_bot">ボットへの転送</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>オムニチャネル・ルーティング（2/4）</h1>
+      <div class="meta">Salesforce Service Cloud ヘルプ · 37 記事 · 生成 2026-08-13</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="omnichannel-1.html">&larr; オムニチャネル・ルーティング（1/4）</a><a href="omnichannel-3.html">オムニチャネル・ルーティング（3/4） &rarr;</a></div>
+<section class="article" id="omnichannel_create_cases_with_omni_flow">
+<h1 class="slds-text-heading_large">オムニチャネルフローテンプレートを使用した着信通話のケースの作成</h1>
+  <p>基本ルーティングとケース作成時のテンプレートを使用して、このルーティングロジックを自分で設定する時間を節約します。このテンプレートでは、通話者を識別し、通話をキューに転送し、通話のケースを作成して、サービス担当者が通話を受け入れるときに新しいケースレコードを画面ポップします。必要に応じてオムニチャネルフローを変更し、デフォルトのルーティングの動作 (キューなど) を変更します。</p>
+
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table></div>
+    <ol><li>
+        <span>[設定] の [クイック検索] ボックスに<kbd>「フロー」</kbd>と入力し、[プロセスの自動化] の <strong class="uicontrol">[フロー]</strong> を選択します。</span>
+      </li><li>
+        <span><strong>[新規フロー]</strong> をクリックします。</span>
+      </li><li>
+        <span><strong>[すべて + テンプレート]</strong> をクリックします。</span>
+      </li><li>
+        <span>フロー種別をオムニチャネルフローに絞り込むには、[新規フロー] 画面の左ペインで <strong class="uicontrol">[オムニチャネルフロー]</strong> を選択します。</span>
+        <div>
+          <div><img alt="新しいオムニチャネルフロー種別。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/omnichannel/omnichannel_new_flow.png" style="width:750px;"></div>
+        </div>
+      </li><li>
+        <span>[Basic Routing with Case Creation (基本ルーティングとケース作成)] テンプレートからフローを作成するには、<strong class="uicontrol">[Voice Calls Routed to Basic Queue with Case Creation (基本キューとケース作成に音声通話を転送)]</strong> を選択して、<strong class="uicontrol">[作成]</strong> をクリックします。</span>
+        <div>
+          <span style="vertical-align:text-bottom;display:inline-block;"><img alt="ケースが見つからない場合に使用する [ケースを作成] 要素などの多くの要素が含まれているフロー。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/omnichannel/omnichannel_basic_routing_with_case_creation_flow.png" style="width:500px;margin-bottom:0;"></span>
+        </div>
+      </li><li>
+        <span>[作業を転送] アクションを開きます。</span>
+      </li><li>
+        <span>[サービスチャネル] 項目で、<strong class="uicontrol">[電話]</strong> を削除し、<strong class="uicontrol">[電話]</strong> を検索して再度選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[完了]</strong> をクリックします。</span>
+      </li><li>
+        <span>オムニチャネルフローを保存します。</span>
+      </li><li>
+        <span>フローに対する更新を有効化するには、<strong class="uicontrol">[有効化]</strong> をクリックします。</span>
+      </li><li>
+        <span>Amazon Connect で、関連付けられた [Sample SCV Basic Routing with Case Creation (サンプルの SCV 基本ルーティングとケース作成)] 問い合わせフローを開きます。</span>
+      </li><li>
+        <span>[Invoke AWS Lambda function (AWS Lambda 関数を呼び出す)] ブロックをダブルクリックし、[<code>flowDevName</code>] および [<code>fallbackQueue</code>] 入力パラメーターを追加します。</span>
+      </li><li>
+        <span><code>flowDevName</code> で、作成した [Voice Calls Routed to Basic Queue with Case Creation (基本キューとケース作成に音声通話を転送)] オムニチャネルフローの API 参照名を指定します。
+        </span>
+      </li><li>
+        <span><code>fallbackQueue</code> で、代替キューの開発者名または ID を指定します。必要に応じて、SCV 基本キューをフォールバックキューとして割り当てます。</span>
+        <div>
+          <span style="vertical-align:text-bottom;display:inline-block;"><img alt="入力パラメーターが表示されている [Function Input Parameters (関数入力パラメーター)] セクション。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/omnichannel/voice_contact_flow_specify_input_parameters.png" style="width:400px;margin-bottom:0;"></span>
+        </div>
+      </li><li>
+        <span>Lambda 関数への変更を保存します。</span>
+      </li><li>
+        <span>[Sample SCV Basic Routing with Case Creation (サンプルの SCV 基本ルーティングとケース作成)] 問い合わせフローを保存して公開します。</span>
+      </li><li>
+        <span>[Sample SCV Inbound (サンプルの SCV 受信)] フローを開きます。</span>
+      </li><li>
+        <span>[フローへの転送] ブロックを開き、<strong class="uicontrol">[Sample SCV Basic Routing with Case Creation (サンプルの SCV 基本ルーティングとケース作成)]</strong> を選択します。</span>
+      </li><li>
+        <span>受信問い合わせフローを保存して、変更を公開します。</span>
+      </li></ol>
+
+    <div><p>完了したら、電話チャネルに発信された通話を転送するために、[Sample SCV Basic Routing with Case Creation (サンプルの SCV 基本ルーティングとケース作成)] オムニチャネルフローを電話チャネルに割り当てます。</p><div>
+        <a name="omnichannel_create_cases_with_omni_flow__image_l1w_bfk_tcc"></a><img alt="チャネルのプロパティ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/omnichannel/omnichannel_voice_channel_properties2.png" id="omnichannel_create_cases_with_omni_flow__image_l1w_bfk_tcc" style="width:500px;">
+      </div></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="コンタクトセンターには、サポート用とセールス用など、顧客が電話をかけられる複数の電話チャネルを追加できます。各チャネルには独自の電話番号が割り当てられます。電話チャネルで通話を転送するには、コンタクトセンターでチャネルを作成してから、チャネルのルーティング方法を指定します。オムニチャネルフローを使用して通話を動的に転送するには、フローをチャネルに割り当てます。" href="#omnichannel_route_calls_with_omni_flow">電話チャネルへのオムニチャネルフローの割り当て</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_create_chat_button_for_flow">
+<h1 class="slds-text-heading_large">[チャット] ボタンへのオムニチャネルフローの割り当て</h1>
+  <p>オムニチャネルルーティング種別とオムニチャネルフローを使用して、最適なサービス担当者にチャットを動的に転送します。</p>
+
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table></div>
+    <ol><li>
+        <span>[設定] の [クイック検索] ボックスに<kbd>「[チャット] ボタンと招待」</kbd>と入力し、<strong class="uicontrol">[[チャット] ボタンと招待]</strong> を選択します。</span>
+      </li><li>
+        <span>既存のボタンを編集するか、新しく作成します。</span>
+      </li><li>
+        <span>[ルーティング情報] セクションの [ルーティング種別] で、[<strong class="uicontrol">オムニチャネル]</strong> を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[ルーティング用のフローを使用]</strong> を選択します。</span>
+      </li><li>
+        <span>[ルーティングフロー] に、チャットを転送するために作成したフローを指定します。</span>
+      </li><li>
+        <span>[キュー] で、このチャットボタンのキューを選択します。ルーティングフローを使用していない場合、キューによってチャットが管理され、優先順位が付けられます。ルーティングフローを使用している場合、キューによってチャットボタンを使用できるかどうかが決まります。キューに割り当てられたサービス担当者がオンラインで業務量がある場合、このボタンを使用できます。ボタンの可用性を管理するには、サービス担当者を大まかにグループ化した親キューを [チャット] ボタンに対して設定することを検討してください。<div><img alt="オムニチャネルを有効にして、ルーティングフローとキューを選択します。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/omnichannel/omnichannel_chat_button.png" style="width:600px;"></div></span>
+      </li></ol>
+
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_create_input_record">
+<h1 class="slds-text-heading_large">input_record の作成</h1>
+  <p>Salesforce レコードの項目値に基づいて作業を転送するフローを作成する場合は、レコード変数を使用してレコードを保存します。</p>
+
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table></div>
+    <ol><li>
+        <span>Flow Builder ツールボックスで、<strong>[マネージャー]</strong> をクリックし、<strong>[新規リソース]</strong> をクリックします。</span>
+      </li><li>
+        <span><strong>[リソース種別]</strong> で <strong>[変数]</strong> を選択します。</span>
+      </li><li>
+        <span><strong>[API 参照名]</strong> に<samp class="parmname">「input_record」</samp>と入力します。</span>
+      </li><li>
+        <span><strong>[データ型]</strong> では <strong>[レコード]</strong> を選択します。</span>
+      </li><li>
+        <span><strong>[オブジェクト]</strong> で、Salesforce オブジェクトを選択します。</span>
+        <div>たとえば、チャットトランスクリプトレコードの項目値に基づいてチャットを転送する場合は、<strong>[チャットトランスクリプト]</strong> を選択します。通話の場合、<strong class="uicontrol">[音声通話]</strong> を選択します。</div>
+      </li><li>
+        <span><strong>[フロー外部での可用性]</strong> で、<strong>[入力で使用可能]</strong> を選択します。</span>
+      </li><li>
+        <span>[<strong>完了] を</strong>クリックします。 <div><img alt="input_record という名前の新しい変数" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/omnichannel/omnichannel_create_input_record.png" style="width:400px;"></div></span>
+      </li></ol>
+
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_create_reasonfornotrouting">
+<h1 class="slds-text-heading_large"><var>reasonForNotRouting</var> の作成</h1>
+  <p>フローで作業項目を転送できない理由を説明するには、<var>reasonForNotRouting</var> 変数を作成します。アプリ内および Web のメッセージングチャネルでこの変数を使用して、フローでメッセージング要求を転送できない理由を返すことができます。</p>
+
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table></div>
+    <ol><li>
+        <span>Flow Builder ツールボックスで、<strong class="uicontrol">[マネージャー]</strong> をクリックし、<strong class="uicontrol">[新規リソース]</strong> をクリックします。</span>
+      </li><li>
+        <span>[リソース種別] で、<strong class="uicontrol">[変数]</strong> を選択します。</span>
+      </li><li>
+        <span>[API 参照名] に<var>「reasonForNotRouting」</var>と入力します。</span>
+      </li><li>
+        <span>[データ型] で <strong class="uicontrol">[テキスト]</strong> を選択します。</span>
+      </li><li>
+        <span>[フロー外部での可用性] で、<strong class="uicontrol">[出力で使用可能]</strong> を選択します。</span>
+      </li><li>
+        <span>[<strong class="uicontrol">完了]</strong> をクリックします。<div><img alt="reasonForNotRouting という名前の新しい変数リソース。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/omnichannel/create_reasonForNotRouting.png" style="width:600px;"></div></span>
+      </li></ol>
+
+    <div><p>オムニチャネルフローに [作業を転送] アクションにならないパスが含まれている場合、フローではこの文字列が返されます。たとえば、フローで割り当て要素を使用して、変数を [Outside business hours (営業時間外)] に設定できます。メッセージング要求が通常の営業時間外に発生したためにサービス担当者が対応できない場合、フローロジックはアプリ内および Web のメッセージングチャネルでこの文字列を返します。</p></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_create_recordid">
+<h1 class="slds-text-heading_large">recordId の作成</h1>
+  <p>フローで作業項目の ID を保存するには、recordId 変数を作成します。</p>
+
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table></div>
+    <ol><li>
+        <span>Flow Builder ツールボックスで、<strong>[マネージャー]</strong> をクリックし、<strong>[新規リソース]</strong> をクリックします。</span>
+      </li><li>
+        <span><strong>[リソース種別]</strong> で <strong>[変数]</strong> を選択します。</span>
+      </li><li>
+        <span><strong>[API 参照名]</strong> に<samp class="parmname">「recordId」</samp>と入力します。<strong>注意:</strong> 必ずこの名前を使用してください。</span>
+      </li><li>
+        <span><strong>[データ型]</strong> で <strong>[テキスト]</strong> を選択します。</span>
+      </li><li>
+        <span><strong>[フロー外部での可用性]</strong> で、<strong>[入力で使用可能]</strong> を選択します。</span>
+      </li><li>
+        <span>[<strong>完了]</strong> をクリックします。<div><img alt="recordId という名前の新しい変数リソース。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/omnichannel/create_recordid.png" style="width:400px;"></div></span>
+      </li></ol>
+
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_create_skilllist">
+<h1 class="slds-text-heading_large">skillList の作成</h1>
+  <p>適切なスキルを持つサービス担当者に作業を転送するには、必要なスキルを特定し、レコードコレクション変数に保存します。</p>
+
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 音声通話にはスキルベースのルーティングを使用できません。</div></div></div>
+</div>
+    <ol><li>
+        <span>Flow Builder ツールボックスで、<strong>[マネージャー]</strong> をクリックし、<strong>[新規リソース]</strong> をクリックします。</span>
+      </li><li>
+        <span><strong>[リソース種別]</strong> で <strong>[変数]</strong> を選択します。</span>
+      </li><li>
+        <span><strong>[API 参照名]</strong> に<samp class="parmname">「skillList」</samp>と入力します。</span>
+      </li><li>
+        <span><strong>[データ型]</strong> では <strong>[レコード]</strong> を選択します。</span>
+      </li><li>
+        <span><strong>[複数の値を許可 (コレクション)]</strong> を選択します。</span>
+      </li><li>
+        <span><strong>[オブジェクト]</strong> で <strong>[スキル要件]</strong> を選択します。</span>
+      </li><li>
+        <span>[<strong>完了]</strong> をクリックします。<div><img alt="skillList という名前の新しい変数リソース。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/omnichannel/omnichannel_create_skillList.png" style="width:400px;"></div></span>
+      </li></ol>
+
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_create_supervisor_configuration">
+<h1 class="slds-text-heading_large">Command Center for Service でのスーパーバイザーの表示の変更</h1>
+  <p>スーパーバイザー設定を使用して、表示される Command Center for Service タブとその順序を設定し、カスタムタブを追加します。スーパーバイザーのグループが表示できるサービス担当者、キュー、スキル、アクションを指定できます。担当者のプライバシーを強化するには、サービス担当者のタイムラインをこれらのスーパーバイザーに非表示にします。スーパーバイザーのグループごとに個別のスーパーバイザー設定を定義できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされている</a>エディションを表示する。</td>
+
+          </tr>
+        </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d103150e56" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d103150e56" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">オムニチャネルを設定する</td>
+
+              <td headers="d103150e56" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>ロールまたは [階層を使用したアクセス許可] によってユーザーをスーパーバイザー設定に追加することはできません。スーパーバイザー設定では、公開グループに直接割り当てられたユーザーのみがサポートされます。</p></div>
+    <ol><li>
+        <span>[設定] で、[クイック検索] ボックスに<kbd>「スーパーバイザー構成」</kbd>と入力し、<strong class="uicontrol">[スーパーバイザー構成]</strong> を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[新規]</strong> をクリックします。</span>
+      </li><li>
+        <span>設定の名前を入力します。[API 参照名] は自動入力されます。</span>
+      </li><li>
+        <span>スーパーバイザーを設定に割り当てるには、[影響を受けるスーパーバイザーは?] セクションでユーザーまたはそのプロファイルを選択します。ユーザー設定は、ユーザープロファイル設定よりも優先されます。権限セットまたはプロファイルを介してサービスプレゼンス状況が割り当てられているユーザーのみが [選択可能なユーザー] リストに表示されます。</span>
+        <div>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> この設定によって担当者、キュー、またはスキルへのスーパーバイザーのアクセス権が変更されることはありません。[Command Center for Service (サービス向け Command Center)] タブに表示される内容が絞り込まれます。</div></div></div>
+
+        </div>
+      </li><li>
+        <span>これらのスーパーバイザーが Command Center for Service の [Service Reps (サービス担当者)] タブに表示される担当者を絞り込むには、[Select Visible Agents (参照可能なエージェントを選択)] セクションで少なくとも 1 人の担当者または公開グループを追加します。</span>
+        <div>公開グループを名前で検索する場合、検索結果には最大 2,000 件の公開グループが表示されます。</div>
+        <div>選択した担当者は、Command Center for Service でスーパーバイザーに表示される担当者です。Command Center for Service には、有効な担当者と無効な担当者が表示されます。この選択により、[ウォールボード] タブの指標の計算に使用されるデータも絞り込まれます。</div>
+      </li><li>
+        <span>これらのスーパーバイザーが Command Center for Service の [Agentforce Agents] タブに表示される AI エージェントを絞り込むには、[Select Visible Agentforce Agents] セクションで少なくとも 1 人のエージェントを追加します。</span>
+        <div>選択した AI エージェントは、Command Center for Service でスーパーバイザーに表示されるエージェントです。
+        </div>
+      </li><li>
+        <span>[キューのバックログ] タブと [処理中] タブからキューを絞り込むには、[表示キューを選択] セクションで少なくとも 1 つのキューを選択します。</span>
+        <div>
+          <p>たとえば、上位の取引先からのケースからのサポートを強化するには、これらの取引先のみが表示されるように [キューのバックログ] タブを絞り込みます。これらの選択により、[ウォールボード] タブのメトリクスの計算に使用されるデータも絞り込まれます。</p>
+          <p>スーパーバイザーが担当者に<a target="_blank" href="omnichannel-4.html#omnichannel_supervisor_change_queues_skills_assigned_to_agent">割り当てられたキュー</a>を変更すると、スーパーバイザーの設定で指定されたキューのみが表示されます。そのスーパーバイザーにスーパーバイザー構成がない場合、すべてのキューが表示されます。</p>
+        </div>
+      </li><li>
+        <span>[スキルのバックログ] タブでスキルを絞り込むには、[表示スキルの定義] セクションでスキルを選択します。また、指定したスキルが少なくとも 1 つある作業項目を表示するのか、指定したすべての指定スキルがある作業項目を表示するのかを指定する必要があります。</span>
+        <div>これらの選択により、[ウォールボード] タブのメトリクスの計算に使用されるデータも絞り込まれます。</div>
+        <div>最大 30 個のスキルを選択できます。</div>
+      </li><li>
+        <span>[Command Center for Service] タブにアクションを表示するには、[アクションを定義] セクションでタブを選択し、アクションを [選択済みのアクション] 列に移動します。</span>
+        <div>[アクションを定義] セクションには、システムアクションとカスタムアクションが表示されます。各タブに最大 10 個のアクションを追加できます。上下矢印を使用して、選択済みのアクションを並び替えます。<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> スーパーバイザー設定でカスタムアクションを追加する場合、Command Center for Service でアクションを表示するには、スーパーバイザーに「フローを実行」ユーザー権限か、ユーザーの詳細ページで [フローユーザー] 項目が有効になっている必要があります。または、フローで [デフォルトの動作を<strong class="uicontrol">上書きし</strong>、有効化されたプロファイルまたは権限セットへのアクセスを制限します] が選択されている場合は、フローへのアクセス権が必要です。</div></div></div>
+</div>
+      </li><li id="omnichannel_create_supervisor_configuration__define_visible_tabs_step"><a name="omnichannel_create_supervisor_configuration__define_visible_tabs_step"></a>
+        <span>Command Center for Service で表示可能なタブを選択するには、[表示可能なタブを定義] セクションまでスクロールし、タブを [選択済みのタブ] リストに移動します。</span>
+        <div><p>Command Center for Service には、[選択済みのタブ] リストに表示される順序でタブが表示されます。<a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.lightning_app_builder_overview.htm&amp;language=ja&amp;type=5">Lightning アプリケーションビルダー</a>で、<a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.lightning_page_types.htm&amp;language=ja&amp;type=5">Command Center for Service Page</a> ページ種別を使用してカスタムタブを作成できます。この機能は、拡張オムニチャネルでのみ使用できます。</p></div>
+      </li><li>
+        <span>担当者のプライバシーをより尊重できるようにするには、<strong class="uicontrol">[エージェントタイムラインをこれらのスーパーバイザーに非表示]</strong> を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="スーパーバイザーが Command Center for Service からアクションを実行できるようにするには、デフォルトアクションを設定します。たとえば、[エージェント] タブで [キューを変更] アクションボタンと [スキルを変更] アクションボタンを有効にして、スーパーバイザーがサービス担当者に割り当てられたキューとスキルを作業場所から直接変更できるようにします。" href="omnichannel-3.html#omnichannel_show_default_actions_omni_supervisor">Command Center for Service タブでのデフォルトアクションの表示</a></li><li><a title="Command Center for Service にカスタムアクションを追加して、スーパーバイザーの生産性とコンタクトセンターの効率を向上させます。たとえば、スーパーバイザーがメールや Slack メッセージをサポート担当者に送信したり、キュー内の作業を再割り当てしたり、サポート担当者を別のシフトに割り当てたりできるアクションを追加します。スーパーバイザーは、[Command Center for Service (サービス向け Command Center)] タブで、選択したサポート担当者、キュー、または作業項目に対してこれらのアクションを呼び出します。" href="omnichannel-3.html#omnichannel_set_up_custom_actions">Command Center for Service タブでのカスタムアクションの設定</a></li><li><a target="_blank" href="omnichannel-4.html#omnichannel_supervisor_change_queues_skills_assigned_to_agent">Command Center for Service を使用したユーザーのキューとスキルの変更</a></li><li><a title="Command Center for Service の機能を活用して、スーパーバイザー用にカスタマイズされたタブを作成します。独自のアプリケーション、コンポーネント、評価指標を [Command Center for Service (サービス向け Command Center)] タブに埋め込んで App Exchange でページを共有するか、独自のニーズに合わせてカスタムタブを使用します。" href="omnichannel-4.html#omnichannel_supervisor_create_custom_tabs">Command Center for Service のカスタムタブの作成</a></li><li><a title="スーパーバイザーは、Command Center for Service の [エージェント] タブでサービス担当者とその作業を監視できます。デフォルトでは、スーパーバイザーはすべてのオンラインサービス担当者を表示できます。スーパーバイザーがサービスリソースオブジェクトに対する参照アクセス権を持っている場合、スーパーバイザーはオフラインのサービス担当者も表示できます。" href="omnichannel-3.html#omnichannel_show_offline_agents_in_supervisor">Command Center for Service でのすべてのオフラインサービス担当者の表示</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_create_variable_prechat">
+<h1 class="slds-text-heading_large">事前チャットの作成</h1>
+  <p>事前チャットフォームで取得した情報に基づいてチャットを転送するフローを作成するには、事前チャットレコードコレクション変数を追加します。会話コンテキストの入力オブジェクトから事前チャットの詳細を取り込むように変数を設定します。</p>
+
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table></div>
+    <ol><li>
+        <span>Flow Builder ツールボックスで、<strong>[マネージャー]</strong> をクリックし、<strong>[新規リソース]</strong> をクリックします。</span>
+      </li><li>
+        <span><strong>[リソース種別]</strong> で <strong>[変数]</strong> を選択します。</span>
+      </li><li>
+        <span><strong>[API 参照名]</strong> に<samp class="parmname">「prechatInfo」</samp>と入力します。</span>
+      </li><li>
+        <span><strong>[データ型]</strong> では <strong>[レコード]</strong> を選択します。</span>
+      </li><li>
+        <span><strong>[複数の値を許可 (コレクション)]</strong> を選択します。</span>
+      </li><li>
+        <span><strong>[オブジェクト]</strong> で <strong>[会話コンテキストの入力]</strong> を選択します。</span>
+      </li><li>
+        <span><strong>[フロー外部での可用性]</strong> で、<strong>[入力で使用可能]</strong> を選択します。</span>
+      </li><li>
+        <span><strong>[完了]</strong> をクリックします。</span>
+        <div>
+          <span style="vertical-align:text-bottom;display:inline-block;"><img alt="prechat という名前の新しい変数リソース。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/omnichannel/omnichannel_create_prechat_variable.png" style="width:700px;margin-bottom:0;"></span>
+        </div>
+      </li></ol>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> 
+      <p>顧客の市区郡に基づいてチャットを転送するとします。顧客がシカゴ在住の場合、シカゴチームにチャットを転送します。それ以外の場合は、デフォルトのキューに転送します。チャットが開始される前にこのプロセスを自動化するには、顧客に事前チャットフォームに記入してもらいます。ここでは、名前とメールアドレスを入力してもらいます。</p>
+      <div><p>この事前チャット情報をフローで使用するには、最初に会話コンテキストの入力オブジェクトに基づいて事前チャットコレクション変数を定義します。次に、事前チャットレコードをループして顧客のメールアドレスを取得するフローを作成します。このフローでは、顧客レコードが見つかった場合、指定されたメールアドレスに基づいて取引先責任者オブジェクトから顧客レコードを取得します。最後に、顧客レコードの市区郡がシカゴの場合、フローによってチャットがシカゴチームに転送されます。それ以外の場合、チャットはデフォルトのキューに転送されます。</p><div><img alt="このフローでは、事前チャット情報に基づいてチャットがシカゴチームまたはデフォルトのキューに転送されます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/omnichannel/omnichannel_flow_with_prechat_variable.png" style="width:700px;"></div></div>
+    </div></div></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_custom_action_create_screen_flow">
+<h1 class="slds-text-heading_large">Command Center for Service カスタムアクションの画面フローの作成</h1>
+  <p>アクションの動作を定義して、スーパーバイザーがアクションボタンをクリックすると表示される画面を設計するには、Flow Builder で画面フローを作成します。たとえば、スーパーバイザーがサービス担当者にメールを送信できる画面を作成できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされている</a>エディションを表示する。</td>
+
+          </tr>
+        </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d175034e54" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d175034e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Flow Builder でフローを開く、編集または作成する</td>
+
+              <td headers="d175034e54" style="vertical-align:top;" class="slds-cell-wrap">「フローの管理」</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>[設定] の [クイック検索] ボックスに<kbd>「フロー」</kbd>と入力し、<strong class="uicontrol">[フロー]</strong> を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[新規フロー]</strong> をクリックします。</span>
+      </li><li>
+        <span><span class="menucascade"><strong class="uicontrol">[画面フロー]</strong> | <strong class="uicontrol">[作成]</strong></span> をクリックします。</span>
+      </li><li>
+        <span>選択したサービス担当者、キュー、または作業項目を画面フローへの入力として受け入れるには、変数リソースを追加します。変数の API 参照名を <kbd>ids</kbd> に設定し、データ型を <kbd>[テキスト]</kbd> に設定し、[複数の値を許可 (コレクション)] オプションと [入力で使用可能] オプションを選択します。</span>
+        <div>この変数には、スーパーバイザーがアクションを実行する Command Center for Service で選択したサービス担当者、キュー、または作業項目が保存されます。<div><img alt="種別、API 参照名、説明、データ型、複数の値を許可するオプション、フロー内外で使用可能かどうかのオプションなどのリソース属性。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/omnichannel/voice_screenflow_variable_supervisor_action.png" style="width:600px;"></div>
+        </div>
+      </li><li>
+        <span>スーパーバイザーが Command Center for Service でアクションボタンをクリックしたときに表示されるページを作成するには、画面要素を追加します。</span>
+      </li><li>
+        <span>フロー要素を使用してアクションの動作を定義します。たとえば、変数から渡される複数の入力 ID を反復処理するには、ループ要素を追加します。</span>
+        <div>
+          <span style="vertical-align:text-bottom;display:inline-block;"><img alt="入力変数の各 ID に対してアクションがループする画面フロー。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/omnichannel/voice_screenflow_supervisor_action.png" style="width:400px;margin-bottom:0;"></span>
+        </div>
+      </li><li>
+        <span>画面フローを保存して名前を付けます。</span>
+        <div>画面フローの表示ラベルは、Command Center for Service のアクションボタン名として表示されます。たとえば、画面フロー表示ラベルとして「Send Email」 (メールの送信) と入力します。</div>
+      </li><li>
+        <span>画面フローをアクションで使用できるようにするには、<strong class="uicontrol">[有効化]</strong> をクリックします。</span>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/modules/flow-builder/flow-builder-screens">Trailhead: フローへの画面の追加</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.flow_builder.htm&amp;language=ja&amp;type=5">Salesforce ヘルプ: Flow Builder</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_custom_report_types">
+<h1 class="slds-text-heading_large">オムニチャネルのカスタムレポートタイプの作成</h1>
+  <p>標準のレポートタイプを使用して、エージェントの作業をオムニチャネルでよく使用されるオブジェクトと結合します。ケース種別ごとの作業負荷やチャネル種別ごとの活動時間などのデータに関するカスタムレポートを作成します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされている</a>エディションを表示する。</td>
+
+          </tr>
+        </tbody></table>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d162131e54" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d162131e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">オムニチャネルを設定してアプリケーションを管理する。</td>
+
+            <td headers="d162131e54" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+          </tr>
+        </tbody></table>
+    <p>レポートでは、<span class="apiname">AgentWork</span> オブジェクトを次のオブジェクトに接続できます。</p>
+    <ul>
+      <li>
+        <span class="apiname">ケース</span>
+      </li>
+
+      <li>
+        <span class="apiname">MessagingSession</span>
+      </li>
+
+      <li>
+        <span class="apiname">音声</span>
+      </li>
+
+      <li>
+        <span class="apiname">リード</span>
+      </li>
+
+      <li>
+        <span class="apiname">WorkOrder</span>
+      </li>
+
+    </ul>
+
+    <p>これらのレポートは、Command Center for Service タブに配置できます。</p>
+    <div style="text-align:left;">
+      <img alt="エージェントの作業を使用した新規カスタムレポートタイプの作成" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/omnichannel/omnichannel_agentwork_report_type_01.png">
+    </div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.reports_defining_report_types.htm&amp;language=ja&amp;type=5">カスタムレポートタイプの作成</a></li><li><a title="Command Center for Service の機能を活用して、スーパーバイザー用にカスタマイズされたタブを作成します。独自のアプリケーション、コンポーネント、評価指標を [Command Center for Service (サービス向け Command Center)] タブに埋め込んで App Exchange でページを共有するか、独自のニーズに合わせてカスタムタブを使用します。" href="omnichannel-4.html#omnichannel_supervisor_create_custom_tabs">Command Center for Service のカスタムタブの作成</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_einstein_case_routing">
+<h1 class="slds-text-heading_large">Einstein ケースルーティングを使用した作業の転送</h1>
+  <p>Einsteinでサービス担当者の時間を節約します。Einstein ケース分類でケースの項目が更新されると、Einstein ケース ルーティングによって割り当てルールが実行され、ケースがサービス担当者に転送されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="https://help.salesforce.com/s/articleView?id=service.einstein_service_intro.htm&amp;language=ja&amp;type=5">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table>
+    <p>
+      <a target="_blank" href="https://salesforce.vidyard.com/watch/SVYoP4cGZbsbeAhcLjGRiF" class="doc_video_link"><span style="vertical-align:text-bottom;display:inline-block;"><img alt="デモビデオを見る" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/resources-global/_corporate/images/play_btn.png" style="margin-bottom:0;" class="doc_video_play_button"></span>の1ミニッツ機能ツアー: Einsteinケース分類とケースルーティング</a>
+    </p>
+    <p>ケースの割り当てルールまたはスキルベースのルーティングルールを使用する場合、ルーティングは自動的に処理されます。<a target="_blank" href="https://help.salesforce.com/s/articleView?id=service.cc_service_rules.htm&amp;language=ja&amp;type=5">Einstein ケース分類</a>の設定を使用して、Einstein による変更後にケースをサービス担当者に転送します。</p>
+    <p>キューベースのルーティングまたはスキルベースのルーティングのその他のロジックを使用する場合、または外部ルーティング実装を使用する場合は、<a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.platform_events.meta/platform_events/sforce_api_objects_aiupdaterecordevent.htm">AIUpdateRecordEvent</a> に登録してください。AIUpdateRecordEvent を通じて Einstein の変更の通知を受け取った後で、ルーティングロジックを再実行します。</p>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_enable">
+<h1 class="slds-text-heading_large">オムニチャネルの有効化と設定</h1>
+  <p>オムニチャネルを有効にして、サービス担当者が同じアプリケーションからさまざまなサービスチャネルで作業を管理できるようにします。次に、ビジネスニーズに基づいてオムニチャネル機能を有効にします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> 
+        <p>標準オムニチャネルは Summer '26 リリースで廃止されます。ユーザーがルーティングワークフローを維持し、最新の機能にアクセスできるように、Summer '26 リリースのロールアウト中に Salesforce によって組織が自動的に拡張オムニチャネルにアップグレードされます。拡張オムニチャネルは、サービス担当者とスーパーバイザー向けの最新の機能を提供します。「<a target="_blank" href="omnichannel-4.html#omnichannel_upgrade_standard_to_enhanced">標準オムニチャネルから拡張</a>へのアップグレード」を参照してください。</p>
+      </div></div></div>
+<p dir="ltr">オムニチャネルは、Agentforce Service(旧称Service Cloud)製品ライセンス、またはデジタルエンゲージメント、拡張チャット、Amazon Connectまたはパートナーテレフォニーを使用するSalesforce Voice(旧称Service Cloud Voice)、ワークフォース管理のいずれかのアドオンライセンスで使用できます。</p><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d179842e69" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d179842e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">オムニチャネルを設定する</td>
+
+              <td headers="d179842e69" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>[設定] から、[クイック検索] ボックスに<kbd>「オムニチャネル設定」</kbd>と入力し、<strong class="uicontrol">[オムニチャネル設定]</strong> を選択します。</span>
+      </li><li>
+        <span>オムニチャネルとその機能を有効にして、変更内容を保存します。</span>
+        <div>
+          <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+                <tr class="">
+                  <th id="d179842e122" style="vertical-align:top;" class="slds-cell-wrap" scope="col">設定</th>
+                  <th id="d179842e125" style="vertical-align:top;" class="slds-cell-wrap" scope="col">使用目的</th>
+                </tr>
+              </thead><tbody>
+                <tr class="">
+                  <td headers="d179842e122" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">オムニチャネルの有効化</td>
+
+                  <td headers="d179842e125" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用目的">さまざまなサービスチャネルから受信した作業項目を、コンタクトセンターの最も適格で対応可能なサポートサービス担当者に転送します。スーパーバイザーが 1 か所 (Command Center for Service) からコンタクトセンター、サービス担当者の作業負荷、作業項目の状況を監視することができるようにします。</td>
+
+                </tr>
+                <tr class="">
+                  <td headers="d179842e122" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">スキルベースのルーティングとエージェントへの直接転送を有効化</td>
+
+                  <td headers="d179842e125" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用目的">作業を特定のサービス担当者または特定のスキルを持つサービス担当者に転送します。「<a title="特定のスキルを持つサービス担当者に作業を転送するには、スキルベースのルーティングを有効にします。" href="omnichannel-3.html#omnichannel_skills_based_routing_enable">Enable Skills-Based Routing</a> or <a title="エージェントへの直接転送を使用して、作業項目をサポート担当者に直接自動的に転送します。" href="omnichannel-3.html#omnichannel_route_to_specific_agent">Route Work Items Directly</a> to a Specific Support Rep (スキルベースのルーティングの有効化または特定のサポート担当者への作業項目の直接転送)」を参照してください。</td>
+
+                </tr>
+                <tr class="">
+                  <td headers="d179842e122" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">セカンダリルーティング優先度の有効化</td>
+
+                  <td headers="d179842e125" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用目的">作業項目をキュー内で古い項目より前に移動したり、キュー間で同じルーティング設定優先度を持つ項目の競合を解決したりします。キューでは、作業項目の待ち時間によって優先度が決まります (先入れ先出し)。しかし、作業項目がキューで待機しているときに、より緊急な作業が飛び込んで来ることもあります。<a title="サポート担当者がセカンダリルーティングの優先度を使用して最初に適切なケースに対応できるようにします。" href="omnichannel-3.html#omnichannel_secondary_routing_priority">「セカンダリルーティング優先度の設定」</a>を参照してください。</td>
+
+                </tr>
+                <tr class="">
+                  <td headers="d179842e122" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">状況ベースの業務量モデルを有効化</td>
+
+                  <td headers="d179842e125" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用目的">開いているタブやセッションではなく、受け入れられた作業の状況に基づいてサービス担当者の業務量を測定します。サービス担当者が対応できない場合、作業が完了または再割り当てされるまで、作業は割り当てられたままになり、業務量に反映されます。<a title="状況ベースの業務量モデルを使用して、サービス担当者の業務量をより正確に測定します。このモデルでは、オムニチャネルは進行中のタブとセッションではなく、受け入れ済み作業の状況に基づいてサービス担当者の業務量を決定します。サービス担当者が対応できない場合や作業タブを閉じた場合、作業が完了または再割り当てされるまで、作業は割り当てられたままで業務量に適用されます。サービス担当者は、作業を一時停止して後で完了することもできます。一方、タブベースの業務量モデルでは、サービスコンソールで作業タブが閉じられたときにサービス担当者の業務量が解放されます。" href="omnichannel-3.html#omnichannel_status_based_capacity">「状況ベースの業務量モデルの設定」</a>を参照してください。</td>
+
+                </tr>
+                <tr class="">
+                  <td headers="d179842e122" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">オムニチャネルを使用するサービス担当者が新しいウィンドウまたはタブを開いたときのログイン動作を定義する</td>
+
+                  <td headers="d179842e125" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用目的"><p>各サービス担当は、一度に 1 つのオムニチャネルセッションにのみログインできます。たとえば、サービス担当者が 1 つのブラウザータブでオムニチャネルにログインしている場合、2 番目のタブでオムニチャネルにログインすると有効なセッションが終了し、進行中の作業がすべて失われます。</p><p>サービス担当者が別のタブまたはウィンドウでオムニチャネルを開いたときの動作を定義するには、次のいずれかのオプションを選択します。</p><ul>
+                      <li><strong class="uicontrol">新しいウィンドウまたはタブでエージェントをオムニチャネルに自動的にログインします。</strong>この場合、サービス担当は元のセッションからログアウトされ、進行中の作業を終了します。</li>
+
+                    </ul>
+<ul>
+                      <li><strong class="uicontrol">開いているタブベースの作業が終了することをポップアップでエージェントに警告</strong>します。この場合、サービス担当はログインするオムニチャネルセッションを選択できます。</li>
+
+                    </ul>
+<ul>
+                      <li>エージェントが新しいウィンドウまたは<strong class="uicontrol">タブで</strong>オムニチャネルに自動的にログインしないようにします (推奨)。この場合、サービス担当は元のセッションにログインしたままになり、進行中の作業が中止されないようにします。サービス担当が新しいセッションにログインしていない。</li>
+
+                    </ul>
+<p>オムニチャネル代替モードが有効になっている場合、このログイン設定は無視されます。この場合、[新しいウィンドウまたはタブでエージェントを自動的にオムニチャネルにログインし<strong class="uicontrol">ない]</strong> オプションが常に使用されます。</p><p style="margin-bottom:0;">新しいウィンドウまたはタブにログインしたときに終了する進行中の作業には、有効な音声通話が含まれます。オンコールのサービス担当者が別のタブまたはウィンドウでオムニチャネルを開くと、通話情報は新しいインスタンスに表示されません。</p></td>
+
+                </tr>
+                <tr class="">
+                  <td headers="d179842e122" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">拡張オムニチャネルルーティング</td>
+
+                  <td headers="d179842e125" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用目的"><p>拡張オムニチャネルルーティングを有効にして、Agentforceエージェントの監視、オムニモバイル、オムニウォールボード、すべてのチャネル用の1つのInbox、Command Center for Serviceのカスタムタブとアクション、サービス担当者用のオムニサイドバーなどの最新機能にアクセスできるようにします。標準オムニチャネルの新機能は開発されなくなりました。</p><p style="margin-bottom:0;">このオプションを有効にする前に、「<a target="_blank" href="omnichannel-4.html#omnichannel_upgrade_standard_to_enhanced">Upgrade Standard Omni-Channel to Enhanced</a> (標準オムニチャネルの拡張へのアップグレード)」の考慮事項と前提条件を確認してください。</p></td>
+
+                </tr>
+              </tbody></table>
+        </div>
+        <div>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div id="omnichannel_enable__note_p1f_pry_1dc" style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><a name="omnichannel_enable__note_p1f_pry_1dc"></a><span class="slds-text-title_caps">重要</span> 代替モードが有効になっている場合、[拡張オムニチャネルルーティング] オプションが無効になっているため、拡張オムニチャネルを標準オムニチャネルにダウングレードすることはできません。</div></div></div>
+
+        </div>
+      </li><li>
+        <span>サービスチャネルから作業を転送するようにサービスチャネルを設定します。</span>
+        <div>たとえば、オムニチャネルを使用してメッセージングセッションをサービス担当者に転送するには、<a target="_blank" href="https://help.salesforce.com/s/articleView?id=sf.livemessage_enable.htm&amp;language=ja&amp;type=5">メッセージングを有効</a>にする必要があります。</div>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="標準オムニチャネルと拡張オムニチャネルの違いを確認してください。拡張オムニチャネルが推奨バージョンです。" href="omnichannel-3.html#omnichannel_std_vs_enhanced">標準オムニチャネルと拡張オムニチャネルの比較</a></li><li><a title="標準オムニチャネルを使用している場合は、拡張オムニチャネルにアップグレードして、すべての高度なオムニチャネル機能をロック解除します。拡張オムニチャネルでは、Voice、ケース、拡張メッセージングなど、より幅広いサービスチャネルがサポートされます。最新のオムニチャネル機能はすべて、拡張オムニチャネル専用に開発されています。たとえば、標準オムニチャネルとは異なり、拡張オムニチャネルでは Agentforce エージェント、オムニモバイル、オムニウォールボード、すべてのチャネル用の 1 つの Inbox、スーパーバイザー用の Command Center for Service のカスタムタブとカスタムアクション、担当者用のオムニサイドバーがサポートされます。" href="omnichannel-4.html#omnichannel_upgrade_standard_to_enhanced">標準オムニチャネルから拡張へのアップグレード</a></li><li><a target="_blank" href="support_general-3.html#service_presence_create_service_channel">サービスチャネルの作成</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=002232058&amp;language=ja&amp;type=1">Knowledge記事: How to Resolve Connectivity Issues (接続の問題の解決方法)</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_enable_omni_inbox_for_agents">
+<h1 class="slds-text-heading_large">サービス担当者向けのオムニモバイルの有効化</h1>
+  <p>
+    <span>オムニモバイルは、拡張オムニチャネルでのみ使用できます。サービス担当者がモバイルデバイスの Salesforce モバイルアプリケーションでオムニモバイルを設定できるようにするには、次の手順を実行します。 </span>
+  </p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table><p>次の手順を実行してオムニチャネルのモバイル環境を設定する前に、デスクトップバージョンのオムニチャネルをすでに設定していることを確認します。</p></div>
+    <ol><li>
+        <span>オムニチャネルの拡張が有効になっていることの確認。</span>
+      </li><li>
+        <span>オムニモバイルを使用できるようにするには、デジタルエンゲージメントライセンスと「メッセージングエージェント」ユーザー権限をすべてのモバイルサービス担当者に割り当てます。</span>
+      </li><li>
+        <span>モバイル サービス担当者に [Omni Inbox] タブが表示されるようにします。</span>
+        <ol>
+          <li>
+            <span>[設定] から、[クイック検索] ボックスに<kbd>「プロファイル」</kbd>と入力し、<strong class="uicontrol">[プロファイル]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>プロファイルを開くには、プロファイルの名前をクリックします。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[オブジェクト設定]</strong> をクリックします。</span>
+          </li>
+
+          <li>
+            <span>オブジェクトのリストをスクロールダウンして、<strong class="uicontrol">Omni Inbox</strong> をクリックします。</span>
+          </li>
+
+          <li>
+            <span>[Omni Inbox] タブが [デフォルトで表示] に設定されていることを確認します。</span>
+            <div>
+              <span style="vertical-align:text-bottom;display:inline-block;"><img alt="このオプションはオムニ受信箱の行に表示されます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/omnichannel/omni_inbox_tab_setting.png" style="width:600px;margin-bottom:0;"></span>
+            </div>
+          </li>
+
+          <li>
+            <span>[デフォルトで表示] に設定されていない場合は、Omni Inbox を編集してこの設定を選択します。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>Omni Inbox をアプリケーションの最上位項目として追加します。</span>
+        <ol>
+          <li>
+            <span>[設定] から、[クイック検索] ボックスに<kbd>「アプリケーションマネージャー」</kbd>と入力し、<strong class="uicontrol">[アプリケーションマネージャー]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>サービス担当者が Salesforce モバイル アプリケーションで Omni Inbox にアクセスするために使用するアプリケーションの [<strong class="uicontrol">編集] を</strong>クリックします。</span>
+          </li>
+
+          <li>
+            <span>左パネルから [<strong class="uicontrol">ナビゲーション項目]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[選択可能な項目] リストから [<strong class="uicontrol">Omni Inbox</strong>] を選択し、[選択済みの項目] リストに移動して、そのリストの最上部に移動します。</span>
+            <div>このオプションは、モバイルユーザーにのみ表示されます。<div><img alt="[オムニ受信箱] が [選択済みの項目] リストの最上部に表示されます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/omnichannel/omni_app_navigation_items.png" style="width:650px;"></div>
+      </div>
+          </li>
+
+        </ol>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="コールセンターで最も適格で対応可能なサポート担当者にあらゆる種別の受信作業項目を転送するようにオムニチャネルを設定します。オムニチャネルは、コンソールと標準アプリケーションの両方にシームレスに統合されます。" href="support_general-3.html#service_presence_intro">オムニチャネルの設定</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.salesforce_app_customize_lex_app.htm&amp;language=ja&amp;type=5">Salesforce モバイルアプリケーションでの Lightning アプリケーションのナビゲーションメニューのカスタマイズ</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.salesforce_app_setup_messaging.htm&amp;language=ja&amp;type=5">Salesforce モバイルアプリケーションでのメッセージングの設定</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_enable_work_notifications">
+<h1 class="slds-text-heading_large">オーディオデバイスと受信した作業通知の設定</h1>
+  <p>間違ったオーディオデバイスで電話を受けた場合は、デバイスを変更します。また、オムニチャネルで受信した作業項目を見逃さないように、音声通知を有効にします。オムニチャネルコンポーネントウィンドウから離れる場合に備えて、視覚的な通知も設定します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table></div>
+    <ol><li>
+        <span>オーディオデバイスを変更するには、オムニチャネルコンポーネントの [設定] アイコンをクリックし、[入力および出力] で目的のデバイスを選択します。</span>
+        <div>選択するデバイスは、現在のブラウザーにのみ設定されます。たとえば、Google Chrome 用にデバイスを選択した場合、そのデバイスは Mozilla Firefox には設定されません。この機能は、Apple Safari ブラウザーでは使用できません。デフォルトでは、通話はシステムデバイスで使用されているスピーカーとマイクを介して行われます。<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> オムニチャネル設定でオーディオデバイスを選択しても、その使用は保証されません。オーディオデバイスの出力または入力の問題をトラブルシューティングするには、ブラウザーとコンピューターのオーディオ設定を確認します。詳細は、Salesforce システム管理者、Salesforce Voice テレフォニープロバイダー、または IT 担当者にお問い合わせください。</div></div></div>
+</div>
+      </li><li>
+        <span>新しい作業に関する通知を受け取るには、通知を受信できるように、オペレーティングシステムとブラウザーアプリケーションで設定を有効にします。</span>
+      </li><li>
+        <span>視覚的なアラートを表示するには、オムニチャネルコンポーネントで [設定] アイコンをクリックし、<strong class="uicontrol">[ブラウザーで新しい作業通知を表示]</strong> を有効にします。</span>
+        <div>新しい作業項目が割り当てられているが、ブラウザーウィンドウがフォーカスされていない場合、アラートを受信します。</div>
+      </li><li>
+        <span>オムニチャネルから通知音を受信するデバイスを選択するには、[設定] アイコンをもう一度クリックし、[リンガー出力] でデバイスを選択します。</span>
+        <div>選択したデバイスは、現在のブラウザーのみに設定されます。たとえば、Google Chrome 用にデバイスを選択した場合、そのデバイスは Mozilla Firefox には設定されません。この機能は、Apple の Safari ブラウザーでは使用できません。</div>
+      </li><li>
+        <span>期待されるリンガー出力サウンドを確認するには、<strong class="uicontrol">[通知音をテスト]</strong> をクリックします。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_flow_considerations">
+<h1 class="slds-text-heading_large">オムニチャネルフローを使用する場合の考慮事項</h1>
+  <p>オムニチャネルフローを使用すると、堅牢なルーティングロジックを実装できます。作業が期待どおりに転送されるようにするには、次のガイドラインを確認してください。</p>
+
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table>
+    <a name="omnichannel_flow_considerations__ul_ag3_s45_gdc"></a><ul id="omnichannel_flow_considerations__ul_ag3_s45_gdc">
+      <li>オムニチャネルフローの実行中にエラーが発生した場合、作業項目はサービスチャネルに指定された代替キューに転送されます。</li>
+
+      <li dir="ltr">オムニチャネルフローの Apex クラスでは、非同期コールアウトのみがサポートされます。同期コールアウトを追加すると、ボットがメッセージングセッションを拒否したり参加しなかったり、作業が適切に転送されなかったりするなど、予期しない動作が発生する可能性があります。<a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.apexcode.meta/apexcode/apex_callouts.htm"><u>「Apex を使用したコールアウトの呼び出し」</u></a>を参照してください。</li>
+
+    </ul>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">オムニチャネルフローアクションを使用してオムニチャネルフローを移行する場合の考慮事項</h2><p>Sandbox から本番環境にオムニチャネルフローを容易に移行できるようになりました。以前は、移行後の特定のフローアクションでは手動での更新が必要でした。バージョン 2.0 に更新することで、[ルーティングの対応可能状況を確認]、[スキル要件を追加]、[作業を転送] などのアクションを手動操作なしで移行できるようになりました。</p><p>手動操作なしでアクションを移行するには、フローでアクションのバージョンを 2.0 バージョンに更新します。</p><p>オムニチャネルフローアクションのバージョンを更新する</p><ul>
+        <li><strong class="uicontrol">Flow Builder</strong> でオムニチャネルフローを開きます。</li>
+
+        <li>フローでアクションを選択し、アクションの設定パネルで [<strong class="uicontrol">詳細オプションを表示</strong>] を選択します。</li>
+
+        <li>[<strong class="uicontrol">アクションバージョン]</strong> ドロップダウンメニューで、バージョン 2.0.0 を選択します。 [<strong class="uicontrol">保存]</strong> を選択します。</li>
+
+      </ul>
+<p>オムニチャネルフローが正常に移行されるようにするには、次のガイドラインを確認してください。</p><ul>
+        <li>アクションを含むオムニチャネルフローの移行中、アクションで参照されるスキルは移行されません。対象組織のフローで使用するスキルを作成して、移行を続行できます。</li>
+
+        <li>フローアクションで参照されるスキルベースのルーティングルールは移行できません。リリース後に再作成できます。代わりに AddSkillRequirement アクションを使用できます。</li>
+
+        <li>[作業を転送] アクションを移動するときに、ルーティング対象としてエージェントまたはキューを選択すると、アクションの移動後に問題が発生する可能性があります。これを回避するには、値をハードコードする代わりに、変数を使用してフロー内で必要なエージェントまたはキューを動的に検索します。[レコードを取得] フローアクションを使用することもできます。この方法では、移行後に [作業を転送] アクションが正しく機能します。</li>
+
+        <li>オムニチャネルフローアクションで変数を使用する場合、変数が名前でレコードを取得して対応する ID を取得するようにします。この方法では、フローの移行後に正しい ID が使用されます。</li>
+
+        <li>サービスチャネルは移行できません。オムニチャネルフローを移行する前に、対象組織で必要なサービスチャネルを作成する必要があります。</li>
+
+        <li>エージェントとキューへの参照は、移行する回避策が必要です。User Entity - Agent への参照の回避策 <ul>
+            <li>[レコードを取得] フローアクションを使用してエージェント ID を取得する (例: ユーザー名またはメール)</li>
+
+            <li>[オムニチャネル] アクション項目で、前のステップから取得したユーザー ID を使用します。</li>
+
+          </ul>
+</li>
+
+        <li>キューエンティティへの参照の回避策<ul>
+            <li>[レコードを取得] フローアクションを使用してキュー ID を取得する (例: キュー名別)</li>
+
+            <li>[オムニチャネル] アクション項目で、キューを参照する項目に前のステップから取得したキュー ID を使用します。</li>
+
+          </ul>
+</li>
+
+      </ul>
+</div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_flows">
+<h1 class="slds-text-heading_large">オムニチャネルフローを使用した高度なルーティング</h1>
+  <p>オムニチャネルフローにより、Flow Builder 内でオムニチャネルのすべての機能が提供されます。Flow Builder の機能と柔軟性を使用して、ルーティングルールを定義し、作業を最適なサービス担当者に動的に転送します。オムニチャネルフローにより、音声通話、チャット、メッセージングセッション、ケース、リード、カスタムオブジェクトなど、サポートされているすべてのチャネルのルーティング設定が統合されます。</p>
+
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="support_general-1.html#how_does_an_omni_channel_flow_work">オムニチャネルフローの仕組み</a></strong><br>顧客がチャット、音声、またはメッセージングの会話を開始したら、オムニチャネルフローを起動して作業項目をキュー、スキル、サービス担当者、またはボットに転送します。</li><li class="slds-p-bottom_small"><strong><a href="omnichannel-1.html#omnichannel_create_a_flow">オムニチャネルフローの作成</a></strong><br>フローを最初から作成します。または、オムニチャネルフローテンプレートからフローを作成して作成時間を短縮します。テンプレートは、チャット、音声通話、メッセージをサービス担当者、キュー、スキルに転送するフローの作成方法を示しています。テンプレートを使用して各着信通話のケースを作成することもできます。ビジネスニーズに合わせてテンプレートから作成されたフローをカスタマイズできます。</li><li class="slds-p-bottom_small"><strong><a href="#omnichannel_create_cases_with_omni_flow">オムニチャネルフローテンプレートを使用した着信通話のケースの作成</a></strong><br>基本ルーティングとケース作成時のテンプレートを使用して、このルーティングロジックを自分で設定する時間を節約します。このテンプレートでは、通話者を識別し、通話をキューに転送し、通話のケースを作成して、サービス担当者が通話を受け入れるときに新しいケースレコードを画面ポップします。必要に応じてオムニチャネルフローを変更し、デフォルトのルーティングの動作 (キューなど) を変更します。</li><li class="slds-p-bottom_small"><strong><a href="#omnichannel_create_chat_button_for_flow">[チャット] ボタンへのオムニチャネルフローの割り当て</a></strong><br>オムニチャネルルーティング種別とオムニチャネルフローを使用して、最適なサービス担当者にチャットを動的に転送します。</li><li class="slds-p-bottom_small"><strong><a href="#omnichannel_route_calls_with_omni_flow">電話チャネルへのオムニチャネルフローの割り当て</a></strong><br>コンタクトセンターには、サポート用とセールス用など、顧客が電話をかけられる複数の電話チャネルを追加できます。各チャネルには独自の電話番号が割り当てられます。電話チャネルで通話を転送するには、コンタクトセンターでチャネルを作成してから、チャネルのルーティング方法を指定します。オムニチャネルフローを使用して通話を動的に転送するには、フローをチャネルに割り当てます。</li><li class="slds-p-bottom_small"><strong><a href="omnichannel-3.html#omnichannel_route_email_to_case">メール-to-ケースからケースを転送するためのオムニチャネルフローの割り当て</a></strong><br>オムニチャネルフローを使用して、カスタマーサポートメールのケースを適格なサポート担当者に転送します。</li><li class="slds-p-bottom_small"><strong><a href="omnichannel-4.html#omnichannel_use_flow_to_route">非リアルタイムオブジェクトを転送するためのオムニチャネルフローの呼び出し</a></strong><br>ケース、リード、カスタムオブジェクトなど、非リアルタイムオブジェクトを転送するには、オムニチャネルフローでルーティングロジックを定義し、ビジネスルールに基づいて親フローからフローを呼び出します。たとえば、ケースが作成されたときにフローの実行をトリガーするには、レコードトリガーフローのサブフローとして追加します。または、カスタム転送プロセスを実行するには、画面フローのサブフローとして追加します。</li><li class="slds-p-bottom_small"><strong><a href="#omnichannel_flow_considerations">オムニチャネルフローを使用する場合の考慮事項</a></strong><br>オムニチャネルフローを使用すると、堅牢なルーティングロジックを実装できます。作業が期待どおりに転送されるようにするには、次のガイドラインを確認してください。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.flow_build.htm&amp;language=ja&amp;type=5">フローの作成 </a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_go_mobile">
+<h1 class="slds-text-heading_large">オムニチャネルを使用したモバイルへの移行</h1>
+  <p>オムニチャネルユーザーはモバイルデバイスから作業を完了できます。オムニチャネルのモバイルバージョンであるオムニモバイルでは、サービス担当者は状況を設定し、Voice を除くすべての拡張チャネルから作業要求を処理できます。また、新しい作業、作業の更新、状況の変更に関する通知をモバイルデバイスで受信します。オムニモバイルは、モバイルデバイスにインストールできる Salesforce モバイルアプリケーションの一部です。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div id="omnichannel_go_mobile__note_wdp_wbc_h2c" style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><a name="omnichannel_go_mobile__note_wdp_wbc_h2c"></a><span class="slds-text-title_caps">メモ</span> この機能は、拡張オムニチャネルでのみ使用できます。</div></div></div>
+
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#omnichannel_omni_inbox_how_it_works">オムニモバイルのしくみ</a></strong><br>サポート担当者がSalesforceモバイル アプリケーションにログインしてOmni Inboxを開きます。プレゼンス状況を対応可能に変更すると、営業担当は顧客からの受信要求の受信を開始し、送信連絡を行うことができます。ログアウトしない限り、オムニチャネルセッションにログインしたままになります。割り当てられた作業項目は、完了、再割り当て、または却下するまでオムニモバイルに表示されます。</li><li class="slds-p-bottom_small"><strong><a href="#omnichannel_enable_omni_inbox_for_agents">サービス担当者向けのオムニモバイルの有効化</a></strong><br>     <span>オムニモバイルは、拡張オムニチャネルでのみ使用できます。サービス担当者がモバイルデバイスの Salesforce モバイルアプリケーションでオムニモバイルを設定できるようにするには、次の手順を実行します。 </span>   </li><li class="slds-p-bottom_small"><strong><a href="#omnichannel_omni_inbox_limitations">オムニモバイルの制限事項</a></strong><br>一部のオムニチャネルデスクトップ機能は、オムニモバイルではサポートされていません。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_how_skills_based_routing_works">
+<h1 class="slds-text-heading_large">スキルベースのルーティングのしくみ</h1>
+  <p>オムニチャネルのスキルベースのルーティングでは、必須スキルに基づいて作業項目を最も適格なサービス担当者と照合します。作業項目が作成されると、オムニチャネルはルーティング設定、スキルベースのルーティングルール、およびオムニチャネルフローの [作業を転送] アクションに渡されるスキル要件に基づいて、必要なスキルを決定します。次に、オムニチャネルは、必要なスキルと作業に対応できる業務量をすべて持つサービス担当者に項目を転送します。</p>
+
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table>
+    <p>作業項目を適切なサービス担当者に転送するために、オムニチャネルはこれら 2 つのソースのスキルの組み合わせを適用します。</p>
+    <dl>
+      
+        <dt style="font-weight:bold;padding-top:.25rem;">ルーティング設定に含まれる静的スキル。</dt>
+
+        <dd style="padding-left:1.5rem;padding-bottom:.5rem;">そのルーティング設定を使用して転送されるすべての作業項目にスキルを追加するには、スキルをルーティング設定に追加します。</dd>
+      
+      
+        <dt style="font-weight:bold;padding-top:.25rem;">スキルベースのルーティングルールまたはオムニチャネルフローから追加された動的スキル。</dt>
+
+        <dd style="padding-left:1.5rem;padding-bottom:.5rem;">条件に基づいて特定の作業項目にスキルを動的に追加するには、スキルベースのルーティングルール、オムニチャネルフロー、またはその両方を使用してロジックを作成します。条件が満たされると、スキルが作業項目に適用されます。</dd>
+      
+    </dl>
+
+    <p>オムニチャネルは、すべての必須スキルを持ち、ルーティング種別 (対応可能状況が最大または最小) に基づいて対応可能で、該当する場合は指定された最小スキルレベルを満たすサービス担当者に各作業項目を転送します。</p>
+    <p>すべての必須スキルを持つサービス担当者がおらず、追加スキルを削除するように設定されている場合、オムニチャネルは、残りのスキルを持つサービス担当者が対応可能になるまで、指定された順序で追加スキルを削除します。優先度の高いスキルが最初に削除され、優先度 0 または優先度のないスキルが最後に削除されます。その後、作業項目は、すべての追加スキルを持っていなくても、最も適した担当者に転送されます。サービス担当者が作業を拒否したりオフラインになったりすると、必須スキルが元の状態に戻り、追加のスキルを削除するプロセスが最初から開始されます。</p>
+    <p>スキルは、ケースなどのレコードがオムニチャネルキューに追加されると評価されます。オムニチャネルキューにあるレコードを編集した場合、そのレコードを同じキューまたは別のキューに再割り当てするまで、スキルへの変更は反映されません。</p>
+    <p>作業項目に特定のスキルが必要で、そのスキルを持つサービス担当者がいない場合、作業項目は転送されません。この状況は、オンラインのサービス担当者がいない場合のキュー内の項目の処理方法に似ています。<a target="_blank" href="omnichannel-4.html#omnichannel_supervisor_intro">Command Center for Service</a> を使用している場合、スーパーバイザーは [<a target="_blank" href="omnichannel-4.html#omnichannel_supervisor_backlog_tab">スキルのバックログ</a>] タブを参照して、スキルを必要とする作業項目のうちサービス担当者に割り当てられていないものを確認できます。</p>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_install_reports">
+<h1 class="slds-text-heading_large">事前作成済みレポートおよびダッシュボードのインストール</h1>
+  <p>コンタクトセンターと担当者のパフォーマンスを追跡するには、Agentforce Service（旧称 Service Cloud）用の事前作成済みレポートとダッシュボードをインストールします。必要に応じて、コピー、変更、削除できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされている</a>エディションを表示する。</td>
+
+          </tr>
+        </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d24447e54" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d24447e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">サービスレポートをインストールする</td>
+
+              <td headers="d24447e54" style="vertical-align:top;" class="slds-cell-wrap">「すべてのデータの編集」</td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Service Cloud は Agentforce Service になりました。Salesforce アプリケーションおよびドキュメントで Service Cloud を参照することがあります。</div></div></div>
+<p>この機能をインストールする前に、拡張オムニチャネルを有効にします。</p></div>
+    <ol><li>
+        <span>[設定] から、[クイック検索] ボックスに「<kbd>Service Cloud レポート</kbd>」と入力し、[<strong class="uicontrol">Service Cloud レポート</strong>] を選択します。</span>
+        <div>[Service Cloud レポート] ページには、複数のダッシュボードとレポートのセットが表示されます。</div>
+      </li><li>
+        <span>インストールするセットを選択します。</span>
+      </li><li>
+        <span>インストールするには、[<strong class="uicontrol">インストール] を</strong>クリックします。</span>
+        <div>最新バージョンを取得するために再インストールする場合もあります。これらのレポートを再インストールすると、同じ開発者名の以前のバージョンのレポートが上書きされます。レポートの変更を保持するには、インストールを再度実行する前にレポートを新しいレポートとして保存します。</div>
+      </li></ol>
+
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> これらのレポートは、オムニチャネルホームページからインストールすることもできます。</div></div></div>
+</div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="analytics_ai.html#report_service_cloud_view">事前作成済みサービスレポートおよびダッシュボードの表示</a></li><li><a title="さまざまなサービスチャネルから受信した作業項目をコンタクトセンターの適格で対応可能なサポート担当者に転送するようにオムニチャネルを設定します。どのオムニチャネルコンポーネントを設定するかについての詳細を確認し、設定タスクのリストを取得するには、新しいオムニチャネル設定ホームに移動します。設定ホームには、項目が正しく設定されていない場合に警告も表示されます。また、会社で定義されているすべてのサービスチャネルインスタンスの詳細を表示したり、サービスチャネルインスタンスにアクセスするためのリンクをクリックしたりできます。" href="omnichannel-3.html#omnichannel_setup_home">オムニチャネル設定ホームへのアクセス</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_interruptible_capacity">
+<h1 class="slds-text-heading_large">中断可能な業務量を使用した優先度の設定</h1>
+  <p>サービス担当者が時間的制約のある作業と長時間の作業の両方を処理する場合、オムニチャネルは顧客が応答時間を短縮できるように時間的制約のある作業項目を転送できます。オムニチャネルで緊急度の高い作業をサービス担当者にすぐに転送できるように、緊急度の低い作業項目を中断可能として定義します。</p>
+
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>作業項目は主または中断可能のいずれかとして指定できます。主作業項目とは、中断不可能とみなされる作業項目です。音声通話やチャットは、中断されるべきでないタスクの例です。一方、中断可能な作業項目とは、より差し迫った作業を優先するために後回しにできる作業項目です。解決に時間を要するケースは、中断可能な作業項目の一例です。</p><p>同様に、サービス担当者の主業務量と中断可能な業務量 (各サービス担当者が一度に処理できる中断不可能な作業と中断可能な作業の量) をそれぞれ定義できます。オムニチャネルは作業を転送するときに、作業項目のサイズと中断可能性を確認し、その作業項目に適した対応可能な業務量があるサービス担当者を検索します。</p><p>たとえば、サービス担当者が一度に 1 つの音声通話と 4 つのケースを処理できるとします。各作業項目の業務量を 1 単位として、サービス担当者の主業務量を 1 つの作業項目に設定し、中断可能な業務量を 4 つの作業項目に設定します。音声通話は中断不可能、ケースは中断可能になるように、サービスチャネルを設定します。</p><p>オムニチャネルで 1 人のサービス担当者に 4 つのケースが割り当てられた場合、そのサービス担当者は中断可能な作業でフル業務量になり、別のケースは提供されません。ただし、主作業である音声通話が着信すると、オムニチャネルはサービス担当者にまだ主業務量があることを確認し、通話を割り当てます。</p></div>
+    <div><p>主業務量と中断可能な業務量に関するオムニチャネルルーティングルールの概要を次に示します。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d66840e77" style="vertical-align:top;" class="slds-cell-wrap" scope="col">次の作業の場合</th>
+              <th id="d66840e80" style="vertical-align:top;" class="slds-cell-wrap" scope="col">オムニチャネルが従うルール</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d66840e77" style="vertical-align:top;" class="slds-cell-wrap" data-label="次の作業の場合">主 (中断不可能)</td>
+
+              <td headers="d66840e80" style="vertical-align:top;" class="slds-cell-wrap" data-label="オムニチャネルが従うルール"> オムニチャネルでは、サービス担当者に使用可能な主業務量がある場合にのみ主作業項目が割り当てられます。中断不可能な作業を転送する場合、オムニチャネルではサービス担当者に割り当てられた中断可能な作業は考慮されません。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d66840e77" style="vertical-align:top;" class="slds-cell-wrap" data-label="次の作業の場合">中断可能</td>
+
+              <td headers="d66840e80" style="vertical-align:top;" class="slds-cell-wrap" data-label="オムニチャネルが従うルール">中断可能な作業を転送する場合、オムニチャネルでは主業務量と中断可能な業務量の両方が十分にあるサービス担当者のみが考慮されます。これにより、サービス担当者が電話などの主作業で多忙な場合、オムニチャネルはサービス担当者が対応できない中断可能な作業を割り当てません。</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">例</h2><p>次のシナリオでは、サービス担当者が一度に最大 5 件のリードと 5 件のケースを処理できると想定します。そのため、主業務量と中断可能な業務量は、5 つの相対作業単位に設定されます。各リードやケースで消費される作業単位数は 1 です。それぞれのサービスチャネルでは、リードが中断不可能、ケースが中断可能として設定されています。</p><ul>
+        <li>サービス担当の Erika は 5 件のケースに対応しているため、対応可能な中断可能な業務量がありません。ただし、中断不可能なリードについては 100% 対応できます。オムニチャネルでリードが受信されると、Erika に使用可能な主業務量があることが確認され、リードが割り当てられます。</li>
+
+        <li>サービス担当者の Lucas は 5 件のリードに対応しているため、対応可能な主業務量がありません。ただし、ケースはないため、中断可能な作業については 100% 対応できます。オムニチャネルでケースが受信されると、Lucas に作業項目に対応するための主業務量と中断可能な業務量の両方が十分あるかどうかが確認されます。Lucas には主業務量がないため、オムニチャネルは両方の種別の業務量に対応できる別のサービス担当者を探します。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">中断可能な業務量の設定</h2><p>オムニチャネルで中断可能性に基づいて作業項目を転送するには、次の操作を実行する必要があります。</p><ul>
+        <li>サービス担当者の業務量を設定します。「<a title="サポート担当者が複数のタスクに柔軟に対応できるようにします。主作業と中断可能な作業の業務量を設定します。" href="omnichannel-3.html#omnichannel_setup_interruptible_capacity">Set Up Support Reps’ Capacity</a>」を参照してください。</li>
+
+        <li>作業項目を主または中断可能として設定します。<a title="チャットなどの中断不可能な作業は、処理できる業務量があるサービス担当者のみに任せてください。中断不可能な作業を主として定義し、ケースやリードといった長期にわたる作業や緊急度の低い作業を中断可能として定義します。" href="omnichannel-1.html#omnichannel_configure_work_items_as_primary_or_interruptible">「作業項目の主または中断可能としての設定」</a>を参照してください。</li>
+
+      </ul>
+<p>各サービス担当者の主業務量と中断可能な業務量を表示するには、[エージェント] タブに移動します。</p><div style="text-align:left;"><img alt="主業務量と中断可能な業務量が表示されている [エージェント] タブ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/omnichannel/omnichannel_agent_tab_interrupt_capacity_01.png">
+      </div></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="サポート担当者が複数のタスクに柔軟に対応できるようにします。主作業と中断可能な作業の業務量を設定します。" href="omnichannel-3.html#omnichannel_setup_interruptible_capacity">サポート担当者の業務量の設定</a></li><li><a title="チャットなどの中断不可能な作業は、処理できる業務量があるサービス担当者のみに任せてください。中断不可能な作業を主として定義し、ケースやリードといった長期にわたる作業や緊急度の低い作業を中断可能として定義します。" href="omnichannel-1.html#omnichannel_configure_work_items_as_primary_or_interruptible">主または中断可能な作業項目の設定</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_intro">
+<h1 class="slds-text-heading_large">オムニチャネルによる作業の転送</h1>
+  <p>オムニチャネルはカスタマイズ可能な柔軟な機能で、宣言的に設定できるため、コードを記述する必要がありません。オムニチャネルを使用して作業項目の優先度を管理すれば、重要な作業項目をエージェントにすばやく簡単に転送できるようになります。サポート担当者が作業項目に対応できる数のみが割り当てられるように、サポート担当者の業務量を管理します。また、さまざまな種別の割り当てに対応できる営業担当を定義することもできます。たとえば、リードや営業の問い合わせに対応する担当者のグループと、サポートの質問で顧客をサポートする別のグループを作成します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> 標準オムニチャネルは Summer '26 リリースで廃止されます。ユーザーがルーティングワークフローを維持し、最新の機能にアクセスできるように、Summer '26 リリースのロールアウト中に Salesforce によって組織が自動的に拡張オムニチャネルにアップグレードされます。拡張オムニチャネルは、サービス担当者とスーパーバイザー向けの最新の機能を提供します。「<a target="_blank" href="omnichannel-4.html#omnichannel_upgrade_standard_to_enhanced">標準オムニチャネルから拡張</a>へのアップグレード」を参照してください。</div></div></div>
+
+    <p>オムニチャネルは、Lightning Experience (推奨) と Salesforce Classic の両方でサポートされています。オムニチャネルは標準アプリケーションとコンソールアプリケーションの両方で実行できます。</p>
+    <p>オムニチャネルは、アプリケーション内で最も対応可能で適格なサポート担当者に作業要求を転送します。Command Center for Service を使用して、リアルタイムの運用インテリジェンスをサポートスーパーバイザーに提供することもできます。営業担当がキューから作業割り当てを手動で選択する必要がなくなるため、コールセンターの全員が時間、労力、および頭脳を節約できます。営業担当は割り当ての作業が容易になるため、より迅速かつ効果的に顧客を支援し、割り当てをより迅速に完了できます。</p>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div id="omnichannel_intro__note_wml_11g_b2c" style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><a name="omnichannel_intro__note_wml_11g_b2c"></a><span class="slds-text-title_caps">メモ</span> 
+      <p>ルーティングロジックは、作業が所有者に割り当てられた場合に適用されます。作業項目が転送された後にその項目の項目値が変更された場合、ルーティングロジックは再適用されません。</p>
+    </div></div></div>
+
+    <p>次の推奨事項を確認してください。</p>
+    <a name="omnichannel_intro__ul_mqf_lzf_b2c"></a><ul id="omnichannel_intro__ul_mqf_lzf_b2c">
+      <li>オムニチャネルを使用して作業を転送および割り当てます。オムニチャネルは、オムニチャネル設定とサービス担当者の業務量に基づいて最適な割り当て先を見つけます。オムニチャネルフローを使用して、スキルに基づいて作業を転送することもできます。また、営業担当はオムニチャネルウィジェットを使用して、自分に割り当てられた作業を表示および管理できます。</li>
+
+      <li>標準オムニチャネルの代わりに拡張を使用します。拡張オムニチャネルは、標準オムニチャネルよりも優れた、担当者とスーパーバイザー向けの広範な環境を備えています。また、今後のオムニチャネル機能は拡張オムニチャネルで開発されます。「<a title="標準オムニチャネルと拡張オムニチャネルの違いを確認してください。拡張オムニチャネルが推奨バージョンです。" href="omnichannel-3.html#omnichannel_std_vs_enhanced">標準オムニチャネルと拡張</a>オムニチャネルの比較」および「オムニチャネルの<a title="オムニチャネルを有効にして、サービス担当者が同じアプリケーションからさまざまなサービスチャネルで作業を管理できるようにします。次に、ビジネスニーズに基づいてオムニチャネル機能を有効にします。" href="#omnichannel_enable">有効化と設定</a>」を参照してください。</li>
+
+    </ul>
+
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="omnichannel-3.html#omnichannel_route_work">オムニチャネルによる作業の転送</a></strong><br>オムニチャネルを使用して、作業項目をキュー、サポート担当者、スキル、さらにはEinsteinボット(サポートされるチャネル上)に転送します。ビジネスニーズに応じて、オムニチャネルフローを含め、異なる方法を使用して作業を転送できます。</li><li class="slds-p-bottom_small"><strong><a href="support_general-3.html#service_presence_intro">オムニチャネルの設定</a></strong><br>コールセンターで最も適格で対応可能なサポート担当者にあらゆる種別の受信作業項目を転送するようにオムニチャネルを設定します。オムニチャネルは、コンソールと標準アプリケーションの両方にシームレスに統合されます。</li><li class="slds-p-bottom_small"><strong><a href="omnichannel-4.html#omnichannel_upgrade_standard_to_enhanced">標準オムニチャネルから拡張へのアップグレード</a></strong><br>標準オムニチャネルを使用している場合は、拡張オムニチャネルにアップグレードして、すべての高度なオムニチャネル機能をロック解除します。拡張オムニチャネルでは、Voice、ケース、拡張メッセージングなど、より幅広いサービスチャネルがサポートされます。最新のオムニチャネル機能はすべて、拡張オムニチャネル専用に開発されています。たとえば、標準オムニチャネルとは異なり、拡張オムニチャネルでは Agentforce エージェント、オムニモバイル、オムニウォールボード、すべてのチャネル用の 1 つの Inbox、スーパーバイザー用の Command Center for Service のカスタムタブとカスタムアクション、担当者用のオムニサイドバーがサポートされます。</li><li class="slds-p-bottom_small"><strong><a href="support_general-3.html#service_presence_test_your_implementation">オムニチャネル実装のテスト</a></strong><br>オムニチャネルを設定して有効にしたら、実装をテストして正常に動作することを確認します。</li><li class="slds-p-bottom_small"><strong><a href="#omnichannel_manage_with_omni_supervisor">サポート担当者、キュー、スキルの管理</a></strong><br>組織のサポート担当者、キュー、スキルを管理します。</li><li class="slds-p-bottom_small"><strong><a href="omnichannel-1.html#omnichannel_agent_support">オムニチャネルを使用したリアルタイムチャネルのカスタマーサポートの提供</a></strong><br>標準チャネルと拡張チャネルで、電話、メッセージング、チャットなどの顧客が希望するリアルタイムコミュニケーションの手段を使用して、顧客に対するサービスを行います。オムニチャネルでこれらの種類のサポート要求を受け入れ、管理できます。必要に応じて、顧客をサポートしている間にスーパーバイザーに連絡してサポートを受けることができます。</li><li class="slds-p-bottom_small"><strong><a href="omnichannel-3.html#omnichannel_route_work_by_due_date">Priority Work By Acceptance Due Date (受け入れ期日別の作業の優先度付け)</a></strong><br>オムニチャネルでは、作業に優先度を付けながら将来の日付を考慮できます。これにより、ルーティングの優先順位付けが強化され、全体的な効率と SLA 管理が改善されます。その結果、スーパーバイザーは SLA コミットメントに関連するチームの作業負荷をより効果的に監視して管理できます。オムニチャネルフローで [承諾期日] を転送作業アクションと共に含めることで、スーパーバイザーが担当者作業の期日を確認できるようにします。システム管理者は、作業項目を送信するときに、目標日を作業項目に割り当てることができます。これは、システム管理者が作業を受け入れる予定日です。システム管理者は、目標日に基づいて、サービス担当者が作業項目を受け入れる必要がある期日を選択できます。</li><li class="slds-p-bottom_small"><strong><a href="omnichannel-3.html#omnichannel_schedule_work_items_for_future_routing">今後のルーティングの作業項目のスケジュール</a></strong><br>[作業項目ルーティングをスケジュール] を使用して、作業項目をすぐにバックログに追加するのではなく、転送する将来の特定の日時を設定します。 </li><li class="slds-p-bottom_small"><strong><a href="#omnichannel_prioritize_work_items_with_custom_request_date">カスタム要求日を使用した作業項目の優先順位付け</a></strong><br>作業項目が再転送または再割り当てされても、元の優先度を維持します。</li><li class="slds-p-bottom_small"><strong><a href="#omnichannel_optimized_routing_for_ai_agents">Agentforce エージェントおよび拡張ボット用に最適化されたルーティング</a></strong><br>Agentforce エージェントと拡張ボットは、最適化されたルーティングを使用して、ユーザーをサポートにより迅速に接続します。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_manage_with_omni_supervisor">
+<h1 class="slds-text-heading_large">サポート担当者、キュー、スキルの管理</h1>
+  <p>組織のサポート担当者、キュー、スキルを管理します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="omnichannel-4.html#omnichannel_supervisor_tabs_intro">[サービス] タブの Command Center の概要</a></strong><br>スーパーバイザーは、Command Center for Service のタブを使用して、コールセンターの健全性をリアルタイムで確認できます。これらのタブにより、スーパーバイザーはどの作業項目が進行中か、有効か、支援が必要か、誰が何に割り当てられているかを確認できます。また、オープン業務量や顧客の平均待機時間など、その他の詳細も表示されます。</li><li class="slds-p-bottom_small"><strong><a href="omnichannel-4.html#omnichannel_supervisor_sort_filter">Command Center for Service での並び替えと絞り込み</a></strong><br>Command Center for Service でリアルタイムデータを整理し、焦点を絞ることで、必要な情報を簡単に見つけることができます。</li><li class="slds-p-bottom_small"><strong><a href="omnichannel-1.html#omnichannel_change_user_queues_skills_with_copilot">AI エージェントを使用したユーザーのキューとスキルの変更</a></strong><br>オムニチャネルユーザーのキューまたはスキルをすばやく変更するには、デスクトップまたは Salesforce モバイルアプリケーションで Agentforce (デフォルト) 会話インターフェースを使用します。[オムニチャネルユーザー設定を更新] エージェントアクションを使用して、キューの割り当てを追加または削除したり、スキルの割り当てを追加または削除したり、これらのユーザーのスキルレベルを変更したりできます。たとえば、待機時間の短縮、顧客満足度の向上、業務効率の向上のために、アイドル状態の担当者を最も混雑しているキューに割り当てることができます。スーパーバイザーの設定に応じて、表示される担当者、キュー、スキルのみを変更できます。</li><li class="slds-p-bottom_small"><strong><a href="omnichannel-4.html#omnichannel_supervisor_change_queues_skills_assigned_to_agent">Command Center for Service を使用した営業担当のキューとスキルの変更</a></strong><br>必要に応じて、Command Center for Service の [Service Reps (サービス担当者)] タブでサービス担当者のキューとスキルを変更します。スーパーバイザーの設定に基づいて、自分に表示されるキューとスキルのみを表示および変更できます。スーパーバイザー設定に割り当てられていない場合は、すべてのスキル (最大 2,000 スキル) を表示できます。最初の 2,000 件のレコードがアルファベット順に表示されます。</li><li class="slds-p-bottom_small"><strong><a href="omnichannel-4.html#omnichannel_supervisor_whisper">サービス担当者の監視とサポート</a></strong><br>サービス担当者が顧客に対応している間、リアルタイムで監視およびサポートします。Command Center for Service で会話を監視しているときに、フラグが設定された会話に優先順位を付けます。フラグは、サービス担当者が支援を必要としている場合や、会話インテリジェンスルールで事前に決定されたキーワードや語句が検出された場合に立てることができます。</li><li class="slds-p-bottom_small"><strong><a href="#omnichannel_monitor_service_agents">Agentforce サービスエージェントの監視</a></strong><br>サービスエージェントが質の高いサービスを提供できるように、エージェントと顧客間のメッセージングセッションを監視します。介入が必要な会話に焦点を絞るには、フラグが設定された会話を確認します。</li><li class="slds-p-bottom_small"><strong><a href="omnichannel-3.html#omnichannel_skills_based_routing_transfer_to_skill_set">異なるスキルセットへの作業項目の転送</a></strong><br>適切なスキルを持つサービス担当者が問題を解決できるように、作業項目を別のスキルセットに転送できます。たとえば、サービス担当者にケースを解決する適切なスキルがない場合、サービス担当者はケースを転送して必要なスキルを指定できます。</li><li class="slds-p-bottom_small"><strong><a href="omnichannel-1.html#omnichannel_abandon_work">中止された顧客とのやりとりの分析</a></strong><br>放棄された顧客とのやりとりとは、顧客がサービス担当者に応答する前に終了する通話またはメッセージングセッションです。放棄された顧客とのやりとりとその分類方法を理解することで、レポートとサービス管理を改善できます。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=sf.voice_supervisor_monitoring.htm&amp;language=ja&amp;type=5">スーパーバイザーによる Voice の監視</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_manage_work_on_the_go">
+<h1 class="slds-text-heading_large">外出中のオムニチャネル作業の管理</h1>
+  <p>Salesforce MobileのOmni Inboxを使用すると、モバイルデバイスを使用してどこからでも作業できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="omnichannel-1.html#omnichannel_agent_mobile_setup">モバイルデバイスでのオムニチャネルの設定</a></strong><br>     Salesforce モバイル アプリケーションで Omni Inbox を<span>使用するには、Digital Engagement ライセンスが必要です。Omni Inbox を設定するには、次のタスクを実行します。</span>   </li><li class="slds-p-bottom_small"><strong><a href="#omnichannel_omni_inbox_manage_work">Omni Inbox を使用した作業の管理</a></strong><br> 新しい作業を受け入れて処理中の作業を再開するには、Salesforce モバイル アプリケーションで Omni Inbox を開きます。</li><li class="slds-p-bottom_small"><strong><a href="omnichannel-3.html#omnichannel_search_sort_rep">Omni-Channel Inbox での検索と並び替え</a></strong><br>Omni-Channel Inbox で作業項目の優先順位付けと管理を効率的に行うには、必要に応じて検索と並び替えを行います。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_monitor_service_agents">
+<h1 class="slds-text-heading_large">Agentforce サービスエージェントの監視</h1>
+  <p>サービスエージェントが質の高いサービスを提供できるように、エージェントと顧客間のメッセージングセッションを監視します。介入が必要な会話に焦点を絞るには、フラグが設定された会話を確認します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="https://help.salesforce.com/s/articleView?id=service.einstein_service_intro.htm&amp;language=ja&amp;type=5">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div id="omnichannel_monitor_service_agents__note_m22_l1c_h2c" style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><a name="omnichannel_monitor_service_agents__note_m22_l1c_h2c"></a><span class="slds-text-title_caps">メモ</span> この機能は、拡張オムニチャネルでのみ使用できます。</div></div></div>
+</div>
+    <ol><li>
+        <span>Command Center for Service で、[Agentforce] タブを開きます。</span>
+        <div>Agentforce タブのテーブルには、すべての有効な会話が表示され、一度に最大 100 件の会話が表示されます。[Agentforce] タブが表示されない場合は、システム管理者にお問い合わせください。<div id="omnichannel_monitor_service_agents__fig_txg_jw2_tdc"><a name="omnichannel_monitor_service_agents__fig_txg_jw2_tdc"></a>
+            <a name="omnichannel_monitor_service_agents__image_uxg_jw2_tdc"></a><img alt="Agentforce タブには、AI エージェントとの会話のリストが表示されます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/omnichannel/omnichannel_command_center_for_service_ai_agent_tab.png" id="omnichannel_monitor_service_agents__image_uxg_jw2_tdc" style="width:750px;">
+          </div></div>
+      </li><li>
+        <span>注意が必要なサービスエージェントを判断するには、フラグを探します。フラグが設定された会話はリストの上部に表示されます。</span>
+      </li><li>
+        <span>会話に注意する必要がなくなった場合は、<strong class="uicontrol">[取り下げ]</strong> をクリックしてフラグを取りさげます。</span>
+      </li><li>
+        <span>各 AI エージェントが処理している有効な会話の数を確認するには、テーブルの上にあるボックスを確認します。</span>
+      </li><li>
+        <span>エージェントで会話のリストを絞り込むには、テーブルの上にあるエージェントのボックスのいずれかを選択します。</span>
+        <div>たとえば、サービスエージェントの会話を表示するには、エージェントの名前のボックスをクリックします。Agentforce タブには、最大 10 人のサービスエージェントの会話を表示できます。エージェントがさらに多い場合、会話数が最も多い上位 10 人のエージェントがタブに表示されます。</div>
+      </li><li>
+        <span>AI エージェントと顧客間の有効な会話を表示するには、<strong class="uicontrol">[監視]</strong> をクリックします。</span>
+      </li><li>
+        <span>AI エージェントにサービス担当者の支援が必要な場合、会話内で <strong class="uicontrol">[担当者に転送]</strong> をクリックします。</span>
+        <div>[担当者に転送] ボタンは、サービスエージェントに割り当てられた発信フローを呼び出します。フローによって作業項目がサービス担当者に転送され、サービスエージェントが会話から退席します。</div>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=ai.generative_ai_enable.htm&amp;language=ja&amp;type=5">Einstein 生成 AI の設定</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=service.service_agent_setup.htm&amp;language=ja&amp;type=5">サービスエージェントの設定</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_multiple_screen_pop_actions">
+<h1 class="slds-text-heading_large">オムニチャネルフローでの複数の [画面ポップを追加] アクションの使用</h1>
+  <p>同じフローで複数の [画面ポップを追加] アクションをチェーニングできます。たとえば、作業の転送先となるキューやサポート担当者に関係なく、レコードを開くアクションを 1 つ追加します。次に、作業の転送先に応じて追加レコードを開く別のアクションを追加します。</p>
+
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table><p>すべての [画面ポップを追加] アクションの画面ポップの指示を [作業を転送] アクションに送信するには、各 [画面ポップを追加] アクションの指示をフローの次のアクションに渡します。続いて、最後の [画面ポップを追加] アクションの指示を [作業を転送] アクションに渡します。</p><p>次の例で、このプロセスの動作について説明します。このサンプルフローは、顧客の注文番号を IVR からの入力として受け入れます。最初の [画面ポップを追加] アクションで、通話者の取引先責任者および取引先レコードが開きます。通話者が注文番号を入力すると、2 番目の [画面ポップを追加] アクションで 3 番目のレコード (注文番号に関連付けられた注文レコード) が開きます。</p><div>
+        <img alt="このフローには、2 つの連続する [画面ポップを追加] アクションと 1 つの [作業を転送] アクションがあります。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/omnichannel/omnichannel_multiple_screen_pops.png" style="width:700px;">
+      </div><p>最初の [画面ポップを追加] アクション (1) の画面ポップの指示は、2 番目の [画面ポップを追加] アクション (2) に渡されます。2 番目のアクションは、両方の [画面ポップを追加] アクションからの集計された指示を [作業を転送] アクションに渡します。</p><p>最初の [画面ポップを追加] アクションからの指示を次のアクションに渡すには、2 番目の [画面ポップを追加] アクションの [コレクション変数を設定] 項目で、最初の [画面ポップを追加] アクションの出力を選択します。通常、この変数を使用して前の画面ポップアクションからの出力を追加し、結果を [作業を転送] アクションに渡します。</p><div>
+        <img alt="最初の [画面ポップを追加] アクションの出力が 2 番目の [画面ポップを追加] アクションへの入力として渡されています。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/omnichannel/omnichannel_pass_screen_pop_instructions.png" style="width:750px;">
+      </div><p>次に、これらの画面ポップの指示を 2 番目の [画面ポップを追加] アクションから [作業を転送] アクションに渡します。[作業を転送] アクションに渡される画面ポップの指示のみが、作業を担当者に転送したときにレコードを開きます。</p><div>
+        <img alt="2 番目の [画面ポップを追加] アクションの出力が [作業を転送] アクションへの入力として渡されます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/omnichannel/omnichannel_pass_screen_pop_instructions_route_action.png" style="width:500px;">
+      </div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> 結合されたすべての [画面ポップを追加] アクションで、合計 3 つのレコードを開くことができます。4 つ以上のレコードを開くように設定されている場合、フローでは最初の 3 つのレコードの画面ポップの指示が保存され、残りは無視されます。さらに、[画面ポップを追加] アクションで 1 つのレコードに対してのみ [フォーカス] 切り替えを有効にできます。複数の [画面ポップを追加] アクションで [フォーカス] 切り替えが有効になっている場合は、最後に定義された [フォーカス] 設定が優先されます。</div></div></div>
+<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> フローで複数の [画面ポップを追加] アクションを追加する場合、すべての画面ポップの指示を保存するためにコレクション変数を定義します。</div></div></div>
+</div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_omni_inbox_how_it_works">
+<h1 class="slds-text-heading_large">オムニモバイルのしくみ</h1>
+  <p>サポート担当者がSalesforceモバイル アプリケーションにログインしてOmni Inboxを開きます。プレゼンス状況を対応可能に変更すると、営業担当は顧客からの受信要求の受信を開始し、送信連絡を行うことができます。ログアウトしない限り、オムニチャネルセッションにログインしたままになります。割り当てられた作業項目は、完了、再割り当て、または却下するまでオムニモバイルに表示されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> メッセージングセッションを再割り当てすることはできません。</div></div></div>
+
+    <div><p>担当者に割り当てられた作業が Omni Inbox に表示されます。</p><div><img alt="担当者に割り当てられた作業が Omni Inbox に表示されます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/omnichannel/omni_mobile.png" style="width:250px;"></div></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_omni_inbox_limitations">
+<h1 class="slds-text-heading_large">オムニモバイルの制限事項</h1>
+  <p>一部のオムニチャネルデスクトップ機能は、オムニモバイルではサポートされていません。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table>
+    <p>オムニモバイルの次の制限事項を確認してください。</p>
+    <ul>
+      <li>オムニモバイルには、担当者向けの機能があります。スーパーバイザー機能はモバイルではサポートされていません。</li>
+
+      <li>オムニモバイルでは、<a target="_blank" href="https://help.salesforce.com/s/articleView?id=service.voice_about.htm&amp;language=ja&amp;type=5">Voice を</a>除くすべての拡張チャネルからの作業がサポートされます。&nbsp;</li>
+
+      <li>オムニモバイルでは、状況ベースの業務量はサポートされますが、タブベースの業務量はサポートされません。「<a target="_blank" href="support_general-3.html#service_presence_capacity_model">業務量モデル</a>について」を参照してください。</li>
+
+      <li>[<a target="_blank" href="support_general-3.html#service_presence_service_channel_settings">サービスチャネル設定</a>] でオプションが有効になっていても、オムニモバイルは自動的に作業要求を受け入れません。</li>
+
+      <li>オムニモバイルでは、<a target="_blank" href="https://developer.salesforce.com/docs/component-library/bundle/lightning:omniToolkitAPI/documentation">Omni Toolkit API</a> はサポートされていません。</li>
+
+    </ul>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_omni_inbox_manage_work">
+<h1 class="slds-text-heading_large">Omni Inbox を使用した作業の管理</h1>
+  <p> 新しい作業を受け入れて処理中の作業を再開するには、Salesforce モバイル アプリケーションで Omni Inbox を開きます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされている</a>エディションを表示する。</td>
+
+          </tr>
+        </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d27848e54" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d27848e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Salesforce モバイル アプリケーションで Omni Inbox にアクセスする</td>
+
+              <td headers="d27848e54" style="vertical-align:top;" class="slds-cell-wrap">メッセージングエージェント</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>Salesforce ログイン情報を使用して Salesforce モバイルアプリケーションにログインします。</span>
+      </li><li>
+        <span>オムニ受信箱を表示するには、<span class="menucascade"><strong class="uicontrol">[メニュー]</strong> | <strong class="uicontrol">[すべての項目]</strong> | <strong class="uicontrol">[オムニ受信箱]</strong></span> をクリックします。システム管理者が Omni Inbox をアプリケーションのナビゲーションの上位項目として追加した場合は、このページの下部にある <strong class="uicontrol">Omni Inbox</strong> をクリックすることもできます。</span>
+      </li><li>
+        <span>作業項目を表示するには、出社可能状況に変更します。</span>
+        <div>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> すべての関連チャネルが状況ベースの業務量用に設定されているプレゼンス状況のみがドロップダウンに表示されます。</div></div></div>
+
+          <div><img alt="ドロップダウンに使用可能なプレゼンス状況がリストされます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/omnichannel/omni_mobile_status.png" style="width:250px;"></div>
+        </div>
+      </li><li>
+        <span>処理中または一時停止中の作業を再開するには、Inbox で作業項目をタップします。</span>
+        <div>
+          <span style="vertical-align:text-bottom;display:inline-block;"><img alt="エージェントに割り当てられた作業がオムニ受信箱に表示されます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/omnichannel/omni_mobile.png" style="width:250px;margin-bottom:0;"></span>
+        </div>
+      </li><li>
+        <span>新しい作業を受け入れるには、作業項目の横にあるチェックマーク (<span style="vertical-align:text-bottom;display:inline-block;"><img alt="ドロップダウンに使用可能なプレゼンス状況がリストされます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/omnichannel/omni_inbox_work_checkmark.png" style="width:22px;margin-bottom:0;"></span>) をタップします。</span>
+      </li><li>
+        <span>作業を拒否するには、作業項目の横にある [X] をタップします。</span>
+        <div>[X] は、システム管理者がプレゼンス設定に設定した作業項目をサポート担当者が拒否できる場合にのみ表示されます。</div>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.salesforce_app_download.htm&amp;language=ja&amp;type=5">Salesforce モバイルアプリケーションのダウンロードとログイン</a></li><li><a target="_blank" href="omnichannel-4.html#omnichannel_work_with_customers">オムニチャネルコンポーネントを使用した顧客への対応 (デスクトップ版)</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=service.service_presence_configuration_settings.htm&amp;language=ja&amp;type=5">プレゼンスに関する設定</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_optimized_routing_for_ai_agents">
+<h1 class="slds-text-heading_large">Agentforce エージェントおよび拡張ボット用に最適化されたルーティング</h1>
+  <p>Agentforce エージェントと拡張ボットは、最適化されたルーティングを使用して、ユーザーをサポートにより迅速に接続します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table>
+    <p>Agentforce エージェントと拡張ボットは、最適化されたルーティングを使用して、ユーザーが会話を開始してから最初の応答を受信するまでの時間を減らします。オムニチャネルは、会話の開始直後にユーザーをエージェントまたはボットに直接接続します。複数のルーティング確認ステップが完了するまで待つ必要はありません。この方法では、接続パスからバックグラウンドステップが削除されるため、より迅速で応答性の高いインタラクションが得られます。</p>
+    <p><strong>ルーティングのしくみ</strong></p>
+    <p>以前は、会話をエージェントまたはボットに転送するには、接続を確立する前に一連の確認手順が必要でした。Agentforce エージェントと拡張ボットは常に使用できるため、更新されたルーティング プロセスではこれらの手順がスキップされ、すぐにユーザが接続されます。</p>
+    <p>更新されたルーティング動作には、次の手順が含まれます。</p>
+    <ul>
+      <li>オムニチャネルは待機中のサービスルーティング (PSR) レコードの作成をスキップします。</li>
+
+      <li>オムニチャネルによって [開封済み (承諾済み)] 状況の AgentWork レコードが作成されます。</li>
+
+      <li>エージェントまたはボットがすぐに会話に参加します。</li>
+
+    </ul>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_prioritize_work_items_with_custom_request_date">
+<h1 class="slds-text-heading_large">カスタム要求日を使用した作業項目の優先順位付け </h1>
+  <p>作業項目が再転送または再割り当てされても、元の優先度を維持します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table>
+    <p>カスタム要求日時を手動で設定することで、現在のキューに入った時間ではなく、元の要求時間に基づいて、目的の順序で作業を転送できます。[<strong class="uicontrol">Requested Date (</strong>要求日)] フィールドを使用して、作業が最初に要求されたタイミングを定義します。</p>
+    <ul>
+      <li>この項目では、日時型の変数のみを使用できます。</li>
+
+      <li>この変数には過去の日付を使用します。実行時に評価された値が将来の値である場合、入力は無視され、待機中のサービスルーティング (PSR) オブジェクトの値は設定されません。</li>
+
+      <li>この入力は、キュー、スキル、またはエージェントに転送するときに使用できます。Agentforce エージェントまたは Einstein ボットにルーティングするときには使用できません。</li>
+
+      <li>追加のスキルを使用する場合、タイムアウトのカウントダウンはカスタム要求時間に基づいて開始されます。</li>
+
+    </ul>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">レポートと AgentWork への影響</h2><p>カスタム要求日時を設定すると、Service Cloud 分析の下流に直接影響します。</p><ul>
+        <li><strong>AgentWork オブジェクト</strong>: フローで設定された値は、PSR オブジェクトの customRequestedDateTime 項目に書き込まれます。この値により、エージェントが ToDo を受け入れるときに AgentWork レコードの RequestedDateTime 項目に入力される方法が決まります。</li>
+
+        <li><strong>応答速度</strong>: customRequestedDateTime 項目はエージェントが応答するまでの経過時間を計算するために使用されるため、カスタムタイムスタンプの使用は応答速度の総計値に影響します。このリフレクションにより、最初の連絡先からの顧客の実際の待機時間をより正確に表現できます。</li>
+
+      </ul>
+</div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="omnichannel-1.html#omnichannel_configure_custom_request_date">Flow Builder でのカスタム要求日の設定</a></strong><br>[要求日] オプションを使用して、作業項目が要求された元の日付を追加します。これにより、作業項目が再転送または再割り当てされても、元の優先度が維持されます。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_psr_lifecycle">
+<h1 class="slds-text-heading_large">ルーティングライフサイクルの詳細の理解</h1>
+  <p>オムニチャネルとルーティングプロセスをさらに掘り下げる場合、2 つの特定のオブジェクト (PendingServiceRouting (PSR) と AgentWork) の理解を深めることをお勧めします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">PSR とは?AgentWork とは?</h2><p><a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.omni_channel_dev.meta/omni_channel_dev/sforce_api_objects_pendingservicerouting.htm">PSR (PendingServiceRouting)</a> は、オムニチャネルを使用して作業が転送されるときに作成される Salesforce オブジェクトです。PSR は、転送中の作業項目に関するルーティング情報が含まれる一時オブジェクトです。サポート担当者が作業項目を受け入れると、オブジェクトが自動的に作成され、PSR が削除されます。Command Center for Service の [キューのバックログ] タブと [スキルのバックログ] タブに PSR が表示されます。</p><p><a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.omni_channel_dev.meta/omni_channel_dev/sforce_api_objects_agentwork.htm">AgentWork</a> は、ルーティングシステムで作業項目を処理できるサポート担当者が見つかったときに自動的に作成される Salesforce オブジェクトです。これには、作業項目とルーティング状況に関する情報が含まれます。このオブジェクトは自動的に削除されませんが、[状態] 項目が無効な状態になると手動で削除できます。有効な状態は、[割り当て済み] と [オープン済み] です。他のすべての状態は、無効な状態とみなされます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">なぜ気にする必要があるのか?</h2><p>レコードの所有者がオムニ対応キューに割り当てられた場合、またはレコードがオムニフローの [作業を転送] アクションを使用して転送された場合は、PSR レコードが自動的に作成されます。また、細かい優先度設定など、フローでサポートされていないより複雑な使用事例で、特に作業を再開、転送、または再割り当てするときに、Apex を使用してこのレコードを手動で作成および更新することができます。ただし、絶対に必要でない限り、これを行うことはお勧めしません。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">基本的なライフサイクルは?</h2><p>この最も簡単なシナリオでは、オムニチャネルを使用して作業項目が転送されるときに PSR レコードが作成されます。作業項目を処理できる可能性のあるサポート担当者が見つかると、AgentWork レコードが作成されます。担当者が作業項目を受け入れると、PSR レコードが削除されます。AgentWork レコードが自動的に削除されることはありませんが、無効な状態 ([クローズ済み]、[使用できません]、[却下済み]、[キャンセル]、[移行済み] など) になると手動で削除できます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">PSR と AgentWork の詳細なライフサイクルは?</h2><p>これらの 2 つのオブジェクトのライフサイクルを完全に理解するには、次の状態図を参照してください。この図には、<a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.omni_channel_dev.meta/omni_channel_dev/sforce_api_objects_pendingservicerouting.htm">PSR</a> および <a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.omni_channel_dev.meta/omni_channel_dev/sforce_api_objects_agentwork.htm">AgentWork</a> レコードの作成と削除に加えて、ライフサイクルの別のフェーズの <code>PSR.IsPushed</code> 状態と <code>AgentWork.Status</code> 値も記載されています。</p><p>
+        <span style="vertical-align:text-bottom;display:inline-block;"><img alt="ルーティングライフサイクルの状態図" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/omnichannel/omni_psr_lifecycle.png" style="width:800px;margin-bottom:0;"></span>
+      </p><p>PSR レコードは一時的ですが、AgentWork レコードは明示的に削除されるまで残ります。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">AgentWork に同じ作業の複数の作業レコードが含まれる理由は?</h2><p dir="ltr">作業項目がサポート担当者に割り当てられるたびに、AgentWork でレコードが作成されます。たとえば、担当者が作業項目を別の担当者に転送する場合、各担当者に 1 つずつ、計 2 つのレコードが存在します。作業が新しい担当者に割り当てられ、元の担当者が作業を開いたままにしている場合、AgentWork には作業項目の複数の有効なレコード (担当者ごとに 1 件) が含まれます。作業項目が同じ担当者に複数回転送される場合、AgentWork には同じ担当者と作業項目の複数の作業レコードを含めることができます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">AgentWork レコードが [完了] に設定されるタイミングは?</h2><p dir="ltr">AgentWork レコードは、次のいずれかのイベントが発生するまで完了しません。</p><ul>
+        <li dir="ltr">タブベースの業務量の場合、割り当てられた営業担当が作業タブを閉じると、レコードが閉じられます。</li>
+
+        <li dir="ltr">状況ベースの業務量の場合、作業の状況が [完了] になるか、作業が再割り当てされたときにレコードが完了します。</li>
+
+        <li dir="ltr">[会話後作業] が有効になっている場合、[会話後作業] 期間が終了したときに作業は完了します。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">オムニチャネルでキュー内の作業項目がサポート担当者に割り当てられない理由は?</h2><p dir="ltr">キューにルーティング設定がない場合、作業はサポート担当者に割り当てられません。キューにルーティング設定が割り当てられていないと、オムニチャネルはキュー内の作業項目を転送しません。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">組織での PSR レコードの使用状況と制限は?</h2><p>組織で現在使用されている待機中のサービスルーティングレコードの数と現在の 1 時間あたりの使用量を表示できます。[設定] から、[クイック検索] ボックスに<kbd>「オムニチャネル」</kbd>と入力し、<strong class="uicontrol">[制限]</strong> を選択します。[制限] ページには、現在の待機中のサービスルーティングレコードの使用率と組織の待機中のサービスルーティングレコードの制限も表示されます。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_rep_capacity">
+<h1 class="slds-text-heading_large">作業業務量について</h1>
+  <p>作業業務量によって、一度に処理できる作業単位が決まります。たとえば、最大 2 つのメッセージングセッションを同時に処理したり、1 つの通話を処理したりできます。システム管理者が業務量を設定します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table>
+    <p dir="ltr">システム管理者が設定した業務量がタブベースの業務量か状況ベースの業務量かに応じて、作業の完了方法が異なります。システム管理者がタブベースの業務量モデルを使用するようにサービスチャネルを設定した場合、オムニチャネルは開いているタブに基づいてサポート担当者の業務量を決定します。各タブは、特定の作業項目のセッションです。作業項目を閉じてオムニチャネルインスタンスから削除するには、その項目のタブを閉じます。タブベースの業務量モデルでは、作業タブが閉じられると業務量が解放されます。作業項目がキューに再割り当てされ、別のサポート担当者がその作業項目を受け取った場合、その作業項目はタブを閉じるまでオムニチャネルインスタンスに表示されます。タブベースの業務量モデルは、標準ナビゲーションを使用するアプリケーションでは機能しません。</p>
+    <p dir="ltr">システム管理者が状況ベースの業務量モデルを使用するようにサービスチャネルを設定した場合、オムニチャネルは、進行中のタブとセッションではなく、受け入れ済み作業の状況に基づいてサポート担当者の業務量を決定します。営業担当がタブを閉じても作業は割り当てられたままです。担当者が対応できない場合でも、その作業はオムニチャネルコンポーネントに表示されます。作業が完了するか、別の担当者に再割り当てされるまで、作業は割り当てられたままで、業務量に反映されます。</p>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_reporting">
+<h1 class="slds-text-heading_large">サービスレポート</h1>
+  <p>サービスレポートには、Salesforce 組織に直接インストールし、必要に応じてカスタマイズできる事前作成済みのレポートとダッシュボードが用意されています。これらのレポートとダッシュボードには、スーパーバイザーが日常業務に必要とする重要な情報が表示されます。標準のカスタムレポートタイプを使用して、独自のカスタムレポートを作成することもできます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table>
+    <p>事前作成済みレポートとダッシュボードには次の利点があります。</p>
+    <dl>
+      
+        <dt style="font-weight:bold;padding-top:.25rem;">パフォーマンス追跡</dt>
+
+        <dd style="padding-left:1.5rem;padding-bottom:.5rem;">コンタクトセンターのパフォーマンスを監視して、トップパフォーマーと改善すべき領域を特定します。</dd>
+      
+      
+        <dt style="font-weight:bold;padding-top:.25rem;">効率に関するインサイト</dt>
+
+        <dd style="padding-left:1.5rem;padding-bottom:.5rem;">回答速度や平均処理時間など、キューの効率に関するインサイトを取得して、ワークフローを最適化し、待機時間を短縮します。</dd>
+      
+      
+        <dt style="font-weight:bold;padding-top:.25rem;">データ主導の意思決定</dt>
+
+        <dd style="padding-left:1.5rem;padding-bottom:.5rem;">リアルタイムデータに基づいて情報に基づいた意思決定を行い、サービス戦略と運用プロセスを強化します。</dd>
+      
+      
+        <dt style="font-weight:bold;padding-top:.25rem;">工数の削減</dt>
+
+        <dd style="padding-left:1.5rem;padding-bottom:.5rem;">事前作成済みのレポートとダッシュボードを使用して時間とリソースを節約し、ゼロから作成する必要がなくなります。</dd>
+      
+      
+        <dt style="font-weight:bold;padding-top:.25rem;">サポート要請の削減</dt>
+
+        <dd style="padding-left:1.5rem;padding-bottom:.5rem;">カスタムレポートを作成するためのデータモデルを理解するのに役立つサポートの必要性を最小限に抑えます。</dd>
+      
+    </dl>
+
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#omnichannel_install_reports">事前作成済みレポートおよびダッシュボードのインストール</a></strong><br>コンタクトセンターと担当者のパフォーマンスを追跡するには、Agentforce Service（旧称 Service Cloud）用の事前作成済みレポートとダッシュボードをインストールします。必要に応じて、コピー、変更、削除できます。</li><li class="slds-p-bottom_small"><strong><a href="#omnichannel_custom_report_types">オムニチャネルのカスタムレポートタイプの作成</a></strong><br>標準のレポートタイプを使用して、エージェントの作業をオムニチャネルでよく使用されるオブジェクトと結合します。ケース種別ごとの作業負荷やチャネル種別ごとの活動時間などのデータに関するカスタムレポートを作成します。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="analytics_ai.html#report_service_cloud_view">事前作成済みサービスレポートおよびダッシュボードの表示</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_route_calls_to_queue">
+<h1 class="slds-text-heading_large">キューへの通話の転送</h1>
+  <p>電話チャネルで通話を転送するには、コンタクトセンターチャネルを編集してから、チャネルのルーティング方法とキューを指定します。</p>
+
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table></div>
+    <ol><li>
+        <span>[設定] の [クイック検索] ボックスに<kbd>「Voice」</kbd>と入力し、使用しているテレフォニーシステムに応じて <strong class="uicontrol">[Amazon コンタクトセンター]</strong> または <strong class="uicontrol">[パートナーテレフォニーコンタクトセンター]</strong> を選択します。</span>
+      </li><li>
+        <span>コンタクトセンターを開いて編集します。</span>
+      </li><li>
+        <span>このチャネルの通話をキューに転送するには、[ルーティング種別] 項目で <strong class="uicontrol">[キュー]</strong> を選択して、キューを選択します。</span>
+        <div>
+          <div>
+            <a name="omnichannel_route_calls_to_queue__image_h1r_kfk_tcc"></a><img alt="チャネルのプロパティ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/omnichannel/omnichannel_voice_channel_properties2.png" id="omnichannel_route_calls_to_queue__image_h1r_kfk_tcc" style="width:500px;">
+          </div>
+        </div>
+      </li><li>
+        <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+      </li></ol>
+
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_route_calls_with_omni_flow">
+<h1 class="slds-text-heading_large">電話チャネルへのオムニチャネルフローの割り当て</h1>
+  <p>コンタクトセンターには、サポート用とセールス用など、顧客が電話をかけられる複数の電話チャネルを追加できます。各チャネルには独自の電話番号が割り当てられます。電話チャネルで通話を転送するには、コンタクトセンターでチャネルを作成してから、チャネルのルーティング方法を指定します。オムニチャネルフローを使用して通話を動的に転送するには、フローをチャネルに割り当てます。</p>
+
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table></div>
+    <ol><li>
+        <span>[設定] の [クイック検索] ボックスに<kbd>「Voice」</kbd>と入力し、使用しているテレフォニーシステムに応じて <strong class="uicontrol">[Amazon コンタクトセンター]</strong> または <strong class="uicontrol">[パートナーテレフォニーコンタクトセンター]</strong> を選択します。</span>
+      </li><li>
+        <span>コンタクトセンターをクリックします。</span>
+      </li><li>
+        <span>[コンタクトセンターチャネル] で、<strong class="uicontrol">[追加]</strong> をクリックして電話チャネルを追加します。既存のチャネルを編集することもできます。</span>
+        <div>
+          <span style="vertical-align:text-bottom;display:inline-block;"><img alt="[コンタクトセンターチャネル] セクションには、コンタクトセンターのすべての電話チャネルが表示されます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/omnichannel/omnichannel_voice_channel_setup.png" style="width:750px;margin-bottom:0;"></span>
+        </div>
+      </li><li>
+        <span>チャネルのプロパティを入力します。</span>
+        <div>
+          <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+                <tr class="">
+                  <th id="d15439e105" style="vertical-align:top;" class="slds-cell-wrap" scope="col">プロパティ</th>
+                  <th id="d15439e108" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+                </tr>
+              </thead><tbody>
+                <tr class="">
+                  <td headers="d15439e105" style="vertical-align:top;" class="slds-cell-wrap" data-label="プロパティ">チャネル名</td>
+
+                  <td headers="d15439e108" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">電話チャネルの名前。</td>
+
+                </tr>
+                <tr class="">
+                  <td headers="d15439e105" style="vertical-align:top;" class="slds-cell-wrap" data-label="プロパティ">電話番号</td>
+
+                  <td headers="d15439e108" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">このチャネルで顧客が連絡するために電話をかける電話番号。</td>
+
+                </tr>
+                <tr class="">
+                  <td headers="d15439e105" style="vertical-align:top;" class="slds-cell-wrap" data-label="プロパティ">ルーティング種別</td>
+
+                  <td headers="d15439e108" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><ul>
+                      <li>通話をキューに転送するには、<strong class="uicontrol">[キュー]</strong> を選択して、キューを選択します。</li>
+
+                      <li>オムニチャネルフローを使用して通話を動的に転送するには、<strong class="uicontrol">[オムニチャネルフロー]</strong> を選択し、フローと代替キューを選択します。フローで通話の転送が失敗すると、通話は代替キューに転送されます。</li>
+
+                      <li>コンタクトセンターチャネルのルーティング方法を指定しないようにするには、<strong class="uicontrol">[なし]</strong> を選択します。このオプションを選択して、<a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.voice_developer_guide.meta/voice_developer_guide/voice_rest_omniflow_execute.htm">Execuite OmniFlow API</a> を使用して通話を転送することもできます。ルーティング手順が指定されていない場合、このチャネルへの通話は失敗します。</li>
+
+                    </ul>
+</td>
+
+                </tr>
+              </tbody></table>
+        </div>
+        <div>
+          <div>
+            <a name="omnichannel_route_calls_with_omni_flow__image_l1w_bfk_tcc"></a><img alt="チャネルのプロパティ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/omnichannel/omnichannel_voice_channel_properties2.png" id="omnichannel_route_calls_with_omni_flow__image_l1w_bfk_tcc" style="width:500px;">
+          </div>
+        </div>
+      </li><li>
+        <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+      </li></ol>
+
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_route_chats_to_queue">
+<h1 class="slds-text-heading_large">キューへのチャットの転送</h1>
+  <p>チャットを転送するには、チャットボタンを編集してから、ルーティング方法とキューを指定します。</p>
+
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table></div>
+    <ol><li>
+        <span>[設定] の [クイック検索] ボックスに<samp class="parmname">「[チャット] ボタンと招待」</samp>と入力し、<strong>[[チャット] ボタンと招待]</strong> を選択します。</span>
+      </li><li>
+        <span>既存のチャットボタンを編集します。</span>
+      </li><li>
+        <span>[ルーティング情報] セクションの <strong>[ルーティング種別]</strong> で <strong>[キュー]</strong> を選択します。</span>
+      </li><li>
+        <span>チャットの転送先となるキューを選択します。キューによってチャットが管理され、優先度が付けられます。キューに割り当てられたサポート担当者がオンラインで業務量がある場合、このボタンを使用できます。</span>
+      </li></ol>
+
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="omnichannel_route_destination_bot">
+<h1 class="slds-text-heading_large">ボットへの転送</h1>
+  <p>拡張メッセージングチャネルを介して会話を拡張ボットに転送します。強力なビジネスルールをオムニチャネルフローに追加して、ボットに会話を送信できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=sf.bots_service_enhanced_route_to.htm&amp;language=ja&amp;type=5">拡張ボットへの会話の転送</a></li></ul></div>
+</div></div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="omnichannel-1.html">&larr; オムニチャネル・ルーティング（1/4）</a><a href="omnichannel-3.html">オムニチャネル・ルーティング（3/4） &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=service.service_cloud.htm&type=5&language=ja">help.salesforce.com — Salesforce Service Cloud（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>

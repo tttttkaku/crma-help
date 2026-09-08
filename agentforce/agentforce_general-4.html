@@ -1,0 +1,2230 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Agentforce 全般 / セットアップ（4/4） | Agentforce / AI ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（35）</h2>
+    <ol>
+      <li><a href="#agent_testing_center_use_test_results">テスト結果の使用</a></li>
+      <li><a href="#agent_topics">サブエージェント</a></li>
+      <li><a href="#agent_topics_add_asset">アセットライブラリからエージェントへのサブエージェントの追加</a></li>
+      <li><a href="#agent_topics_add_custom">カスタムサブエージェントの作成</a></li>
+      <li><a href="#agent_topics_delete_asset">アセットライブラリからのサブエージェントの削除</a></li>
+      <li><a href="#agent_topics_instructions_resolve">プロンプトを作成するためのサブエージェントの指示の解決方法</a></li>
+      <li><a href="#agent_topics_manage">サブエージェントの管理</a></li>
+      <li><a href="#agent_topics_parent">サブエージェント</a></li>
+      <li><a href="#agent_topics_remove">エージェントからのサブエージェントの削除</a></li>
+      <li><a href="#agent_topics_routing">サブエージェントの分類とルーティング</a></li>
+      <li><a href="#agent_trust_data_masking">Agentforce のデータマスキングの制限事項</a></li>
+      <li><a href="#agent_user">エージェントユーザー権限のベストプラクティス</a></li>
+      <li><a href="#agent_variables">従来のビルダーの変数</a></li>
+      <li><a href="#agent_variables_create">従来のビルダーでのエージェントのカスタム変数の作成</a></li>
+      <li><a href="#agent_variables_ref">従来のビルダーの標準変数参照</a></li>
+      <li><a href="#agent_versions">従来のビルダーでのエージェントバージョンの管理</a></li>
+      <li><a href="#agent_versions_commit">Commit an Agent Version (エージェントバージョンの確定)</a></li>
+      <li><a href="#agent_versions_delete">エージェントまたはエージェントバージョンの削除</a></li>
+      <li><a href="#agent_versions_draft">エージェントのドラフトの作成</a></li>
+      <li><a href="#agent_versions_lifecycle">エージェントのバージョン管理と編集</a></li>
+      <li><a href="#agentforce_gateway_add_remove_connection_protection">Agentforce ゲートウェイ ポリシーの接続保護の追加または削除</a></li>
+      <li><a href="#agentforce_gateway_apply_policies">Agentforce ゲートウェイポリシーの適用</a></li>
+      <li><a href="#agentforce_gateway_apply_policies_by_agent">エージェントによるポリシーの適用</a></li>
+      <li><a href="#agentforce_gateway_create_policy">Agentforce ゲートウェイポリシーの作成</a></li>
+      <li><a href="#agentforce_gateway_default_policy_execution_order">Agentforce ゲートウェイのデフォルトのポリシー実行順序</a></li>
+      <li><a href="#agentforce_gateway_delete_policies">Agentforce ゲートウェイ ポリシーの削除</a></li>
+      <li><a href="#agentforce_gateway_edit_policies">Agentforce ゲートウェイ ポリシーの編集</a></li>
+      <li><a href="#agentforce_gateway_manage_policies">Agentforce ゲートウェイポリシーの管理</a></li>
+      <li><a href="#agentforce_gateway_policies">Agentforce ゲートウェイ</a></li>
+      <li><a href="#agentforce_gateway_policy_templates">Agentforce ゲートウェイ ポリシー テンプレート</a></li>
+      <li><a href="#agentforce_grid">Agentforceグリッド</a></li>
+      <li><a href="#agentforce_grid_columns">グリッド列</a></li>
+      <li><a href="#agentforce_grid_create_worksheet">グリッドワークシートの作成</a></li>
+      <li><a href="#agentforce_grid_set_up">Agentforce グリッドの設定</a></li>
+      <li><a href="#agentforce_grid_troubleshooting">Agentforce グリッドのトラブルシューティングとヒント</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>Agentforce 全般 / セットアップ（4/4）</h1>
+      <div class="meta">Salesforce AI / Agentforce ヘルプ · 35 記事 · 生成 2026-08-13</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="agentforce_general-3.html">&larr; Agentforce 全般 / セットアップ（3/4）</a><a href="prompt_builder-1.html">プロンプトビルダー（1/3） &rarr;</a></div>
+<section class="article" id="agent_testing_center_use_test_results">
+<h1 class="slds-text-heading_large">テスト結果の使用</h1>
+  <p>テストの実行が完了すると、テストスイートの全体的な総計値と各テストの評価スコアが表示されます。この結果を使用して、失敗した発言やスコアの低い発言を特定し、Agentforce Builder で手動で再テストします。サブエージェントとアクション内の手順を絞り込み、回答に満足するまで繰り返します。この結果は、ガイダンスの不明瞭さ、Knowledgeの欠如、設定の問題など、根本的な問題を明らかにするのに役立つ可能性があるため、繰り返し発生する障害には細心の注意を払ってください。結果を解釈するには、各評価がエージェントのパフォーマンスの測定にどのように役立つかを確認します。</p>
+
+    <p>結果を解釈するには、各評価がエージェントのパフォーマンスの測定にどのように役立つかを確認します。</p>
+    <p>デフォルトの評価のスコアは 1、合格、または 0、不合格です。</p>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:27.472527472527474%"><col style="width:38.46153846153847%"><col style="width:34.065934065934066%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d60242e43" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">評価</th>
+            <th id="d60242e46" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">テストの意義</th>
+            <th id="d60242e49" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">推奨</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d60242e43" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="評価">回答評価</td>
+
+            <td headers="d60242e46" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="テストの意義"><p dir="ltr">スコア 3 ～ 5 は、エージェントが一般的に目標を達成したことを示します。スコア 5 は、無関係なコンテンツを含まない、正確で完全、かつブランドに沿った回答を反映します。</p><p dir="ltr">スコア 3 ～ 4 では、明確さと完全性のレベルが低下しています。コアインテントがまだ解決されていない間に、若干の欠落や部分的な理解が生じてあいまいになることがあります。</p><p dir="ltr">スコアが 1 ～ 2 の場合、エージェントは目標達成に苦労したと考えられます。回答が不明確であったり、重要な要素が欠落していたり、無関係な情報が含まれていたりします。また、CRM から取得すべきであった情報をユーザーに要求する場合もあります。</p><p dir="ltr" style="margin-bottom:0;">スコア 0 は、ユーザーのクエリの解決に完全に失敗したことを示します。応答は汎用的で、ユーザーのインテントには対応しません。</p></td>
+
+            <td headers="d60242e49" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="推奨">サブエージェントの選択、指示、またはアクションに関連する問題についてエージェント設定を確認します。Knowledgeギャップ（古い記事など）や、エージェントが適切に応答できない他の問題があるかどうかを検討します。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d60242e43" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="評価">サブエージェントアサーション</td>
+
+            <td headers="d60242e46" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="テストの意義"><p dir="ltr">スコア 1 は、エージェントが発言に対応する適切なサブエージェントを正しく識別したことを示します。</p><p dir="ltr" style="margin-bottom:0;">スコア 0 は、エージェントが発言に対応するために予期しないサブエージェントを選択したことを示します。</p></td>
+
+            <td headers="d60242e49" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="推奨">Agentforce Builder で失敗した発言を手動で再テストし、計画キャンバスでエージェントの推論を確認します。予期されるアクションとサブエージェント自体の両方の手順を調整して、エージェントが正しい選択肢に向かって明確に誘導し、誤ったアクションの使用を制限します。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d60242e43" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="評価">アクションアサーション</td>
+
+            <td headers="d60242e46" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="テストの意義"><p dir="ltr">スコア 1 は、発言に対処するためにエージェントがサブエージェント内の適切なアクションをすべて正しく識別したことを示します。</p><p dir="ltr" style="margin-bottom:0;">0 のスコアは、エージェントが誤ったアクションを選択したか、発言に対応するために必要なすべてのアクションをサブエージェント内で選択できなかったことを示します。</p></td>
+
+            <td headers="d60242e49" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="推奨">Agentforce Builder で失敗した発言を手動で再テストし、計画キャンバスでエージェントの推論を確認します。予期されるアクションとサブエージェント自体の両方の手順を調整して、エージェントが正しい選択肢に向かって明確に誘導し、誤ったアクションの使用を制限します。</td>
+
+          </tr>
+        </tbody></table>
+    <p>回答品質の評価は主に 0 ～ 5 で評価され、3 以上が合格を示します。ただし、[指示遵守] は [高]、[低]、または [不確実] として一意に評価されます。各スコアの理由は、LLM 審査員が情報バブルを介して提供します。</p>
+    <p dir="ltr"><strong>LLM-as-judge とは何ですか?</strong></p>
+    <p dir="ltr">裁判官としての LLM は、ある大規模言語モデル (LLM) が別の LLM の出力を評価することで、集計のスコアリングや回答のランク付けなどのタスクの拡張性が高く、自動化された客観的な評価ツールとして機能します。「判断」LLM は、実際の正確性、関連性、一貫性、ソースへの忠実度などのタスクと評価条件を含むプロンプトを受信します。これらのリソースとガイドラインを使用して、LLM 審査員は予想される応答を判断し、エージェント応答と比較してから、スコア、ランキング、またはテキストフィードバックを生成します。LLM-as-Judge プロンプトは、最も正確で有益なテスト結果を提供するために慎重に設計されています。</p>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:37.3134328358209%"><col style="width:62.68656716417911%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d60242e142" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">評価</th>
+            <th id="d60242e145" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">テストの意義</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d60242e142" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="評価">完全性</td>
+
+            <td headers="d60242e145" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="テストの意義"><p dir="ltr">スコア 5 は、重要な漏れのない完全で正確な回答を示します。4 と 3 のスコアは、理解に若干影響する軽微なギャップから中程度のギャップを除き、完了度の低下を反映しています。</p><p dir="ltr">スコア 1 または 2 は、生成された回答が著しく不完全であり、いくつかの情報または最も重要な情報が欠落しているため、混乱が生じたり、部分的に誤解を招く結果になったりすることを示します。</p><p dir="ltr" style="margin-bottom:0;">スコア 0 は、評価が完全に失敗したことを示します。つまり、回答に重要な情報がすべて含まれていないため、非常に混乱したり、誤解を招く可能性があります。</p></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d60242e142" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="評価">一貫性</td>
+
+            <td headers="d60242e145" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="テストの意義"><p dir="ltr">3 ～ 5 のスコアは、エージェントが基礎となる情報を適切な文章と文法構造で会話言語に正しく変換でき、会話が円滑に流れてユーザーにわかりやすくなることを示します。</p><p dir="ltr" style="margin-bottom:0;">0 ～ 2 のスコアは、情報が Salesforce オブジェクトから取得され、JSON 構造やダイレクト項目コンテンツなどの未加工データとして配信されたことを示します。</p></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d60242e142" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="評価">簡潔性</td>
+
+            <td headers="d60242e145" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="テストの意義"><p dir="ltr">3 ～ 5 のスコアは、エージェントの反応が短いが正確で、目的のコンテンツの本質を正常に把握していることを示します。</p><p dir="ltr" style="margin-bottom:0;">0 ～ 2 のスコアは、回答が長かったり、反復的であったり、重要でない点が含まれていたり、無関係な内容が含まれていたりするため、生成された回答が簡潔でないことを意味します。</p></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d60242e142" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="評価">遅延</td>
+
+            <td headers="d60242e145" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="テストの意義">テスト発言で高い遅延または異常な遅延が発生している場合は、発言自体または一部の基盤インフラストラクチャに問題があると考えられます。エージェントによる調整で問題が解決しない場合は、Salesforce サポートに連絡してインフラストラクチャの問題を確認してください。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d60242e142" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="評価">命令の遵守</td>
+
+            <td headers="d60242e145" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="テストの意義"><p dir="ltr">高: エージェントはサブエージェントの指示を解釈して完全に従い、重要事項に対処して必要な情報を提供します。</p><p dir="ltr">低: エージェントがサブエージェントの指示を正確に解釈または従いません。少なくとも 1 つの命令に従うことに失敗し、誤った応答が返されます。これにより、命令を絞り込み、より明確な制約を設定する必要が生じます。</p><p dir="ltr" style="margin-bottom:0;">Uncertain (不確実): 応答やアクションがあいまいである、応答が不完全である、またはサブエージェントの指示の解釈が競合しているために、指示の遵守を確定的に判断できません。</p></td>
+
+          </tr>
+        </tbody></table>
+    <p>デフォルトの評価は、期待結果と実際の結果を比較してスコアリングされますが、品質評価は固定条件に基づいて審査員 LLM によって評価されます。回答のスコアが低い場合、その回答が本当に期待を満たしていないかどうかを慎重に確認します。たとえば、審査員 LLM は簡潔性スコアが低いスコアを割り当てますが、追加のコンテキストの方が顧客にとって有益であると感じたり、ブランドの姿勢と一致したりする可能性があります。それ以外の場合は、追加の指示やガードレールを追加して、エージェントを目標に合わせて調整できます。スコアを解釈するときは、常に具体的な目標と使用事例を考慮してください。品質評価は指針となりますが、エージェントの成功または失敗の絶対的な基準ではありません。</p>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="エージェントソリューションを確認して更新すると、成功する可能性が高くなります。Agentforce分析を確認し、パフォーマンス、使用状況、品質、Trust、コスト、ROIなどの重要指標に関するレポートを作成します。" href="agentforce_general-2.html#agent_parent_monitor">エージェントの監視</a></li><li><a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/modules/agentforce-agent-testing">Trailhead: Agentforce テストセンター</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agent_topics">
+<h1 class="slds-text-heading_large">サブエージェント</h1>
+  <p>サブエージェントはエージェントが実行できるジョブです。サブエージェントの各部分と、それらを使用してエージェントのロジック、推論、会話機能を定義する方法について説明します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition。<a title="特定のクラウドと一般的な使用事例のエージェント種別とデフォルトテンプレートについて説明します。" href="agentforce_general-3.html#agent_setup_explore_types">必要なアドオンライセンスはエージェント種別によって異なります。</a></td>
+
+            </tr>
+          </tbody></table>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 2026 年 4 月以降、エージェントトピックはサブエージェントと呼ばれるようになりました。機能に変更はありません。この移行中、ドキュメントで新しい用語と以前の用語が混在している場合があります。</div></div></div>
+
+    <p>サブエージェントは、エージェントが実行できる特定のジョブであると考えてください。エージェントに割り当てられたサブエージェントによって、エージェントが処理できる機能が定義されます。サブエージェントには、エージェントのロジックを制御してエージェントの推論を誘導する命令と、エージェントが使用できるツールであるアクションが含まれます。</p>
+    <p>サブエージェントの部分には、名前、説明、推論手順、推論アクション、エージェントアクションが含まれます。</p>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:14.285714285714285%"><col style="width:42.857142857142854%"><col style="width:42.857142857142854%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d40839e86" style="vertical-align:top;" class="slds-cell-wrap" scope="col">サブエージェント項目</th>
+            <th id="d40839e89" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+            <th id="d40839e92" style="vertical-align:top;" class="slds-cell-wrap" scope="col">使用方法</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d40839e86" style="vertical-align:top;" class="slds-cell-wrap" data-label="サブエージェント項目">名前と説明</td>
+
+            <td headers="d40839e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>名前はサブエージェントの API 参照名です。通常、サブエージェントが行う作業を平易な言葉で説明するには 2 ～ 3 語です。</p><p style="margin-bottom:0;">説明は、サブエージェントの機能と、このサブエージェントに分類する必要があるユーザー要求の種別を説明する 1 ～ 3 文です。つまり、この説明では、このサブエージェントをトリガーするユーザーメッセージについて説明します。</p></td>
+
+            <td headers="d40839e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用方法"><p>デフォルトでは、これらの項目は特別なサブエージェントであるエージェントルーターと共に使用され、会話でサブエージェントを使用するタイミングを決定します。ルーティング動作はカスタマイズできます。「<a title="エージェントルーターの詳細と、会話でエージェントがサブエージェントを選択する方法を制御するためにエージェントルーターをカスタマイズする方法について説明します。" href="#agent_topics_routing">サブエージェント分類およびルーティング</a>」を参照してください。</p><p style="margin-bottom:0;">エージェントは、エージェントに割り当てられたすべてのサブエージェントの名前と説明をユーザーの質問または要求、最近の会話履歴と比較します。そのコンテキストとエージェントルーターの指示に基づいて、エージェントは最適な一致を選択します。</p></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d40839e86" style="vertical-align:top;" class="slds-cell-wrap" data-label="サブエージェント項目">説明</td>
+
+            <td headers="d40839e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">指示 (推論指示と呼ばれることもあります) は、サブエージェント、ビジネスケース、および会話全般のコンテキストで会話を処理する方法をエージェントに指示するガイドラインです。命令には、プログラムロジック (エージェントスクリプトで記述) と自然言語プロンプトの組み合わせが含まれます。ロジックでは、エージェントのワークフローとビジネスルールを厳密に定義します。プロンプトはエージェントの会話スキルをより柔軟にガイドします。</td>
+
+            <td headers="d40839e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用方法"><p>LLM に送信するプロンプトを作成するには、推論命令を使用します。</p><p>エージェントがサブエージェントに移動すると、順序どおりに推論手順の解決が開始され、エージェントがより正確に確実に推論できるようにロジックが実行されます。「<a title="エージェントがサブエージェントの推論手順でプログラム式を実行して推論の準備をする方法について説明します。" href="#agent_topics_instructions_resolve">How Subagent Instructions</a> are Resolved to Build a Prompt」を参照してください。</p><p style="margin-bottom:0;">エージェントがロジックの最後に達すると、自然言語の指示を含む解決済みプロンプトを LLM に送信して、推論プロセスを開始します。</p></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d40839e86" style="vertical-align:top;" class="slds-cell-wrap" data-label="サブエージェント項目">推論に使用できるアクション (推論アクション)</td>
+
+            <td headers="d40839e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>推論に使用できるアクション (推論アクションとも呼ばれる) は、LLM を使用した推論中にエージェントが実行できるアクションです。これには、「Answer Questions with Knowledge」などの従来のエージェントアクションへの参照が含まれます。ただし、別のサブエージェントへの移行、変数の設定、担当者へのエスカレーションなどのユーティリティを含めることもできます。</p><p style="margin-bottom:0;">推論アクションでは、アクションを使用できるタイミングを制御する検索条件を定義できます。アクションの後にロジックを追加して、アクションを順番に連結することもできます。</p></td>
+
+            <td headers="d40839e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用方法"><p>理由アクションは、理由の説明から作成されたプロンプトと共に LLM に送信されます。LLM は、ユーザーのメッセージ、最近の会話履歴、解決済みの推論手順、および推論アクションで定義されたロジックに基づいて、実行するアクションとユーティリティを選択します。</p><p style="margin-bottom:0;">アクションをサブエージェントに追加すると、デフォルトでアクションがサブエージェントの推論アクションに追加されます。</p></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d40839e86" style="vertical-align:top;" class="slds-cell-wrap" data-label="サブエージェント項目">アクション定義</td>
+
+            <td headers="d40839e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">バックグラウンドで、サブエージェントにはサブエージェントに割り当てられたすべてのエージェントアクションのリストが含まれます。これは、アクションの名前と説明、入力と出力のリスト、エージェントアクションが情報を取得したり ToDo を実行したりするためにコールする Salesforce 機能 (フローやプロンプトテンプレートなど) への参照など、サブエージェントの使用事例に関連するすべてのアクションのリストと考えることができます。アクション定義により、サブエージェント内でアクションを参照および使用できるようになります。アクション定義はキャンバスビューには表示されませんが、スクリプトビューでは確認できます。</td>
+
+            <td headers="d40839e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用方法"><p>アクションをサブエージェントに追加すると、デフォルトでアクションがサブエージェントのアクション定義とその推論アクションに追加されます。アクションをサブエージェントの推論アクションから削除して、エージェントが推論中に実行できないようにし、引き続きサブエージェント内で使用できます。</p><ul>
+                <li>アクションを確定的に実行するには、推論を実行する前にアクションをサブエージェントの推論手順に追加します。</li>
+
+                <li>LLM が推論中にアクションを選択できるようにするには、アクションをサブエージェントの推論アクションに追加します。</li>
+
+              </ul>
+<p style="margin-bottom:0;">サブエージェントからアクションを完全に削除するには、[エクスプローラー] パネルから削除します。または、エージェントのスクリプトでアクション定義とアクションへの参照を削除します。</p></td>
+
+          </tr>
+        </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#agent_topics_routing">サブエージェントの分類とルーティング</a></strong><br>エージェントルーターの詳細と、会話でエージェントがサブエージェントを選択する方法を制御するためにエージェントルーターをカスタマイズする方法について説明します。</li><li class="slds-p-bottom_small"><strong><a href="#agent_topics_instructions_resolve">プロンプトを作成するためのサブエージェントの指示の解決方法</a></strong><br>エージェントがサブエージェントの推論手順でプログラム式を実行して推論の準備をする方法について説明します。</li><li class="slds-p-bottom_small"><strong><a href="#agent_topics_manage">サブエージェントの管理</a></strong><br>エージェントにサブエージェントを追加および削除します。カスタムサブエージェントを作成します。アセットライブラリでサブエージェントを管理します。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agent_topics_add_asset">
+<h1 class="slds-text-heading_large">アセットライブラリからエージェントへのサブエージェントの追加</h1>
+  <p>一般的なビジネス使用事例を処理するために作成されたサンプルから開始するために、標準サブエージェントをエージェントに追加します。または、独自に作成したカスタムサブエージェントを追加します。アセットライブラリからサブエージェントをエージェントに追加すると、サブエージェントのコピーがエージェントに追加されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition。<a title="特定のクラウドと一般的な使用事例のエージェント種別とデフォルトテンプレートについて説明します。" href="agentforce_general-3.html#agent_setup_explore_types">必要なアドオンライセンスはエージェント種別によって異なります。</a></td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 2026 年 4 月以降、エージェントトピックはサブエージェントと呼ばれるようになりました。機能に変更はありません。この移行中、ドキュメントで新しい用語と以前の用語が混在している場合があります。</div></div></div>
+<table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d138257e77" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d138257e77" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">エージェントにサブエージェントを追加する</td>
+
+              <td headers="d138257e77" style="vertical-align:top;" class="slds-cell-wrap">AIエージェントの管理とエージェントタイプ<a target="_blank" href="agentforce_general-3.html#agent_setup_explore_types">の必要な権限</a></td>
+
+            </tr>
+          </tbody></table><p>エージェントを変更するには、ドラフト状態である必要があります。コミットされたエージェントを変更する場合は、<a title="複数のバージョンのエージェントを作成して、エージェントの設計をシームレスに反復します。コミットされたエージェントバージョンからドラフトを作成し、テストに基づいて変更を続行したり、バックアップとして保存したりして、すばやく以前のバージョンに戻すことができます。" href="#agent_versions_draft">新しいドラフトを作成</a>します。</p></div>
+    <ol><li>
+        <span>Agentforce Studio アプリケーションの [エージェント] リストから、サブエージェントを追加するエージェントを開きます。</span>
+      </li><li>
+        <span>[Explorer (エクスプローラー)] パネルで、[Subagents (サブエージェント)] にマウスポインターを置いて [<span style="vertical-align:text-bottom;display:inline-block;"><img alt="プラスアイコン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/agent_builder_plus_icon.png" style="width:20px;margin-bottom:0;"></span>] をクリックします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[アセットライブラリから追加]</strong> を選択します。</span>
+      </li><li>
+        <span>エージェントに追加する 1 つ以上のサブエージェントを選択します。</span>
+      </li><li>
+        <span>[<strong class="uicontrol">エージェントに追加</strong>] をクリックします。</span>
+      </li></ol>
+
+    <div><p>選択した各サブエージェントのコピーがエージェントに追加され、そのコピーを編集できます。サブエージェントに加えた変更は、このエージェントバージョンにのみ適用され、アセットライブラリの他のエージェントやサブエージェントには影響しません。</p><p>エージェントルーターを使用してサブエージェントのルーティングと分類を制御する場合、エージェントに追加する各サブエージェントは、エージェントルーターの推論アクションに自動的に追加されます。</p></div>
+    <div><p>エージェントにサブエージェントを追加する場合、ビジネスニーズに合わせてサブエージェントをカスタマイズします。</p><ul>
+        <li>サブエージェントの指示と推論アクションを確認してカスタマイズします。</li>
+
+        <li>サブエージェントに含まれるエージェントアクション (基盤となるフロー、プロンプトテンプレート、その他の参照アクションなど) を確認してカスタマイズします。</li>
+
+        <li>エージェントルーターを使用する場合、会話をサブエージェントに転送するロジックまたは手順を指定します。</li>
+
+      </ul>
+</div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agent_topics_add_custom">
+<h1 class="slds-text-heading_large">カスタムサブエージェントの作成</h1>
+  
+  <p>カスタムサブエージェントは、アセットライブラリまたは Agentforce Builder のエージェント内から作成できます。アセットライブラリからサブエージェントを作成すると、複数のエージェントおよびバージョンに追加できます。Agentforce Builder でエージェント内からサブエージェントを作成すると、そのエージェントだけが使用できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition。<a title="特定のクラウドと一般的な使用事例のエージェント種別とデフォルトテンプレートについて説明します。" href="agentforce_general-3.html#agent_setup_explore_types">必要なアドオンライセンスはエージェント種別によって異なります。</a></td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 2026 年 4 月以降、エージェントトピックはサブエージェントと呼ばれるようになりました。機能に変更はありません。この移行中、ドキュメントで新しい用語と以前の用語が混在している場合があります。</div></div></div>
+<table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d67665e79" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d67665e79" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">カスタムサブエージェントを作成する</td>
+
+              <td headers="d67665e79" style="vertical-align:top;" class="slds-cell-wrap">AIエージェントの管理とエージェントタイプ<a target="_blank" href="agentforce_general-3.html#agent_setup_explore_types">の必要な権限</a></td>
+
+            </tr>
+          </tbody></table></div>
+  
+  <div id="topic_custom_builder" aria-labelledby="ariaid-title2" class="nested1"><a name="topic_custom_builder"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">Agentforce Builder でのカスタムサブエージェントの作成</h2>
+    
+    <p>Agentforce Builder でエージェントからサブエージェントを作成すると、そのエージェントだけが使用できます。行った変更は、このエージェントバージョンにのみ適用されます。サブエージェントを他のエージェントおよびエージェントバージョンに追加できるようにするには、代わりにアセットライブラリで作成します。</p>
+
+      <div><p>エージェントを変更するには、ドラフト状態である必要があります。コミットされたエージェントを変更する場合は、<a title="複数のバージョンのエージェントを作成して、エージェントの設計をシームレスに反復します。コミットされたエージェントバージョンからドラフトを作成し、テストに基づいて変更を続行したり、バックアップとして保存したりして、すばやく以前のバージョンに戻すことができます。" href="#agent_versions_draft">新しいドラフトを作成</a>します。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 
+          <p>次の手順では、キャンバス ビューでサブエージェントを作成する方法について説明しますが、Agentforce Builder でサブエージェントを作成する方法はいくつかあります。</p>
+          <ul>
+            <li>Agentforce にサブエージェントの作成を依頼します。エージェントが実行できる作業の詳細を入力すると、Agentforce によってサブエージェントとアクションが生成されます。変更を受け入れるか拒否できます。</li>
+
+            <li>スクリプトビューでサブエージェントを作成します。</li>
+
+          </ul>
+
+        </div></div></div>
+</div>
+      <ol><li>
+          <span>Agentforce Studio アプリケーションの [エージェント] リストから、サブエージェントを追加するエージェントを開きます。</span>
+        </li><li>
+          <span>[Explorer (エクスプローラー)] パネルで、[Subagents (サブエージェント)] にマウスポインターを置いて [<span style="vertical-align:text-bottom;display:inline-block;"><img alt="プラス記号アイコン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/agent_builder_plus_icon.png" style="width:20px;margin-bottom:0;"></span>] をクリックします。</span>
+        </li><li>
+          <span>[<strong class="uicontrol">Create new subagent</strong>] を選択します。</span>
+        </li><li>
+          <span>サブエージェントに名前を付け、[作成して<strong class="uicontrol">開く] を</strong>クリックします。</span>
+          <div>カスタムサブエージェントがエージェントに追加されます。エージェントルーターを使用してサブエージェントのルーティングと分類を制御する場合、推論に使用できるエージェントルーターのアクションにサブエージェントが追加されます。</div>
+        </li><li>
+          <span>説明、推論の手順、および推論に使用できるアクションを編集します。変更を保存します。</span>
+          <div><a title="サブエージェントはエージェントが実行できるジョブです。サブエージェントの各部分と、それらを使用してエージェントのロジック、推論、会話機能を定義する方法について説明します。" href="#agent_topics">サブエージェントの各部分について説明します。</a></div>
+        </li><li>
+          <span>必要に応じて、サブエージェントにアクションを追加します。</span>
+          <ol>
+            <li>
+              <span>[Explorer (エクスプローラー)] パネルで、サブエージェントにマウスポインターを置いて [<span style="vertical-align:text-bottom;display:inline-block;"><img alt="プラス記号アイコン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/agent_builder_plus_icon.png" style="width:20px;margin-bottom:0;"></span>] をクリックします。</span>
+            </li>
+
+            <li>
+              <span>アセットライブラリから 1 つ以上のアクションを追加するか、カスタムアクションを作成します。</span>
+              <div>アセットライブラリからアクションを追加するときは、基盤となるフロー、プロンプトテンプレート、その他の参照アクションを含め、常にアクションを確認してビジネスニーズに合わせてカスタマイズしてください。</div>
+            </li>
+
+            <li>
+              <span>サブエージェントの推論手順、推論に使用できるアクション、またはその両方でアクションを参照します。</span>
+              <div>アクションは、推論に使用できるアクションに自動的に追加されます。</div>
+            </li>
+
+          </ol>
+        </li></ol>
+
+      <div><p>サブエージェントはこのエージェントバージョンでのみ使用でき、アセットライブラリでは使用できません。サブエージェントに加えた変更は、このエージェントバージョンにのみ適用され、他のエージェントには影響しません。サブエージェントの名前を変更する場合は、エージェントルーターまたは他のサブエージェントでサブエージェントへの参照を手動で更新します。</p></div>
+    
+  </div>
+
+  <div id="topic_custom_asset_library" aria-labelledby="ariaid-title3" class="nested1"><a name="topic_custom_asset_library"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">アセットライブラリからのカスタムサブエージェントの作成</h2>
+    
+    <p>アセットライブラリからカスタムサブエージェントを作成し、複数のエージェントとバージョンでサブエージェントを使用できるようにします。次に、1 人以上のエージェントに追加します。</p>
+
+      <ol><li>
+          <span>[設定] から、「<kbd>Agentforce アセット」</kbd>と入力し、[<strong class="uicontrol">Agentforce アセット]</strong> を選択します。</span>
+        </li><li>
+          <span>[サブエージェント] タブで、[<strong class="uicontrol">新規サブエージェント]</strong> をクリックします。</span>
+        </li><li>
+          <span>すべての必須項目に入力します。少なくとも 1 つのサブエージェント命令を追加する必要があります。必要に応じて、AI を使用してサブエージェント項目を評価し、改善を提案するには、[<span style="vertical-align:text-bottom;display:inline-block;"><img alt="Gen AI キラキラアイコン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/agent_sparkle_icon_white.png" style="width:20px;margin-bottom:0;"></span>] をクリックします。続いて、<strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+          <div>現在、アセットライブラリで作成されたサブエージェントは、従来の Agentforce Builder のサブエージェントのスタイルに従います。サブエージェントの部分とサブエージェント手順のベストプラクティスについては、「従来のビルダーの<a title="サブエージェントは、エージェントが実行できる特定のジョブであり、エージェントの推論に不可欠な要素です。サブエージェントには、ジョブで使用できるツールであるアクションと、エージェントに意思決定方法を指示する指示が含まれます。エージェントに割り当てられたサブエージェントによって、エージェントが処理できる機能が定義されます。Salesforce には一般的な使用事例に対応する標準サブエージェントのライブラリが用意されており、ユーザーの特定のビジネスニーズに合わせてカスタムサブエージェントを作成できます。" href="einstein_copilot-5.html#copilot_topics">サブエージェント」</a>を参照してください。サブエージェントは、いずれかのビルダーで作成されたエージェントでサポートされ、エージェントに追加した後にカスタマイズできます。</div>
+        </li><li>
+          <span>サブエージェントに追加するアセットライブラリからアクションを選択し、[<strong class="uicontrol">完了]</strong> をクリックします。</span>
+        </li></ol>
+
+      <div><p>サブエージェントはアセットライブラリで使用できます。サブエージェントを使用するには、<a title="一般的なビジネス使用事例を処理するために作成されたサンプルから開始するために、標準サブエージェントをエージェントに追加します。または、独自に作成したカスタムサブエージェントを追加します。アセットライブラリからサブエージェントをエージェントに追加すると、サブエージェントのコピーがエージェントに追加されます。" href="#agent_topics_add_asset">エージェントに追加</a>します。</p><p>アセットライブラリからサブエージェントをエージェントに追加すると、サブエージェントのコピーがエージェントに追加され、そのコピーを編集できます。サブエージェントに加えた変更は、このエージェントバージョンにのみ適用され、アセットライブラリの他のエージェントやサブエージェントには影響しません。</p><p>アセットライブラリでサブエージェントに行った変更は、エージェントに追加したサブエージェントのコピーには同期されません。アセットライブラリでサブエージェントに行った変更をエージェントに適用するには、更新されたサブエージェントをエージェントに追加します。</p></div>
+    
+  </div>
+
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agent_topics_delete_asset">
+<h1 class="slds-text-heading_large">アセットライブラリからのサブエージェントの削除</h1>
+  <p>エージェントに追加する必要がなくなったカスタムサブエージェントをアセットライブラリから削除します。アセットライブラリから標準サブエージェントを削除することはできません。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition。<a title="特定のクラウドと一般的な使用事例のエージェント種別とデフォルトテンプレートについて説明します。" href="agentforce_general-3.html#agent_setup_explore_types">必要なアドオンライセンスはエージェント種別によって異なります。</a></td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 2026 年 4 月以降、エージェントトピックはサブエージェントと呼ばれるようになりました。機能に変更はありません。この移行中、ドキュメントで新しい用語と以前の用語が混在している場合があります。</div></div></div>
+<table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d104366e77" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d104366e77" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">サブエージェントを削除する</td>
+
+              <td headers="d104366e77" style="vertical-align:top;" class="slds-cell-wrap">AIエージェントの管理とエージェントタイプ<a target="_blank" href="agentforce_general-3.html#agent_setup_explore_types">の必要な権限</a></td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>[設定] から、「<kbd>Agentforce アセット」</kbd>と入力し、[<strong class="uicontrol">Agentforce アセット]</strong> を選択します。</span>
+      </li><li>
+        <span>[サブエージェント] タブで、削除するサブエージェントの横にあるドロップダウンメニューをクリックします。次に、[<strong class="uicontrol">削除] を</strong>選択します。</span>
+      </li></ol>
+
+    <div><p>サブエージェントがアセットライブラリから削除されます。サブエージェントに含まれるアクションは、アセットライブラリから自動的に削除されません。アセットライブラリからサブエージェントをエージェントに追加した場合、そのサブエージェントの独立したコピーがエージェントに追加されます。アセットライブラリからサブエージェントを削除しても、サブエージェントまたはその関連アクションは、サブエージェントが追加されたエージェントから削除されません。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agent_topics_instructions_resolve">
+<h1 class="slds-text-heading_large">プロンプトを作成するためのサブエージェントの指示の解決方法</h1>
+  <p>エージェントがサブエージェントの推論手順でプログラム式を実行して推論の準備をする方法について説明します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition。<a title="特定のクラウドと一般的な使用事例のエージェント種別とデフォルトテンプレートについて説明します。" href="agentforce_general-3.html#agent_setup_explore_types">必要なアドオンライセンスはエージェント種別によって異なります。</a></td>
+
+            </tr>
+          </tbody></table>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 2026 年 4 月以降、エージェントトピックはサブエージェントと呼ばれるようになりました。機能に変更はありません。この移行中、ドキュメントで新しい用語と以前の用語が混在している場合があります。</div></div></div>
+
+    <p>推論手順は、サブエージェント、ビジネスケース、および会話全般のコンテキストで会話を処理する方法をエージェントに指示するガイドラインです。プログラムロジックと自然言語プロンプトの組み合わせが含まれ、ロジックでエージェントの一般的なワークフローとビジネスルールを確実に処理し、プロンプトでエージェントの会話スキルをより柔軟にガイドします。推論手順のロジックは、エージェントが推論の前に実行する必要があること、自然言語プロンプトは、エージェントが推論中に考慮する必要があることと考えることができます。</p>
+    <p>エージェントがサブエージェントに移動すると、記述された順序でサブエージェントの推論手順が上から下へ解決されます。このプロセスには次のものが含まれます。</p>
+    <ul>
+      <li>リソース (変数やアクションなど) への参照を実際の値に置き換える (値の手動設定を含む)</li>
+
+      <li>インラインアクションを実行し、結果を命令に挿入する</li>
+
+      <li>条件ステートメントの評価と適用</li>
+
+    </ul>
+
+    <p>サブエージェントの実行のこの段階では、推論は実行されないため、エージェントはまだ LLM に依存しません。推論命令のすべての論理式は、記述どおりに実行され、記述された順序で実行されます。</p>
+    <p>推論手順のいずれかの時点でエージェントが別のサブエージェントへの移行を実行すると、エージェントは手順が解決して推論が行われる前に会話をリダイレクトします。それ以外の場合、エージェントが推論手順の最後に達すると、解決された推論手順をプロンプトに挿入して LLM に送信し、推論プロセスを開始します。プロンプトには次の内容が含まれます。</p>
+    <ul>
+      <li>すべてのエージェント操作に適用されるエージェントレベルの手順</li>
+
+      <li>ユーザーの最新のメッセージを含む最近の会話履歴</li>
+
+      <li>解決済みサブエージェントの推論手順</li>
+
+      <li>サブエージェントに関連付けられた<a title="サブエージェントはエージェントが実行できるジョブです。サブエージェントの各部分と、それらを使用してエージェントのロジック、推論、会話機能を定義する方法について説明します。" href="#agent_topics">推論アクション</a>。これは、エージェントが推論プロセス中に実行できるアクション (エージェントアクションを含む) です。</li>
+
+    </ul>
+
+    <p>エージェントは LLM を使用して、プロンプトで使用可能な情報を分析し、次のステップを決定します。</p>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">例</h2><p>エージェントが配送を期待する顧客とチャットしている。顧客の注文 ID が 1234、配送予定日が 2026 年 2 月 10 日で、配送予定期間外である。</p><p>顧客のメッセージに基づいて、エージェントは次の推論手順を含むサブエージェントを選択します。</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>reasoning:
+  instructions:-&gt;
+    If @variables.updated_delivery_date == None
+      run @actions.get_delivery_date 
+        with order_ID=@variables.order_ID
+        set @variables.updated_delivery_date=@outputs.delivery_date
+
+      | Tell the user that the expected delivery date for order number {!@variables.order_ID} is {!@variables.updated_delivery_date}. 
+
+    If @variables.is_late == None
+      run @actions.check_if_late
+        with order_ID=@variables.order_ID
+        with delivery_date=@variables.updated_delivery_date
+        set @variables.is_late = @outputs.is_late
+
+    if @variables.is_late == "true":
+      | Apologize to the customer for the delay in receiving their order.</code></pre><p>プロンプトを作成するために、Agentforce は次の手順で 1 行ずつ理由の説明を解決します。</p><ol>
+        <li>アクション<code>get_delivery_date</code>を実行して配送予定日を取得します。</li>
+
+        <li>変数<code>updated_delivery_date</code>を、アクションによって返された <code>outputs.delivery_date</code> の値に設定します。この場合、値は <code>February 10, 2026</code> に設定されます。</li>
+
+        <li>プロンプトに命令 <code>Tell the user that the expected delivery
+            date for order number 1234 is February 10, 2026.</code> を追加します。</li>
+
+        <li><code>action check_if_late</code>を実行します。</li>
+
+        <li>この<code>variable is_late</code>を、アクションによって返された <code>outputs.is_late</code> の値に設定します。この場合、変数は <code>"True"</code> に設定されます。</li>
+
+        <li>if <code>@variables.is_late == "True"</code> の値をチェックして、注文が遅延しているかどうかを判断します。</li>
+
+        <li>注文が遅れているため、プロンプトに次の命令を追加します。 <code>Apologize to the
+            customer for the delay in receiving their order.</code>
+        </li>
+
+      </ol><p>プロンプトに追加された解決済みの理由の説明を次に示します。</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>Tell the user that the expected delivery date for the order number 1234 is February 10, 2026. 
+Apologize to the customer for the delay in receiving their order.
+</code></pre><p>プロンプトが LLM に送信され、エージェントの次のステップが判断されて応答が生成されます。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agent_topics_manage">
+<h1 class="slds-text-heading_large">サブエージェントの管理</h1>
+  <p>エージェントにサブエージェントを追加および削除します。カスタムサブエージェントを作成します。アセットライブラリでサブエージェントを管理します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition。<a title="特定のクラウドと一般的な使用事例のエージェント種別とデフォルトテンプレートについて説明します。" href="agentforce_general-3.html#agent_setup_explore_types">必要なアドオンライセンスはエージェント種別によって異なります。</a></td>
+
+            </tr>
+          </tbody></table>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 2026 年 4 月以降、エージェントトピックはサブエージェントと呼ばれるようになりました。機能に変更はありません。この移行中、ドキュメントで新しい用語と以前の用語が混在している場合があります。</div></div></div>
+
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#agent_topics_add_asset">アセットライブラリからエージェントへのサブエージェントの追加</a></strong><br>一般的なビジネス使用事例を処理するために作成されたサンプルから開始するために、標準サブエージェントをエージェントに追加します。または、独自に作成したカスタムサブエージェントを追加します。アセットライブラリからサブエージェントをエージェントに追加すると、サブエージェントのコピーがエージェントに追加されます。</li><li class="slds-p-bottom_small"><strong><a href="#agent_topics_add_custom">カスタムサブエージェントの作成</a></strong><br>カスタムサブエージェントは、アセットライブラリまたは Agentforce Builder のエージェント内から作成できます。アセットライブラリからサブエージェントを作成すると、複数のエージェントおよびバージョンに追加できます。Agentforce Builder でエージェント内からサブエージェントを作成すると、そのエージェントだけが使用できます。</li><li class="slds-p-bottom_small"><strong><a href="#agent_topics_remove">エージェントからのサブエージェントの削除</a></strong><br>不要になったサブエージェントを削除して、エージェントが役に立つ適切な応答を引き続き提供するようにします。</li><li class="slds-p-bottom_small"><strong><a href="agentforce_general-3.html#agent_subagent_edit_in_asset_library">アセットライブラリでのサブエージェントの編集</a></strong><br>アセットライブラリでサブエージェントを直接編集します。編集によって、すでに使用されているサブエージェントのバージョンが変更されることはありません。これは、元のサブエージェントのコピーであるためです。</li><li class="slds-p-bottom_small"><strong><a href="#agent_topics_delete_asset">アセットライブラリからのサブエージェントの削除</a></strong><br>エージェントに追加する必要がなくなったカスタムサブエージェントをアセットライブラリから削除します。アセットライブラリから標準サブエージェントを削除することはできません。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agent_topics_parent">
+<h1 class="slds-text-heading_large">サブエージェント</h1>
+  <p>サブエージェントは、エージェントが実行できる特定のジョブです。エージェントに割り当てられたサブエージェントによって、エージェントが処理できる機能が定義されます。Agentforce Builder と従来のビルダーのサブエージェントについて説明します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition。<a title="特定のクラウドと一般的な使用事例のエージェント種別とデフォルトテンプレートについて説明します。" href="agentforce_general-3.html#agent_setup_explore_types">必要なアドオンライセンスはエージェント種別によって異なります。</a></td>
+
+            </tr>
+          </tbody></table>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 2026 年 4 月以降、エージェントトピックはサブエージェントと呼ばれるようになりました。機能に変更はありません。この移行中、ドキュメントで新しい用語と以前の用語が混在している場合があります。</div></div></div>
+
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#agent_topics">サブエージェント</a></strong><br>サブエージェントはエージェントが実行できるジョブです。サブエージェントの各部分と、それらを使用してエージェントのロジック、推論、会話機能を定義する方法について説明します。</li><li class="slds-p-bottom_small"><strong><a href="einstein_copilot-5.html#copilot_topics">従来のビルダーのサブエージェント</a></strong><br>サブエージェントは、エージェントが実行できる特定のジョブであり、エージェントの推論に不可欠な要素です。サブエージェントには、ジョブで使用できるツールであるアクションと、エージェントに意思決定方法を指示する指示が含まれます。エージェントに割り当てられたサブエージェントによって、エージェントが処理できる機能が定義されます。Salesforce には一般的な使用事例に対応する標準サブエージェントのライブラリが用意されており、ユーザーの特定のビジネスニーズに合わせてカスタムサブエージェントを作成できます。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agent_topics_remove">
+<h1 class="slds-text-heading_large">エージェントからのサブエージェントの削除</h1>
+  <p>不要になったサブエージェントを削除して、エージェントが役に立つ適切な応答を引き続き提供するようにします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition。<a title="特定のクラウドと一般的な使用事例のエージェント種別とデフォルトテンプレートについて説明します。" href="agentforce_general-3.html#agent_setup_explore_types">必要なアドオンライセンスはエージェント種別によって異なります。</a></td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 2026 年 4 月以降、エージェントトピックはサブエージェントと呼ばれるようになりました。機能に変更はありません。この移行中、ドキュメントで新しい用語と以前の用語が混在している場合があります。</div></div></div>
+<table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d168046e77" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d168046e77" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">エージェントからサブエージェントを削除する</td>
+
+              <td headers="d168046e77" style="vertical-align:top;" class="slds-cell-wrap">AIエージェントの管理とエージェントタイプ<a target="_blank" href="agentforce_general-3.html#agent_setup_explore_types">の必要な権限</a></td>
+
+            </tr>
+          </tbody></table><p>エージェントを変更するには、ドラフト状態である必要があります。コミットされたエージェントバージョンを変更する場合は、<a title="複数のバージョンのエージェントを作成して、エージェントの設計をシームレスに反復します。コミットされたエージェントバージョンからドラフトを作成し、テストに基づいて変更を続行したり、バックアップとして保存したりして、すばやく以前のバージョンに戻すことができます。" href="#agent_versions_draft">ドラフトを作成</a>します。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 
+        <p>次の手順では、キャンバス ビューでエージェントからサブエージェントを削除する方法について説明しますが、Agentforce Builder でサブエージェントを削除する方法はいくつかあります。</p>
+        <ul>
+          <li>Agentforce にサブエージェントの削除を依頼します。変更を受け入れるか拒否できます。</li>
+
+          <li>スクリプトビューでサブエージェントを削除します。</li>
+
+        </ul>
+
+      </div></div></div>
+</div>
+    <ol><li>
+        <span>Agentforce Studio アプリケーションの [エージェント] リストから、サブエージェントを削除するエージェントを開きます。</span>
+      </li><li>
+        <span>[エクスプローラー] パネルの [サブエージェント] で、エージェントから削除するサブエージェントにマウスポインターを置きます。</span>
+      </li><li>
+        <span>[<span style="vertical-align:text-bottom;display:inline-block;"><img alt="省略符号メニューアイコン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/agent_builder_ellipsis_menu.png" style="width:20px;margin-bottom:0;"></span>] をクリックし、<strong class="uicontrol">[削除]</strong> をクリックします。</span>
+      </li><li>
+        <span>エージェントルーターなど、他のサブエージェントからサブエージェントへの参照を削除します。</span>
+        <div>サブエージェントは、エージェントルーターの推論アクションから自動的に削除されます。</div>
+      </li><li>
+        <span>変更内容を保存します。</span>
+      </li></ol>
+
+    <div><p>サブエージェントおよび関連付けられたアクションがエージェントから削除され、サブエージェントに行ったカスタマイズも削除されます。アセットライブラリからサブエージェントをエージェントに追加した場合、そのサブエージェントの独立したコピーがエージェントに追加されます。エージェントからサブエージェントを削除しても、アセットライブラリからサブエージェントは削除されません。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agent_topics_routing">
+<h1 class="slds-text-heading_large">サブエージェントの分類とルーティング</h1>
+  <p>エージェントルーターの詳細と、会話でエージェントがサブエージェントを選択する方法を制御するためにエージェントルーターをカスタマイズする方法について説明します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition。<a title="特定のクラウドと一般的な使用事例のエージェント種別とデフォルトテンプレートについて説明します。" href="agentforce_general-3.html#agent_setup_explore_types">必要なアドオンライセンスはエージェント種別によって異なります。</a></td>
+
+            </tr>
+          </tbody></table>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 2026 年 4 月以降、エージェントトピックはサブエージェントと呼ばれるようになりました。機能に変更はありません。この移行中、ドキュメントで新しい用語と以前の用語が混在している場合があります。</div></div></div>
+
+    <p>エージェントを作成すると、エージェントルーターと呼ばれる特別なサブエージェントがエージェントに追加され、各エージェントの会話の開始サブエージェントとして定義されます。デフォルトでは、エージェントはこのサブエージェントをサブエージェント分類に使用します。サブエージェント分類は、ユーザーが実行したい操作とエージェントが実行できるジョブに基づいて、最も関連性の高いサブエージェントを選択するプロセスです。 エージェント内のすべてのサブエージェントへのトランジションがエージェントルーターの推論アクションに追加され、エージェントの会話で使用できるようになります。エージェントは、ユーザーの最新のメッセージを含む最近の会話履歴をエージェントルーターの推論アクションのすべてのサブエージェントの名前と説明と比較して、最適な一致を選択します。</p>
+    <p>エージェント ルータは他のサブエージェントと同様に編集できるため、<a title="サブエージェントはエージェントが実行できるジョブです。サブエージェントの各部分と、それらを使用してエージェントのロジック、推論、会話機能を定義する方法について説明します。" href="#agent_topics">推論手順とアクション</a>をカスタマイズして初期変数を設定し、サブエージェントの分類とルーティングを制御するロジックを追加できます。</p>
+    <ul>
+      <li>特定のサブエージェントに分類を促進する条件、アクション、変数を追加します。</li>
+
+      <li>検索条件に基づく分類からサブエージェントを除外します (次の場合にこのアクションを使用できるようにします)。</li>
+
+      <li>他のサブエージェントからのトランジションを介してのみサブエージェントにアクセスできるようにするには、サブエージェントへの参照を削除します。</li>
+
+    </ul>
+
+    <p>検索条件と変数を使用して、サブエージェントへのアクセスとルーティングを制御できます。たとえば、変数に基づく検索条件を追加して、特定のサブエージェントを検証済みの顧客のみが使用できるようにすることができます。この例では、推論アクションの検証済み変数に基づいて会話が転送されます。[注文管理]、[一般的な FAQ]、および [エスカレーション] サブエージェントは、顧客が検証された ([次の文字列と一致する] が True と検証された) 場合にのみ使用できます。顧客が検証されていない場合 (検証対象が False の場合)、会話は [検証を識別] サブエージェントに転送されます。</p>
+    <div style="text-align:left;">
+      <img alt="検索条件が追加されたトピックセレクターアクション" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/agent_topics_routing_filter.png" style="width:500px;">
+    </div>
+    <p>デフォルトでは、エージェントルーターはエージェントのエージェントスクリプトの開始サブエージェントとして定義されます。つまり、「subagent」プレフィックスの代わりに「start_agent」プレフィックスを使用するサブエージェントです。</p>
+    <div style="text-align:left;">
+      <img alt="start_agent プレフィックスが表示されているエージェントスクリプト" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/agent_topics_routing_script.png" style="width:600px;">
+    </div>
+    <p>ただし、代わりに別のサブエージェントを開始サブエージェントとして定義できます。会話の後半でエージェントルーターを使用してサブエージェント分類に移動することも、サブエージェントルーティングを異なる方法で制御する場合はエージェントからエージェントルーターを完全に削除することもできます。</p>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">サブエージェントの分類とルーティング</h2><p>2026 年 4 月以降、新しい Agentforce Builder で Agentforce 従業員エージェントと Agentforce サービスエージェントのデフォルト テンプレートを使用して作成されたエージェントは、Salesforce が所有する HyperClassifier モデルをサブエージェント分類に使用します。HyperClassifier モデルは、特に複雑な命令に従ったり、否定的な命令に従ったりする場合に、標準的な LLM よりも速度と精度で優れています。</p><p>エージェントスクリプトの次の<code>start_agent</code>ブロックは、サブエージェント分類の HyperClassifier を設定します。</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="nolang">start_agent agent_router:
+    description: "Welcome the user and determine the appropriate topic/subagent based on user input"
+    model_config:
+       model: "model://sfdc_ai__DefaultEinsteinHyperClassifier"
+</code></pre><p><code>model_config</code>を削除すると、エージェントはデフォルトでサブエージェント分類に [設定] の Agentforce のモデル オプションを選択します。</p><p>詳細については、『Agentforce 開発者ガイド』の「<a target="_blank" href="https://developer.salesforce.com/docs/ai/agentforce/guide/ascript-model.html">Configure Models in Agent Script</a>」を参照してください。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Agentforce には Salesforce の [Default model (デフォルトモデル)] オプションを使用することをお勧めします。このオプションを使用すると、Salesforce はエージェントの精度とパフォーマンスに合わせて最適なモデルの組み合わせを選択できます。ただし、代わりに AWS ホストモデルオプションを選択できます。" href="agentforce_general-3.html#agent_setup_select_model_provider">Agentforce モデルオプションの選択</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agent_trust_data_masking">
+<h1 class="slds-text-heading_large">Agentforce のデータマスキングの制限事項</h1>
+  <p>Einstein Trust Layer では、大規模言語モデル（LLM）のパターンベースおよび項目ベースのデータ マスキングはエージェントで無効になっています。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition。<a title="特定のクラウドと一般的な使用事例のエージェント種別とデフォルトテンプレートについて説明します。" href="agentforce_general-3.html#agent_setup_explore_types">必要なアドオンライセンスはエージェント種別によって異なります。</a></td>
+
+            </tr>
+          </tbody></table>
+    <p>マスキングは、機密情報や個人識別情報を LLM に公開しないように保護できますが、場合によっては、応答に必要なコンテキストがマスキングされるため、エージェントの応答の精度や関連性に影響する可能性があります。たとえば、ユーザーがエージェントに類似する取引先のリストの作成を依頼した場合、参照取引先の詳細は重要なコンテキスト情報になります。参照取引先を LLM に送信する前にプロンプトからマスクした場合、類似する特性を持つ取引先を識別するために必要なコンテキスト情報がありません。</p>
+    <p>Einstein Trust Layerには、機密データをデータのマスキング以外の悪用や漏洩から保護するのに役立ついくつかのポリシーと機能が含まれています。</p>
+    <p>Salesforce Trust境界外のLLMに送信されるすべての情報は、LLMプロバイダーとのゼロ データ保持契約の対象になります。LLM に送信された情報は、生成された応答が Salesforce に返送された後は、プロバイダーによって保持、参照、またはトレーニングに使用されません。</p>
+    <p>プロンプト テンプレート、Apex、またはモデル API に基づくカスタム アクションは、Salesforce Trust Boundary 内でホストされている LLM (Anthropic Claude モデルなど) を含め、Salesforce が管理する LLM を参照できます。Salesforce Trust 境界内でホストされる LLM を使用する場合、データは Salesforce Trust 境界から離れません。この場合、エージェントのデータ マスキングは無効のままですが、データはSalesforce Trustの境界内に留まり、ゼロ データ保持ポリシーは引き続き適用されます。</p>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> プロンプトテンプレートは、Salesforce アプリケーションで直接、またはエージェントアクションを介して使用できます。エージェントアクションを介してプロンプトテンプレートがコールされると、データマスキングが無効になります。プロンプト テンプレートが直接使用される場合（サービス返信など）、データ マスキングは Einstein Trust Layer の設定に基づいて適用されます。</div></div></div>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agent_user">
+<h1 class="slds-text-heading_large">エージェントユーザー権限のベストプラクティス</h1>
+    <p>メッセージングチャネルに接続するエージェントなど、多くの AI エージェントは、組織で Salesforce ユーザーとして動作します。これらのエージェントユーザーに付与した権限によって、AI エージェントが実行できるアクションが決まります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+        <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition。<a title="特定のクラウドと一般的な使用事例のエージェント種別とデフォルトテンプレートについて説明します。" href="agentforce_general-3.html#agent_setup_explore_types">必要なアドオンライセンスはエージェント種別によって異なります。</a></td>
+
+            </tr>
+          </tbody></table>
+        <p>AI エージェントは従業員または顧客とやりとりできます。従業員とやりとりするほとんどのエージェントは、Lightning Experience など、ログインユーザーに制限されたチャネルに接続します。これらのエージェントは、ログインユーザーのコンテキストで実行されます。ユーザーライセンス、権限、項目レベルセキュリティ、共有設定など、すでに設定されている Salesforce のアクセス制御によって、エージェントがアクセスできる内容が決まります。</p>
+        <p>顧客とやりとりするほとんどのエージェントは、メッセージングチャネルなど、ログインユーザーに制限されないチャネルに接続します。エンドユーザーがアクセスできないデータに安全にアクセスし、アクションを実行するために、エージェントはエージェントユーザー (エージェントが作業するために必要なすべての権限を持つ Salesforce インテグレーションユーザー) として動作します。</p>
+        <p>Agent Creator でエージェントユーザーを作成できます。[新規エージェントユーザー] オプションを選択することをお勧めします。このオプションを選択すると、デフォルトでエージェントのセキュリティが確保されるように、最小限のアクセス権を持つエージェントユーザーが作成されます。エージェントに必要な追加アクセス権を付与します。エージェントにアクセス権を付与する対象を決定するときは、最小権限の原則に従います。</p>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">エージェントユーザーに推奨されるアクセス権</h2><p>ほとんどのエージェントユーザーには、デフォルトでエージェントユーザーに付与されているアクセス権に加えて、次のアクセス権が必要です。</p><ul>
+                <li>エージェントが操作するレコードを表示または編集できるロール。</li>
+
+                <li>フロー、Apex、またはプロンプト テンプレートを介してエージェントが操作する各オブジェクトに対する最小レベルのオブジェクト権限。新しいアクションをエージェントに追加する場合は、アクションで参照されるオブジェクトへのアクセス権がエージェントユーザーに付与されていることを確認します。</li>
+
+            </ul>
+<p>その他の要件については、エージェントのドキュメントを参照してください。エージェントがプロンプトテンプレートなどの追加機能にアクセスする必要がある場合は、エージェントユーザーに必要なアクセス権を付与する権限セットまたは権限セットグループを作成します。エージェントユーザーに割り当てるカスタム権限セットは、Einstein エージェントライセンスと Einstein エージェントユーザープロファイルに関連付けられている必要があります。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d62427e99" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">エージェントが使用する機能</th>
+              <th id="d62427e102" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">必要な権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d62427e99" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="エージェントが使用する機能">エージェントアクションに関連付けられたプロンプトテンプレートを含む</td>
+
+              <td headers="d62427e102" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="必要な権限">権限セット: プロンプトテンプレートユーザー</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d62427e99" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="エージェントが使用する機能">フロー (エージェントアクションに関連付けられたフローを含む)</td>
+
+              <td headers="d62427e102" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="必要な権限"><p>アプリケーション権限: フローを実行</p><p>または</p><p>個々のフローへのアクセス権の付与</p><p style="margin-bottom:0;">「フローを実行するためのユーザーアクセスの<a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.flow_distribute_security.htm&amp;language=ja&amp;type=5">制限」</a>を参照してください。</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d62427e99" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="エージェントが使用する機能">Apex クラス (エージェントアクションに関連付けられたクラスを含む)</td>
+
+              <td headers="d62427e102" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="必要な権限"><p>Apex クラス アクセス:エージェントが使用する Apex クラスを選択します。</p><p style="margin-bottom:0;"><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.code_package_security.htm&amp;language=ja&amp;type=5">「Apex クラスセキュリティのしくみ」を参照してください。</a></p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d62427e99" style="text-align:left;vertical-align:top;" rowspan="5" class="slds-cell-wrap" data-label="エージェントが使用する機能"><p>Knowledge and <span>Data 360</span>を活用する次のような機能とアクション:</p><ul>
+                  <li>Agentforce データライブラリ</li>
+
+                  <li>Knowledge エージェントアクションを使用した質問への回答</li>
+
+                </ul>
+</td>
+
+              <td headers="d62427e102" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="必要な権限">アプリケーション権限: ナレッジの表示を許可</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d62427e102" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="必要な権限">アプリケーション権限: 会話エントリへのアクセス</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d62427e102" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="必要な権限">権限セット: Data Cloud ユーザー</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d62427e102" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="必要な権限"><p>Data Category Visibility：エージェントが回答で使用する Knowledge Article データを含むデータ カテゴリを選択します。</p><p style="margin-bottom:0;">「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=service.category_visibility_whatis.htm&amp;language=ja&amp;type=5">データカテゴリ表示</a>」を参照</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d62427e102" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="必要な権限">オブジェクト権限:最小権限の原則に従って、Knowledgeオブジェクトへのアクセス権を付与します。</td>
+
+            </tr>
+          </tbody></table></div>
+        <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> 
+            <p>Agent Creator で Agentforce サービスエージェント（ASA）のエージェントユーザーを作成すると、そのユーザーにはデフォルトで次のプロパティが含まれます。</p>
+            <ul>
+                <li>ユーザーライセンス: Einstein Agent</li>
+
+                <li>プロファイル: Einstein エージェントユーザー </li>
+
+                <li>姓: EinsteinServiceAgent ユーザー</li>
+
+                <li>権限セットグループ: AgentforceServiceAgentUserPsg。「Agentforce サービスエージェントセキュアベース」権限セットが含まれます。</li>
+
+            </ul>
+
+            <p>ほとんどの ASA では、必要な機能とオブジェクトにアクセスするために追加の権限が必要です。</p>
+            <ul>
+                <li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=service.messaging_permissions_parent.htm&amp;language=ja&amp;type=5">メッセージング</a>または<a target="_blank" href="https://help.salesforce.com/s/articleView?id=service.miaw_prepare_users.htm&amp;language=ja&amp;type=5">拡張チャット</a></li>
+
+                <li>取引先責任者、ケース、ケース関連の問題、Knowledgeオブジェクトに対する「参照」、「作成」、「編集」、「削除」、「すべてのレコードの参照」、「すべてのレコードの編集」、または「すべての項目の参照」アクセス権</li>
+
+                <li>プロンプト テンプレート、フロー、Apex クラス、Agentforce データ ライブラリ、および [Answer Questions with Knowledge (ナレッジを使用して質問に回答)] エージェント アクションへのアクセス</li>
+
+            </ul>
+
+        </div></div></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">エージェントユーザーの考慮事項</h2><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> <p>組織の共有設定 (OWD) によって、所有していないレコードへのユーザーのアクセス権が決まります。認証済みユーザーを使用するエージェントセッションでは、セッションはエンドユーザーのコンテキストで実行され、OWD はユーザーが外部か内部かによって異なります。認証されていないユーザーのエージェントセッションでは、セッションはエージェントユーザーのコンテキストで実行され、内部ユーザーの OWD が適用されます。</p><div><p>OWD、エージェントユーザーの権限、およびエージェント設定を慎重に確認し、エンドユーザーとビジネスに適したレコードアクセス権があることを確認します。</p><ul>
+                        <li>エージェントのユーザーレコードを使用するすべてのエージェントで、<a title="サブエージェントとアクションの検索条件を作成して、特定の条件を満たした場合にのみエージェントが会話で使用できるようにします。指定した変数に基づいてアクセスを制限できます。顧客チャネルのエージェントの場合、検索条件を使用して、ユーザーの ToDo を実行するサブエージェントとアクションに認証を要求することをお勧めします。" href="agentforce_general-1.html#agent_asset_filters">検索条件</a>と<a title="セキュリティを強化し、エージェントの動作の一貫性を確保するには、検索条件、命令、アクションの入力として変数を使用します。変数を使用して、エージェントがサブエージェントとアクションを使用する方法を制御したり、会話に関する詳細情報を提供したりできます。" href="#agent_variables">変数</a>を使用して、サブエージェントおよびアクションレベルでレコードアクセスを制限することをお勧めします。この戦略により、OWD に関係なく機密データが保護されます。</li>
+
+                        <li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.admin_sharing.htm&amp;language=ja&amp;type=5">内部ユーザーの</a> OWD を制限して、すべての内部ユーザーのレコードアクセスを制限できます。その後、必要に応じて Einstein エージェントユーザーを除外して、アクセス権を選択的に付与する<a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.admin_sharing.htm&amp;language=ja&amp;type=5">共有ルールを作成</a>できます。</li>
+
+                    </ul>
+</div></div></div></div>
+<ul>
+                <li>エージェントに適切なアクセス権があることを確認するには、リリースする前に Sandbox でエージェントをテストします。</li>
+
+                <li>管理者権限を持つ Salesforce ユーザーのみがエージェントユーザーを表示または編集できます。</li>
+
+                <li>エージェントユーザーログイン情報を使用して Salesforce にログインすることはできません。</li>
+
+                <li>エージェントユーザーが Salesforce で作業している場合、そのユーザー名はレコードの [作成者]、[最終更新者]、または [所有者] 項目や Salesforce の監査項目に表示される可能性があります。</li>
+
+                <li>エージェントユーザーを区別するには、各ユーザーの名を、関連付けられているエージェントの名前に更新することを検討してください。</li>
+
+                <li>[ユーザー] 設定ページですべてのエージェントユーザーを簡単に見つけるには、Einstein エージェントユーザープロファイルで絞り込むリストビューを作成することを検討してください。</li>
+
+            </ul>
+<p>
+            <iframe width="640" height="360" src="https://play.vidyard.com/BxzXP38d5kUqwQREMzsd4Q" class="doc_embedded_video"><!-- --></iframe></p></div>
+    
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agent_variables">
+<h1 class="slds-text-heading_large">従来のビルダーの変数</h1>
+  <p>セキュリティを強化し、エージェントの動作の一貫性を確保するには、検索条件、命令、アクションの入力として変数を使用します。変数を使用して、エージェントがサブエージェントとアクションを使用する方法を制御したり、会話に関する詳細情報を提供したりできます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition。<a title="特定のクラウドと一般的な使用事例のエージェント種別とデフォルトテンプレートについて説明します。" href="agentforce_general-3.html#agent_setup_explore_types">必要なアドオンライセンスはエージェント種別によって異なります。</a></td>
+
+            </tr>
+          </tbody></table>
+    <div><p>コンテキスト変数はオブジェクト項目に対応付けられます。エージェントが顧客チャネルに接続できる場合、カスタム項目を含め、メッセージングセッションオブジェクト項目から対応付けられたコンテキスト変数が含まれます。コンテキスト変数には <code>$Context</code> のプレフィックスが付き、通常は参照のみです。エンドユーザー言語コンテキスト変数は編集可能です。</p><p>会話変数はエージェントに固有であり、会話セッション中にのみ値が保持されます。</p><p>カスタム会話変数には、アクションの出力値が保存されます。カスタム会話変数は、検索条件で、またはアクションの入力として使用できます。この変数は Boolean、Number、または Text データ型にできます。</p></div>
+    <div><p>変数を使用する方法をいくつか紹介します。</p><ul>
+                <li>コンテキスト変数またはカスタム会話変数をアクション入力に割り当てます。アクション入力に変数を割り当てると、エージェントは割り当てられた変数のみを使用して入力の値を入力できます。アクション入力は、Boolean、Number、Text のいずれかのデータ型である必要があります。</li>
+
+                <li>アクション出力を変数に対応付けます。出力値は検索条件と命令で使用できます。アクション出力は、Boolean、Number、Text のいずれかのデータ型である必要があります。</li>
+
+                <li>検索条件で変数を使用します。検索条件により、エージェントは変数が検索条件を満たした場合にのみサブエージェントまたはアクションを使用できます。</li>
+
+                <li>エージェント API で変数値を指定し、サブエージェントの指示で変数にメンションします。</li>
+
+            </ul>
+<p>コンテキスト変数の場合は、<code>{!$Context.VariableAPIName}</code> の形式を使用します。会話変数の場合は、<code>{!VariableAPIName}</code> の形式を使用します。</p></div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#agent_variables_create">従来のビルダーでのエージェントのカスタム変数の作成</a></strong><br>アクション出力をカスタム変数に対応付けて、エージェントがサブエージェントとアクションを使用する方法を制御します。たとえば、アクション入力に変数を割り当てると、エージェントは割り当てられた変数のみを使用して入力の値を入力できます。</li><li class="slds-p-bottom_small"><strong><a href="#agent_variables_ref">従来のビルダーの標準変数参照</a></strong><br>一部のエージェントには、標準変数と呼ばれる事前作成済み変数が含まれています。従来の Agentforce Builder の [コンテキスト] タブでエージェントの標準変数を調べます。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://youtu.be/sOnECEt7iWs">動画: Control Agentforce Decision-Making with Variables and Filters (変数とフィルタを使用した Agentforce 意思決定の制御)</a></li><li><a target="_blank" href="https://developer.salesforce.com/docs/ai/agentforce/guide/agent-api-get-started.html">Agentforce 開発者ガイド: エージェント API の使用開始</a></li><li><a target="_blank" href="https://developer.salesforce.com/docs/ai/agentforce/guide/agent-api-variables.html">Agentforce 開発者ガイド: エージェント API を使用したエージェント変数の送信</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agent_variables_create">
+<h1 class="slds-text-heading_large">従来のビルダーでのエージェントのカスタム変数の作成</h1>
+ 
+ <p>アクション出力をカスタム変数に対応付けて、エージェントがサブエージェントとアクションを使用する方法を制御します。たとえば、アクション入力に変数を割り当てると、エージェントは割り当てられた変数のみを使用して入力の値を入力できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+  <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition。<a title="特定のクラウドと一般的な使用事例のエージェント種別とデフォルトテンプレートについて説明します。" href="agentforce_general-3.html#agent_setup_explore_types">必要なアドオンライセンスはエージェント種別によって異なります。</a></td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col><col></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d27401e77" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d27401e77" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">カスタム変数を作成する</td>
+
+       <td headers="d27401e77" style="vertical-align:top;" class="slds-cell-wrap">AIエージェントの管理とエージェントタイプ<a target="_blank" href="agentforce_general-3.html#agent_setup_explore_types">の必要な権限</a></td>
+
+      </tr>
+     </tbody></table></div>
+  <ol><li>
+                <span>Agentforce エージェントの [設定] ページから、従来のビルダーでエージェントを開きます。エージェントが有効な場合は、<a target="_blank" href="einstein_copilot-5.html#copilot_setup_activate_deactivate">無効化し</a>ます。</span>
+            </li><li>
+                <span>左サイドバーから、[<strong class="uicontrol">コンテキスト] を</strong>選択します。</span>
+            </li><li>
+                <span>[<strong class="uicontrol">新規変数]</strong> をクリックします。次に、変数の詳細を入力し、設定を確認します。</span>
+                <div>変数のデータ型は、アクション出力のデータ型に基づきます。</div>
+                <table class="slds-table slds-table_bordered slds-m-bottom_small"><thead class="slds-text-title_caps">
+                        <tr><th id="d27401e131-option" style="vertical-align:bottom;text-align:left;">
+
+                        </th><th id="d27401e131-desc" style="vertical-align:bottom;text-align:left;">
+                    </th></tr></thead><tbody><tr class="">
+                        <th id="d27401e142" headers="d27401e131-option" style="vertical-align:top;">API による値の設定を許可</th>
+
+                        <td headers="d27401e131-desc d27401e142" style="vertical-align:top;">API を使用してこの変数の値を変更します。この変数を検証やその他のセキュリティ機能で使用している場合は、API で非表示にすることを検討し、このオプションは選択しないでください。</td>
+
+                    </tr><tr class="">
+                        <th id="d27401e151" headers="d27401e131-option" style="vertical-align:top;">LLM に値の使用を許可</th>
+
+                        <td headers="d27401e131-desc d27401e151" style="vertical-align:top;">エージェントは、この変数の値を使用して意思決定を行い、会話応答を生成できます。この変数を検証やその他のセキュリティ機能で使用している場合は、LLM で非表示にすることを検討し、このオプションは選択しないでください。</td>
+
+                    </tr><tr class="">
+                        <th id="d27401e160" headers="d27401e131-option" style="vertical-align:top;">この変数の割り当てまたは対応付け</th>
+
+                        <td headers="d27401e131-desc d27401e160" style="vertical-align:top;">コンテキスト変数またはカスタム会話変数をアクション入力に割り当てると、エージェントは割り当てられた変数のみを使用して入力の値を入力できます。アクション出力を変数に対応付けるときに、検索条件と命令で出力値を使用できます。</td>
+
+                    </tr></tbody></table>
+            </li><li>
+    <span>変更内容を保存します。</span>
+   </li></ol>
+
+  <div><p>変数とその使用場所に関する詳細を表示するには、従来のビルダーの [コンテキスト] パネルでその名前をクリックします。</p><p>作成後にアクション入力に変数を割り当てるには、従来のビルダーでアクション入力に移動します。次に、[変数を割り当て] ドロップダウンから変数を選択します。</p><p>作成後にアクション出力を変数に対応付けるには、従来のビルダーでアクション出力に移動します。次に、[変数に対応付け] ドロップダウンから、この変数を選択します。</p><p>変数から値を削除するには、空の値のアクション出力を対応付けます。</p></div>
+ 
+<ul><li class="slds-p-bottom_small"><strong><a href="agentforce_general-1.html#agent_custom_variables_filters_example">例: 検索条件と変数を使用したエージェントのメモリの改善</a></strong><br>変数と検索条件を使用して、エージェントが一般的なトラブルシューティングの問い合わせを効果的に解決できるようにします。この例では、ログインの問題に関連するトラブルシューティング手順と、エージェントが使用できるアクションを制御する検索条件を保存する変数を作成します。エージェントは、すべてのトラブルシューティング手順を変数に保存します。次に、会話のコンテキストに基づいて最も関連性の高いステップを提供することで、トラブルシューティングプロセスを通じて顧客をガイドします。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agent_variables_ref">
+<h1 class="slds-text-heading_large">従来のビルダーの標準変数参照</h1>
+ <p>一部のエージェントには、標準変数と呼ばれる事前作成済み変数が含まれています。従来の Agentforce Builder の [コンテキスト] タブでエージェントの標準変数を調べます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+        <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition。<a title="特定のクラウドと一般的な使用事例のエージェント種別とデフォルトテンプレートについて説明します。" href="agentforce_general-3.html#agent_setup_explore_types">必要なアドオンライセンスはエージェント種別によって異なります。</a></td>
+
+            </tr>
+          </tbody></table>
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">標準コンテキスト変数</h2><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:22.69503546099291%"><col style="width:17.730496453900706%"><col style="width:17.730496453900706%"><col style="width:41.84397163120567%"></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d127211e82" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">変数の API 参照名</th>
+       <th id="d127211e85" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">型</th>
+       <th id="d127211e88" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+       <th id="d127211e91" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">対応付けられたオブジェクト項目</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d127211e82" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="変数の API 参照名"><code>$Context.End​UserLanguage</code></td>
+
+       <td headers="d127211e85" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="型">テキスト</td>
+
+       <td headers="d127211e88" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="説明">メッセージングユーザーが送信するメッセージの言語コード。例: en_US。この変数は編集可能です。</td>
+
+       <td headers="d127211e91" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="対応付けられたオブジェクト項目">MessagingSession.EndUserLanguage</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d127211e82" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="変数の API 参照名">$Context.End​UserContactId</td>
+
+       <td headers="d127211e85" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="型">Id</td>
+
+       <td headers="d127211e88" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="説明">メッセージングユーザーに関連付けられた取引先責任者レコードの ID。</td>
+
+       <td headers="d127211e91" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="対応付けられたオブジェクト項目">MessagingEndUser.ContactId </td>
+
+      </tr>
+      <tr class="">
+       <td headers="d127211e82" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="変数の API 参照名">$Context.RoutableId</td>
+
+       <td headers="d127211e85" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="型">テキスト</td>
+
+       <td headers="d127211e88" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="説明">メッセージングチャネルのセッションの ID。</td>
+
+       <td headers="d127211e91" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="対応付けられたオブジェクト項目">MessagingSession.Id </td>
+
+      </tr>
+      <tr class="">
+       <td headers="d127211e82" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="変数の API 参照名">$Context.Messaging​EndUserId</td>
+
+       <td headers="d127211e85" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="型">Id</td>
+
+       <td headers="d127211e88" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="説明">メッセージングユーザーの ID。</td>
+
+       <td headers="d127211e91" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="対応付けられたオブジェクト項目">MessagingSession.MessagingEndUserId </td>
+
+      </tr>
+     </tbody></table></div>
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">その他の標準変数</h2><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:27.586206896551722%"><col style="width:21.551724137931032%"><col style="width:50.86206896551724%"></colgroup><thead class="slds-text-title_caps">
+                        <tr class="">
+                            <th id="d127211e180" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">変数の API 参照名</th>
+                            <th id="d127211e183" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">型</th>
+                            <th id="d127211e186" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+                        </tr>
+                    </thead><tbody>
+                        <tr class="">
+                            <td headers="d127211e180" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="変数の API 参照名"><code>verifiedCustomerId</code></td>
+
+                            <td headers="d127211e183" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="型">Id</td>
+
+                            <td headers="d127211e186" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="説明">[顧客を検証] エージェントアクションを使用して検証されるメッセージングユーザーの ID。「顧客検証サブエージェントを使用したサブエージェントおよびアクションへの<a title="Agentforce サービスエージェントがユーザーの代わりに非公開アクションを実行する前に、エージェントがやりとりしているユーザーの ID を確認することをお勧めします。エージェントセッションで未検証ユーザーの ID を検証するには、顧客検証サブエージェントまたはサービス顧客検証サブエージェントを使用するようにエージェントを設定し、指定したサブエージェントとアクションへのアクセスを制限します。ビジネスのセキュリティ要件に応じて、サブエージェントとアクションごとに異なるレベルの検証を要求できます。" href="agentforce_service.html#service_agentforce_customer_verification">アクセスの制御</a>」を参照してください。</td>
+
+                        </tr>
+                    </tbody></table><p>カスタムアクションで標準変数を使用するには、[エージェントコンテキストを取得] 呼び出し可能アクションを使用します。たとえば、フローに [エージェントコンテキストを取得] アクションを追加して、標準変数の値を保存します。</p></div>
+ 
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://developer.salesforce.com/docs/ai/agentforce/guide/agent-api-get-started.html">Agentforce 開発者ガイド: エージェント API の使用開始</a></li><li><a target="_blank" href="https://developer.salesforce.com/docs/ai/agentforce/guide/agent-api-variables.html">Agentforce 開発者ガイド: エージェント API を使用したエージェント変数の送信</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agent_versions">
+<h1 class="slds-text-heading_large">従来のビルダーでのエージェントバージョンの管理</h1>
+  
+  <p>エージェントの複数のバージョンを作成して、本番から有効なバージョンを削除することなく変更を行い、テストします。または、バックアップとして保存するバージョンを作成して、以前のバージョンにすばやく戻すことができるようにします。エージェントの新しいバージョンを作成すると、Salesforce によってエージェントのサブエージェント、アクション、その他のアセットの独立したコピーが作成されます。各エージェントおよびエージェントバージョンには独自のアセットがあり、アセットは共有されません。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition。<a title="特定のクラウドと一般的な使用事例のエージェント種別とデフォルトテンプレートについて説明します。" href="agentforce_general-3.html#agent_setup_explore_types">必要なアドオンライセンスはエージェント種別によって異なります。</a></td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d70437e75" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d70437e75" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">AI エージェントのバージョンを管理する</td>
+
+              <td headers="d70437e75" style="vertical-align:top;" class="slds-cell-wrap">AIエージェントの管理とエージェントタイプ<a target="_blank" href="agentforce_general-3.html#agent_setup_explore_types">の必要な権限</a></td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>エージェントのバージョンは 20 個まで作成できます。一度に有効化できるエージェントのバージョンは 1 つのみです。制限に達した場合は、新しいバージョンをコピーする前に古いバージョンを削除してください。</p><p>コピーに失敗した場合は、20 バージョンの制限を超えていないこと、すべての変更を保存していること、および適切な権限があることを確認します。</p><p>エージェントのバージョンをコピーすると、そのアセットもコピーされるため、すべてのエージェントとエージェントバージョンに独自のアセットが含まれます。これらのアセットには次のものが含まれます。</p><ul>
+        <li><a title="エージェントレベルの手順は、すべての状況で操作する方法に関するガイダンス (従うべきルールを含む) をエージェントに提供します。歓迎メッセージやエラーメッセージなどのシステムメッセージは、ユーザーがエージェントとのチャットを開始したときや、システムエラーが発生したときに送信されます。" href="einstein_copilot-5.html#copilot_setup_system_messages">システムメッセージ</a></li>
+
+        <li>サブエージェント (標準サブエージェントと標準<a title="標準のサブエージェントを編集して、特定の使用事例のニーズを満たし、ビジネスに適したガードレールに従っていることを確認します。" href="einstein_copilot-5.html#copilot_topics_edit">サブエージェント</a>に行ったカスタマイズを含む)</li>
+
+          <li>アクション (<a title="エージェントでアクションを使用するには、アクションをサブエージェントに追加します。アクションは複数のサブエージェントに追加できます。エージェントにサブエージェントを追加すると、Salesforce によってサブエージェントとそのアクションのコピーが作成されます。各エージェントとエージェントバージョンには、サブエージェントとアクションの独自のコピーがあります。" href="einstein_copilot-1.html#copilot_actions_add">標準アクション</a>と<a title="カスタムアクションを使用すると、Salesforce 機能でエージェントを拡張して、ビジネスに固有の ToDo でユーザーをサポートする準備ができます。Apex、フロー、プロンプト・テンプレート、APIインテグレーションを使用してカスタム・アクションを構築します。" href="einstein_copilot-1.html#copilot_actions_custom">カスタムエージェントアクション</a>を含む)</li>
+
+        <li><a title="サブエージェントとアクションの検索条件を作成して、特定の条件を満たした場合にのみエージェントが会話で使用できるようにします。指定した変数に基づいてアクセスを制限できます。顧客チャネルのエージェントの場合、検索条件を使用して、ユーザーの ToDo を実行するサブエージェントとアクションに認証を要求することをお勧めします。" href="agentforce_general-1.html#agent_asset_filters">検索条件</a></li>
+
+        <li><a title="アクション出力をカスタム変数に対応付けて、エージェントがサブエージェントとアクションを使用する方法を制御します。たとえば、アクション入力に変数を割り当てると、エージェントは割り当てられた変数のみを使用して入力の値を入力できます。" href="#agent_variables_create">カスタム変数、出力の対応付け、入力割り当て</a></li>
+
+      </ul>
+<p>現在、標準およびカスタムサブエージェントとアクションのバージョン管理はサポートされていません。カスタムサブエージェントまたはアクションに加えた変更は、割り当てられているエージェントとバージョンにのみ適用されます。</p><p>各新規エージェントバージョン (エージェントバージョンのアセットを含む) は、コピーしたバージョンの独立したコピーです。</p></div><ol><li>
+        <span>Agentforce エージェントの [設定] ページのエージェントのリストで、エージェント行を展開してそのバージョンを表示します。コピーまたは削除するエージェントのドロップダウンをクリックします。</span>
+      </li><li>
+        <span>エージェントバージョンを作成するには、複製するバージョンの右側のドロップダウンから、[<strong class="uicontrol">バージョンをコピー</strong>] を選択します。エージェントバージョンを削除するには、[<strong class="uicontrol">削除] を</strong>選択します。</span>
+      </li></ol>
+<div><p>Agentforce Builder とエージェントの [詳細] ページでエージェントのバージョンをすばやく切り替えることができます。</p></div>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://youtu.be/wguiOv24_Ek">動画: Use Versions to Deploy Agentforce Agents with Zero Downtime (バージョンを使用してダウンタイムゼロの Agentforce エージェントをリリース)</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agent_versions_commit">
+<h1 class="slds-text-heading_large">Commit an Agent Version (エージェントバージョンの確定)</h1>
+  <p>エージェントのバージョンをコミットしてエージェントのスナップショットを保存し、Agentforce Builder の外部で使用できるようにエージェントを準備します。有効化するには、エージェントバージョンを確定する必要があります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition。<a title="特定のクラウドと一般的な使用事例のエージェント種別とデフォルトテンプレートについて説明します。" href="agentforce_general-3.html#agent_setup_explore_types">必要なアドオンライセンスはエージェント種別によって異なります。</a></td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d149766e77" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d149766e77" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">エージェントバージョンをコミットする</td>
+
+              <td headers="d149766e77" style="vertical-align:top;" class="slds-cell-wrap">AIエージェントの管理とエージェントタイプ<a target="_blank" href="agentforce_general-3.html#agent_setup_explore_types">の必要な権限</a></td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>Agentforce Studio アプリケーションの [エージェント] ページから、新しいエージェントを作成するか、既存のエージェントバージョンを開きます。</span>
+      </li><li>
+        <span>エージェントのバージョンが複数ある場合は、Agentforce Builder のヘッダーから、確定するエージェントのバージョンを選択します。</span>
+      </li><li>
+        <span>エージェントを変更し、変更を保存します。</span>
+      </li><li>
+        <span>エージェントバージョンをコミットする準備ができたら、<strong class="uicontrol">［Commit Version］</strong> をクリックします。</span>
+      </li></ol>
+
+    <div><p>エージェントバージョンを確定すると、変更できなくなります。エージェントバージョンは組織のメタデータに保存され、顧客または従業員向けに<a href="einstein_copilot-5.html#copilot_setup_activate_deactivate">有効化</a>できます。</p><p>確定後にエージェントバージョンを変更するには、<a title="複数のバージョンのエージェントを作成して、エージェントの設計をシームレスに反復します。コミットされたエージェントバージョンからドラフトを作成し、テストに基づいて変更を続行したり、バックアップとして保存したりして、すばやく以前のバージョンに戻すことができます。" href="#agent_versions_draft">新しいドラフトを作成</a>します。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agent_versions_delete">
+<h1 class="slds-text-heading_large">エージェントまたはエージェントバージョンの削除</h1>
+  <p>エージェントまたはエージェントバージョンを削除すると、Agentforce Builder から完全に削除されます。削除されたエージェントは復元できません。</p>
+<div id="agent_versions_only_delete" aria-labelledby="ariaid-title2" class="nested1"><a name="agent_versions_only_delete" href="https://help.salesforce.com/s?language=ja"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">エージェントバージョンの削除</h2>
+    <div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+      <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition。<a title="特定のクラウドと一般的な使用事例のエージェント種別とデフォルトテンプレートについて説明します。" href="agentforce_general-3.html#agent_setup_explore_types">必要なアドオンライセンスはエージェント種別によって異なります。</a></td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+              <tr class="">
+                <th id="d43512e92" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+              </tr>
+            </thead><tbody>
+              <tr class="">
+                <td headers="d43512e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">エージェントを作成する</td>
+
+                <td headers="d43512e92" style="vertical-align:top;" class="slds-cell-wrap">AIエージェントの管理とエージェントタイプ<a target="_blank" href="agentforce_general-3.html#agent_setup_explore_types">の必要な権限</a></td>
+
+              </tr>
+            </tbody></table></div>
+      <ol><li>
+          <span>アプリケーションランチャーから、<strong class="uicontrol">Agentforce Studio</strong>を見つけて選択し、<strong class="uicontrol">[エージェント]</strong>をクリックします。</span>
+        </li><li>
+          <span>Agentforce Studio アプリケーションの [エージェント] ページから、バージョンを削除するエージェントを開きます。</span>
+        </li><li>
+          <span>Agentforce Builder のヘッダーから、削除するエージェントのバージョンを選択します。</span>
+        </li><li>
+          <span>[<strong class="uicontrol">Activate</strong> or <strong class="uicontrol">Commit Version (バージョン</strong>を有効化または確定)] ボタンの横にあるドロップダウン矢印を選択し、[<strong class="uicontrol">Delete Version (バージョン</strong>を削除)] をクリックします。バージョンが 1 つしかない場合、エージェント全体が削除されます。</span>
+        </li></ol>
+
+      <div><p>有効なエージェントまたはエージェントバージョンは削除できません。エージェントまたはエージェントバージョンを削除する前に無効化します。</p></div>
+    
+  </div>
+
+  <div id="agent_delete" aria-labelledby="ariaid-title3" class="nested1"><a name="agent_delete" href="https://help.salesforce.com/s?language=ja"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">エージェント全体の削除</h2>
+    
+      <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> マルチエージェントソリューションで接続済みサブエージェントとして使用されているエージェントを削除しようとすると、エージェントを削除する前に接続済みサブエージェントを削除するように警告されます。「<a title="不要になった接続済みサブエージェントをオーケストレーターエージェントから削除します。接続済みサブエージェントを削除しても、この接続済みエージェントの基盤となる参照エージェントには影響しません。" href="agentforce_general-2.html#agent_multi_orch_remove">Remove a Connected Subagent from</a> an Orchestrator Agent (Orchestrator Agent からの接続済みサブエージェントの削除) (ベータ)」を参照してください。</div></div></div>
+</div>
+      <ol><li>
+          <span>アプリケーションランチャーから、<strong class="uicontrol">Agentforce Studio</strong>を見つけて選択し、<strong class="uicontrol">[エージェント]</strong>をクリックします。</span>
+        </li><li>
+          <span>[エージェント] ページの [すべてのエージェント] リストで、削除するエージェントの行を見つけます。ドロップダウンメニューを開き、[<strong class="uicontrol">エージェントを削除</strong>] を選択します。エージェントまたはエージェントバージョンを削除すると、復元できなくなります。</span>
+        </li></ol>
+
+      <div><p>従来のエージェントは、<strong class="uicontrol">［Delete］</strong> ボタンが無効になった状態でエージェント リストに表示されることがあります。従来のエージェントは従来のビルダーから削除する必要があります。</p></div>
+    
+  </div>
+
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agent_versions_draft">
+<h1 class="slds-text-heading_large">エージェントのドラフトの作成</h1>
+  <p>複数のバージョンのエージェントを作成して、エージェントの設計をシームレスに反復します。コミットされたエージェントバージョンからドラフトを作成し、テストに基づいて変更を続行したり、バックアップとして保存したりして、すばやく以前のバージョンに戻すことができます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition。<a title="特定のクラウドと一般的な使用事例のエージェント種別とデフォルトテンプレートについて説明します。" href="agentforce_general-3.html#agent_setup_explore_types">必要なアドオンライセンスはエージェント種別によって異なります。</a></td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d24688e77" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d24688e77" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">エージェントドラフトを作成する</td>
+
+              <td headers="d24688e77" style="vertical-align:top;" class="slds-cell-wrap">AIエージェントの管理とエージェントタイプ<a target="_blank" href="agentforce_general-3.html#agent_setup_explore_types">の必要な権限</a></td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>ドラフトは、コミットされたエージェントバージョンからのみ作成できます。ドラフトを作成すると、確定するまで新しいバージョンを編集できます。一度に有効化できるエージェントのバージョンは 1 つのみです。</p><p>コミットされたエージェントバージョンからドラフトを作成すると、そのアセットがコピーされ、すべてのエージェントとエージェントバージョンに独自のアセットが設定されます。これらのアセットには次のものが含まれます。</p><ul>
+        <li>システムメッセージ</li>
+
+        <li>標準サブエージェント、カスタムサブエージェント、および標準サブエージェントに行ったカスタマイズを含むサブエージェント</li>
+
+        <li>アクション (標準エージェントアクション、カスタムエージェントアクション、標準エージェントアクションに行ったカスタマイズなど)</li>
+
+        <li>変数、出力の対応付け、入力の割り当て</li>
+
+      </ul>
+<p>サブエージェントとアクションのバージョン管理はサポートされていません。カスタムサブエージェントまたはアクションに加えた変更は、割り当てられているエージェントとバージョンにのみ適用されます。</p></div>
+    <ol><li>
+        <span>Agentforce Studio アプリケーションの [エージェント] ページから、ドラフトの作成に使用するエージェントを開きます。</span>
+      </li><li>
+        <span>エージェントのバージョンが複数ある場合は、Agentforce Builder のヘッダーから、ドラフトの作成元のエージェントのバージョンを選択します。</span>
+      </li><li>
+        <span>[<strong class="uicontrol">新規ドラフト]</strong> をクリックします。</span>
+        <div>[新規ドラフト] ボタンが表示されない場合は、エージェントバージョンがドラフト状態になっています。新しいドラフトを作成するには、<a title="エージェントのバージョンをコミットしてエージェントのスナップショットを保存し、Agentforce Builder の外部で使用できるようにエージェントを準備します。有効化するには、エージェントバージョンを確定する必要があります。" href="#agent_versions_commit">現在のエージェントバージョン</a>を確定してから、ドラフトを作成します。エージェントバージョンをコミットすると、変更できなくなりますが、そこから作成した新しいバージョンを編集することはできます。</div>
+      </li></ol>
+
+    <div><p>Agentforce Builder でドラフトバージョンが開きます。新しいバージョンは、作成元のエージェントの名前を継承し、次の連番が追加されます (たとえば、[私のエージェント - 3] をコピーすると、新しいバージョンの名前は [私のエージェント - 4] になります)。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agent_versions_lifecycle">
+<h1 class="slds-text-heading_large">エージェントのバージョン管理と編集</h1>
+  <p>ドラフト状態や確定済み状態、エージェントのバージョン管理方法など、エージェントの作成と反復を行うときのエージェントのさまざまな状態について説明します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition。<a title="特定のクラウドと一般的な使用事例のエージェント種別とデフォルトテンプレートについて説明します。" href="agentforce_general-3.html#agent_setup_explore_types">必要なアドオンライセンスはエージェント種別によって異なります。</a></td>
+
+            </tr>
+          </tbody></table>
+    <dl>
+      
+        <dt style="font-weight:bold;padding-top:.25rem;">1. エージェントを作成する</dt>
+
+        <dd style="padding-left:1.5rem;padding-bottom:.5rem;"><p style="margin-bottom:0;">新しいエージェントまたは新しいエージェントバージョンを作成するときは、エージェントの編集可能なドラフトを作成します。</p></dd>
+      
+      
+        <dt style="font-weight:bold;padding-top:.25rem;">2. エージェントを変更し、変更をテストする</dt>
+
+        <dd style="padding-left:1.5rem;padding-bottom:.5rem;"><p>エージェントを作成するときに、変更を加えて保存します。変更を保存するたびに、現在のエージェントバージョンへの変更が保存され、引き続き編集できます。</p><p>この時点で、エージェントはドラフト状態になります。多くの変更や 1 つ以上の大きな変更を行っているため、変更をすばやく実行してテストする必要があります。</p><p>[プレビュー] パネルで、模擬データを使用してエージェントの動作をシミュレーションするか、組織の実際のデータを使用してエージェントの動作をライブテストします。エージェントをプレビューすると、エージェントのやりとりとプロセスの詳細なステップごとの追跡を確認できます。また、詳細なトレースとデバッグでさらに詳しく調べることができるため、情報に基づいた正確な修正を行うことができます。</p><p style="margin-bottom:0;">エージェントがドラフト状態の場合、エージェントを有効化することはできません。</p></dd>
+      
+      
+        <dt style="font-weight:bold;padding-top:.25rem;">3. エージェントを確定して有効化する</dt>
+
+        <dd style="padding-left:1.5rem;padding-bottom:.5rem;"><p>エージェントの設計とパフォーマンスに満足したら、エージェントを確定します。準備ができたら、顧客または従業員の<a href="einstein_copilot-5.html#copilot_setup_activate_deactivate">エージェントを有効化</a>します。</p><p>Git に精通している場合、エージェントバージョンの確定は変更の確定に似ています。エージェントバージョンをコミットすると、エージェントバージョンのスナップショットがメタデータに保存されます。これにより、有効化できるようになります。</p><p style="margin-bottom:0;">エージェントバージョンを確定すると、そのエージェントバージョンは変更できなくなります。</p></dd>
+      
+      
+        <dt style="font-weight:bold;padding-top:.25rem;">4. ドラフトを作成してエージェントのバージョンを設定し、編集を続行する</dt>
+
+        <dd style="padding-left:1.5rem;padding-bottom:.5rem;"><p>バージョンを確定した後にエージェントに対して反復処理を実行するには、<a title="複数のバージョンのエージェントを作成して、エージェントの設計をシームレスに反復します。コミットされたエージェントバージョンからドラフトを作成し、テストに基づいて変更を続行したり、バックアップとして保存したりして、すばやく以前のバージョンに戻すことができます。" href="#agent_versions_draft">ドラフトを作成</a>します。ドラフトを作成すると、新しい編集可能なバージョンのエージェントが作成されます。ドラフトは確定するまで編集できます。</p><p style="margin-bottom:0;">エージェントに対して反復処理を行う場合、多くのエージェントバージョンを作成するのが一般的です。Agentforce Builder では、ヘッダーのドロップダウンメニューからバージョンを切り替えることができます。</p></dd>
+      
+    </dl>
+
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#agent_versions_commit">Commit an Agent Version (エージェントバージョンの確定)</a></strong><br>エージェントのバージョンをコミットしてエージェントのスナップショットを保存し、Agentforce Builder の外部で使用できるようにエージェントを準備します。有効化するには、エージェントバージョンを確定する必要があります。</li><li class="slds-p-bottom_small"><strong><a href="#agent_versions_draft">エージェントのドラフトの作成</a></strong><br>複数のバージョンのエージェントを作成して、エージェントの設計をシームレスに反復します。コミットされたエージェントバージョンからドラフトを作成し、テストに基づいて変更を続行したり、バックアップとして保存したりして、すばやく以前のバージョンに戻すことができます。</li><li class="slds-p-bottom_small"><strong><a href="#agent_versions_delete">エージェントまたはエージェントバージョンの削除</a></strong><br>エージェントまたはエージェントバージョンを削除すると、Agentforce Builder から完全に削除されます。削除されたエージェントは復元できません。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agentforce_gateway_add_remove_connection_protection">
+<h1 class="slds-text-heading_large">Agentforce ゲートウェイ ポリシーの接続保護の追加または削除</h1>
+  <p>Policy Builder で一致条件または手動選択を編集して、ポリシーに接続を追加または削除します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">サポートされるエディションと必要な権限については、「<a title="Agentforce ゲートウェイ ポリシーを使用して、外部 API および Model Context Protocol（MCP）サーバへの接続を保護します。アクセスを制御し、使用制限を設定し、コンプライアンスを確保します。" href="#agentforce_gateway_policies">Agentforce Gateway」</a>を参照してください。</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>[<strong class="uicontrol">設定]</strong> から、[クイック検索] ボックスに「<kbd>ポリシー」</kbd>と入力し、[<strong class="uicontrol">ポリシー] を</strong>選択します。</span>
+      </li><li>
+        <span>Agentforce Gateway Policies ページで、<strong class="uicontrol">API</strong> または <strong class="uicontrol">MCP Servers</strong> タブを選択し、現在接続を保護しているポリシーを選択します。</span>
+      </li><li>
+        <span>ポリシーの詳細ページで、[<strong class="uicontrol">Open in Policy Builder</strong>] をクリックします。</span>
+      </li><li>
+        <span>サイドバーから、[<strong class="uicontrol">Target Entities</strong> <span style="vertical-align:text-bottom;display:inline-block;"><img alt="Policy Builder の対象エンティティの選択。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/rules_gray.png" style="height:16px;width:16px;margin-bottom:0;"></span> (対象エンティティ)] を選択し、保護を更新します。</span>
+        <div>
+          <ul>
+            <li>[<strong class="uicontrol">Matching Criteria (</strong>一致条件)] タブ: 一致条件を編集または削除します。</li>
+
+            <li><strong class="uicontrol">[Manual Selection</strong> (手動選択)] タブ: API 接続または MCP サーバの説明の横にあるドロップダウンを使用して、保護を変更または削除します。</li>
+
+          </ul>
+
+        </div>
+      </li><li>
+        <span>[ポリシーを保存<strong class="uicontrol">(Save Policy</strong>)] をクリックします。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agentforce_gateway_apply_policies">
+<h1 class="slds-text-heading_large">Agentforce ゲートウェイポリシーの適用</h1>
+  <p>一致条件を定義して、手動または自動でポリシーを適用します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">サポートされるエディションと必要な権限については、「<a title="Agentforce ゲートウェイ ポリシーを使用して、外部 API および Model Context Protocol（MCP）サーバへの接続を保護します。アクセスを制御し、使用制限を設定し、コンプライアンスを確保します。" href="#agentforce_gateway_policies">Agentforce Gateway」</a>を参照してください。</td>
+
+            </tr>
+          </tbody></table></div>
+  
+  <ul><li class="slds-p-bottom_small"><strong><a href="#agentforce_gateway_apply_policies_by_agent">エージェントによるポリシーの適用</a></strong><br>API 接続と MCP サーバー接続でポリシーを適用するエージェントを対象とします。この設定を使用しない場合、接続を保護するポリシーはその接続をコールするすべてのエージェントに適用されます。</li></ul>
+<div id="agentforce_gateway_apply_policies_manually_api" aria-labelledby="ariaid-title2" class="nested1"><a name="agentforce_gateway_apply_policies_manually_api" href="https://help.salesforce.com/s?language=ja"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">API 接続への手動でのポリシーの適用</h2>
+    
+    <p>Policy Builder の [手動選択] タブを使用して、特定の API 接続にポリシーを割り当てます。</p>
+
+      <ol><li>
+          <span>[<strong class="uicontrol">設定]</strong> から、[クイック検索] ボックスに「<kbd>ポリシー」</kbd>と入力し、[<strong class="uicontrol">ポリシー] を</strong>選択します。</span>
+        </li><li>
+          <span>Agentforce Gateway Policies ページで、<strong class="uicontrol">API</strong> タブを選択し、ポリシーを選択します。</span>
+        </li><li>
+          <span>ポリシーの詳細ページで、[<strong class="uicontrol">ビルダーで開く</strong>] を選択します。</span>
+        </li><li>
+          <span>Policy Builder で、サイドバーから [<strong class="uicontrol">Target Entities</strong> <span style="vertical-align:text-bottom;display:inline-block;"><img alt="Policy Builder の対象エンティティの選択。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/rules_gray.png" style="height:16px;width:16px;margin-bottom:0;"></span>] を選択します。</span>
+        </li><li>
+          <span>[Target APIs (対象 API)] ページで、[<strong class="uicontrol">Manual Selection (</strong>手動選択)] タブを選択します。</span>
+        </li><li>
+          <span>[手動選択] で、[<strong class="uicontrol">接続を追加</strong>] を選択します。</span>
+        </li><li>
+          <span>[接続を追加] ダイアログの [API で接続を選択] で、ポリシーを適用する API を選択します。</span>
+          <div>
+            <ul>
+              <li> API のすべての接続にポリシーを適用するには、API 名の横にあるチェックボックスをオンにします。API の [接続] 列が [現在のすべての接続] に更新されます。</li>
+
+              <li> ポリシーを特定の接続に適用するには、[接続] 列のリンクをクリックし、各接続の横にあるチェックボックスをオンにして、[API で接続を選択] ウィンドウに戻ります。[接続] 列のリンクが更新され、選択した接続数が表示されます (例: 2 接続)。</li>
+
+            </ul>
+
+          </div>
+        </li><li>
+          <span>[<strong class="uicontrol">接続を追加</strong>] を選択します。</span>
+          <div>[接続] 列に [現在のすべての接続] リンクがある選択した API の場合、ポリシーはすべての接続に適用されます。選択した API の [接続] 列に多数の接続が表示されている場合、ポリシーは事前選択された接続にのみ適用されます。</div>
+        </li></ol>
+
+    
+  </div>
+
+  <div id="agentforce_gateway_apply_policies_manually_mcp" aria-labelledby="ariaid-title3" class="nested1"><a name="agentforce_gateway_apply_policies_manually_mcp" href="https://help.salesforce.com/s?language=ja"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">MCP Server 接続への手動でのポリシーの適用</h2>
+    
+    <p>Policy Builder の [手動選択] タブを使用して、特定の MCP サーバーにポリシーを割り当てます。</p>
+
+      <div><p>MCP サーバーを登録するときに手動でポリシーを適用することもできます。これらのポリシーは手動で適用するため、新しいサーバー登録には自動的に適用されません。</p></div>
+      <ol><li>
+          <span>[<strong class="uicontrol">設定]</strong> から、[クイック検索] ボックスに「<kbd>ポリシー」</kbd>と入力し、[<strong class="uicontrol">ポリシー] を</strong>選択します。</span>
+        </li><li>
+          <span>Agentforce Gateway Policies ページで、<strong class="uicontrol">MCP Servers</strong> タブを選択し、ポリシーを選択します。</span>
+        </li><li>
+          <span>ポリシーの詳細ページで、[<strong class="uicontrol">Open in Policy Builder</strong>] を選択します。</span>
+        </li><li>
+          <span>Policy Builder で、サイドバーから [<strong class="uicontrol">Target Entities</strong> <span style="vertical-align:text-bottom;display:inline-block;"><img alt="Policy Builder の対象エンティティの選択。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/rules_gray.png" style="height:16px;width:16px;margin-bottom:0;"></span>] を選択します。</span>
+        </li><li>
+          <span>[Target MCP Servers (対象 MCP サーバ)] ページで、[<strong class="uicontrol">Manual Selection (</strong>手動選択)] タブを選択します。</span>
+        </li><li>
+          <span>[Manual Selection (手動選択)] で、[<strong class="uicontrol">Add MCP Servers</strong> (MCP サーバを追加)] を選択します。</span>
+        </li><li>
+          <span>1 つ以上の MCP サーバを選択し、[<strong class="uicontrol">サーバを追加</strong>] をクリックします。</span>
+        </li></ol>
+
+    
+  </div>
+
+  <div id="agentforce_gateway_define_matching_criteria" aria-labelledby="ariaid-title4" class="nested1"><a name="agentforce_gateway_define_matching_criteria" href="https://help.salesforce.com/s?language=ja"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">ポリシーを自動的に適用するための一致条件の定義</h2>
+    
+    <p>1 つのポリシーを複数の MCP サーバーまたは API 接続に自動的に適用するための一致条件を定義します。ポリシーは、条件に一致する既存および将来の登録を保護します。</p>
+
+      <div><p>一致条件により、サーバー保護を自動的に拡張できます。</p></div>
+      <ol><li>
+          <span>[<strong class="uicontrol">設定]</strong> から、[クイック検索] ボックスに「<kbd>ポリシー」</kbd>と入力し、[<strong class="uicontrol">ポリシー] を</strong>選択します。</span>
+        </li><li>
+          <span>Agentforce ゲートウェイの [ポリシー] ページで、ポリシー タイプに応じて [<strong class="uicontrol">APIs</strong>] タブまたは [<strong class="uicontrol">MCP Servers</strong>] タブを選択し、ポリシーを選択します。</span>
+        </li><li>
+          <span>ポリシーの詳細ページで、[<strong class="uicontrol">Open in Policy Builder</strong>] を選択します。</span>
+        </li><li>
+          <span>Policy Builder で、<strong class="uicontrol">［Matching Criteria</strong>］ タブを選択します。</span>
+        </li><li>
+          <span>一致条件を設定します。</span>
+          <div>
+            <ul>
+              <li><strong>適用先:</strong><ul>
+                  <li>API 接続の場合、ポリシーを<strong>すべての条件</strong>を満たす接続または<strong>すべての条件</strong>を満たす接続に適用します。</li>
+
+                  <li>MCP サーバ接続の場合、ポリシーを<strong>すべての条件</strong>を満たす MCP サーバまたは<strong>MCP サーバ</strong>に適用します。</li>
+
+                </ul>
+</li>
+
+              <li><strong>変数:</strong><ul>
+                  <li>API 接続の場合、<strong>API ソース</strong>または <strong>API 参照名</strong>で絞り込みます。</li>
+
+                  <li>MCP サーバの場合は、<strong>MCP Server Source</strong> または <strong>MCP Server Name</strong> で絞り込みます。</li>
+
+                </ul>
+</li>
+
+              <li><strong>演算子:</strong> 条件演算子を選択します。</li>
+
+              <li><strong>値:</strong> 絞り込む値を選択します。この値は大文字と小文字が区別されます。</li>
+
+            </ul>
+
+          </div>
+        </li><li>
+          <span>条件を追加するには、<strong class="uicontrol">[条件を追加]</strong> をクリックします。</span>
+        </li><li>
+          <span>複数のルール間で AND 条件を作成するには、［<strong class="uicontrol">Add Group］</strong> をクリックします。</span>
+        </li><li>
+          <span>[ポリシーを保存<strong class="uicontrol">(Save Policy</strong>)] をクリックします。</span>
+          <div>ポリシーは、指定した条件に一致する現在および将来のすべての MCP サーバーまたは API 接続に自動的に適用されます。</div>
+        </li></ol>
+
+      <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span>  一致条件を作成または編集したり、MCP サーバーまたは API を作成または編集したり、接続を追加したりすると、保護する接続が変更される可能性があります。同期は 15 分間隔で自動的に実行されます。更新をすぐに適用するには、「<a title="API、接続、一致条件、または MCP サーバーの設定後、保護には最大 15 分かかります。" href="#agentforce_gateway_apply_policies">Sync Policy Matching Criteria Immediately</a>」を参照してください。</div></div></div>
+</div>
+    
+  </div>
+
+  <div id="agentforce_gateway_sync_matching_criteria_immediately" aria-labelledby="ariaid-title5" class="nested1"><a name="agentforce_gateway_sync_matching_criteria_immediately" href="https://help.salesforce.com/s?language=ja"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">ポリシー一致条件をすぐに同期</h2>
+    
+    <p>API、接続、一致条件、または MCP サーバーの設定後、保護には最大 15 分かかります。</p>
+
+      <ol><li>
+          <span>ポリシーの詳細ページで、[<strong class="uicontrol">Open in Policy Builder</strong>] の横にあるドロップダウンをクリックします。</span>
+        </li><li>
+          <span>[<strong class="uicontrol">Sync Criteria-Based Policies</strong>] を選択します。</span>
+        </li></ol>
+
+      <div><p>このアクションにより、自動更新を待たずに接続と保護対象間ですべてのポリシー一致条件が同期されます。</p></div>
+    
+  </div>
+
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agentforce_gateway_apply_policies_by_agent">
+<h1 class="slds-text-heading_large">エージェントによるポリシーの適用</h1>
+  <p>API 接続と MCP サーバー接続でポリシーを適用するエージェントを対象とします。この設定を使用しない場合、接続を保護するポリシーはその接続をコールするすべてのエージェントに適用されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">サポートされるエディションと必要な権限については、「<a title="Agentforce ゲートウェイ ポリシーを使用して、外部 API および Model Context Protocol（MCP）サーバへの接続を保護します。アクセスを制御し、使用制限を設定し、コンプライアンスを確保します。" href="#agentforce_gateway_policies">Agentforce Gateway」</a>を参照してください。</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>エージェントのリストを追加したり、エージェントを選択する一致条件を指定したりすると、それらのエージェントのみがポリシーの対象となります。このアクションでは、保護の範囲に焦点を絞り、特定の制限または条件をさまざまなエージェントのセットに選択的に適用できます。</p><p>Policy Builder で、ポリシーを適用するエージェントを設定します。</p><ul>
+        <li><strong>Quota Type by Agent:</strong> [Policy Definition (ポリシー定義)] タブの目標管理ポリシーで、目標をすべての対象エージェントで<strong>共有</strong>するか、<strong>エージェントごとに</strong>共有するかを設定します。この設定は、[エージェント<strong class="uicontrol">(Agents</strong>)] タブを選択したエージェントに適用されます。</li>
+
+        <li>[<strong>エージェント] タブ:</strong> ポリシーを適用するエージェントを選択します。すべての対応可能なエージェント、または手動または一致条件によって選択した特定のエージェントを選択します。</li>
+
+      </ul>
+<p>ポリシーを適用するエージェントを設定したら、［<strong class="uicontrol">Target Agents］</strong> タブの ［Policy Details］ ページで対象エージェントを確認します。</p></div>
+  
+  <div id="agentforce_gateway_configure_target_agents" aria-labelledby="ariaid-title2" class="nested1"><a name="agentforce_gateway_configure_target_agents" href="https://help.salesforce.com/s?language=ja"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">ゲートウェイポリシーの対象エージェントの設定</h2>
+    
+    <p>Policy Builder の ［Agents］ タブを使用して、ポリシーを適用する Agentforce エージェントを定義します。</p>
+
+      <ol><li>
+          <span>[<strong class="uicontrol">設定]</strong> から、[クイック検索] ボックスに「<kbd>ポリシー」</kbd>と入力し、[<strong class="uicontrol">ポリシー] を</strong>選択します。</span>
+        </li><li>
+          <span>Agentforce ゲートウェイの [ポリシー] ページで、[<strong class="uicontrol">API</strong>s] タブまたは [<strong class="uicontrol">MCP Servers</strong>] タブを選択し、ポリシーを選択します。</span>
+        </li><li>
+          <span>ポリシーの詳細ページで、[<strong class="uicontrol">Open in Policy Builder</strong>] をクリックします。</span>
+        </li><li>
+          <span>サイドバーから、[<strong class="uicontrol">エージェント</strong>] タブを選択します。</span>
+        </li><li>
+          <span>ポリシーを適用するエージェントを選択します。</span>
+          <div>
+            <ul>
+              <li><strong>すべての対応</strong>可能なエージェント: ポリシーは、一致条件を満たす現在および将来のすべてのエージェントに適用されます。たとえば、組織内のすべてのエージェントに適用されます。このオプションは、保護された接続を使用するすべてのエージェントを 1 つのポリシーで対象とする場合に使用します。</li>
+
+              <li><strong>特定のエージェント:</strong> すべての対応可能なエージェントのリストから個々のエージェントを選択します。このポリシーは、選択したエージェントにのみ適用されます。</li>
+
+            </ul>
+
+          </div>
+        </li><li>
+          <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+        </li></ol>
+
+      <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span>  ポリシーを適用するには、<strong>特定のエージェント</strong>を使用するときに少なくとも 1 つのエージェントを選択します。このポリシーは、エージェントを追加するまで適用されません。</div></div></div>
+</div>
+    
+  </div>
+
+  <div id="agentforce_gateway_view_target_agents" aria-labelledby="ariaid-title3" class="nested1"><a name="agentforce_gateway_view_target_agents" href="https://help.salesforce.com/s?language=ja"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">ゲートウェイポリシーの対象エージェントの表示</h2>
+    
+    <p>[Policy Details (ポリシーの詳細)] ページから、ポリシーの対象となるエージェントを表示します。</p>
+
+      <ol><li>
+          <span>[<strong class="uicontrol">設定]</strong> から、[クイック検索] ボックスに「<kbd>ポリシー」</kbd>と入力し、[<strong class="uicontrol">ポリシー] を</strong>選択します。</span>
+        </li><li>
+          <span>Agentforce Gateway Policies ページで、<strong class="uicontrol">API</strong> または <strong class="uicontrol">MCP Servers</strong> タブを選択します。</span>
+        </li><li>
+          <span>ポリシーを選択して、ポリシーの詳細ページを開きます。</span>
+        </li><li>
+          <span>[<strong class="uicontrol">Target Agents (対象エージェント</strong>)] タブを開きます。</span>
+        </li></ol>
+
+      <div><p>このタブには、ポリシーが適用されるエージェントが表示されます。エージェント名は Agentforce エージェントの詳細ページにリンクします。リストには、手動で選択した条件または一致条件が反映されます。ポリシーを変更するか、新しいエージェントが条件に一致すると、手動で更新したとき、または定期的に更新したときにリストが更新されます。</p></div>
+    
+  </div>
+
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agentforce_gateway_create_policy">
+<h1 class="slds-text-heading_large">Agentforce ゲートウェイポリシーの作成</h1>
+  <p>事前作成済みテンプレートからポリシーを作成し、いくつかの簡単な手順に従ってガバナンスのニーズに合った新しいポリシーを作成します。ポリシーをすぐに適用することも、保存して後で適用することもできます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">サポートされるエディションと必要な権限については、「<a title="Agentforce ゲートウェイ ポリシーを使用して、外部 API および Model Context Protocol（MCP）サーバへの接続を保護します。アクセスを制御し、使用制限を設定し、コンプライアンスを確保します。" href="#agentforce_gateway_policies">Agentforce Gateway」</a>を参照してください。</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>API 接続と MCP サーバー接続のどちらを保護しているかに応じて、異なるテンプレートを使用できます。「<a title="ポリシーを作成するには、テンプレートから開始します。使用可能なテンプレートは、API と MCP のどちらのサーバー接続を保護しているかによって異なります。" href="#agentforce_gateway_policy_templates">Agentforce Gateway Policy Templates</a>」を参照してください。</p></div>
+    <ol><li>
+        <span>[<strong class="uicontrol">設定]</strong> から、[クイック検索] ボックスに「<kbd>ポリシー」</kbd>と入力し、[<strong class="uicontrol">ポリシー] を</strong>選択します。</span>
+      </li><li>
+        <span>Agentforce ゲートウェイの [ポリシー] ページで、[<strong class="uicontrol">新規] を</strong>選択します。</span>
+      </li><li>
+        <span>Policy Builder で、API 接続の場合は [<strong class="uicontrol">APIs</strong>] タブ、MCP サーバ接続の場合は [<strong class="uicontrol">MCP Servers</strong>] タブを選択します。</span>
+      </li><li>
+        <span>ポリシーテンプレートを選択します。</span>
+      </li><li>
+        <span>[<strong class="uicontrol">続行]</strong> を選択します。</span>
+      </li><li>
+        <span>[Policy Definition (ポリシー定義)] ページで、必要なポリシー情報を入力します。</span>
+      </li><li>
+        <span>保存して後で適用するには、<strong class="uicontrol">[保存]</strong> をクリックします。</span>
+      </li><li>
+        <span>すぐに適用するには、サイドバーから ［<strong class="uicontrol">Target Entities</strong> <span style="vertical-align:text-bottom;display:inline-block;"><img alt="Policy Builder の対象エンティティの選択。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/rules_gray.png" style="height:16px;width:16px;margin-bottom:0;"></span> を選択し、「 <a title="一致条件を定義して、手動または自動でポリシーを適用します。" href="#agentforce_gateway_apply_policies">Agentforce Gateway Policy</a> の適用 」の手順を実行します。</span>
+      </li></ol>
+
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#agentforce_gateway_policy_templates">Agentforce ゲートウェイ ポリシー テンプレート</a></strong><br>ポリシーを作成するには、テンプレートから開始します。使用可能なテンプレートは、API と MCP のどちらのサーバー接続を保護しているかによって異なります。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agentforce_gateway_default_policy_execution_order">
+<h1 class="slds-text-heading_large">Agentforce ゲートウェイのデフォルトのポリシー実行順序</h1>
+  <p>デフォルトのポリシー実行順序により、意図したとおりに接続が保護されます。実行順序は、ポリシー種別、適用方法、タイムスタンプに基づきます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">サポートされるエディションについては、「<a title="Agentforce ゲートウェイ ポリシーを使用して、外部 API および Model Context Protocol（MCP）サーバへの接続を保護します。アクセスを制御し、使用制限を設定し、コンプライアンスを確保します。" href="#agentforce_gateway_policies">Agentforce Gateway</a>」を参照してください。</td>
+
+          </tr>
+        </tbody></table>
+    <ul>
+      <li><strong>ポリシーテンプレートの優先度:</strong><ul>
+          <li><strong>API 接続:</strong> アクセス制限ポリシーは、目標管理よりも優先されます。</li>
+
+          <li><strong>MCP サーバ接続:</strong> MCP 属性ベースのアクセス制御ポリシーは MCP 目標管理よりも優先されます。</li>
+
+        </ul>
+</li>
+
+      <li><strong>同じポリシー タイプ：</strong>同じタイプの複数のポリシーが適用される場合、手動で適用したポリシーが規則ベースのポリシーよりも優先されます。</li>
+
+      <li><strong>同じ適用方法:</strong> ポリシーの種別と適用方法が同じ場合、最新のタイムスタンプを持つポリシーが優先されます。</li>
+
+    </ul>
+
+    <p>手動選択とルール方法が重複し、同じポリシーが 2 回接続に適用される場合、ポリシーは 1 回のみ実行されます。</p>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> デフォルトのポリシーの順序は変更できません。</div></div></div>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agentforce_gateway_delete_policies">
+<h1 class="slds-text-heading_large">Agentforce ゲートウェイ ポリシーの削除</h1>
+  <p>不要になったポリシーは削除できます。ポリシーを削除すると、関連付けられたすべての接続とエージェントから保護が削除されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">サポートされるエディションと必要な権限については、「<a title="Agentforce ゲートウェイ ポリシーを使用して、外部 API および Model Context Protocol（MCP）サーバへの接続を保護します。アクセスを制御し、使用制限を設定し、コンプライアンスを確保します。" href="#agentforce_gateway_policies">Agentforce Gateway」</a>を参照してください。</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>[<strong class="uicontrol">設定]</strong> から、[クイック検索] ボックスに「<kbd>ポリシー」</kbd>と入力し、[<strong class="uicontrol">ポリシー] を</strong>選択します。</span>
+      </li><li>
+        <span>Agentforce Gateway Policies ページで、<strong class="uicontrol">API</strong> または <strong class="uicontrol">MCP Servers</strong> タブを選択します。</span>
+      </li><li>
+        <span>次のいずれかの方法で削除します。</span>
+        <div>
+          <ul>
+            <li>ポリシー名の横にあるドロップダウンをクリックし、<strong class="uicontrol">［Delete］</strong> をクリックします。</li>
+
+            <li>保険契約の詳細ページを開きます。[<strong class="uicontrol">Open in Policy Builder</strong> (Policy Builder で開く)] の横にあるドロップダウンを選択し、[<strong class="uicontrol">Delete Policy (</strong>ポリシーを削除)] を選択します。</li>
+
+          </ul>
+
+        </div>
+      </li><li>
+        <span><strong class="uicontrol">[削除]</strong> をクリックします。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agentforce_gateway_edit_policies">
+<h1 class="slds-text-heading_large">Agentforce ゲートウェイ ポリシーの編集</h1>
+  <p>Policy Builder でポリシーの詳細と設定を編集します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">サポートされるエディションと必要な権限については、「<a title="Agentforce ゲートウェイ ポリシーを使用して、外部 API および Model Context Protocol（MCP）サーバへの接続を保護します。アクセスを制御し、使用制限を設定し、コンプライアンスを確保します。" href="#agentforce_gateway_policies">Agentforce Gateway」</a>を参照してください。</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>[<strong class="uicontrol">設定]</strong> から、[クイック検索] ボックスに「<kbd>ポリシー」</kbd>と入力し、[<strong class="uicontrol">ポリシー] を</strong>選択します。</span>
+      </li><li>
+        <span>Agentforce Gateway Policies ページで、<strong class="uicontrol">API</strong> または <strong class="uicontrol">MCP Servers</strong> タブを選択します。</span>
+      </li><li>
+        <span>編集するポリシーを選択し、［<strong class="uicontrol">Open in Policy Builder</strong>］ をクリックします。</span>
+      </li><li>
+        <span>ポリシー定義と設定を編集し、<strong class="uicontrol">[Save Policy</strong> (ポリシーを保存)] をクリックします。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agentforce_gateway_manage_policies">
+<h1 class="slds-text-heading_large">Agentforce ゲートウェイポリシーの管理</h1>
+  <p>デフォルトのポリシー実行順序と既存のポリシーの管理方法を理解します。ポリシーの詳細を編集したり、保護する接続や対象とするエージェントを調整したりできます。</p>
+
+    <p>ポリシーを制御して、接続が保護され、ガバナンス戦略が維持されるようにします。</p>
+    <ul>
+      <li><a title="デフォルトのポリシー実行順序により、意図したとおりに接続が保護されます。実行順序は、ポリシー種別、適用方法、タイムスタンプに基づきます。" href="#agentforce_gateway_default_policy_execution_order">Agentforce ゲートウェイのデフォルトのポリシー実行順序</a></li>
+
+      <li><a title="Policy Builder でポリシーの詳細と設定を編集します。" href="#agentforce_gateway_edit_policies">Agentforce ゲートウェイ ポリシーの編集</a></li>
+
+      <li><a title="Policy Builder で一致条件または手動選択を編集して、ポリシーに接続を追加または削除します。" href="#agentforce_gateway_add_remove_connection_protection">Agentforce ゲートウェイ ポリシーの接続保護の追加または削除</a></li>
+
+      <li><a title="不要になったポリシーは削除できます。ポリシーを削除すると、関連付けられたすべての接続とエージェントから保護が削除されます。" href="#agentforce_gateway_delete_policies">Agentforce ゲートウェイ ポリシーの削除</a></li>
+
+    </ul>
+
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#agentforce_gateway_default_policy_execution_order">Agentforce ゲートウェイのデフォルトのポリシー実行順序</a></strong><br>デフォルトのポリシー実行順序により、意図したとおりに接続が保護されます。実行順序は、ポリシー種別、適用方法、タイムスタンプに基づきます。</li><li class="slds-p-bottom_small"><strong><a href="#agentforce_gateway_edit_policies">Agentforce ゲートウェイ ポリシーの編集</a></strong><br>Policy Builder でポリシーの詳細と設定を編集します。</li><li class="slds-p-bottom_small"><strong><a href="#agentforce_gateway_add_remove_connection_protection">Agentforce ゲートウェイ ポリシーの接続保護の追加または削除</a></strong><br>Policy Builder で一致条件または手動選択を編集して、ポリシーに接続を追加または削除します。</li><li class="slds-p-bottom_small"><strong><a href="#agentforce_gateway_delete_policies">Agentforce ゲートウェイ ポリシーの削除</a></strong><br>不要になったポリシーは削除できます。ポリシーを削除すると、関連付けられたすべての接続とエージェントから保護が削除されます。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agentforce_gateway_policies">
+<h1 class="slds-text-heading_large">Agentforce ゲートウェイ</h1>
+  <p>Agentforce ゲートウェイ ポリシーを使用して、外部 API および Model Context Protocol（MCP）サーバへの接続を保護します。アクセスを制御し、使用制限を設定し、コンプライアンスを確保します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <p>Policy Builder は、次の接続種別で同じように動作します。</p>
+    <ul>
+      <li><strong>Model Context Protocol server connections：</strong>Agentforce エージェントと MCP サーバ間の接続を保護します。</li>
+
+      <li><strong>API 接続:</strong> MuleSoft for Agentforce: API Catalog for Salesforce で API の API エージェントインタラクションを保護します。</li>
+
+    </ul>
+
+    <p>どちらの場合も、テンプレートからポリシーを作成し、手動または一致条件を使用して接続に適用します。実行順序、編集、削除を同じページから管理します。</p>
+    <table summary="使用可能なエディション" class="slds-table slds-table_bordered slds-m-bottom_small edition"><caption>使用可能なエディション</caption><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+          </tr>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition (<strong>Foundations</strong> Edition または <strong>Agentforce 1</strong> Edition 付属)</td>
+
+          </tr>
+        </tbody></table>
+    <table summary="ユーザー権限" class="slds-table slds-table_bordered slds-m-bottom_small permission"><caption>ユーザー権限</caption><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">Agentforceエージェントを作成および管理するには、<strong>アプリケーションのカスタマイズ</strong>、または<strong>AIエージェントの管理</strong>と<a target="_blank" href="agentforce_general-3.html#agent_setup_explore_types">エージェント タイプ</a>の権限の両方が必要です。</td>
+
+          </tr>
+        </tbody></table>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 営業担当のドラフトモードでは保護を使用できません。</div></div></div>
+
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#agentforce_gateway_create_policy">Agentforce ゲートウェイポリシーの作成</a></strong><br>事前作成済みテンプレートからポリシーを作成し、いくつかの簡単な手順に従ってガバナンスのニーズに合った新しいポリシーを作成します。ポリシーをすぐに適用することも、保存して後で適用することもできます。</li><li class="slds-p-bottom_small"><strong><a href="#agentforce_gateway_apply_policies">Agentforce ゲートウェイポリシーの適用</a></strong><br>一致条件を定義して、手動または自動でポリシーを適用します。</li><li class="slds-p-bottom_small"><strong><a href="#agentforce_gateway_manage_policies">Agentforce ゲートウェイポリシーの管理</a></strong><br>デフォルトのポリシー実行順序と既存のポリシーの管理方法を理解します。ポリシーの詳細を編集したり、保護する接続や対象とするエージェントを調整したりできます。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agentforce_gateway_policy_templates">
+<h1 class="slds-text-heading_large">Agentforce ゲートウェイ ポリシー テンプレート</h1>
+  <p>ポリシーを作成するには、テンプレートから開始します。使用可能なテンプレートは、API と MCP のどちらのサーバー接続を保護しているかによって異なります。</p>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">API 接続のテンプレート</h2><p>発信通話量を制限し、特定の HTTP メソッドまたはパスへのアクセスを制限することで、API トラフィックとセキュリティを管理します。リソースの枯渇を防ぎ、エージェントがセキュリティ要件に従って承認されたエンドポイントのみを操作できるようにします。</p><p>
+      </p><div>
+        <p><strong>目標管理ポリシーテンプレート</strong></p>
+        <p>目標管理ポリシーテンプレートは、API 接続と MCP サーバー接続の両方で使用できます。指定された期間中にエージェントが送信できる要求の数を制限することで、発信通話を選択された接続に制限します。次の設定を行うことができます。</p>
+        <ul>
+          <li><strong>Call Limit:</strong>指定した期間内でポリシーで許可されるコールの最大数。</li>
+
+          <li><strong>Time Interval:</strong>指定したコール制限が適用される期間。</li>
+
+          <li><strong>Quota Type by API Operation (</strong>API 操作別の目標種別): API 操作間で目標がどのように配分されるか。<ul>
+              <li><strong>共有:</strong> すべての操作で共有される 1 つの目標。たとえば、1 秒あたり 100 件のコールを複数の操作で共有する場合、操作 A で 50 件を使用すると、残りの操作は合計で 50 件になります。</li>
+
+              <li><strong>API 操作ごと:</strong> 各操作の個別の制限。たとえば、制限が 1 秒あたり 100 コールの場合、各操作では 1 秒あたり 100 コールが許可されます。</li>
+
+            </ul>
+</li>
+
+          <li><strong>Quota Type by Agent (</strong>エージェント別の目標種別): 目標エージェント間の配分方法:<ul>
+              <li><strong>共有:</strong>AA の単一割り当てがすべてのエージェントで共有されます。たとえば、1 秒あたり 100 件の通話があり、エージェント A が 50 件を使用した場合、エージェント B と C を合わせて 50 件残っています。</li>
+
+              <li><strong>エージェントごと:</strong> 各エージェントの個別の制限。たとえば、エージェントごとに 1 秒あたり 100 件の通話がある場合、エージェント A、B、C はそれぞれ独立して 1 秒あたり 100 件の通話を行うことができます。</li>
+
+            </ul>
+</li>
+
+        </ul>
+
+      </div>
+      <div>
+        <p><strong>制限付きアクセスポリシーテンプレート</strong></p>
+        <p>[アクセス制限] ポリシーテンプレートは API 接続にのみ適用されます。Flex Gateway で許可される HTTP パスとメソッドが制限されます。次の設定を行うことができます。</p>
+        <ul>
+          <li><strong>Methods:</strong> 制限する HTTP メソッド。</li>
+
+          <li><strong>パス:</strong> 制限するパス。このフィールドでは文字列パスがサポートされ、ワイルドカード<code>*</code>は任意のセグメントに一致します。たとえば、<code>/users/*/details</code> は <code>/users/123/details</code> または <code>/users/john/details</code> と一致します。デフォルトでは、<code>*</code> はすべてのパスを意味します。</li>
+
+        </ul>
+
+        <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> API 接続の場合、ポリシーに API 接続がないと無効になります。一致条件が設定されている場合に有効になります。</div></div></div>
+
+      </div>
+    <p></p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">MCP Server 接続のテンプレート</h2><p>目標および属性ベースのポリシーテンプレートを適用して、MCP サーバー接続の送信要求量とツールレベルのアクセスを制御します。安定したサーバーパフォーマンスを確保し、未承認のエージェントが制限されたツールを実行できないようにします。</p><p>
+      </p><div>
+        <p><strong>目標管理ポリシーテンプレート</strong></p>
+        <p>目標管理ポリシーテンプレートは、API 接続と MCP サーバー接続の両方で使用できます。指定された期間中にエージェントが送信できる要求の数を制限することで、発信通話を選択された接続に制限します。次の設定を行うことができます。</p>
+        <ul>
+          <li><strong>Call Limit:</strong>指定した期間内でポリシーで許可されるコールの最大数。</li>
+
+          <li><strong>Time Interval:</strong>指定したコール制限が適用される期間。</li>
+
+          <li><strong>Quota Type by Tool</strong> (ツール別の目標種別): MCP ツール間で目標がどのように配分されるか:<ul>
+              <li><strong>共有:</strong> すべてのツールで共有される個々の目標。たとえば、1 秒あたり 100 件の通話をツールで共有する場合、ツール A で 50 件を使用すると、残りのツールは合計で 50 件残ります。</li>
+
+            <li><strong>ツールごと:</strong> 各ツールの個別の制限。たとえば、制限が 1 秒あたり 100 コールの場合、各ツールでは 1 秒あたり 100 コールが許可されます。</li>
+
+            </ul>
+</li>
+
+          <li><strong>Quota Type by Agent (</strong>エージェント別の目標種別): 目標エージェント間の配分方法:<ul>
+              <li><strong>共有:</strong> すべてのエージェントが 1 つの制限を共有します。たとえば、1 秒あたり 100 件の通話があり、エージェント A が 50 件を使用した場合、エージェント B と C を合わせて 50 件残っています。</li>
+
+              <li><strong>エージェントごと:</strong> 各エージェントの個別の制限。たとえば、エージェントごとに 1 秒あたり 100 件の通話がある場合、エージェント A、B、C はそれぞれ独立して 1 秒あたり 100 件の通話を行うことができます。</li>
+
+            </ul>
+</li>
+
+        </ul>
+
+      </div>
+      <div>
+        <p><strong>MCP 属性ベースのアクセス制御ポリシーテンプレート</strong></p>
+        <p>MCP 属性ベースのアクセス制御ポリシーテンプレートは、MCP サーバー接続でのみ使用できます。MCP Server ツールへのエージェントのアクセスをツール名で制御します。MCP サーバーで特定のツールを許可またはブロックします。</p>
+      </div>
+    <p></p></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agentforce_grid">
+<h1 class="slds-text-heading_large">Agentforceグリッド</h1>
+  <p>Agentforce Gridは、Salesforce内でAIソリューションをすばやくテストするためのスプレッドシートのような強力なツールです。未加工データからインサイト、そしてアクションへと進むために、各列が最後の列で構築される AI ワークフローを作成します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition。<a title="特定のクラウドと一般的な使用事例のエージェント種別とデフォルトテンプレートについて説明します。" href="agentforce_general-3.html#agent_setup_explore_types">必要なアドオンライセンスはエージェント種別によって異なります。</a></td>
+
+            </tr>
+          </tbody></table>
+    
+    <p>Agentforce Gridは、使い慣れたスプレッドシート レイアウト(ワークブックとワークシートに整理)に基づいていますが、AI向けに再設計されています。このスマートワークスペースでは、行はジョブを表し、列は動的な連続アクションとして機能します。ワークフローは左から右に処理され、データとアクション列が使用されます。データ列は標準 Salesforce オブジェクトまたは Data Cloud データモデルオブジェクトを照会し、アクション列は数式の計算、レコードの更新などを行います。アクション列には、LLM コンテンツの生成やエージェントの実行ができる AI 列も含まれます。</p>
+    <p>Salesforce 式言語を使用する数式で実行条件を指定して、任意の列を条件付きで実行できます。実行条件では、リソースを大量に消費する AI ステップが特定の条件を満たす行でのみ実行されるようにします。また、 でこれらの操作を実行する前に、組み込みの Billing Calculator で Flex Credit 使用量の行あたりのリアルタイムのクレジット数の推定を確認します。AI、エージェント、プロンプトテンプレートの列のコストへの影響を積極的に測定できます。</p>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agentforce_grid_columns">
+<h1 class="slds-text-heading_large">グリッド列</h1>
+ <p>グリッドでは、データ列を使用して CRM と Data 360 データを接続したり、アクション列を使用してデータを操作したりします。列は左から右に積み上げられます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+  <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition。<a title="特定のクラウドと一般的な使用事例のエージェント種別とデフォルトテンプレートについて説明します。" href="agentforce_general-3.html#agent_setup_explore_types">必要なアドオンライセンスはエージェント種別によって異なります。</a></td>
+
+            </tr>
+          </tbody></table>
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">データ列</h2><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d137499e78" style="vertical-align:top;" class="slds-cell-wrap" scope="col">列</th>
+       <th id="d137499e81" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d137499e78" style="vertical-align:top;" class="slds-cell-wrap" data-label="列">データモデルオブジェクト</td>
+
+       <td headers="d137499e81" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><span>Data 360</span> からデータを取り込みます。</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d137499e78" style="vertical-align:top;" class="slds-cell-wrap" data-label="列">オブジェクト</td>
+
+       <td headers="d137499e81" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">CRM データを取り込む</td>
+
+      </tr>
+     </tbody></table></div>
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">アクション列</h2><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d137499e126" style="vertical-align:top;" class="slds-cell-wrap" scope="col">列</th>
+       <th id="d137499e129" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d137499e126" style="vertical-align:top;" class="slds-cell-wrap" data-label="列">エージェント</td>
+
+       <td headers="d137499e129" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">既存の Agentforce Agent を取り込む</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d137499e126" style="vertical-align:top;" class="slds-cell-wrap" data-label="列">エージェントテスト</td>
+
+       <td headers="d137499e129" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">テスト発言を使用してエージェントを一括テストする</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d137499e126" style="vertical-align:top;" class="slds-cell-wrap" data-label="列">AI</td>
+
+       <td headers="d137499e129" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">インラインプロンプトを作成し、LLM を使用してコンテンツを生成、要約、または抽出する</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d137499e126" style="vertical-align:top;" class="slds-cell-wrap" data-label="列">評価</td>
+
+       <td headers="d137499e129" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">エージェントおよびプロンプトテンプレートを評価するための評価と総計値が含まれる </td>
+
+      </tr>
+      <tr class="">
+       <td headers="d137499e126" style="vertical-align:top;" class="slds-cell-wrap" data-label="列">Formula</td>
+
+       <td headers="d137499e129" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Salesforce 式言語を使用してカスタム式を作成する</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d137499e126" style="vertical-align:top;" class="slds-cell-wrap" data-label="列">呼び出し可能アクション</td>
+
+       <td headers="d137499e129" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">標準およびカスタムの呼び出し可能なアクションにアクセスする</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d137499e126" style="vertical-align:top;" class="slds-cell-wrap" data-label="列">ルックアップ</td>
+
+       <td headers="d137499e129" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">関連レコードのインポート</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d137499e126" style="vertical-align:top;" class="slds-cell-wrap" data-label="列">プロンプトテンプレート</td>
+
+       <td headers="d137499e129" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">プロンプトビルダーから既存のプロンプトテンプレートを追加する</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d137499e126" style="vertical-align:top;" class="slds-cell-wrap" data-label="列">テキスト</td>
+
+       <td headers="d137499e129" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">独自のテキストを追加する書き込み可能なスペースを作成する</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d137499e126" style="vertical-align:top;" class="slds-cell-wrap" data-label="列">レコードを更新</td>
+
+       <td headers="d137499e129" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ワークシートの値を CRM の項目に書き戻します。 </td>
+
+      </tr>
+      <tr class="">
+       <td headers="d137499e126" style="vertical-align:top;" class="slds-cell-wrap" data-label="列">Web 検索</td>
+
+       <td headers="d137499e129" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">LLM を使用して関連するコンテンツを Web で検索する</td>
+
+      </tr>
+     </tbody></table></div>
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">列の設定</h2><p>すべての列に次の項目が含まれます。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d137499e256" style="vertical-align:top;" class="slds-cell-wrap" scope="col">項目</th>
+       <th id="d137499e259" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d137499e256" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">列の名前</td>
+
+       <td headers="d137499e259" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">列の名前。列を編集して名前を変更できます。</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d137499e256" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">実行設定</td>
+
+       <td headers="d137499e259" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ワークシートの更新および実行条件の追加時に列を自動的に実行するオプション。</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d137499e256" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">適用モード</td>
+
+       <td headers="d137499e259" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>Run Per Row (行ごとに実行): このモードは、別の列のデータを参照する場合、またはすべての行で同じ値を複製する場合に使用します。</p><p style="margin-bottom:0;"> インポート: このモードは、項目のリストを生成または照会していて、結果のリストを異なる行に分割する場合に使用します。</p></td>
+
+      </tr>
+     </tbody></table></div>
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">参照列</h2><p>列を参照して列に対して照会します。列を参照するには、列を @メンションするか、SOQL で作業している場合は値を文字列として渡します。次に例を示します。</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>SELECT Id, Subject, Status, Priority, ActivityDate, OwnerId, WhatId, CreatedDate
+FROM Task
+WHERE WhatId = '{Account.ID}'
+ORDER BY CreatedDate DESC</code></pre><p>必要な参照を取得できるように、構文が正しいことを確認します。たとえば、{columnName.field} は特定の JSON キーを参照し、{columnName} はセルデータ全体を渡します。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> 
+    <p>SOQL で一部の数式を使用する場合は、型の一貫性を維持するために参照を文字列として書式設定します。例: 「{Account.Id}」。</p>
+   </div></div></div>
+</div>
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">列の JSON</h2><p>多くの列の型には構造化 JSON ビューが含まれます。</p><ul>
+    <li>Salesforce</li>
+
+    <li>データモデルオブジェクト</li>
+
+    <li>ルックアップ</li>
+
+    <li>プロンプトテンプレート</li>
+
+    <li>エージェント</li>
+
+    <li>評価</li>
+
+    <li>呼び出し可能アクション</li>
+
+   </ul>
+<p>JSON を表示するには、列のセルをクリックしてプレビューパネルを開き、<strong class="uicontrol">［JSON］ を</strong>クリックします。このインタラクティブビューアーを使用して、キーと値を検索します。<strong class="uicontrol">［+］</strong> をクリックして新しい列に値を抽出することもできます。</p></div>
+ 
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agentforce_grid_create_worksheet">
+<h1 class="slds-text-heading_large">グリッドワークシートの作成</h1>
+ 
+ <p>Einsteinを有効にして権限をユーザーに割り当てたら、ソリューションの探索を開始できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+  <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition。<a title="特定のクラウドと一般的な使用事例のエージェント種別とデフォルトテンプレートについて説明します。" href="agentforce_general-3.html#agent_setup_explore_types">必要なアドオンライセンスはエージェント種別によって異なります。</a></td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d65565e79" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d65565e79" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">グリッドワークシートを作成および変更する</td>
+
+       <td headers="d65565e79" style="vertical-align:top;" class="slds-cell-wrap">Agentforce グリッドの管理</td>
+
+      </tr>
+     </tbody></table></div>
+  <ol><li>
+    <span>アプリケーションランチャーで、[Agentforce Grid]を見つけて選択します。</span>
+   </li><li>
+    <span>[<strong class="uicontrol">Create Grid (グリッド</strong>を作成)] をクリックします。</span>
+   </li><li>
+    <span>名前を入力します。必要に応じて、[ホーム] タブのグリッドのリストに表示される説明を追加します。</span>
+   </li><li>
+    <span><strong class="uicontrol">[作成]</strong> をクリックします。</span>
+   </li><li>
+    <span>最初の列の入力に使用する内容を選択します。</span>
+    <div>
+     <ul>
+      <li>Salesforce は CRM レコードを照会します。</li>
+
+      <li>Data Cloud は <span>Data 360</span> レコードを照会します。</li>
+
+      <li>AI は LLM を使用してデータを生成します。</li>
+
+      <li>エージェントが Agentforce エージェントを実行します。</li>
+
+      <li>CSV ファイルから独自のデータをアップロードすることもできます。</li>
+
+     </ul>
+
+    </div>
+   </li><li>
+    <span>データの準備ができたら、データの追加と実験を開始できます。</span>
+    <div>
+     <ul>
+      <li>さらに列を作成するには、[<strong class="uicontrol">+列を追加</strong>] をクリックします。</li>
+
+      <li>ある列のデータを参照し、別の列の入力として使用するには、別の列で @メンションします。</li>
+
+      <li>列の詳細を表示したり、データを並び替えたり、編集または削除したりするには、列ヘッダーをクリックします。</li>
+
+      <li>ワークシートをエクスポートまたは削除したり、CSV ファイルをアップロードしたりするには、オプションアイコンをクリックします。
+       <div style="text-align:left;"><img alt="3 つのドットのオプションアイコンと、[CSV からインポート]、[エクスポート]、[ワークシートを削除] のオプションが表示されたドロップダウンリストが表示されている画面スニペット。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/grid_options_icon.png"></div></li>
+
+      <li>新しいワークシートタブをグリッドに追加するには、[<strong class="uicontrol">+]</strong> をクリックします。</li>
+
+      <li>ワークシートの名前を変更するには、タブ名をダブルクリックします。</li>
+
+      <li>セルを変更するには、ダブルクリックしてテキストを変更します。</li>
+
+      <li>列でデータを実行するには、列パネルで [保存 &amp; 実行(<strong class="uicontrol">Save and Run</strong>)] を保存するか、列メニューで [この列の<strong class="uicontrol">すべてのセル</strong>を更新(Update All Cells in this Column)] をクリックします。</li>
+
+      <li>セルでデータを実行するには、実行ボタンをクリックします。</li>
+
+      <li>行のデータを実行するには、行を選択して [<strong class="uicontrol">実行] を</strong>クリックします。</li>
+
+      <li>ワークシート全体のデータを実行するには、すべての行を選択して、[<strong class="uicontrol">実行] を</strong>クリックします。</li>
+
+     </ul>
+
+    </div>
+   </li></ol>
+
+ 
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agentforce_grid_set_up">
+<h1 class="slds-text-heading_large">Agentforce グリッドの設定</h1>
+ 
+ <p>グリッドの使用を開始するには、まずEinsteinを有効にして必要な権限を割り当てます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+  <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition。<a title="特定のクラウドと一般的な使用事例のエージェント種別とデフォルトテンプレートについて説明します。" href="agentforce_general-3.html#agent_setup_explore_types">必要なアドオンライセンスはエージェント種別によって異なります。</a></td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d120774e79" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d120774e79" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">権限セットを割り当てる</td>
+
+       <td headers="d120774e79" style="vertical-align:top;" class="slds-cell-wrap">「権限セットの割り当て」</td>
+
+      </tr>
+     </tbody></table></div>
+  <ol><li>
+    <span>[設定] から、[クイック検索] ボックスに「<kbd>Einstein 設定」</kbd>と入力し、[<strong class="uicontrol">Einstein 設定</strong>] を選択します。</span>
+   </li><li>
+    <span><strong class="uicontrol">Einstein を有効</strong>にします。</span>
+   </li><li>
+    <span>[設定] の [クイック検索] ボックスに<kbd>「権限セット」</kbd>と入力し、<strong class="uicontrol">[権限セット]</strong> を選択します。</span>
+   </li><li>
+    <span><strong class="uicontrol">[新規]</strong> をクリックします。</span>
+   </li><li>
+    <span>権限セット情報を入力します。</span>
+   </li><li>
+    <span>権限セットのユーザー種別を選択します。特定のユーザーまたは権限セットライセンスを選択します。または、異なるライセンスを持つユーザーを権限セットに割り当てる場合は、[<strong class="uicontrol">なし] を</strong>選択します。</span>
+   </li><li>
+    <span>「Agentforce グリッドの管理」権限を追加します。</span>
+   </li><li>
+    <span>権限セットをユーザーに割り当てます。</span>
+   </li></ol>
+
+  <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 
+    <p>プロンプトテンプレートをオプションとして含めるには、ユーザーに「プロンプトテンプレートマネージャー」または「プロンプトテンプレートユーザー」権限セットも付与されていることを確認します。</p>
+   </div></div></div>
+</div>
+ 
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="agentforce_grid_troubleshooting">
+<h1 class="slds-text-heading_large">Agentforce グリッドのトラブルシューティングとヒント</h1>
+  <p>Grid の使用を開始するときに使用するヒントを次に示します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition。<a title="特定のクラウドと一般的な使用事例のエージェント種別とデフォルトテンプレートについて説明します。" href="agentforce_general-3.html#agent_setup_explore_types">必要なアドオンライセンスはエージェント種別によって異なります。</a></td>
+
+            </tr>
+          </tbody></table>
+    <ul>
+      <li>ワークシートには最大 1,000 行を含めることができます。</li>
+
+      <li>セルが更新されない場合は、約 30 秒待ってからページを更新します。</li>
+
+      <li>リッチテキスト書式設定が必要な場合は、AI を使用してテキストを HTML に変換します。</li>
+
+      <li>関連レコードをインポートするには、参照列を使用します。</li>
+
+      <li>思いどおりのパフォーマンスやコストが得られない場合は、モデルを切り替えてみてください。</li>
+
+      <li>AI プロンプトで指示的になります。プロンプトの指示とデータを明確に分離します。たとえば、次のプロンプトを使用します。<p>ToDo のリストが表示されます。ToDo の説明と期日に基づいて、優先度が最も高い ToDo を特定します。ToDo のリストを次に示します。{ToDo list}</p> このプロンプトの代わりに:<p>{ToDo リスト} を集計し、優先度が最も高い ToDo を特定します。</p></li>
+
+      <li>F6 キーを使用して、ワークシートヘッダー、グリッド、サイドパネル間を移動します。</li>
+
+    </ul>
+
+  
+</div></div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="agentforce_general-3.html">&larr; Agentforce 全般 / セットアップ（3/4）</a><a href="prompt_builder-1.html">プロンプトビルダー（1/3） &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=ai.copilot_intro.htm&type=5&language=ja">help.salesforce.com — Salesforce AI / Agentforce（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>

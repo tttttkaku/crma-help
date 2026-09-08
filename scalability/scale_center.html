@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Scale Center（パフォーマンス診断） | スケーラビリティ ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（9）</h2>
+    <ol>
+      <li><a href="#scale_center_alerts">Configure Alerts</a></li>
+      <li><a href="#scale_center_analyze_performance_reports">Analyze Performance Reports</a></li>
+      <li><a href="#scale_center_apply_scale_insights">Apply Scale Insights</a></li>
+      <li><a href="#scale_center_enable_standard_users">Enable Scale Center for Standard Users</a></li>
+      <li><a href="#scale_center_faq">Scale Center FAQ</a></li>
+      <li><a href="#scale_center_org_overview">Org Overview</a></li>
+      <li><a href="#scale_center_overview">Scale Center</a></li>
+      <li><a href="#scale_center_see_whats_new">See What’s New in Scale Center</a></li>
+      <li><a href="#scale_center_view_org_performance">View and Compare Org Performance Metrics</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>Scale Center（パフォーマンス診断）</h1>
+      <div class="meta">Salesforce スケーラビリティ ヘルプ · 9 記事 · 生成 2026-08-17</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="scale_test.html">&larr; Scale Test（負荷テスト）</a><a href="insights.html">インサイト（Lightning／レポート／検索／DB／デプロイ／Apex） &rarr;</a></div>
+<section class="article" id="scale_center_alerts">
+<h1 class="slds-text-heading_large">Configure Alerts</h1>
+ 
+ <p>Configure Scale Center alerts to monitor critical org metrics and receive notifications
+  when thresholds are breached.</p>
+
+  <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="Important" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-scalability-262-0-0-production-enus/10fed30e-b440-4267-91a6-b6264993ae50/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">Important</span> Only system administrators can access the Alerts page and configure alert
+    settings.</div></div></div>
+<p><strong>Considerations</strong></p><ul>
+    <li>This feature is only available for non-Signature customers. Signature customers will continue
+     to receive the full experience and support of <a target="_blank" href="https://help.salesforce.com/s/articleView?id=000382042&amp;language=en_US&amp;type=1">Proactive Monitoring (ProM)</a> through Signature Success Plan.</li>
+
+    <li>Specify up to three email addresses to receive notifications.</li>
+
+    <li>When an alert reaches its threshold, Scale Center emails recipients with a direct link to
+     run a detailed analysis. The investigation type and time window are prepopulated based on the
+     alert.</li>
+
+    <li>To view alert change history, click <strong class="uicontrol">See Change History</strong> from the
+     alerts settings page.</li>
+
+   </ul>
+<p>To configure your alerts:</p></div>
+  <ol><li>
+    <span>From Setup, in the Quick Find box, enter <kbd>Scale Center</kbd>, then click
+      <strong class="uicontrol">Alerts</strong>.</span>
+   </li><li>
+    <span>Click <strong class="uicontrol">Set Up Alerts</strong>.</span>
+   </li><li>
+    <span>Select the alerts you want to monitor.</span>
+   </li><li>
+    <span>In the <strong class="uicontrol">Recipient Email Address</strong> field, enter up to three email
+     addresses.</span>
+   </li><li>
+    <span>Click <strong class="uicontrol">Save</strong>.</span>
+    <div>Your alerts are saved. They can take a few minutes to become active.</div>
+   </li></ol>
+
+  <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="Alert Types" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-scalability-262-0-0-production-enus/10fed30e-b440-4267-91a6-b6264993ae50/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">Alert Types</span> 
+   
+   <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:35.46099290780141%"><col style="width:64.53900709219857%"></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d4600e127" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Alert Type</th>
+       <th id="d4600e130" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Description</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d4600e127" style="vertical-align:top;" class="slds-cell-wrap" data-label="Alert Type">Row Lock Timeout Errors</td>
+
+       <td headers="d4600e130" style="vertical-align:top;" class="slds-cell-wrap" data-label="Description">Multiple processes attempt to simultaneously update the same record, exceeding the
+        timeout limit. Common causes include parent-child data skew, failing API or Apex triggers,
+        and concurrent Email-to-Case updates.</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d4600e127" style="vertical-align:top;" class="slds-cell-wrap" data-label="Alert Type">Asynchronous Apex Executions Limit</td>
+
+       <td headers="d4600e130" style="vertical-align:top;" class="slds-cell-wrap" data-label="Description">Background tasks queued for processing reach their limit. Common causes include
+        inefficient Apex or poor API call setup. Unlike synchronous code, these tasks run when
+        resources become available rather than executing immediately.</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d4600e127" style="vertical-align:top;" class="slds-cell-wrap" data-label="Alert Type">Database CPU Consumption Throttles</td>
+
+       <td headers="d4600e130" style="vertical-align:top;" class="slds-cell-wrap" data-label="Description">Database requests execute slower than the threshold, excluding time spent on code
+        compilation or external callouts.</td>
+
+      </tr>
+     </tbody></table>
+  </div></div></div>
+ 
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="scale_center_analyze_performance_reports">
+<h1 class="slds-text-heading_large">Analyze Performance Reports</h1>
+  
+  <p>To troubleshoot errors or spikes reported in an org performance query, create a
+  performance analysis report.</p>
+
+    <div><p>Start a new analysis report, see report status, and view the last 100 reports for your org.
+    You can create 15 analysis reports per week. Reports expire after 30 days.</p><p>To share an analysis report with other users in the same org, copy and send them the report
+    URL.</p></div>
+    <ol><li>
+        <span>From Setup, in the Quick Find box, enter <kbd>Scale Center</kbd>, and then
+     click <strong class="uicontrol">Performance Analysis</strong>.</span>
+      </li><li>
+        <span>Click <strong class="uicontrol">New Analysis</strong>.</span>
+      </li><li>
+        <span>Select the type, time zone, start date, and end date.</span>
+      </li><li>
+        <span>Give the report a name.</span>
+      </li><li>
+        <span>Click <strong class="uicontrol">Submit</strong>.</span>
+      </li></ol>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="Performance Analysis Types" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-scalability-262-0-0-production-enus/10fed30e-b440-4267-91a6-b6264993ae50/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">Performance Analysis Types</span> 
+      
+      <ul>
+        <li>Apex Summary</li>
+
+        <li>Concurrent Apex</li>
+
+        <li>Consolidated Report (including Failed Logins)</li>
+
+        <li>Database Performance</li>
+
+        <li>Flow Performance</li>
+
+        <li>Governor Limits</li>
+
+        <li>Integrations Performance</li>
+
+        <li>List View and Reports</li>
+
+        <li>Row Lock </li>
+
+      </ul>
+
+    </div></div></div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="insights.html#apex_investigations_faq">Apex Investigations FAQ</a></strong><br>Get answers to common questions about Apex investigations in Scale Center.</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="scale_center_apply_scale_insights">
+<h1 class="slds-text-heading_large">Apply Scale Insights</h1>
+  <p>Get insights about your Apex code, reports, and search. View database and deployment
+  recommendations.</p>
+
+<ul><li class="slds-p-bottom_small"><strong><a href="apexguru_core.html#apexguru_overview">ApexGuru Insights</a></strong><br>Use AI and machine learning models to analyze your Apex code, surface performance     antipatterns, detect unused and duplicated code, and generate prescriptive optimization     recommendations.</li><li class="slds-p-bottom_small"><strong><a href="insights.html#lex_insights_overview">Lightning Experience Insights</a></strong><br>Use on-demand insights to identify, analyze, and improve the performance of your custom     Lightning pages and Lightning components. Lightning Experience Insights provides a high-level     overview of your users’ experience, and detailed metrics to identify bottlenecks and optimize     page load times. You can find this data inside the Performance Insights and Usage Insights     dashboards.</li><li class="slds-p-bottom_small"><strong><a href="insights.html#database_insights_overview">Database Insights</a></strong><br>Fix expensive SOQL queries and reduce database time.</li><li class="slds-p-bottom_small"><strong><a href="insights.html#deployment_insights_overview">Deployment Insights</a></strong><br>Compare org performance before and after deployment to identify regressions introduced     by recent changes.</li><li class="slds-p-bottom_small"><strong><a href="insights.html#report_insights_overview">Report Insights</a></strong><br>Use on-demand insights to identify slow reports and improve their     performance.</li><li class="slds-p-bottom_small"><strong><a href="insights.html#search_insights_overview">Search Insights</a></strong><br>Use on-demand insights to get recommendations and improve your search   performance.</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="scale_center_enable_standard_users">
+<h1 class="slds-text-heading_large">Enable Scale Center for Standard Users</h1>
+  
+  <p>Use the Scale Center Standard Permission Set to enable access for standard users who
+    aren’t System Administrators.</p>
+
+    <div><p>Your org’s admin can enable access for 5 additional users and see how many licenses are
+        being used. Only your org’s admin can see the Permission Set Licenses section in your
+        Company Information settings.</p></div>
+    <ol><li>
+        <span>From Setup, go to Administration, then Users, and then click <strong>Permission
+          Sets</strong>.</span>
+      </li><li>
+        <span>Click <strong class="uicontrol">Scale Center Standard Permission Set</strong>.</span>
+      </li><li>
+        <span>Click <strong class="uicontrol">Manage Assignments</strong>.</span>
+        <div>
+          <div>
+            <img alt="The Manage Assignments button on the Permission Sets page in Setup" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-scalability-262-0-0-production-enus/10fed30e-b440-4267-91a6-b6264993ae50/scalability/images/scale_center_manage_assignments_button.png" style="width:800px;">
+          </div>
+        </div>
+      </li><li>
+        <span>Click <strong class="uicontrol">Add Assignments</strong>.</span>
+        <div>
+          <span style="vertical-align:text-bottom;display:inline-block;"><img alt="The Add Assignments button on the Permission Sets page in Setup" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-scalability-262-0-0-production-enus/10fed30e-b440-4267-91a6-b6264993ae50/scalability/images/scale_center_add_assignments_button.png" style="width:800px;margin-bottom:0;"></span>
+        </div>
+      </li><li>
+        <span>Select 1 or more users.</span>
+      </li><li>
+        <span>Click <strong class="uicontrol">Assign</strong>, and then save your changes.</span>
+      </li></ol>
+
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="scale_center_faq">
+<h1 class="slds-text-heading_large">Scale Center FAQ</h1>
+  
+  <p>Get answers to common questions about using Scale Center.</p>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">How much does Scale Center cost?</h2><p>It’s free.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">I have an org with scale issues, but it’s not Unlimited Edition (UE) or Signature. How do I get access?</h2><p>Scale Center is available in Production and Full Copy sandbox environments for all major
+        Salesforce editions, including Enterprise and Professional.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">After enabling Scale Center, why can't I see it in my UE full sandbox?</h2><p>If your sandbox org license expired, match it with your UE production org.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">How far back in time can I retrieve data?</h2><p>For performance metrics and analysis reports, Scale Center retrieves data from the last 30 days.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Can I review more than one 24-hour period at a time?</h2><p>No, the maximum time span that you can select to retrieve Org Performance metrics is 24 hours. When triaging, a shorter time span gives better results.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Which user profiles can access Scale Center?</h2><p>System Administrators can access Scale Center and give access to 5 Standard (non-SysAdmin) users per org.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Is there a limit to the number of investigations I can run?</h2><p>You can run up to 15 investigations per organization every 7 days. This limit uses a 7-day
+        rolling window based on when each investigation starts. While your reports are saved for 30
+        days, each investigation only counts toward your limit for the first 7 days.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Is there a limit to the number of on-demand insights I can run?</h2><p>For each of the main insight pages, you can run up to 3 on-demand insights per week, per
+        org.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Can I request an increase to this weekly limit?</h2><p>No, this limit is the same for all orgs.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Does a Consolidated investigation count as one or eight investigations?</h2><p>A Consolidated investigation counts as one and we recommend using it to help stay under the weekly limit.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">How do I generate the Failed Logins investigation?</h2><p>The Failed Logins investigation is part of the Consolidated Report.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">How do I get started with ApexGuru?</h2><p>ApexGuru is a feature in the Scale Insights section of Scale Center.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Are Scale Center and ApexGuru available in the EU Operating Zone?</h2><p>No, due to data governance and compliance requirements, customers in the EU Operating Zone aren’t able to access Scale Center or ApexGuru.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Is Scale Center available in Hyperforce?</h2><p>Yes, orgs that migrate to Hyperforce have access to Scale Center.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Does Scale Center affect performance?</h2><p>No, the logs used by Scale Center are collected with no impact on performance.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">How do I share a report from Scale Center?</h2><p>To share an analysis report with other users in the same org, copy and send them the report URL.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Does Scale Center count against Salesforce platform limits, add to API usage, or require storage space?</h2><p>No.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Does Scale Center use underlying event log files, shield monitoring events, or any other data?</h2><p>Scale Center aggregates and processes data from multiple internal data sources.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Why must I accept the message about backend services?</h2><p>Some Scale Center backend services are hosted on Hyperforce infrastructure. All data is part of the trust layer and we follow security and data governance best practices.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">My org recently migrated from 1P to Hyperforce. Can I create investigations on
+        1P?</h2><p>No, once you migrate to Hyperforce, you can’t create investigations on 1P. To compare
+        metrics and data points, create investigations for 1P before migration.</p></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="scale_center_org_overview">
+<h1 class="slds-text-heading_large">Org Overview</h1>
+ 
+ <p>Use the Org Overview page to monitor org health, identify peak usage, and review
+  recommendations for optimizing performance.</p>
+
+  <div><p>Considerations</p><ul>
+    <li>Review the Summary of Peak Hour Last Week for key takeaways and errors.</li>
+
+    <li>Run the Analyze Org Health report to get detailed peak hour insights.</li>
+
+    <li>Prioritize fixing critical issues like high average run time and counts.</li>
+
+   </ul>
+<p>To monitor your organization's health:</p></div>
+  <ol><li>
+    <span>From Setup, in the Quick Find box, enter <kbd>Scale Center</kbd>, then click
+      <strong class="uicontrol">Org Overview</strong>.</span>
+   </li><li>
+    <span>Review the Summary of Peak Hour section to see your highest Requests Per Second (RPS) and
+     error anomalies like Row Locks and Concurrent Apex errors.</span>
+   </li><li>
+    <span>Click <strong class="uicontrol">Analyze Critical Issues</strong> to trigger a scan of your top
+     performance blockers.</span>
+   </li></ol>
+
+  <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="Org Overview Categories" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-scalability-262-0-0-production-enus/10fed30e-b440-4267-91a6-b6264993ae50/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">Org Overview Categories</span> 
+   
+   <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:35.46099290780141%"><col style="width:64.53900709219857%"></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d6059e92" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Insight</th>
+       <th id="d6059e95" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Definition</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d6059e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="Insight">Slow Apex Classes</td>
+
+       <td headers="d6059e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Definition">Identifies the most dominating Apex entry points with high average run time. Reduce
+        the average run time for these entry points to prevent software failure and improve the user
+        experience.</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d6059e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="Insight">Expensive SOQL Queries</td>
+
+       <td headers="d6059e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Definition">Highlights the highest contributors to the overall DB CPU time. Fix these SOQLs to
+        improve the efficiency and scalability of your app’s database interactions.</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d6059e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="Insight">Critical Apex Errors</td>
+
+       <td headers="d6059e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Definition">Resolve these errors to eliminate bad user experiences and increase overall system
+        efficiency.</td>
+
+      </tr>
+     </tbody></table>
+  </div></div></div>
+ 
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="scale_center_overview">
+<h1 class="slds-text-heading_large">Scale Center</h1>
+  
+  <p>Diagnose root causes and act on scale issues earlier in your development cycle. View
+    org performance metrics and analyze performance reports.</p>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Access Scale Center</h2><ul>
+        <li>From Setup, in the Quick Find box, enter <kbd>Scale</kbd>, then click
+            <strong class="uicontrol">Scale Center</strong>.</li>
+
+        <li>To enable Scale Center for your org, turn on <strong class="uicontrol">Enable Scale Center</strong>.
+          Performance metrics appear within a few hours.</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Considerations</h2><ul>
+        <li>Scale Center is Generally Available in Salesforce Lightning.</li>
+
+        <li>Scale Center is a free product in full sandboxes and production orgs for all Unlimited
+          Edition (UE), Enterprise Edition (EE), Professional Edition (PE), Signature, and Scale
+          Test customers.</li>
+
+        <li>Some features in Scale Center allow you to hide and unhide URLs and other fields. All
+          Scale Center users in your org can view these fields and any customer data they
+          include.</li>
+
+        <li>Scale Center runs on its own infrastructure, separate from your other services. Scale
+          Center can have different privacy and security protections and it can be hosted in
+          different physical locations.</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Explore Scale Center</h2></div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#scale_center_see_whats_new">See What’s New in Scale Center</a></strong><br>View the latest updates and new features for Scale Center.</li><li class="slds-p-bottom_small"><strong><a href="#scale_center_enable_standard_users">Enable Scale Center for Standard Users</a></strong><br>Use the Scale Center Standard Permission Set to enable access for standard users who     aren’t System Administrators.</li><li class="slds-p-bottom_small"><strong><a href="#scale_center_org_overview">Org Overview</a></strong><br>Use the Org Overview page to monitor org health, identify peak usage, and review   recommendations for optimizing performance.</li><li class="slds-p-bottom_small"><strong><a href="#scale_center_alerts">Configure Alerts</a></strong><br>Configure Scale Center alerts to monitor critical org metrics and receive notifications   when thresholds are breached.</li><li class="slds-p-bottom_small"><strong><a href="#scale_center_view_org_performance">View and Compare Org Performance Metrics</a></strong><br>Monitor and analyze your org's performance in Scale Center.</li><li class="slds-p-bottom_small"><strong><a href="#scale_center_analyze_performance_reports">Analyze Performance Reports</a></strong><br>To troubleshoot errors or spikes reported in an org performance query, create a   performance analysis report.</li><li class="slds-p-bottom_small"><strong><a href="#scale_center_apply_scale_insights">Apply Scale Insights</a></strong><br>Get insights about your Apex code, reports, and search. View database and deployment   recommendations.</li><li class="slds-p-bottom_small"><strong><a href="#scale_center_faq">Scale Center FAQ</a></strong><br>Get answers to common questions about using Scale Center.</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">See Also</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://trailhead.salesforce.com/content/learn/modules/scale-center-quick-look">Trailhead: Scale Center: Quick Look</a></li><li><a target="_blank" href="https://trailhead.salesforce.com/content/learn/trails/explore-scalability">Trailhead: Explore Scalability</a></li><li><a target="_blank" href="https://admin.salesforce.com/blog/2026/empowering-admins-build-org-scalability-with-new-scale-center-features">Blog: Empowering Admins to Build Org Scalability</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=000384939&amp;language=en_US&amp;type=1">Knowledge Article: Understand Org Throttling</a></li><li><a target="_blank" href="https://architect.salesforce.com/well-architected/overview?_ga=2.12209143.216710569.1696863967-768154935.1656097572">Salesforce Architects: Well-Architected Framework</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="scale_center_see_whats_new">
+<h1 class="slds-text-heading_large">See What’s New in Scale Center</h1>
+  
+  <p>View the latest updates and new features for Scale Center.</p>
+
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:34.01360544217687%"><col style="width:65.98639455782312%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d6211e38" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Date</th>
+              <th id="d6211e41" style="vertical-align:top;" class="slds-cell-wrap" scope="col">What's New</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d6211e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="Date">August 2026</td>
+
+              <td headers="d6211e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="What's New">Configure alerts to monitor critical org metrics and get an email when Scale
+                Center detects a threshold breach.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d6211e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="Date">June 2026</td>
+
+              <td headers="d6211e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="What's New">Identify duplicate Apex code with Code Duplicates in ApexGuru Insights. Filter findings by scope and effort level, then download as PDF.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d6211e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="Date">May 2026</td>
+
+              <td headers="d6211e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="What's New"><ul>
+                  <li>Use Deployment Insights to compare org performance before and after
+                    deployment to identify regressions and make data-driven rollback or
+                    optimization decisions.</li>
+
+                  <li>Use Agentforce for Scale to summarize org performance, get critical
+                    takeaways, run investigations, and analyze results.</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d6211e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="Date">March 2026</td>
+
+              <td headers="d6211e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="What's New">Use the Org Overview page to monitor org health, identify peak usage, and
+                review recommendations for optimizing performance.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d6211e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="Date">February 2026</td>
+
+              <td headers="d6211e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="What's New"><ul>
+                  <li>Use on-demand Database Insights to get recommendations for optimizing slow
+                    queries and improving database performance.</li>
+
+                  <li>Lightning Experience Insights is now generally available.</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d6211e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="Date">December 2025</td>
+
+              <td headers="d6211e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="What's New">Scale Center is now available in Government Cloud Plus with Org Performance,
+                Performance Comparison, and Performance Analysis features.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d6211e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="Date">October 2025</td>
+
+              <td headers="d6211e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="What's New"><ul>
+                  <li>Use on-demand Lightning Experience Insights (beta) to identify slow
+                    pages, components, and actions. Improve your End-to-End Performance Time
+                    (EPT).</li>
+
+                  <li>Scale Center is now generally available for all Enterprise and Professional
+                    Edition production and full copy sandbox orgs.</li>
+
+                  <li>Scale Center is now available in Large Data Volume (LDV) orgs for Partners and
+                    ISVs.</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d6211e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="Date">September 2025</td>
+
+              <td headers="d6211e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="What's New"><ul>
+                  <li>Use on-demand Report Insights to identify slow reports and improve their
+                    performance.</li>
+
+                  <li>Use on-demand Search Insights to get recommendations and improve your search
+                    performance.</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d6211e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="Date">July 2025</td>
+
+              <td headers="d6211e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="What's New">Scale Center is available for all EU customers who aren’t on Hyperforce EU
+                Operating Zone (OZ).</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d6211e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="Date">May 2025</td>
+
+              <td headers="d6211e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="What's New"><ul>
+                  <li>Generate improved Apex Concurrency and Apex Summary investigations with
+                    actionable insights, prioritization, and recommendations.</li>
+
+                  <li>Provide feedback on Apex investigations in the app.</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d6211e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="Date">October 2024</td>
+
+              <td headers="d6211e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="What's New">The Customer Success Score (CSS) dashboard includes a direct link to Scale
+                Center for Signature customers.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d6211e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="Date">September 2024</td>
+
+              <td headers="d6211e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="What's New">View unencrypted URLs in the Callouts Summary section of the Integrations Performance
+        report.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d6211e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="Date">August 2024</td>
+
+              <td headers="d6211e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="What's New">View Report Insights to see slow reports over the last week and ways to improve
+        performance.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d6211e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="Date">June 2024</td>
+
+              <td headers="d6211e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="What's New"><ul>
+                  <li>View more org performance metrics for connection pools, Visualforce, and
+                    sync/async callout errors.</li>
+
+                  <li>Get recommendations for improving SOQL performance in the database CPU
+          investigation.</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d6211e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="Date">January 2024</td>
+
+              <td headers="d6211e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="What's New"><ul>
+                  <li>View Apex insights.</li>
+
+                  <li>Download ApexGuru insights in PDF format.</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d6211e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="Date">October 2023</td>
+
+              <td headers="d6211e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="What's New">Scale Center is available for all Performance Edition customer orgs.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d6211e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="Date">September 2023</td>
+
+              <td headers="d6211e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="What's New"><ul>
+                  <li>Enable Scale Center for 5 Standard (non-System Administrator) users per
+                    org.</li>
+
+                  <li>Run 15 Deep Dive investigations per week, per org.</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d6211e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="Date">August 2023</td>
+
+              <td headers="d6211e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="What's New"><ul>
+                  <li>All Unlimited Edition (UE) Full Sandbox orgs can access Scale Center.</li>
+
+                  <li>Scale Center is available for all Signature customer orgs.</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d6211e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="Date">June 2023</td>
+
+              <td headers="d6211e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="What's New">Scale Center is generally available for all UE production orgs.</td>
+
+            </tr>
+          </tbody></table></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="scale_center_view_org_performance">
+<h1 class="slds-text-heading_large">View and Compare Org Performance Metrics</h1>
+  
+  <p>Monitor and analyze your org's performance in Scale Center.</p>
+
+    <div><p>View a snapshot of your org's performance metrics over a defined time range, or compare
+    two time ranges. Ranges longer than 12 hours can take several minutes to load.</p></div>
+    <ol><li>
+        <span>From Setup, enter <kbd>Scale Center</kbd> in the Quick Find box, then
+     click <strong class="uicontrol">Org Performance</strong>.</span>
+      </li><li>
+        <span>Select a time range.</span>
+      </li><li>
+        <span>To compare two time ranges from the last 30 days, select
+          <strong class="uicontrol">Compare</strong>. The first range is the baseline. The second is the
+          comparison.</span>
+      </li><li>
+        <span>Click <strong class="uicontrol">Submit</strong> to load time series charts for each metric.</span>
+      </li><li>
+        <span>Click to toggle a metric, or double-click to isolate it.</span>
+      </li><li>
+        <span>Click and drag any chart to select a time range and open an analysis.</span>
+        <div>When Concurrent Apex Errors are elevated, drag a spike in its chart to open the
+          Concurrent Apex report. The report surfaces potential causes (throttling, schema, or
+          deployment invalidation) and shows time distribution for long-running transactions. If
+          significant time is at the database layer, focus on SOQL and DML optimization. The report
+          lists the top five contributing operations by type (Insert, Update, and Delete). Apply
+          indexed fields and appropriate filters first. Entry points display as <strong>Critical</strong>,
+            <strong>Major</strong>, or <strong>Minor</strong>. Columns in red mark the dominant layer. For deeper
+          investigation, turn on Debug Logs with <strong>Finest Mode</strong> and reproduce the triggering use
+          case. Then, open the <strong>Apex Log Analyzer</strong> and check the Analysis tab. To resolve row
+          lock contention, review your data model, audit <code>FOR UPDATE</code> usage, and
+          batch large transactions.</div>
+      </li></ol>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="Metric Definitions" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-scalability-262-0-0-production-enus/10fed30e-b440-4267-91a6-b6264993ae50/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">Metric Definitions</span> 
+      
+      <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:35.46099290780141%"><col style="width:64.53900709219857%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d5759e121" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Metric</th>
+              <th id="d5759e124" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Definition</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d5759e121" style="vertical-align:top;" class="slds-cell-wrap" data-label="Metric">Successful Logins</td>
+
+              <td headers="d5759e124" style="vertical-align:top;" class="slds-cell-wrap" data-label="Definition">Total successful logins.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d5759e121" style="vertical-align:top;" class="slds-cell-wrap" data-label="Metric">Failed Logins</td>
+
+              <td headers="d5759e124" style="vertical-align:top;" class="slds-cell-wrap" data-label="Definition">Total unsuccessful logins. An unusually high count can indicate network
+        problems.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d5759e121" style="vertical-align:top;" class="slds-cell-wrap" data-label="Metric">Concurrent Apex Errors</td>
+
+              <td headers="d5759e124" style="vertical-align:top;" class="slds-cell-wrap" data-label="Definition">Synchronous Apex requests that exceeded 5 seconds and the concurrent request
+                governor limit. The limit is based on license type and count (minimum 10, cap of 50)
+                and exists to prevent service disruptions and prolonged page load times. Exceeding
+                it causes unrecoverable runtime exceptions. Common causes include inefficient SOQL,
+                excessive concurrent DML, high-CPU Apex code, and schema or metadata changes that
+                invalidate caches.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d5759e121" style="vertical-align:top;" class="slds-cell-wrap" data-label="Metric">Concurrent UI Errors</td>
+
+              <td headers="d5759e124" style="vertical-align:top;" class="slds-cell-wrap" data-label="Definition">UI requests that exceeded 10 seconds and governor limits. Common causes include
+        multiple dashboard refreshes and long-running reports. To learn more, see <a target="_blank" href="https://help.salesforce.com/s/articleView?id=000380304&amp;language=en_US&amp;type=1">Proactive Alert Monitoring: Concurrent UI Errors</a>.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d5759e121" style="vertical-align:top;" class="slds-cell-wrap" data-label="Metric">Row Lock Errors</td>
+
+              <td headers="d5759e124" style="vertical-align:top;" class="slds-cell-wrap" data-label="Definition">Exceptions from simultaneous attempts to update the same record. Common causes:
+        parent-child data skew, failed API or Apex triggers, and Email-to-Case timeouts. To learn
+        more, see <a target="_blank" href="https://help.salesforce.com/s/articleView?id=000384162&amp;language=en_US&amp;type=1">Proactive Alert Monitoring: Rowlock Timeout
+        Errors</a>.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d5759e121" style="vertical-align:top;" class="slds-cell-wrap" data-label="Metric">Total Callout Errors</td>
+
+              <td headers="d5759e124" style="vertical-align:top;" class="slds-cell-wrap" data-label="Definition">Errors from callouts to external or managed packages.</td>
+
+            </tr>
+          </tbody></table>
+    </div></div></div>
+  
+</div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="scale_test.html">&larr; Scale Test（負荷テスト）</a><a href="insights.html">インサイト（Lightning／レポート／検索／DB／デプロイ／Apex） &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.scalability_overview.htm&type=5&language=ja">help.salesforce.com — Salesforce スケーラビリティ（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>

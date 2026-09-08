@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>インサイト（Lightning／レポート／検索／DB／デプロイ／Apex） | スケーラビリティ ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（8）</h2>
+    <ol>
+      <li><a href="#apex_investigations_faq">Apex Investigations FAQ</a></li>
+      <li><a href="#database_insights_overview">Database Insights</a></li>
+      <li><a href="#deployment_insights_overview">Deployment Insights</a></li>
+      <li><a href="#lex_insights_overview">Lightning Experience Insights</a></li>
+      <li><a href="#lex_insights_performance">Performance Insights</a></li>
+      <li><a href="#lex_insights_usage">Usage Insights</a></li>
+      <li><a href="#report_insights_overview">Report Insights</a></li>
+      <li><a href="#search_insights_overview">Search Insights</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>インサイト（Lightning／レポート／検索／DB／デプロイ／Apex）</h1>
+      <div class="meta">Salesforce スケーラビリティ ヘルプ · 8 記事 · 生成 2026-08-17</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="scale_center.html">&larr; Scale Center（パフォーマンス診断）</a><a href="agentforce_for_scale.html">Agentforce for Scale &rarr;</a></div>
+<section class="article" id="apex_investigations_faq">
+<h1 class="slds-text-heading_large">Apex Investigations FAQ</h1>
+  
+  <p>Get answers to common questions about Apex investigations in Scale Center.</p>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">What does Org Throttling Detection show?</h2><p>Org Throttling Detection shows when your org experienced throttling due to high
+        infrastructure usage. If throttling occurred, the report displays the reason for the
+        throttle, start and end time, and the URI that was throttled.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">How do I understand Long-Running Apex Transactions?</h2><p>Time spent for All Long-Running (&gt; 5 s) Apex Transactions illustrates how time is
+        distributed across various components for transactions exceeding 5 seconds. These components
+        can include:</p><ul>
+        <li>Database calls</li>
+
+        <li>Apex execution</li>
+
+        <li>Workflow time</li>
+
+        <li>Compile time</li>
+
+        <li>Other implementation-specific transactions </li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">How are long-running transactions organized?</h2><p>Scale Center organizes long-running transactions by combining entry point frequency and run
+        time, sorting the list in descending order. The analysis focuses on outermost triggers. It
+        groups data by the outermost trigger class and excludes internal triggers. For flow entry
+        points, the object ID corresponds to the custom object executed within the flow, not the
+        flow ID.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">What do the red highlights in transaction tables indicate?</h2><p>The red highlighting in specific columns indicates the area where the most run time was
+        spent within that particular transaction, including:</p><ul>
+        <li>Database time</li>
+
+        <li>Apex execution time</li>
+
+        <li>Workflow time</li>
+
+        <li>Other relevant time components</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">How do I provide feedback about this feature?</h2><p>Click the <strong class="uicontrol">Thumbs Up</strong> or <strong class="uicontrol">Thumbs Down</strong> icon.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">How do I see the latest version of Apex investigations?</h2><p>The latest version is provided by default. To see the older version, click
+          <strong class="uicontrol">Switch back to the old version</strong>. Then to go back to the latest
+        version, click <strong class="uicontrol">Try the new version</strong>.</p></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="database_insights_overview">
+<h1 class="slds-text-heading_large">Database Insights</h1>
+ 
+ <p>Fix expensive SOQL queries and reduce database time.</p>
+
+  <div><p>Considerations</p><ul>
+    <li>Database Insights shows you SOQL insights and your top 15 expensive SOQL queries.</li>
+
+    <li>Use the Takeaways section to see the impact on your org and follow the recommendations.</li>
+
+   </ul>
+<p>To generate database insights:</p></div>
+  <ol><li>
+    <span>From Setup, in the Quick Find box, enter <kbd>Scale Insights</kbd>, then click
+      <strong class="uicontrol">Database Insights</strong>.</span>
+   </li><li>
+    <span>Click <strong class="uicontrol">Generate Insight Report</strong> for on-demand analysis. Database
+     Insights analyzes your queries and provides recommendations to improve database time.</span>
+   </li></ol>
+
+  <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="Database Insight Categories" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-scalability-262-0-0-production-enus/10fed30e-b440-4267-91a6-b6264993ae50/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">Database Insight Categories</span> 
+   
+   <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:35.46099290780141%"><col style="width:64.53900709219857%"></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d3887e83" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Insight</th>
+       <th id="d3887e86" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Definition</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d3887e83" style="vertical-align:top;" class="slds-cell-wrap" data-label="Insight">Top 15 Expensive SOQL Queries</td>
+
+       <td headers="d3887e86" style="vertical-align:top;" class="slds-cell-wrap" data-label="Definition"><p style="margin-bottom:0;">SOQL queries running during peak business hours consume high CPU cycles. Optimize slow
+         queries to reduce CPU consumption and improve transaction speeds during peak hours.</p></td>
+
+      </tr>
+      <tr class="">
+       <td headers="d3887e83" style="vertical-align:top;" class="slds-cell-wrap" data-label="Insight">Takeaways &amp; Impact</td>
+
+       <td headers="d3887e86" style="vertical-align:top;" class="slds-cell-wrap" data-label="Definition">Use the recommendations to optimize suboptimal queries, reducing database time and
+        improving scale.</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d3887e83" style="vertical-align:top;" class="slds-cell-wrap" data-label="Insight">Query Plan Analyzer Integration</td>
+
+       <td headers="d3887e86" style="vertical-align:top;" class="slds-cell-wrap" data-label="Definition">Use Query Plan Analyzer to get recommendations for speeding up SOQL queries against
+        large volumes and optimizing for scale.</td>
+
+      </tr>
+     </tbody></table>
+  </div></div></div>
+ 
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="deployment_insights_overview">
+<h1 class="slds-text-heading_large">Deployment Insights</h1>
+  
+  <p>Compare org performance before and after deployment to identify regressions introduced
+    by recent changes.</p>
+
+    <div><p>Considerations</p><ul>
+        <li>Deployment data is available starting 4 days after your org opts in to Scale
+          Center.</li>
+
+        <li>Deployments from the last 30 days (up to yesterday) are available for analysis.</li>
+
+        <li>If no deployments appear, check back after you run a deployment.</li>
+
+        <li>Wait at least 24 hours after deployment completion before generating a report.</li>
+
+        <li>Deployment Insights analyzes a 7-day window: the 3 days before the deployment, the
+          deployment day, and the 3 days after. If fewer than 3 days of post-deployment data are
+          available, the report uses the maximum available time window.</li>
+
+        <li>Peak hours are identified based on request volume spikes. If your org has low weekend
+          traffic, peak hours are selected from high-activity weekdays instead to ensure accurate
+          before-and-after comparisons. If your deployment occurs before a weekend, the analysis
+          uses peak hours from high-traffic weekdays rather than low-activity weekend periods.</li>
+
+        <li>All insights use the same peak-hour methodology, including errors, user experience, API
+          performance, and infrastructure regressions.</li>
+
+      </ul>
+<p>To generate a deployment insights report:</p></div>
+    <ol><li>
+        <span>From Setup, in the Quick Find box, enter <kbd>Scale Insights</kbd>, then
+          click <strong class="uicontrol">Deployment Insights</strong>.</span>
+      </li><li>
+        <span>Select a deployment from the last 30 days (up to yesterday).</span>
+      </li><li>
+        <span>Click <strong class="uicontrol">Generate Insight Report</strong>.</span>
+      </li></ol>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="Deployment Insight Sections" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-scalability-262-0-0-production-enus/10fed30e-b440-4267-91a6-b6264993ae50/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">Deployment Insight Sections</span> 
+      
+      <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:35.46099290780141%"><col style="width:64.53900709219857%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d3980e105" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Section</th>
+              <th id="d3980e108" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Description</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d3980e105" style="vertical-align:top;" class="slds-cell-wrap" data-label="Section">Successful Deployments and Failed Deployments</td>
+
+              <td headers="d3980e108" style="vertical-align:top;" class="slds-cell-wrap" data-label="Description">Displays a summary of deployment results over the last 30 days.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d3980e105" style="vertical-align:top;" class="slds-cell-wrap" data-label="Section">Change in Errors Before and After Deployment</td>
+
+              <td headers="d3980e108" style="vertical-align:top;" class="slds-cell-wrap" data-label="Description">Compares peak hour error counts from before and after deployment to help you
+                identify whether the deployment increased or resolved errors.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d3980e105" style="vertical-align:top;" class="slds-cell-wrap" data-label="Section">Change in Performance Before and After Deployment</td>
+
+              <td headers="d3980e108" style="vertical-align:top;" class="slds-cell-wrap" data-label="Description">Compares performance metrics from peak traffic hours before and after
+                deployment to assess the impact on your org.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d3980e105" style="vertical-align:top;" class="slds-cell-wrap" data-label="Section">Additional Insights on Errors, User Experience, API Performance, and
+                Infrastructure Performance Regressions </td>
+
+              <td headers="d3980e108" style="vertical-align:top;" class="slds-cell-wrap" data-label="Description">Provides detailed information on regressions in these areas, including
+                telemetry on how to optimize performance for recent deployments.</td>
+
+            </tr>
+          </tbody></table>
+    </div></div></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="lex_insights_overview">
+<h1 class="slds-text-heading_large">Lightning Experience Insights</h1>
+  
+  <p>Use on-demand insights to identify, analyze, and improve the performance of your custom
+    Lightning pages and Lightning components. Lightning Experience Insights provides a high-level
+    overview of your users’ experience, and detailed metrics to identify bottlenecks and optimize
+    page load times. You can find this data inside the Performance Insights and Usage Insights
+    dashboards.</p>
+
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="Note" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-scalability-262-0-0-production-enus/10fed30e-b440-4267-91a6-b6264993ae50/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">Note</span> As a part of Scale Center, Lightning Experience Insights isn't supported in
+        Government Cloud Plus.</div></div></div>
+<p><strong>Key Terminology</strong></p><p>Before diving into the Lightning Experience Insights report, it's helpful to understand how
+        Salesforce measures a few key performance metrics:</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:29.850746268656714%"><col style="width:70.1492537313433%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d5225e48" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">Metric</th>
+              <th id="d5225e51" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">Details</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d5225e48" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Metric">Experienced Page Time (EPT)</td>
+
+              <td headers="d5225e51" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Details">EPT is the primary metric Salesforce uses to measure page load performance in
+                Lightning. It measures the total time that it takes for a page to load to a state
+                where a user can fully interact with it. A lower EPT means the page loads faster,
+                providing a better user experience.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d5225e48" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Metric">P75 EPT</td>
+
+              <td headers="d5225e51" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Details">This value represents the 75th percentile for EPT. It means that 75% of page
+                loads for your users were this fast or faster. We use P75 instead of the average (or
+                50th percentile) because it more accurately represents the experience of users who
+                encounter slower performance. This metric helps you to identify and focus on issues
+                that affect a significant portion of your user base.</td>
+
+            </tr>
+          </tbody></table><p><strong>Generate the Lightning Experience Insights Report</strong></p><p>To generate Lightning Experience Insights, follow these steps.</p></div>
+    <ol><li>
+        <span>From Setup, in the Quick Find box, enter <kbd>Lightning Experience
+            Insights</kbd> and click <strong class="uicontrol">Lightning Experience
+          Insights</strong>.</span>
+      </li><li>
+        <span>Click <strong class="uicontrol">Generate Report</strong>.</span>
+      </li><li>
+        <span>After the report finishes generating, click <strong class="uicontrol">Performance Insights</strong>
+          or <strong class="uicontrol">Usage Insights</strong> to view data from the new Lightning Experience
+          Insights report.</span>
+      </li></ol>
+
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="Note" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-scalability-262-0-0-production-enus/10fed30e-b440-4267-91a6-b6264993ae50/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">Note</span> It can take some time for a report to become available. You can click
+          <strong class="uicontrol">Refresh</strong>, or return to Lightning Experience Insights a little later
+        to review your report.</div></div></div>
+<p>The Performance Insights and Usage Insights dashboards contain several sections designed to
+        guide you from high-level trends to specific, actionable details. To learn more, see these
+        pages.</p></div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#lex_insights_performance">Performance Insights</a></strong><br>The Performance Insights dashboard focuses on four core metrics for page performance,     which it measures and presents in different ways to provide useful insights. These four metrics     appear at the top of your report.</li><li class="slds-p-bottom_small"><strong><a href="#lex_insights_usage">Usage Insights</a></strong><br>Generate Usage Insights to identify your most popular pages and evaluate their     performance. This dashboard lets you pinpoint performance bottlenecks and focus on optimizing     your most used pages.</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="lex_insights_performance">
+<h1 class="slds-text-heading_large">Performance Insights</h1>
+  
+  <p>The Performance Insights dashboard focuses on four core metrics for page performance,
+    which it measures and presents in different ways to provide useful insights. These four metrics
+    appear at the top of your report.</p>
+
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:20.36659877800407%"><col style="width:79.63340122199592%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d4349e38" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">Metric</th>
+              <th id="d4349e41" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">Details</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d4349e38" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Metric">First Page Experienced Page Time (EPT)</td>
+
+              <td headers="d4349e41" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Details"><p>Page load time for a complete page load, including Lightning Experience bootstrap
+                  (framework initialization), measured in milliseconds. (Divide by 1000 to get the
+                  number of seconds.) Typically, only the first page that a user visits in Lightning
+                  Experience requires Lightning Experience bootstrap.</p><p style="margin-bottom:0;">You can’t affect the time it takes for Lightning Experience bootstrap — that’s
+                  our job, and we’re always working on it. Because it adds significant time to the
+                  EPT, we measure and share it, but Subsequent Page EPT represents the more typical
+                  user experience.</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d4349e38" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Metric">Subsequent Page EPT</td>
+
+              <td headers="d4349e41" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Details">Page load time for other pages, after Lightning Experience bootstrap, measured
+                in milliseconds. This metric typically accounts for any page a user navigates to
+                after loading Lightning Experience. Without the need to reload Lightning Experience,
+                this metric is typically faster. While First Page EPT represents a first impression
+                or start of session experience, Subsequent Page EPT is the better measurement of how
+                your users experience Salesforce as they use it throughout a working
+                session.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d4349e38" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Metric">Total Page Views</td>
+
+              <td headers="d4349e41" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Details">Total number of page views over the 7-day period. You can use it as a way to
+                track increasing usage of your Salesforce implementation.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d4349e38" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Metric">First Page Views, % of Total</td>
+
+              <td headers="d4349e41" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Details">Proportion of all page views that are first page views. This ratio gives you a
+                meaningful insight into how your users experience working with Salesforce in
+                Lightning Experience. This number is normally low, a minority of overall page views.
+                If you see a larger number, review the business processes performed in Salesforce
+                and consider optimizing navigation or other processes to make it easier for users to
+                stay in Lightning Experience.</td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="Note" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-scalability-262-0-0-production-enus/10fed30e-b440-4267-91a6-b6264993ae50/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">Note</span> When not explicitly separated, we blend EPT across first and subsequent page views, and
+        simply refer to it as “EPT.” This definition omits Lightning Experience bootstrap, and
+        combines non-bootstrap EPT from both first and subsequent page navigation. Because you can’t
+        directly optimize bootstrap, it represents the portion of EPT you can influence. It provides
+        a simplified metric for further breakdowns across geographies, browsers, and slow
+        pages.</div></div></div>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Embedded ApexGuru Insights</h2><p>When you access a report, ApexGuru recommendations are automatically embedded in your
+        Lightning Experience Performance dashboard. Click a hyperlinked action name to open its
+        ApexGuru insights in a new tab inside the dashboard. There, access ApexGuru’s Code
+        Recommendations and SOQL/DML Analysis for the corresponding Apex action. Make the suggested
+        revisions to your code to improve Lightning Experience performance. </p><p>In the <a href="#lex_insights_performance__key-insights" target="_self">Key
+          Insights</a> for slowest Apex actions section, ApexGuru recommendations are available
+        when the webpage loads. In the <a href="#lex_insights_performance__high-impact" target="_self">High Impact, Slow Performing Pages</a> section, recommendations for Apex
+        actions load in the background to ensure that embedding many insights at once doesn’t slow
+        down dashboard loading time. </p></div>
+    <div id="lex_insights_performance__key-insights"><a name="lex_insights_performance__key-insights"></a><h2 class="slds-text-heading_medium slds-p-top_small">Key Insights</h2><p>This section provides a plain-language summary of the most important performance takeaways.
+        Rather than just presenting raw numbers, this section interprets the data for you,
+        highlighting critical issues and applicable best practices. It serves as your starting point
+        and immediately draws your attention to the most significant performance problems and
+        opportunities for your org.</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:21.645021645021643%"><col style="width:78.35497835497836%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d4349e137" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Insight</th>
+              <th id="d4349e140" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Details</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d4349e137" style="vertical-align:top;" class="slds-cell-wrap" data-label="Insight">Number of components</td>
+
+              <td headers="d4349e140" style="vertical-align:top;" class="slds-cell-wrap" data-label="Details">The number of custom components on a page affects page load time, especially
+                when a component is complex or inefficient. Make sure that every component on your
+                pages has a purpose.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d4349e137" style="vertical-align:top;" class="slds-cell-wrap" data-label="Insight">Secured Browser Caching</td>
+
+              <td headers="d4349e140" style="vertical-align:top;" class="slds-cell-wrap" data-label="Details"><a target="_blank" href="https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/perf_secure_browser_caching.htm">Secure data caching</a> in the browser improves
+                page reload performance by avoiding extra round trips to the server. This setting is
+                enabled by default. </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d4349e137" style="vertical-align:top;" class="slds-cell-wrap" data-label="Insight">Lightning CDN</td>
+
+              <td headers="d4349e140" style="vertical-align:top;" class="slds-cell-wrap" data-label="Details">The <a target="_blank" href="https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/perf_cdn.htm">Lightning content delivery network</a> (CDN)
+                serves static content for the Lightning Component framework. This setting is enabled
+                by default.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d4349e137" style="vertical-align:top;" class="slds-cell-wrap" data-label="Insight">Dynamic Boxcar'ing</td>
+
+              <td headers="d4349e140" style="vertical-align:top;" class="slds-cell-wrap" data-label="Details"><a target="_blank" href="https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/controllers_server_actions_boxcar_dynamic.htm">Dynamic boxcar optimization</a> improves Aura
+                app performance by grouping Aura actions into boxcars.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d4349e137" style="vertical-align:top;" class="slds-cell-wrap" data-label="Insight">Apex caching</td>
+
+              <td headers="d4349e140" style="vertical-align:top;" class="slds-cell-wrap" data-label="Details">Percentage of Apex actions served from the client cache, instead of requiring a
+                round trip to the server. Make sure that your Apex classes are taking full advantage
+                of the <a target="_blank" href="https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/controllers_server_apex_auraenabled_annotation.htm">@AuraEnabled annotation</a> to get caching of
+                server-side action results.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d4349e137" style="vertical-align:top;" class="slds-cell-wrap" data-label="Insight">Slowest Apex actions</td>
+
+              <td headers="d4349e140" style="vertical-align:top;" class="slds-cell-wrap" data-label="Details">These Apex methods are the slowest actions used by your custom components.
+                Check <a title="Use AI and machine learning models to analyze your Apex code, surface performance antipatterns, detect unused and duplicated code, and generate prescriptive optimization recommendations." href="apexguru_core.html#apexguru_overview">ApexGuru Insights</a> for
+                opportunities to optimize these actions.</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Performance Trends</h2><p>After Key Insights, review charts that visualize your org’s P75 EPT over the selected week
+        and break down EPT by region and browser. This graph helps you identify trends and
+        understand performance patterns. You can see when EPT is spiking, whether performance is
+        degrading over time, or if recent changes have improved page load times. </p><p>The Performance Trends chart shows trends for both the initial page load (1st Page EPT) and
+        subsequent page navigation within the app.</p></div>
+    <div id="lex_insights_performance__high-impact"><a name="lex_insights_performance__high-impact"></a><h2 class="slds-text-heading_medium slds-p-top_small">High Impact, Slow Performing Pages</h2><p>This section lists the ten pages with the highest combination of the number of page views
+        and the highest P75 EPT. That is, it identifies the ten slowest pages that get used the
+        most. With this data, you can focus your optimization efforts where they have the most
+        impact. </p><p>It also goes deeper by identifying the specific pages, components, and actions that can
+        make Salesforce feel slow for your users. For a given page in the table, expand the row to
+        see the individual components and their actions — such as complex Apex calls or inefficient
+        component logic — that are the most resource-intensive. You and your development team can
+        use this data to move directly from analysis to action, addressing the root cause of the
+        performance bottleneck at a fine grained level. </p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="Note" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-scalability-262-0-0-production-enus/10fed30e-b440-4267-91a6-b6264993ae50/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">Note</span>  To focus your attention on the impactful changes you can make, this section only
+        displays custom components and actions. Components that can’t be determined from metrics are
+        aggregated together, and are shown as “UNKNOWN.” You can still expand the “component” row,
+        and review the individual actions for optimization opportunities.</div></div></div>
+<p><strong>Untimed Action Metrics</strong></p><p>This table provides non-time-based metrics. These metrics offer insight into which
+        component actions run the most frequently, and whether and how efficiently they’re
+        reused.</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:21.978021978021978%"><col style="width:78.02197802197803%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d4349e273" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">Metric</th>
+              <th id="d4349e276" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">Details</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d4349e273" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Metric">Action Count</td>
+
+              <td headers="d4349e276" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Details">The number of times this action ran during the selected time period.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d4349e273" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Metric">Boxcar Count</td>
+
+              <td headers="d4349e276" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Details"><p>The number of actions grouped in a batch in a single network request.
+                  Lightning Experience can group multiple actions into one request for efficiency.
+                  If the batch becomes too large, higher counts mean more efficient batching, but
+                  potentially longer individual action times.</p><p style="margin-bottom:0;">See <a target="_blank" href="https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/controllers_server_actions_batching.htm">Batching of Server-side Actions</a> in the
+                Lightning Aura Components Developer Guide for a detailed description of the
+                boxcar’ing process.</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d4349e273" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Metric">Cache Eligible</td>
+
+              <td headers="d4349e276" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Details">Indicates if you can serve an action from a cache. If it can, it loads faster
+                because it doesn’t require new processing from the server. Check the cache hit ratio
+                to see how often this process actually happens. For more details, see <a target="_blank" href="https://developer.salesforce.com/docs/platform/lwc/guide/apex-result-caching.html">Client-Side Caching of Apex Method Results</a>
+                and <a target="_blank" href="https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/controllers_server_storable_actions.htm">Storable Actions</a>.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d4349e273" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Metric">Cache Hit Ratio</td>
+
+              <td headers="d4349e276" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Details">The percentage of actions that returned results from cache rather than
+                requiring server processing. Higher ratios indicate better caching efficiency, and
+                generally result in faster response times for repeated actions.</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p><strong>Timed Action Metrics</strong></p><p>It's easier to interpret the details provided in the High Impact, Slow Performing Pages
+        list when you understand the phases of an action request. Let's review this process,
+        starting from when a component fires the action, to the different phases of the round trip
+        to Salesforce, until the action completes and applies any updates to the page.</p><p>This diagram illustrates the various phases of an action request.</p><div>
+        <img alt="Sequence of a component action request" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-scalability-262-0-0-production-enus/10fed30e-b440-4267-91a6-b6264993ae50/scalability/images/lex_page_action_request.jpg" style="width:800px;">
+      </div><p>The Performance Insights dashboard provides these time-based metrics.</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:21.978021978021978%"><col style="width:78.02197802197803%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d4349e375" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">Metric</th>
+              <th id="d4349e378" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">Details</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d4349e375" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Metric">XHR Request Stall Time</td>
+
+              <td headers="d4349e378" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Details">Measure of the initial network connection delay before a request is sent to the
+                server. This value includes the time needed to look up the server’s address (DNS
+                lookup) and establish the network connection (TCP setup).</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d4349e375" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Metric">Server Time</td>
+
+              <td headers="d4349e378" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Details">Time spent running the action on the server, including database operations and
+                business logic. This value excludes network transfer time and client-side
+                processing, and can help identify when delays are due to server processing.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d4349e375" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Metric">Time to First Byte (TTFB)</td>
+
+              <td headers="d4349e378" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Details">Time from when a request is sent to the server until the server receives the
+                first byte of the response. This value indicates how quickly the server responds to
+                the action, and can help identify when delays are due to server processing or
+                network issues.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d4349e375" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Metric">XHR Duration</td>
+
+              <td headers="d4349e378" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Details">Time between when a network request is sent to the server and when the client
+                receives the full response. This value measures pure network communication time,
+                including the server execution time, but not client-side processing.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d4349e375" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Metric">XHR Response Stall Time</td>
+
+              <td headers="d4349e378" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Details"><p>Delay in processing the response due to the main thread being busy. Begins when a
+                  network response is received from the server and ends when the JavaScript callback
+                  runs. This metric helps identify when the client-side app is the bottleneck,
+                  rather than network or server performance issues.</p><p style="margin-bottom:0;">Heavy JavaScript execution or UI thread blocking often cause client-side
+                  processing issues that prevent immediate response handling. If you see high
+                  values, review the component and consider redesigning it to handle responses more
+                  independently or asynchronously.</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d4349e375" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Metric">Duration</td>
+
+              <td headers="d4349e378" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Details">Total time for this action to complete, from when the action is first requested
+                until the client-side callback completes. This value includes all waiting time,
+                network transfer, server processing, and client-side execution. It’s the complete
+                end-to-end time for an action to finish.</td>
+
+            </tr>
+          </tbody></table></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="lex_insights_usage">
+<h1 class="slds-text-heading_large">Usage Insights</h1>
+  
+  <p>Generate Usage Insights to identify your most popular pages and evaluate their
+    performance. This dashboard lets you pinpoint performance bottlenecks and focus on optimizing
+    your most used pages.</p>
+
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:20.36659877800407%"><col style="width:79.63340122199592%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d647e36" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">Metric</th>
+            <th id="d647e39" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">Details</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d647e36" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Metric">Average Page Views</td>
+
+            <td headers="d647e39" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Details">Average number of page views over the chosen 7-day period.</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d647e36" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Metric">Total Page Views</td>
+
+            <td headers="d647e39" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Details">Total number of page views over the seven day period. You can use it as a way to
+              track increasing usage of your Salesforce implementation.</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d647e36" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Metric">Average Daily Active Users (DAU)</td>
+
+            <td headers="d647e39" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Details">The average DAU over the chosen 7-day period. DAU is the count of unique users
+              who visited your site.</td>
+
+          </tr>
+        </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Usage Trends</h2><p>Below the usage overview metrics, you'll find trend charts that monitor the scale of your
+        org's activity, including page view and DAU trends, geography and browser breakdowns. These
+        charts offer insights into your org's overall reach and user base. </p><p>Page views and DAU track usage trends over a 7-day period between first and subsequent
+        pages, and they visualize how usage patterns shift over time. Geographical map and browser
+        pie charts show where your users use Lightning pages the most, based on page views. In
+        these, average DAU and EPT metrics serve as reference. </p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Most Used Pages</h2><p>The Most Used Pages table highlights which of your pages receive the most user traffic.
+        This lets you focus optimization efforts where they have the greatest impact on user
+        experience, leveraging average DAU metric as reference. You can also use EPT data in this
+        table to evaluate if your most popular pages meet performance expectations.</p></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="report_insights_overview">
+<h1 class="slds-text-heading_large">Report Insights</h1>
+  
+  <p>Use on-demand insights to identify slow reports and improve their
+    performance.</p>
+
+    <div><p>Considerations</p><ul>
+        <li>Report Insights shows you public access reports and excludes private reports.</li>
+
+        <li>As a part of Scale Center, Report Insights is supported in Government Cloud Plus.</li>
+
+      </ul>
+<p>To generate report insights:</p></div>
+    <ol><li>
+        <span>From Setup, in the Quick Find box, enter <kbd>Scale Insights</kbd>, then
+          click <strong class="uicontrol">Report Insights</strong>.</span>
+      </li><li>
+        <span>Click <strong class="uicontrol">Generate Insight Report</strong> for on-demand analysis. Report
+          Insights analyzes your reports and recommends improvements for the slowest ones.</span>
+      </li></ol>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="Report Insight Categories" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-scalability-262-0-0-production-enus/10fed30e-b440-4267-91a6-b6264993ae50/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">Report Insight Categories</span> 
+      
+      <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:35.46099290780141%"><col style="width:64.53900709219857%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d3590e83" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Insight</th>
+              <th id="d3590e86" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Definition</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d3590e83" style="vertical-align:top;" class="slds-cell-wrap" data-label="Insight">Slow Reports by Average Run Time</td>
+
+              <td headers="d3590e86" style="vertical-align:top;" class="slds-cell-wrap" data-label="Definition">Ranked by average run time.</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d3590e83" style="vertical-align:top;" class="slds-cell-wrap" data-label="Insight">Recommendations</td>
+
+              <td headers="d3590e86" style="vertical-align:top;" class="slds-cell-wrap" data-label="Definition">Ways to optimize your slow reports and avoid performance issues.</td>
+
+            </tr>
+          </tbody></table>
+    </div></div></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="search_insights_overview">
+<h1 class="slds-text-heading_large">Search Insights</h1>
+ 
+ <p>Use on-demand insights to get recommendations and improve your search
+  performance.</p>
+
+  <div><p>Considerations</p><ul>
+    <li>Search Insights provides insights, recommendations, and best practices about your custom
+     entities with search enabled.</li>
+
+    <li>As a part of Scale Center, Search Insights is supported in Government Cloud Plus.</li>
+
+   </ul>
+<p>To generate search insights:</p></div>
+  <ol><li>
+    <span>From Setup, in the Quick Find box, enter <kbd>Scale Insights</kbd>, then click
+      <strong class="uicontrol">Search Insights</strong>.</span>
+   </li><li>
+    <span>Click <strong class="uicontrol">Generate Insight Report</strong> for on-demand analysis. Search
+     Insights analyzes your entities and provides recommendations to improve your search
+     performance.</span>
+   </li></ol>
+
+  <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="Search Insight Categories" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-scalability-262-0-0-production-enus/10fed30e-b440-4267-91a6-b6264993ae50/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">Search Insight Categories</span> 
+   
+   <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:35.46099290780141%"><col style="width:64.53900709219857%"></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d1229e83" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Insight</th>
+       <th id="d1229e86" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Definition</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d1229e83" style="vertical-align:top;" class="slds-cell-wrap" data-label="Insight">Entities Never Queried</td>
+
+       <td headers="d1229e86" style="vertical-align:top;" class="slds-cell-wrap" data-label="Definition"><p>Custom objects aren't queried even though Salesforce maintains search indexes.
+         Operations related to these objects are slower.</p><p style="margin-bottom:0;">Use previous reports to identify the most unused entities. Go to these custom objects in Object
+         Manager and disable search.</p></td>
+
+      </tr>
+      <tr class="">
+       <td headers="d1229e83" style="vertical-align:top;" class="slds-cell-wrap" data-label="Insight">Entities Queried and Never Clicked</td>
+
+       <td headers="d1229e86" style="vertical-align:top;" class="slds-cell-wrap" data-label="Definition"><p>Custom objects are searched for but never actually clicked once search results are
+         returned.</p><p style="margin-bottom:0;">Ask your business team if these objects need to be searchable and consider disabling search in
+         Object Manager.</p></td>
+
+      </tr>
+     </tbody></table>
+  </div></div></div>
+ 
+</div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="scale_center.html">&larr; Scale Center（パフォーマンス診断）</a><a href="agentforce_for_scale.html">Agentforce for Scale &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.scalability_overview.htm&type=5&language=ja">help.salesforce.com — Salesforce スケーラビリティ（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>

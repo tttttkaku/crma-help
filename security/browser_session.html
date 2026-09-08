@@ -1,0 +1,2056 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>ブラウザ・セッション・クリックジャック | セキュリティ（組織を保護する）ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（15）</h2>
+    <ol>
+      <li><a href="#browser_security">ブラウザーのセキュリティ設定の有効化</a></li>
+      <li><a href="#platform_cookies">Salesforce Platform の Cookie</a></li>
+      <li><a href="#security_browser_features">ブラウザー機能へのアクセス権の制御</a></li>
+      <li><a href="#security_clickjack_apply_unclear_support">一般的なブラウザーに対するクリックジャック保護の適用</a></li>
+      <li><a href="#security_clickjack_enable_visualforce">Visualforce ページのクリックジャック保護の有効化</a></li>
+      <li><a href="#security_clickjack_protection_configure">クリックジャック保護の定義</a></li>
+      <li><a href="#security_clickjack_specify_iframe_trusted_domains">インラインフレームの信頼済みドメインの指定</a></li>
+      <li><a href="#security_coep">クロスオリジンエンベッダーポリシー (COEP) を使用したページリソース要求の制限</a></li>
+      <li><a href="#security_cookies_test_blocked_salesforce">ブロックされた Salesforce セッション Cookie の影響のテスト</a></li>
+      <li><a href="#security_coop">クロスオリジンオープナーポリシー (COOP) を使用した Visualforce ページの保護</a></li>
+      <li><a href="#security_external_interactions">外部 URL とオリジンとのやりとりの制限</a></li>
+      <li><a href="#security_external_redirects">外部 URL へのリダイレクトの管理</a></li>
+      <li><a href="#security_session_browser_about">セッションとブラウザーのセキュリティ</a></li>
+      <li><a href="#security_session_types">ユーザーセッション種別</a></li>
+      <li><a href="#security_settings_referrer_policy">URL 内の機密情報の保護</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>ブラウザ・セッション・クリックジャック</h1>
+      <div class="meta">Salesforce セキュリティ（組織を保護する）ヘルプ · 15 記事 · 生成 2026-08-13</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="network_access.html">&larr; ネットワーク・IP制限・信頼済みURL</a><a href="passwords_users.html">パスワード・ユーザアクセス &rarr;</a></div>
+<section class="article" id="browser_security">
+<h1 class="slds-text-heading_large">ブラウザーのセキュリティ設定の有効化</h1>
+  <p>ブラウザーのセキュリティ設定により、機密情報を保護し、SSL 証明書を監視します。</p>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">参照元 URL 保護</h2><p>Salesforce の外部で納入商品を読み込む場合や、Salesforce の外部に移動する場合、参照元ヘッダーには URL 全体ではなく Salesforce.com または Force.com のみが表示されます。この機能により、完全な URL だと公開されてしまう可能性のある機密情報 (組織 ID など) が参照元ヘッダーに表示されなくなります。 この機能は、Chrome と Firefox でのみサポートされています。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">公開鍵ピンニング</h2><p>中間者 (man-in-the-middle) 攻撃を検出するために、Salesforce でユーザーが表示できる SSL 証明書が監視されるようになりました。カスタム証明書は影響を受けません。公開鍵ピンニングは、Chrome と Firefox でのみサポートされています。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">HSTS (HTTP Strict Transport Security) 保護</h2><p>HSTS は、HTTPS を使用するようにブラウザーをリダイレクトします。これは、すべての Salesforce ページと Visualforce ページ、およびすべての Experience Cloud サイトと Salesforce サイトで有効になっており、無効にすることはできません。HSTS ヘッダーまたはその値は変更できません。</p><p>HSTS を適用したら、ブラウザーでは HTTPS のみがドメインで使用できるようにキャッシュされます。キャッシュの保存期間は 2 年です。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="ログイン後、ユーザーはプラットフォームとのセッションを確立します。セッションセキュリティを使用して、ユーザーがログインしたままコンピューターから離れているときにネットワークにさらされる危険を制限します。また、ある従業員が別の従業員のセッションを使用したりする場合などの、内部攻撃の危険も制限します。複数のセッション設定から選択して、セッションの動作を制御します。" href="overview_misc.html#security_overview_sessions">セッションセキュリティ</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="platform_cookies">
+<h1 class="slds-text-heading_large">Salesforce Platform の Cookie</h1>
+  <p>Salesforce Platform では、機能の向上と処理時間の短縮のために Cookie を使用しています。Cookie は、ユーザーの設定を保存することで、ユーザーエクスペリエンスと Salesforce Platform のパフォーマンスを向上させることができます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: すべてのエディション</td>
+
+          </tr>
+        </tbody></table>
+    <div><p>Salesforce では現在、エンドユーザーの Cookie 利用同意管理を行うための機能を提供していません。プラットフォームは、多数の既存のサードパーティソリューションと互換性があります。社内の IT チームと協力するか、実装パートナーに相談して、組織のニーズに適したソリューションを見極めることをお勧めします。</p><p> Cookie は必須、機能、マーケティングに分割されます。機能の Cookie には設定と統計が含まれます。</p><ul>
+        <li>必須: Web サイトを閲覧し、その機能を使用するために絶対に必要です。</li>
+
+        <li>機能: 設定: 以前に行われた選択を記憶するために Web サイトで使用されます。言語設定は設定種別の Cookie の一例です。</li>
+
+        <li>機能: 統計: クリックされたリンクやユーザーがアクセスしたページなど、Web サイトの使用方法に関する情報を収集するために使用されます。</li>
+
+        <li>マーケティング: よりパーソナライズされた環境 (関連する広告を含む) のためにオンライン活動を追跡するために使用される。</li>
+
+      </ul>
+<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Salesforce Platform は、機能 Cookie を使用せずに実行できますが、機能が低下する可能性があります。機能への影響は、ブロックされた Cookie の目的によって異なります。</div></div></div>
+<p>次の表では、Salesforce によって収集される Salesforce Platform の Cookie について説明します。</p></div>
+    <table summary="すべてのユーザーが対象の Cookie (認証済みおよび未認証)" class="slds-table slds-table_bordered slds-m-bottom_small"><caption>
+        すべてのユーザーが対象の Cookie (認証済みおよび未認証)
+      </caption><colgroup><col style="width:24.95164410058027%"><col style="width:19.342359767891683%"><col style="width:27.079303675048354%"><col style="width:28.62669245647969%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Cookie 名</th>
+            <th id="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" scope="col">期間</th>
+            <th id="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Cookie の種類</th>
+            <th id="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>__Host-ERIC_PROD-&lt;random number&gt;</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">1 分</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">エンタープライズ要求インフラストラクチャ Cookie (ERIC) は、サーバーとクライアント間のクロスサイトリクエストフォージェリ (CSRF) セキュリティトークンを継承します。Cookie 名は、サーバーモード (PROD または PRODD DBSKU) および乱数を示します。Lightning アプリケーションごとに異なるトークンが生成されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>_ga</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">2 年</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 統計</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">サイト管理者が Google アナリティクストラッキング ID を使用したサイトユーザーの追跡を行うことを選択した場合に使用されるサードパーティの Cookie。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>{UserId}_KMPage</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">1 日</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 設定</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Salesforce Classic で、[記事の管理] の [ビュー内を検索]、[記事の言語]、[{DataCategory}]、および [検証状況] での最後のユーザー選択を参照するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>{UserId}_KnowledgePageDispatcher</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 設定</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Salesforce Classic で、ユーザー選択を記憶して [ナレッジ] に [記事] ビューと [私のドラフト] ビューのどちらを表示するかを判別するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>{UserId}_KnowledgePageFilter{DataCategory}</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 設定</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Salesforce Classic で、[ナレッジ] のデータカテゴリ検索条件での最後のユーザー選択を記憶するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>{UserId}_KnowledgePageFilterArticleArticleType</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 設定</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Salesforce Classic で、[ナレッジ] の [記事] ビューの記事タイプ検索条件での最後のユーザー選択を記憶するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>{UserId}_KnowledgePageFilterArticlePublishStatus</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 設定</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Salesforce Classic で、[ナレッジ] の [記事] ビューの公開状況検索条件での最後のユーザー選択を記憶するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>{UserId}_KnowledgePageFilterArticleValidationStatus</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 設定</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Salesforce Classic で、[ナレッジ] の [記事] ビューの検証状況検索条件での最後のユーザー選択を記憶するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>{UserId}_KnowledgePageFilterLanguage</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 設定</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Salesforce Classic で、[ナレッジ] の言語検索条件での最後のユーザー選択を記憶するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>{UserId}_KnowledgePageFilterMyDraftArticleType</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 設定</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Salesforce Classic で、[ナレッジ] の [私のドラフト] ビューの記事タイプ検索条件での最後のユーザー選択を記憶するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>{UserId}_KnowledgePageFilterMyDraftPublishStatus</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 設定</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Salesforce Classic で、[ナレッジ] の [私のドラフト] ビューの公開状況検索条件での最後のユーザー選択を記憶するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>{UserId}_KnowledgePageFilterMyDraftValidationStatus</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 設定</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Salesforce Classic で、[ナレッジ] の [私のドラフト] ビューの検証状況検索条件での最後のユーザー選択を記憶するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>{UserId}_KnowledgePageSortFieldArticle</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 設定</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Salesforce Classic で、[ナレッジ] の [記事] ビューの [並び替え] での最後のユーザー選択を記憶するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>{UserId}_KnowledgePageSortFieldMyDraft</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 設定</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Salesforce Classic で、[ナレッジ] の [私のドラフト] ビューの [並び替え] での最後のユーザー選択を記憶するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>{UserId}_spring_KmMlAnyoneDraftArticlesList</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">1 日</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Salesforce Classic で、[記事の管理] の [ドラフト記事] ビューのレイアウトプロパティを設定するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>{UserId}_spring_KmMlArchivedArticlesList</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">1 日</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Salesforce Classic で、[記事の管理] の [アーカイブ済み記事] のレイアウトプロパティを設定するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>{UserId}_spring_KmMlMyDraftArticlesList</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">1 日</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Salesforce Classic で、[記事の管理] の [自分] に割り当てられた [ドラフト記事] のレイアウトプロパティを設定するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>{UserId}_spring_KmMlMyDraftTranslationsList</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">1 日</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Salesforce Classic で、[記事の管理] の [ドラフト翻訳] のレイアウトプロパティを設定するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>{UserId}_spring_KmMlPublishedArticlesList</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">1 日</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Salesforce Classic で、[記事の管理] の [公開記事] のレイアウトプロパティを設定するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>{UserId}_spring_KmMlPublishedTranslationsList</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">1 日</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Salesforce Classic で、[記事の管理] の [公開翻訳] のレイアウトプロパティを設定するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>&lt;namespace&gt;_sid</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Live Agent セッションを識別する。チャットサービスを介した特定のブラウザーセッションの一意の仮名化 ID を保存します。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>52609e00b7ee307e</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ブラウザー指紋 Cookie。セッションセキュリティの問題を検出するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>79eb100099b9a8bf</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ブラウザー指紋トリガー Cookie。セッションセキュリティの問題を検出するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>activeView</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 設定</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Salesforce Classic で、[記事の管理] の [記事] または [翻訳] タブでの最後のユーザー選択を記憶するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>apex__EmailAddress</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">1 年</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">メールアドレスに関連付けられた取引先責任者 ID をキャッシュする。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>auraBrokenDefGraph</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">1 週間</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 統計</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Lightning ページに不正な形式の HTML がある場合に追跡するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>autocomplete</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">60 日</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 設定</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ログインページでユーザーのユーザー名を保存するかどうかを判別する。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>BAYEAX_BROWSER</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">作成時に期限切れ</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">CometD ストリーミングチャネルに登録されている一意のブラウザーを識別する。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>BrowserId</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">1 年</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">セキュリティ保護に使用される。.salesforce.com、.force.com、および Salesforce ログインページ、Lightning ページ、Experience Cloud サイトのドメインなどの Salesforce ドメインのサブセットに表示されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>calViewState</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 統計</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Salesforce Classic のインラインカレンダー日付の状態 (今週を選択) を設定する。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>caPanelState</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 設定</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">カレンダーパネルを開いた状態、閉じた状態、高さのパーセントの状態を保存する。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>clientSrc</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">セキュリティ保護に使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>CookieConsent</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">1 年</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">エンドユーザーの Cookie 利用同意設定の適用に使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>CookieConsentPolicy</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">1 年</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">クライアント側ユーティリティによって設定されたエンドユーザーの Cookie 利用同意設定を適用するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>cookieSettingVerified</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ユーザーに Cookie が必要であることを伝えるポップアップメッセージを作成するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>cordovaVersion</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">モバイルアプリケーションでの内部診断に使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>cqcid</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">1 年</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 統計</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ゲストの買い物客の閲覧活動を追跡するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>csssid</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">適切なテナント組織で要求コンテキストを確立するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>csssid_Client</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ユーザーの切り替えを有効化。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>devOverrideCsrfToken</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">CSRF トークン。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>disco</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ログインをバイパスする最後のユーザーログインとアクティブセッションを追跡する。たとえば、OAuth ルール適用フローなど。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>FedAuth</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">SharePoint コネクタで、SharePoint の最上位サイトに対して認証するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>force-proxy-stream</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">3 時間</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">クライアント要求が同じプロキシホストに到達するようにし、キャッシュからコンテンツを取得しやすくする。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>force-stream</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">180 分</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">スティッキーセッションに対するサーバー要求をリダイレクトするために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>gTalkCollapsed</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">1 年</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Salesforce Classic のサイドバーをユーザーに対して開くかどうかを制御する。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>guest_uuid_essential_&lt;15-char SiteID&gt;</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">1 年</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Salesforce サイトのゲストユーザーの一意の ID を指定する。ユーザーが最後にサイトにアクセスしてから 1 年後に期限切れになります。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>hideDevelopmentTools</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 設定</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">開発者ツールを表示するかどうかを決定するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>hideFilesWarningModal</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">50 年</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 設定</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Salesforce ファイルへの公開リンクがメール送信に含まれることのユーザー承認を保存する。ユーザーがこのアクションを承認すると、警告ウィンドウは継続的に表示されなくなります。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>hideIdentityDialog</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">1 年</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 設定</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">別のユーザーに切り替えると現在のユーザーがログアウトされることを通知するダイアログボックスを非表示にする。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>idccsrf</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">特定のシングルサインオン (SSO) フローの <code>CrossSiteRequestForgery</code> 検証を追跡する。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>ideaToggle</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 設定</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">[アイデア] リストビューまたは [フィード] リストビューを表示する。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>inst</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ブックマークとハードコード化された URL で別のインスタンスに要求を送信するときに、要求を別のインスタンスにリダイレクトするために使用される。この種類のリダイレクトは、組織の移行、分割、または URL 更新の後に実行できます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>iotcontextsplashdisable</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">10 年</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 設定</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">IoT 製品で、コンテキストスプラッシュポップアップを表示するかどうかのユーザー設定が保存されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>language</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">複数の言語をサポートするカスタムコンポーネント、アンケート、およびフローの言語を識別します。この Cookie がない場合、カスタム機能の翻訳が正しく表示されないことがあります。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>lastlist</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">最後のリスト URL の Cookie 名を保存するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>liveagent_invite_rejected_</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 統計</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">同じドメインで招待を再発行しないように Live Agent に指示する。この Cookie を削除すると、顧客は繰り返し招待を受信する可能性があるため、カスタマーエクスペリエンスが低下します。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>liveagent_sid</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Live Agent セッションを識別する。チャットサービスを介した特定のブラウザーセッションの一意の仮名化 ID を保存します。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>lloopch_loid</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">1 年</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ユーザーを特定のポータルログインまたはアプリケーションログインのどちらに転送するかを判別する。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>login</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">60 日</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 設定</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ユーザーのセッションが期限切れになった場合に、プロセスビルダーアプリケーションの使用時にユーザー名を取得して、メインログインページに入力するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名"><code>loginURL</code></td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 設定</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ユーザーが <samp class="filepath">login.salesforce.com</samp> または <samp class="filepath">test.salesforce.com</samp> を使用してログインしない組織の開始ページを保存します。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>oinfo</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">3 か月</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 統計</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">最後にログインした組織を追跡する。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>pc-unit</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">1 年</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 設定</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">プラットフォームキャッシュ単位の表示を MB または KB に設定する。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>PreferredLanguage</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">1 年</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 設定</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">言語検出およびローカライズされたユーザーエクスペリエンスのユーザー言語設定を保存するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>promptTestMod</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">30 日</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">テストモードが有効かどうかを保存する。この Cookie は参照のみです。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>redirectionWarning</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">1 年</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 設定</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">許可リストにリダイレクト警告インタースティシャルページを設定することから除外される URL を顧客が保存できるようにする。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名"><code>rememberUn</code></td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">60 日</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 設定</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ユーザーがログイン時に [記憶する] チェックボックスをオンにしたかどうかを示します。これにより、ユーザー名が保存されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>RRetURL</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">元の状態を復元するために「次のユーザーとしてログインする」に使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>RRetURL2</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">セッションからログアウトしたときにリダイレクトする戻り URL。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>RSID</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">セッション ID とログイン方法セッション ID。 この場合、Cookie が応答にコピーされ、プロキシ状況では対象 URL が適切に再構築されます。Cookie が作成、検証、変更されることはありません。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名"><code>rsid2</code></td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">システム管理者が内部ユーザーとしてログインし、内部ユーザーがポータルユーザーとしてログインすると、この Cookie に内部ユーザーの暗号化されたセッション ID が保存されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名"><code>saml_request_id</code></td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">60 日</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">SAML <code>AuthnRequest</code> ID の生成に使用されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>schgtclose</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">0</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 統計</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">廃止された機能。使用されません。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>SetupDomainProbePassed</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Salesforce は Winter '25 ですべての [設定] ページを <samp class="filepath">*.salesforce-setup.com</samp> ドメインに移動します。 この cookie は、サーバが正しいドメインで設定の読み込みを適切に処理するために必要です。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>sfdc_lv2</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">1 年</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ユーザーのデバイスの有効化の詳細を保存します。Cookie が設定されていない場合や Cookie の有効期限が切れた場合、ユーザーは次回ログインするときに ID を検証する必要があります。ID 検証には、SMS、認証アプリケーション、セキュリティキーなどの検証方法が必要です。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>sfdc-stream</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">3 時間</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Salesforce インフラストラクチャ内で、スティッキーセッションに対するサーバー要求を適切に転送するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>showNewBuilderWarningMessage</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">100 年</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 設定</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">新しいダッシュボードビルダーの警告メッセージを表示または非表示にするために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>sid</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">現在のユーザーの Lighting プラットフォーム Soap-API と Rest-API データ接続を認証するために使用されるセッション ID。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>sid_Client</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">セッションの改ざんを検出して防止するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>sidebarPinned</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">10 年</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Salesforce Classic サイドバーの状態を制御する。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>ssostartpage</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">1 年</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">シングルサインオン (SSO) の ID プロバイダー (IdP) の場所を識別する。特定のサービスプロバイダーが開始した SSO 要求は、この Cookie がないと失敗する可能性があります。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>SUCSP</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">システム管理者が [他のユーザーとしてログイン] を介して想定しているユーザー ID がカスタマーサクセスポータル (CSP) ユーザーである場合に使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>SUPRM</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">セッション</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">システム管理者が ([他のユーザーとしてログイン] を介して) 想定しているユーザー ID がパートナーリレーション管理 (PRM) ポータルユーザーである場合に使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>t</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">作成時に期限切れ</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 統計</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">アクセス権チェックの重複を回避するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>useStandbyUrl</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">設定なし</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">必須</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ソフトフォンの読み込み時にスタンバイ URL を設定するまでの時間を制御する。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>waveUserPrefFinderLeftNav</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">100 年</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 設定</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">CRM Analytics の左側のナビゲーション UI の設定。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>waveUserPrefFinderListView</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">100 年</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 設定</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">CRM Analytics でリストビューを表示するための設定。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>webact</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">1 年</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 統計</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">パーソナライズのためにページビューあたりの総計値を収集するために使用される。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d81752e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie 名">
+              <code>WelcomePanel</code>
+            </td>
+
+            <td headers="d81752e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="期間">1 日</td>
+
+            <td headers="d81752e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="Cookie の種類">機能: 設定</td>
+
+            <td headers="d81752e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Salesforce の設定を保存する。</td>
+
+          </tr>
+        </tbody></table>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="ユーザーがログインすると、セッションとブラウザーの操作が攻撃の標的になる可能性があります。セッションセキュリティ設定を定義し、クリックジャックから保護し、外部 URL とオリジンの許可リストを管理します。次に、Salesforce Platform が機能を改善して処理時間を短縮するために使用する Cookie を確認します。" href="#security_session_browser_about">セッションとブラウザーのセキュリティ</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="security_browser_features">
+<h1 class="slds-text-heading_large">ブラウザー機能へのアクセス権の制御</h1>
+  
+  <p>外部 (Salesforce 以外の) サーバーまたは URL への要求がユーザーのカメラとマイクロフォンにアクセスできるかどうかを制御するには、Permissions-Policy HTTP ヘッダーを有効にします。その後、次の各ブラウザー機能へのアクセスを許可するタイミングを選択します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic および Lightning Experience の両方</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Contact Manager</strong> Edition、<strong>Group</strong> Edition、<strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d14210e81" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d14210e81" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">セキュリティ設定を変更する</td>
+
+              <td headers="d14210e81" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>[設定] で、[クイック検索] ボックスに<kbd>「セッションの設定」</kbd>と入力して、<strong class="uicontrol">[セッションの設定]</strong> を選択します。</span>
+      </li><li>
+        <span>[ブラウザー機能の権限] セクションで、<strong class="uicontrol">[Permissions-Policy HTTP ヘッダーを含める]</strong> を選択します。</span>
+        <div>この設定を無効にすると、Salesforce から読み込まれたすべての外部アプリケーションと Web サイトがユーザーのカメラとマイクロフォンにアクセスできるようになります。</div>
+      </li><li>
+        <span>[カメラ] と [マイクロフォン] で、Salesforce からの要求がブラウザー機能にアクセスできるタイミングを選択します。</span>
+        <ol>
+          <li>
+            <span>このブラウザー機能へのアクセスを最も詳細に制御するには、<strong class="uicontrol">[信頼済み URL のみ]</strong> を選択します。</span>
+            <div>この推奨設定を選択したら、[信頼済み URL] 設定ページからアクセスできる信頼済み URL とブラウザー機能を指定します。</div>
+          </li>
+
+          <li>
+            <span>Salesforce から読み込まれるすべての外部アプリケーションと Web サイトにこのブラウザー機能へのアクセス権を付与するには、<strong class="uicontrol">[常に]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>Salesforce から読み込まれたすべての外部アプリケーションと Web サイトでブラウザー機能へのアクセスをブロックするには、<strong class="uicontrol">[なし]</strong> を選択します。</span>
+            <div>[なし] を選択すると、Salesforce ドメインのスクリプトでもブラウザー機能にアクセスできません。</div>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>変更内容を保存します。</span>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="ユーザーやネットワークとのやりとりを信頼する URL を指定します。コンテンツセキュリティポリシー (CSP) ディレクティブを使用して、Lightning コンポーネント、サードパーティ API、WebSocket 接続で各信頼済み URL から読み込むことができるリソースの種別を制御します。[セッションの設定] で Permissions-Policy HTTP ヘッダーを有効にしている場合は、Salesforce からブラウザー機能にアクセスできる URL も制御できます。" href="network_access.html#security_trusted_urls_manage">信頼済み URL の管理</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="security_clickjack_apply_unclear_support">
+<h1 class="slds-text-heading_large">一般的なブラウザーに対するクリックジャック保護の適用</h1>
+  
+  <p>クリックジャック攻撃からユーザーを保護するために、Content-Security-Policy: frame-ancestors HTTP ヘッダーディレクティブがサポートされている場合、Salesforce が提供するページにそのディレクティブが適用されます。クリックジャック保護をより多くのユーザーに拡張するには、Salesforce が要求アプリケーションまたは専門ブラウザーでそのディレクティブがサポートされるかどうかを特定できないまれなケースで、そのディレクティブを含めます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic および Lightning Experience の両方</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Contact Manager</strong> Edition、<strong>Group</strong> Edition、<strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d97866e81" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d97866e81" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">セキュリティ設定を変更する</td>
+
+              <td headers="d97866e81" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>Salesforce Lightning Experience および Salesforce Classic のサポート対象ブラウザーとデバイスでは、クリックジャック保護に必要な HTTP ヘッダーディレクティブがサポートされます。ユーザーがサポート対象外のアプリケーション、または Content-Security-Policy: frame-ancestors のサポートが不明確な特殊なブラウザーを介してアクセスする場合のみ、この機能を有効にすることをお勧めします。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-error"><img alt="警告" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_warning.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">警告</span> このオプションが有効になっていると、ユーザーが Content-Security-Policy: frame-ancestors ディレクティブがサポートされていないアプリケーションまたはブラウザーから Salesforce にアクセスしたときにサポートの欠如が明確でない場合、エラーが発生する可能性があります。ユーザーのアプリケーションおよびブラウザーを使用して、Sandbox でこの機能をテストすることをお勧めします。そのときに、ユーザーに表示されるエラーに対する追加のクリックジャック保護の利点を検討してください。</div></div></div>
+</div>
+    <ol><li>
+        <span>[設定] で、[クイック検索] ボックスに<kbd>「セッションの設定」</kbd>と入力して、<strong class="uicontrol">[セッションの設定]</strong> を選択します。</span>
+      </li><li>
+        <span>[Content Security Policy (CSP) Directive Rendering (コンテンツセキュリティポリシー (CSP) ディレクティブの表示)] セクションで <strong class="uicontrol">[Apply CSP directives for less common browsers (一般的ではないブラウザーに CSP ディレクティブを適用)]</strong> を選択し、変更を保存します。</span>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="クリックジャックは、ユーザーをだまして何か (ボタンまたはリンクなど) をクリックさせる攻撃の一種です。クリックにより、悪意のあるアクションを実行する HTTP 要求が送信され、データ侵入、認証されていないメール、ログイン情報の変更、または同様の結果がもたらされる可能性があります。この種類の攻撃から保護するには、ほとんどの Salesforce ページを同じドメインのページでインラインフレームでのみ提供できます。フレーム化できるページ種別と、関連するクリックジャック設定の定義方法について説明します。" href="#security_clickjack_protection_configure">クリックジャック保護の定義</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="security_clickjack_enable_visualforce">
+<h1 class="slds-text-heading_large">Visualforce ページのクリックジャック保護の有効化</h1>
+  
+  <p>クリックジャック攻撃から保護できるようにするには、外部サイトで Visualforce ページをインラインフレーム (iframe) で読み込むことができないようにします。必要に応じて、信頼済み外部サイトでの Visualforce ページのフレーム化を許可できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic および Lightning Experience の両方</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Contact Manager</strong> Edition、<strong>Group</strong> Edition、<strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d116364e81" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d116364e81" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">セキュリティ設定を変更する</td>
+
+              <td headers="d116364e81" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>Visualforce ページを現在フレーム化している許可リストドメイン。</span>
+        <div>
+          <p>既存の機能を維持するには、Visualforce ページのクリックジャック保護を有効にする前にこの手順を完了してください。</p>
+          <p>Trustする各ドメインを [セッションの設定] の [インラインフレームの信頼済みドメイン] 許可リストに追加します。カスタムドメインまたは管理パッケージを使用している場合は、それらのドメインも許可リストに追加します。詳細は、Salesforce ヘルプの<a title="外部サイトで Visualforce ページまたはアンケートをインラインフレーム (iframe) で読み込むことができるようにするには、ドメインを [セッションの設定] の許可リストに追加します。" href="#security_clickjack_specify_iframe_trusted_domains">「インラインフレームの信頼済みドメインの指定」</a>を参照してください。</p>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> インフラストラクチャによっては、HTTP ヘッダーの最大サイズが制限されます。Visualforce ページのフレーム化を複数のドメインで許可する場合は、CSP ヘッダーのサイズを 12 KB 未満に抑えてください。ヘッダーサイズが 16 KB に近づくと Salesforce のお客様から問題が報告され、サードパーティが処理中にヘッダーを追加することがよくあります。</div></div></div>
+
+        </div>
+      </li><li>
+        <span>[設定] で、[クイック検索] ボックスに<kbd>「セッションの設定」</kbd>と入力して、<strong class="uicontrol">[セッションの設定]</strong> を選択します。</span>
+        <div>
+          <p>Visualforce ページの [クリックジャック保護] の下にある 2 つの設定は、ヘッダーが有効かどうかを参照します。<a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.pages.meta/pages/pages_compref_page.htm">Apex:page</a> 項目の <code>showHeader</code> は、ヘッダーがページで有効になっているかどうかを示します。</p>
+        </div>
+      </li><li>
+        <span>ヘッダーが有効化された Visualforce ページを他の Visualforce ページでフレーム化できるようにするには、<strong class="uicontrol">[標準ヘッダーがある Visualforce ページのクリックジャック保護を有効化]</strong> を選択します。</span>
+      </li><li>
+        <span>ヘッダーが無効化された Visualforce ページを他の Visualforce ページでフレーム化できるようにするには、<strong class="uicontrol">[ヘッダーが無効化された Visualforce ページのクリックジャック保護を有効化]</strong> を選択します。</span>
+      </li><li>
+        <span>変更を保存します。</span>
+        <div>少なくとも 1 つのオプションを有効にしてセッション設定を保存すると、対応する Visualforce ページの CSP の <code>frame-ancestors</code> HTTP 応答ヘッダーが <code>'self'</code> に設定されます。また、同じ HTTPS 応答ヘッダーに Visualforce ページのインラインフレームの信頼済みドメインが含まれます。</div>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="クリックジャックは、ユーザーをだまして何か (ボタンまたはリンクなど) をクリックさせる攻撃の一種です。クリックにより、悪意のあるアクションを実行する HTTP 要求が送信され、データ侵入、認証されていないメール、ログイン情報の変更、または同様の結果がもたらされる可能性があります。この種類の攻撃から保護するには、ほとんどの Salesforce ページを同じドメインのページでインラインフレームでのみ提供できます。フレーム化できるページ種別と、関連するクリックジャック設定の定義方法について説明します。" href="#security_clickjack_protection_configure">クリックジャック保護の定義</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.concept_salesforce_surveys.htm&amp;language=ja&amp;type=5">Salesforce フィードバック管理</a></li><li><a title="クリックジャック攻撃からユーザーを保護するために、Content-Security-Policy: frame-ancestors HTTP ヘッダーディレクティブがサポートされている場合、Salesforce が提供するページにそのディレクティブが適用されます。クリックジャック保護をより多くのユーザーに拡張するには、Salesforce が要求アプリケーションまたは専門ブラウザーでそのディレクティブがサポートされるかどうかを特定できないまれなケースで、そのディレクティブを含めます。" href="#security_clickjack_apply_unclear_support">一般的なブラウザーに対するクリックジャック保護の適用</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="security_clickjack_protection_configure">
+<h1 class="slds-text-heading_large">クリックジャック保護の定義</h1>
+  <p>クリックジャックは、ユーザーをだまして何か (ボタンまたはリンクなど) をクリックさせる攻撃の一種です。クリックにより、悪意のあるアクションを実行する HTTP 要求が送信され、データ侵入、認証されていないメール、ログイン情報の変更、または同様の結果がもたらされる可能性があります。この種類の攻撃から保護するには、ほとんどの Salesforce ページを同じドメインのページでインラインフレームでのみ提供できます。フレーム化できるページ種別と、関連するクリックジャック設定の定義方法について説明します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic および Lightning Experience の両方</td>
+
+          </tr>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Contact Manager</strong> Edition、<strong>Group</strong> Edition、<strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</td>
+
+          </tr>
+        </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">クリックジャック保護</h2><p>クリックジャックでは、信頼済みのドメインまたはサイトを使用してユーザーをだまし、悪意のあるリンクをクリックさせます。クリックジャックでは、信頼済みドメインが iframe で提供された後、非表示または透明の UI コントロールが同じ場所で提供されます。たとえば、[保存] ボタンの上にある透明なボタンです。ユーザーは、実際には非表示の UI コントロールをクリックしているときに、最上位の iframe をクリックしていると思っています。</p><p>ユーザーを保護するために、Salesforce ではクリックジャック保護を使用します。Salesforce が提供するページの場合、クリックジャック保護はコンテンツセキュリティポリシー (CSP) の <code>frame-ancestors</code> HTTP 応答ヘッダーディレクティブを介して実装されます。HTTP 応答ヘッダーは、HTTP 要求に応じてサーバーからブラウザーまたはクライアントマシンに渡される HTTP 応答の一部です。そのヘッダー内のディレクティブは、追加のコンテキストまたは指示を提供する値です。CSP の <code>frame-ancestors</code> HTTP 応答ヘッダーディレクティブは、iframe でページを読み込むことができるサイトをブラウザーに伝えます。</p><p>Salesforce では、CSP の <code>frame-ancestors</code> HTTP 応答ヘッダーディレクティブが、そのディレクティブがサポートされている場合に Salesforce が提供するページに適用されます。クリックジャック保護をより多くのユーザーに拡張するには、Salesforce が要求アプリケーションまたは専門ブラウザーでそのディレクティブがサポートされるかどうかを特定できないまれなケースで、そのディレクティブを含めます。詳細は、<a title="クリックジャック攻撃からユーザーを保護するために、Content-Security-Policy: frame-ancestors HTTP ヘッダーディレクティブがサポートされている場合、Salesforce が提供するページにそのディレクティブが適用されます。クリックジャック保護をより多くのユーザーに拡張するには、Salesforce が要求アプリケーションまたは専門ブラウザーでそのディレクティブがサポートされるかどうかを特定できないまれなケースで、そのディレクティブを含めます。" href="#security_clickjack_apply_unclear_support">「一般的ではないブラウザーへのクリックジャック保護の適用」</a>を参照してください。</p><p>Salesforce には 3 つの CSP <code>frame-ancestors</code> 値が適用されます。ページ種別によって、デフォルトでこの HTTP 応答ヘッダーが存在するかどうかと、ヘッダー内でこれらのどのオプションを使用できるかが決まります。</p><ul>
+        <li><code>'none'</code> — このページを iframe で読み込むことができないようにします。</li>
+
+        <li><code>'self'</code> – 同じ URL スキームとポート番号を含め、保護されたページと同じオリジンからのページでこのページを iframe で読み込むことができます。</li>
+
+        <li>ドメインのリスト — このページを iframe で読み込むことができるドメイン。リストにはワイルドカードを含めることができます。たとえば、<code>*.force.com</code> です。通常、このオプションは <code>'self'</code> 値と組み合わせて使用されます。</li>
+
+      </ul>
+<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> CSP <code>frame-ancestors</code> ヘッダーディレクティブは、古い <code>X-Frame-Options</code> ヘッダーを置き換えます。詳細は、<cite>Mozilla 開発者ネットワーク</cite>の<a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options">「X-Frame-Options」</a>を参照してください。</div></div></div>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">CSP ヘッダーサイズ</h2><p>インフラストラクチャによっては、HTTP ヘッダーの最大サイズが制限されます。組織で提供されるコンテンツを複数のドメインでフレーム化できるようにする場合は、CSP ヘッダーのサイズを 12 KB 未満に抑えます。ヘッダーサイズが 16 KB に近づくと Salesforce のお客様から問題が報告され、サードパーティが処理中にヘッダーを追加することがよくあります。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Salesforce ログインページ</h2><p>外部サイトでは、<samp class="filepath">https://login.salesforce.com</samp> などの汎用ログインページを含め、Salesforce ログインページをフレーム化できません。また、外部サイトでは、<samp class="filepath">https://mycompany.my.salesforce.com</samp> など、組織の [私のドメイン] のログインページをフレーム化できません。このようなページでは、CSP の <code>frame-ancestors</code> HTTP 応答ヘッダーが <code>'none'</code> に設定されます。この HTTP 応答ヘッダーを変更することはできません。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Lightning ページ</h2><p>プラットフォームの一部として Salesforce が配信する Lightning ページでは、同じ組織内で Lightning ページをフレーム化できます。このページの URL には、<samp class="filepath">lightning.force.com</samp> と 16 桁数字の形式の一意の識別子が含まれます。このようなページでは、CSP の <code>frame-ancestors</code> HTTP 応答ヘッダーが <code>'self'</code> に設定されます。この HTTP 応答ヘッダーディレクティブを変更することはできません。</p><p>Experience Cloud サイトの Lightning ページのクリックジャック保護オプションについての詳細は、Experience Cloud サイトでこのトピックのセクションを参照してください。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Salesforce Classic ページ</h2><p>外部サイトでは、Salesforce Classic 内で作成され、Salesforce によって配信されたページをフレーム化することはできません。Salesforce Classic ページの例として、[設定] ページや、Salesforce オブジェクトのページ (取引先の詳細ページなど) があります。ユーザーは Lightning モードでこれらのページを表示できますが、ページは Salesforce Classic を使用して作成されています。</p><p><strong class="uicontrol">[設定ページのクリックジャック保護を有効化]</strong> と <strong class="uicontrol">[設定以外の Salesforce ページのクリックジャック保護を有効化]</strong> の 2 つの [セッションの設定] で、Salesforce が配信する Classic ページのフレーム化が禁止されます。これらの設定はデフォルトで有効になっており、無効にすることはできません。これらの設定を無効にするには、Salesforce カスタマーサポートにご連絡ください。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Visualforce ページ</h2><p>デフォルトでは、Visualforce ページは iframe で読み込むことができます。ヘッダーがある Visualforce ページの場合、CSP の <code>frame-ancestors</code> HTTP 応答ヘッダーディレクティブはありません。</p><p>外部 Web サイトで Visualforce ページが iframe に読み込まれないようにするには、Visualforce ページをフレーム化するように信頼する外部ドメインを定義し、2 つのセッション設定を有効にします。詳細は、Salesforce ヘルプの<a title="クリックジャック攻撃から保護できるようにするには、外部サイトで Visualforce ページをインラインフレーム (iframe) で読み込むことができないようにします。必要に応じて、信頼済み外部サイトでの Visualforce ページのフレーム化を許可できます。" href="#security_clickjack_enable_visualforce">「Visualforce ページのクリックジャック保護の有効化」</a>および<a title="外部サイトで Visualforce ページまたはアンケートをインラインフレーム (iframe) で読み込むことができるようにするには、ドメインを [セッションの設定] の許可リストに追加します。" href="#security_clickjack_specify_iframe_trusted_domains">「インラインフレームの信頼済みドメインの指定」</a>を参照してください。</p><p>ブラウザーはサードパーティの Cookie をブロックするため、認証された Visualforce ページをフレーム化するには追加の手順が必要です。『<cite>Visualforce Developer Guide</cite>』の「<a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.pages.meta/pages/pages_quick_start_external_iframe.htm">Put Visualforce Pages on External Domains</a>」を参照してください。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Experience Cloud サイト</h2><p>デフォルトでは、Experience Cloud サイトページでは、同じドメインとプロトコルセキュリティを持つ他のサイトページをフレーム化できます。このようなのページの CSP の <code>frame-ancestors</code> HTTP 応答ヘッダーディレクティブは <code>'self'</code> に設定されます。</p><p>ページレベルの設定を使用して、信頼済み外部ドメインでのサイトページのフレーム化を許可できます。エクスペリエンスビルダーサイトページの場合、クリックジャック設定は [セキュリティとプライバシー] 設定にあります。Salesforce タブと Visualforce サイトの場合、クリックジャック設定はエクスペリエンスワークスペースの Force.com サイトのページ管理にあります。</p><p>詳細は、Salesforce ヘルプの<a target="_blank" href="https://help.salesforce.com/s/articleView?id=experience.networks_clickjack_protection.htm&amp;language=ja&amp;type=5">「Experience Cloud サイトのクリックジャック保護の有効化」</a>を参照してください。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Salesforce サイトおよび Force.com サイト</h2><p>デフォルトでは、Salesforce サイトおよび Force.com サイト内のページでは、同じドメインとプロトコルセキュリティを持つ他のサイトページをフレーム化できます。このようなのページの CSP の <code>frame-ancestors</code> HTTP 応答ヘッダーディレクティブは <code>'self'</code> に設定されます。</p><p>ページレベルのサイト設定を使用して、信頼済み外部ドメインでのサイトページのフレーム化を許可できます。各ページのクリックジャック保護レベルおよび信頼済みドメインを設定するには、Site.com Studio で設定を編集します。詳細は、Salesforce ヘルプの<a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.siteforce_clickjacking_enable.htm&amp;language=ja&amp;type=5">「Site.com でのクリックジャック保護の有効化」</a>を参照してください。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">アンケート</h2><p>デフォルトでは、アンケートは、同じドメインとプロトコルセキュリティを持つページでフレーム化できます。CSP の <code>frame-ancestors</code> HTTP 応答ヘッダーディレクティブは <code>'self'</code> に設定されます。</p><p>必要に応じて、組織のアンケートをフレーム化するように信頼する外部ドメインを定義できます。詳細は、Salesforce ヘルプの<a title="外部サイトで Visualforce ページまたはアンケートをインラインフレーム (iframe) で読み込むことができるようにするには、ドメインを [セッションの設定] の許可リストに追加します。" href="#security_clickjack_specify_iframe_trusted_domains">「インラインフレームの信頼済みドメインの指定」</a>を参照してください。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">開示およびコンプライアンスハブコネクタ</h2><p>デフォルトでは、開示とコンプライアンスのハブコネクタは、同じドメインとプロトコルセキュリティのページでフレーム化できます。CSP の <code>frame-ancestors</code> HTTP 応答ヘッダーディレクティブは <code>'self'</code> に設定されます。</p><p>必要に応じて、信頼する外部ドメインを定義して、組織の開示とコンプライアンスのハブコネクタをフレーム化できます。詳細は、Salesforce ヘルプの<a title="外部サイトで Visualforce ページまたはアンケートをインラインフレーム (iframe) で読み込むことができるようにするには、ドメインを [セッションの設定] の許可リストに追加します。" href="#security_clickjack_specify_iframe_trusted_domains">「インラインフレームの信頼済みドメインの指定」</a>を参照してください。</p></div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#security_clickjack_enable_visualforce">Visualforce ページのクリックジャック保護の有効化</a></strong><br>クリックジャック攻撃から保護できるようにするには、外部サイトで Visualforce ページをインラインフレーム (iframe) で読み込むことができないようにします。必要に応じて、信頼済み外部サイトでの Visualforce ページのフレーム化を許可できます。</li><li class="slds-p-bottom_small"><strong><a href="#security_clickjack_specify_iframe_trusted_domains">インラインフレームの信頼済みドメインの指定</a></strong><br>外部サイトで Visualforce ページまたはアンケートをインラインフレーム (iframe) で読み込むことができるようにするには、ドメインを [セッションの設定] の許可リストに追加します。</li><li class="slds-p-bottom_small"><strong><a href="#security_clickjack_apply_unclear_support">一般的なブラウザーに対するクリックジャック保護の適用</a></strong><br>クリックジャック攻撃からユーザーを保護するために、Content-Security-Policy: frame-ancestors HTTP ヘッダーディレクティブがサポートされている場合、Salesforce が提供するページにそのディレクティブが適用されます。クリックジャック保護をより多くのユーザーに拡張するには、Salesforce が要求アプリケーションまたは専門ブラウザーでそのディレクティブがサポートされるかどうかを特定できないまれなケースで、そのディレクティブを含めます。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="ログイン後、ユーザーはプラットフォームとのセッションを確立します。セッションセキュリティを使用して、ユーザーがログインしたままコンピューターから離れているときにネットワークにさらされる危険を制限します。また、ある従業員が別の従業員のセッションを使用したりする場合などの、内部攻撃の危険も制限します。複数のセッション設定から選択して、セッションの動作を制御します。" href="overview_misc.html#security_overview_sessions">セッションセキュリティ</a></li><li><a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/frame-ancestors">Mozilla 開発者ネットワーク: CSP: frame-ancestors</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="security_clickjack_specify_iframe_trusted_domains">
+<h1 class="slds-text-heading_large">インラインフレームの信頼済みドメインの指定</h1>
+  
+  <p>外部サイトで Visualforce ページまたはアンケートをインラインフレーム (iframe) で読み込むことができるようにするには、ドメインを [セッションの設定] の許可リストに追加します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic および Lightning Experience の両方</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Contact Manager</strong> Edition、<strong>Group</strong> Edition、<strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d24705e81" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d24705e81" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">セキュリティ設定を変更する</td>
+
+              <td headers="d24705e81" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>このトピックでは、Visualforce ページのインライン フレーム化について説明します。Experience Cloud サイトと Salesforce サイトの信頼済みドメインを指定するには、Salesforce ヘルプの「エクスペリエンスビルダーサイトの<a target="_blank" href="https://help.salesforce.com/s/articleView?id=experience.networks_clickjack_protection.htm&amp;type=5&amp;language=ja">クリックジャック保護の</a>有効化」および「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.siteforce_clickjacking_enable.htm&amp;type=5&amp;language=ja">Site.com のクリックジャック</a>保護の有効化」を参照してください。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> インフラストラクチャによっては、HTTP ヘッダーの最大サイズが制限されます。組織で提供されるコンテンツを複数のドメインでフレーム化できるようにする場合は、CSP ヘッダーのサイズを 12 KB 未満に抑えます。ヘッダーサイズが 16 KB に近づくと Salesforce のお客様から問題が報告され、サードパーティが処理中にヘッダーを追加することがよくあります。</div></div></div>
+</div>
+    <ol><li>
+        <span>Visualforce ページをフレーム化するために Trust するドメインを決定します。</span>
+        <div>
+          <p>許可リストに登録する外部ドメインを決定するときは、次のドメイン種別を含めます。</p>
+        </div>
+        <ol>
+          <li>
+            <span>カスタムドメイン — サイトコンテンツを提供する https://www.example.com など、所有するドメイン。</span>
+            <div>カスタムドメインは [設定] の [ドメイン] ページにあります。詳細は、Salesforce ヘルプの「カスタムドメインの<a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.domain_mgmt_view.htm&amp;type=5&amp;language=ja">詳細の表示</a>」を参照してください。</div>
+          </li>
+
+          <li>
+            <span>管理パッケージによって提供される Visualforce ページ。</span>
+            <div>このようなページでは、本番では URL 形式の <code><var>MyDomainName</var>--<var>PackageName</var>.vf.force.com</code> を使用し、Sandbox では <code><var>MyDomainName</var>--<var>SandboxName</var>--<var>PackageName</var>.sandbox.vf.force.com</code> を使用します。他の本番以外の組織の URL 形式については、Salesforce ヘルプの「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.domain_name_partitioned_domains_sandbox.htm&amp;type=5&amp;language=ja">Sandbox ドメイン URL パターン</a>」を参照してください。<p>組織のパッケージで提供される Visualforce ページのパッケージ名を取得するには、[設定] の [Visualforce ページ] ページの [名前空間プレフィックス] 列を使用します。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Salesforce で提供されるパッケージの Visualforce ページでは、パッケージ名として <code>c</code> が使用され、外部サイトとして扱われません。</div></div></div>
+</div>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>[設定] で、[クイック検索] ボックスに<kbd>「セッションの設定」</kbd>と入力して、<strong class="uicontrol">[セッションの設定]</strong> を選択します。</span>
+      </li><li>
+        <span>[設定] の [セッション設定] ページの [インラインフレームの信頼済みドメイン] セクションで、<strong class="uicontrol">[ドメインを追加]</strong> をクリックします。</span>
+      </li><li>
+        <span>[ドメイン] を入力します。</span>
+        <div>使用可能な形式は、<samp class="filepath">example.com</samp>、<samp class="filepath">https://example.com</samp>、および <samp class="filepath">*.example.com</samp> です。</div>
+      </li><li>
+        <span>このドメインで許可された IFrame 種別を選択します。</span>
+        <ol>
+          <li>
+            <span>指定したドメインで Visualforce ページを iframe で読み込むことができるようにするには、<strong class="uicontrol">[Visualforce ページ]</strong> を選択して変更を保存します。</span>
+            <div>Visualforce ページのクリックジャック保護が有効になっている場合、ドメインは、対応する Visualforce ページのコンテンツセキュリティポリシー (CSP) の <code>frame-ancestors</code> HTTP 応答ヘッダーに追加されます。たとえば、<code>'self' abc.com *.my.site.com</code> です。詳細は、Salesforce ヘルプの<a title="クリックジャック攻撃から保護できるようにするには、外部サイトで Visualforce ページをインラインフレーム (iframe) で読み込むことができないようにします。必要に応じて、信頼済み外部サイトでの Visualforce ページのフレーム化を許可できます。" href="#security_clickjack_enable_visualforce">「Visualforce ページのクリックジャック保護の有効化」</a>を参照してください。<p>Visualforce ページのクリックジャック保護が有効になっていない場合、すべての外部 Web サイトで Visualforce ページを iframe で読み込むことができます。詳細は、Salesforce ヘルプの<a title="クリックジャックは、ユーザーをだまして何か (ボタンまたはリンクなど) をクリックさせる攻撃の一種です。クリックにより、悪意のあるアクションを実行する HTTP 要求が送信され、データ侵入、認証されていないメール、ログイン情報の変更、または同様の結果がもたらされる可能性があります。この種類の攻撃から保護するには、ほとんどの Salesforce ページを同じドメインのページでインラインフレームでのみ提供できます。フレーム化できるページ種別と、関連するクリックジャック設定の定義方法について説明します。" href="#security_clickjack_protection_configure">「クリックジャック保護の定義」</a>を参照してください。</p></div>
+          </li>
+
+          <li>
+            <span>指定したドメインでアンケートを iframe で読み込むことができるようにするには、<strong class="uicontrol">[アンケート]</strong> を選択して変更を保存します。</span>
+            <div>ドメインは、アンケートページの CSP の <code>frame-ancestors</code> HTTP 応答ヘッダーに追加されます。たとえば、<code>'self' abc.com *.my.site.com</code> です。</div>
+          </li>
+
+          <li>
+            <span>指定したドメインで iframe に開示を読み込むことができるようにするには、[<strong class="uicontrol">Disclosure and Compliance Hub Connector</strong>] を選択して、変更を保存します。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>[インラインフレームの信頼済みドメイン] リストのドメインを編集するには、該当のドメインの <strong class="uicontrol">[編集]</strong> をクリックします。</span>
+      </li><li>
+        <span>[インラインフレームの信頼済みドメイン] リストのドメインを削除するには、該当のドメインの <strong class="uicontrol">[削除]</strong> をクリックします。</span>
+      </li></ol>
+
+    <div><p>認証済みVisualforceページをiframeに読み込むには、追加の手順が必要です。『<cite>Visualforce Developer Guide</cite>』の「<a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.pages.meta/pages/pages_quick_start_external_iframe.htm">Put Visualforce Pages on External Domains</a>」を参照してください。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="クリックジャックは、ユーザーをだまして何か (ボタンまたはリンクなど) をクリックさせる攻撃の一種です。クリックにより、悪意のあるアクションを実行する HTTP 要求が送信され、データ侵入、認証されていないメール、ログイン情報の変更、または同様の結果がもたらされる可能性があります。この種類の攻撃から保護するには、ほとんどの Salesforce ページを同じドメインのページでインラインフレームでのみ提供できます。フレーム化できるページ種別と、関連するクリックジャック設定の定義方法について説明します。" href="#security_clickjack_protection_configure">クリックジャック保護の定義</a></li><li><a title="クリックジャック攻撃からユーザーを保護するために、Content-Security-Policy: frame-ancestors HTTP ヘッダーディレクティブがサポートされている場合、Salesforce が提供するページにそのディレクティブが適用されます。クリックジャック保護をより多くのユーザーに拡張するには、Salesforce が要求アプリケーションまたは専門ブラウザーでそのディレクティブがサポートされるかどうかを特定できないまれなケースで、そのディレクティブを含めます。" href="#security_clickjack_apply_unclear_support">一般的なブラウザーに対するクリックジャック保護の適用</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="security_coep">
+<h1 class="slds-text-heading_large">クロスオリジンエンベッダーポリシー (COEP) を使用したページリソース要求の制限</h1>
+  
+  <p>カスタム Visualforce ページを保護するために、各自のページを信頼する外部ソースからのコンテンツのみを許可します。クロスオリジンエンベッダーポリシー (COEP) の設定を有効にすると、外部ソースの埋め込みコンテンツは、各自のページまたはドメインに読み込み可能であることがオリジンで明示的に指定されている場合にのみ読み込まれます。埋め込みコンテンツには、画像、ドキュメント、ウィジェットなどが該当します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic および Lightning Experience の両方</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Contact Manager</strong> Edition、<strong>Group</strong> Edition、<strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d124230e81" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d124230e81" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">セキュリティ設定を変更する</td>
+
+              <td headers="d124230e81" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>COEP が有効になっている場合、外部ソースの埋め込みコンテンツは、外部オリジンで次のいずれかの方法で許可されている場合にのみ読み込まれます。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 必要なコンテンツへのユーザーのアクセスを維持するには、この機能を本番で有効にする前に、予測される動作を確認し、Sandbox で COEP をテストすることをお勧めします。
+     <p>ブラウザーのアクセスチェックでは、ページからアクセスする Visualforce サイトと外部サイトの両方のヘッダーが使用されます。クロスオリジンエンベッダーポリシー (COEP) とクロスオリジンオープナーポリシー (COOP) ヘッダーの組み合わせによって、Visualforce ページと外部サイトがやりとりできるかどうかが決まります。COOP および COEP についての詳細は、MDN Web ドキュメントの<a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Opener-Policy">「Cross-Origin-Opener-Policy」</a>および<a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Embedder-Policy">「Cross-Origin-Embedder-Policy」</a>を参照することをお勧めします。</p></div></div></div>
+<ul>
+        <li>クロスオリジンリソースポリシー (CORP)。外部ソースのコンテンツには、クロスオリジンリソースポリシーヘッダーとクロスオリジン値が含まれます。</li>
+
+        <li>クロスオリジンリソース共有 (CORS)。外部オリジンの CORS 許可リストに対象のページまたはそのドメインが含まれます。ページで要求が実行されると、外部オリジンは必要な Access-Control-Allow-* ヘッダーで応答し、ページはこのヘッダーを使用してコンテンツにアクセスできます。</li>
+
+      </ul>
+</div>
+    <ol><li>
+        <span>[設定] で、[クイック検索] ボックスに<kbd>「セッションの設定」</kbd>と入力して、<strong class="uicontrol">[セッションの設定]</strong> をクリックします。</span>
+      </li><li>
+        <span>[Visualforce Cross-Origin Security ヘッダー] セクションで、<strong class="uicontrol">[Cross-Origin Embedder Policy (COEP)]</strong> を選択します。</span>
+        <div>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> COEP はすべてのカスタム Visualforce ページに適用されます。</div></div></div>
+
+        </div>
+      </li><li>
+        <span>変更内容を保存します。</span>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="コネクテッドな世界では、外部 Web サイトとオリジンとのやりとりが不可欠です。ネットワークとデータを保護するには、許可リストを設定し、Salesforce と外部オリジンのやりとりの方法を制限する設定を有効にします。また、Salesforce から発生するリダイレクトを信頼できる URL に制限します。" href="#security_external_interactions">外部 URL とオリジンとのやりとりの制限</a></li><li><a title="外部攻撃からカスタム Visualforce ページを防御できるようにします。クロスオリジンオープナーポリシー (COOP) を有効にすると、最上位のカスタム Visualforce ページがそれぞれ新しい参照コンテキストグループで開きます。このプロセスにより、他のブラウザータブと Visualforce ページやページのコンテンツ間の直接的なアクセスが阻止されます。" href="#security_coop">クロスオリジンオープナーポリシー (COOP) を使用した Visualforce ページの保護</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="security_cookies_test_blocked_salesforce">
+<h1 class="slds-text-heading_large">ブロックされた Salesforce セッション Cookie の影響のテスト</h1>
+ 
+ <p>サードパーティの Cookie をブロックするユーザーをサポートするには、Salesforce セッションの Cookie を使用するカスタム機能とコードをテストします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+  <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"> 使用可能なインターフェース: Salesforce Classic および Lightning Experience</td>
+
+      </tr>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Group</strong> Edition、<strong>Essentials</strong> Edition、<strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</td>
+
+      </tr>
+     </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d108710e81" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d108710e81" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">[私のドメイン] 設定を編集する</td>
+
+       <td headers="d108710e81" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+      </tr>
+     </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> これらの手順は、サードパーティまたはクロスドメインの Cookie を許可するようにブラウザーを設定できる場合にのみ適用されます。ブラウザーがすでにこれらの Cookie をブロックしている場合、Salesforce のどの設定でもその動作を上書きすることはできません。</div></div></div>
+</div>
+  <div><p>規制や消費者の懸念により、主要な Web ブラウザーはデフォルトでサードパーティの Cookie をブロックします。一部のブラウザーでは、ユーザーは設定でこれらの Cookie を許可できます。ただし、その慣行によってセキュリティリスクが生じる可能性があります。</p><p>サードパーティは Salesforce の Cookie に直接アクセスできません。また、拡張ドメインでは、Salesforce 内で他のクロスドメインインタラクションが発生しないように、組織の Salesforce でホストされる URL が変更されています。また、[設定] ページが salesforce-setup.com ドメインで提供されている場合、Classic ページをクロスドメイン Cookie なしで [設定] で読み込むことができます。</p><p>ただし、Salesforce セッション Cookie を使用するカスタムコードまたは機能は、ブラウザーでサードパーティ Cookie がブロックされても影響を受ける可能性があります。最も一般的な例は、Web サイトで iframe に認証済み Visualforce ページを読み込む場合です。この認証プロセスは、Salesforce セッション Cookie に依存します。または、以前にサードパーティの Cookie を有効にして、カスタムドメインまたはトークンベースの認証を使用せずに Lightning Out (ベータ) を使用している場合、Salesforce サーバ外にリリースする Lightning コンポーネントが機能しなくなる可能性があります。このカスタムコードまたは機能を維持するには、サードパーティによる Salesforce Cookie の使用がブロックされたときの動作をテストし、必要に応じてコードを更新します。</p></div>
+ 
+ <div id="test_blocked_salesforce_cookies_disable" lang="ja-jp" aria-labelledby="ariaid-title2" class="nested1"><a name="test_blocked_salesforce_cookies_disable" href="https://help.salesforce.com/s?language=ja"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">Salesforce Cookie のサードパーティ使用の無効化</h2>
+  
+  <p>サードパーティによる Salesforce Cookie の使用を必要とする機能に対するブロックされたサードパーティ Cookie の影響をテストするには、[私のドメイン] の [設定] ページで、Salesforce Cookie のファーストパーティ使用を必要とする設定を有効にします。ブラウザーがすでにサードパーティの Cookie をブロックしている場合は、このステップをスキップできます。</p>
+
+   <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> この設定は、Amazon Connect を使用する Service Cloud Voice または Amazon Connect からのパートナーテレフォニーを使用する Service Cloud Voice とは互換性がありません。<a target="_blank" href="https://help.salesforce.com/s/articleView?id=004333227&amp;language=ja&amp;type=1"><u>詳細はこちら</u></a>。</div></div></div>
+<p>ブラウザーがすでにサードパーティの Cookie をブロックしている場合、これらの設定は無効です。また、これらの設定は Salesforce Cookie にのみ影響します。Salesforce に組み込まれたサードパーティアプリケーションを含め、サードパーティ Cookie を使用する Salesforce からのコールをテストするには、ブラウザーでサードパーティ Cookie を無効にします。</p></div>
+   <ol><li>
+     <span>[設定] から、[クイック検索] ボックスに<kbd>「私のドメイン」</kbd>と入力し、<strong class="uicontrol">[私のドメイン]</strong> を選択します。</span>
+    </li><li>
+     <span>[ルーティングおよびポリシー] セクションで <strong class="uicontrol">[編集]</strong> をクリックします。</span>
+    </li><li>
+     <span>[<strong class="uicontrol">Require first-party use of Salesforce cookies</strong> (Salesforce Cookie のファーストパーティ使用が必要)] を選択します。</span>
+     <div>
+      <p>この設定を有効にすると、<code>SameSite=None</code> 属性が Salesforce Cookie から削除されます。Salesforce が提供する Cookie とのやり取りは、使用しているブラウザーに関係なく、サードパーティの Cookie がブロックされた場合の動作を模倣します。</p>
+      <p>設定ページが組織の <samp class="filepath">salesforce-setup.com</samp> ドメインで提供されていない場合、この設定を有効にすると、Classic で作成された古い設定ページにアクセスするには追加の手順が必要になります。Salesforce Classic でページを開くように指示するメッセージがユーザーに表示されます。</p>
+     </div>
+    </li><li>
+     <span>[プレビュードメインでの <strong class="uicontrol">Salesforce Cookie のクロスドメイン</strong>使用を許可] を有効にして、変更を保存します。</span>
+     <div>
+      <p>この設定は、[Salesforce Cookie のファーストパーティ使用が必要] 設定が有効になっている場合にのみ使用でき、適用されます。[Salesforce Cookie のファーストパーティ使用が必要] が有効になっている場合、この設定はデフォルトで有効になっています。</p>
+      <p>提供される Salesforce 機能の中には、プレビュードメインを使用してコンテンツ、メール、商品などを iframe に読み込むものがあります。たとえば、ユーザーが Marketing Cloud でキャンペーンのメールドラフトをプレビューするとします。サードパーティの Cookie がブロックされている場合、これらの機能の一部が機能するわけではありません。Salesforce でこれらの機能が更新される間、この設定により、ブロックされたサードパーティ Cookie の影響を無駄な中断なしでテストできます。</p>
+      <div style="text-align:left;"><img alt="[設定] の [私のドメイン] ページの [ルーティングおよびポリシー] セクション。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/security/images/session/my_domain_restrict_cookie_use.png" style="width:796px;"></div>
+      <p>[プレビュードメインでの Salesforce Cookie のクロスドメイン使用を許可] 設定 (2) は、[Salesforce Cookie のファーストパーティ使用を必須] 設定 (1) が有効になっている場合は常に有効にすることをお勧めします。そうしないと、Lightning を使用してプレビュー ドメインをフレーム化する機能が機能しなくなります。</p>
+     </div>
+    </li></ol>
+
+  
+ </div>
+
+ <div id="test_blocked_salesforce_cookies_resolve" aria-labelledby="ariaid-title3" class="nested1"><a name="test_blocked_salesforce_cookies_resolve" href="https://help.salesforce.com/s?language=ja"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">問題の解決</h2>
+  
+  <p>サードパーティの Cookie がブロックされた場合に機能しなくなる問題については、概要として 2 つの方法で解決できます。同じドメインから Cookie にアクセスするようにプロセスを変更したり、別の方法を使用して Cookie 内の情報を提供したりできます。</p>
+
+   <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> これらの問題を解決するには、Salesforce の外部で更新が必要な場合があります。これらの変更に関する指示やサポートは提供できません。</div></div></div>
+</div>
+   <div><p>サイトで一般公開したコンテンツを別のドメインで組織から読み込む場合、セッション Cookie は使用されません。この場合、Visualforceページが以前に<samp class="filepath">salesforce.com</samp>で提供されていない限り、SalesforceセッションCookieに関連する他のステップは必要ありません。</p><p>未管理Visualforceページのドメインが<samp class="filepath">salesforce.com</samp>から<samp class="filepath">force.com</samp>に変更された場合、その変更に対応する組織の更新方法についての詳細は、Knowledge記事「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001406148&amp;language=ja&amp;type=1">Ensure Access to</a> Your Visualforce Pages in Summer '24 and Winter '25」を参照してください。</p><p>認証済み Visualforce ページまたはその他の認証済みサイト コンテンツをフレーム化するには、カスタム ドメインを使用してフレーム化されたコンテンツを提供することをお勧めします。カスタムドメインでは、所有するドメイン (<samp class="filepath">https://www.example.com</samp> など) でサイトコンテンツを提供します。最も重要なのは、認証済みコンテンツをフレーム化するページと同じ登録可能なドメインで Salesforce に提供し、必要なセッション Cookie を許可することです。認証済みコンテンツを提供するカスタムドメインを設定するには、2 つの方法があります。</p><ul>
+     <li>コンテンツをフレーム化するサイトの登録可能なドメインのサブドメインで認証済みコンテンツを提供します。たとえば、Web サイトが <samp class="filepath">example.com</samp> の場合、カスタムドメインを使用して、<samp class="filepath">site.example.com</samp> などのサブドメインで認証済みサイトコンテンツを提供します。この方法は、コンテンツをフレーム化するサイトのドメインが別のサブドメイン (<samp class="filepath">www.example.com</samp> など) である場合にも機能します。</li>
+
+     <li>フレーム化するドメインと同じドメインで認証済みページを提供するようにカスタムドメインを設定します。サードパーティサービスまたは CDN を使用してカスタムドメインを提供します (必須の<a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.domain_mgmt_enable_https.htm&amp;language=ja&amp;type=5">前提条件</a>を満たすことを含む)。選択したカスタム URL パスプレフィックスとドメインで提供される他のコンテンツとの競合が発生しないように注意してください。<p>このオプションを使用する場合、コンテンツをフレーム化するときに Salesforce が提供する URL パスプレフィックスを含めます。たとえば、カスタムドメインが <samp class="filepath">example.com</samp> の場合、サイトパスが <samp class="filepath">/store</samp> の Experience Cloud サイトページを提供するには、<samp class="filepath">https://example.com/store</samp> という URL をフレーム化します。</p></li>
+
+    </ul>
+<p>カスタムドメインを使用して認証済みコンテンツを提供できない場合、他の 2 つのオプションがあります。Visualforce ページまたはサイトコンテンツのフレーム化を停止し、代わりに新しいブラウザ ウィンドウまたはタブでページを開くことができます。または、トークン ベースの認証でLightning Out(ベータ)を使用してコンテンツを提供することもできます。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Lightning Out はパイロットまたはベータサービスで、<a target="_blank" href="https://www.salesforce.com/company/legal/agreements/">Agreements - Salesforce.com</a> のベータサービス条件、またはお客様が締結した場合は書面による統合パイロット契約、および<a target="_blank" href="https://ptd.salesforce.com/?_ga=2.247987783.1372150065.1709219475-629000709.1639001992">製品条件ディレクトリ</a>の適用条件が適用されます。このパイロットサービスまたはベータサービスは、お客様ご自身の裁量でご利用ください。</div></div></div>
+</div>
+  
+ <div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.domain_mgmt.htm&amp;language=ja&amp;type=5">カスタムドメイン</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=003786014&amp;language=ja&amp;type=1">Knowledge Article: Visualforce Limitations in Salesforce Classic When Third-Party Cookies are Blocked (ナレッジ記事: サードパーティの Cookie がブロックされている場合の Salesforce Classic での Visualforce の制限)</a></li></ul></div>
+</div>
+
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="security_coop">
+<h1 class="slds-text-heading_large">クロスオリジンオープナーポリシー (COOP) を使用した Visualforce ページの保護</h1>
+  
+  <p>外部攻撃からカスタム Visualforce ページを防御できるようにします。クロスオリジンオープナーポリシー (COOP) を有効にすると、最上位のカスタム Visualforce ページがそれぞれ新しい参照コンテキストグループで開きます。このプロセスにより、他のブラウザータブと Visualforce ページやページのコンテンツ間の直接的なアクセスが阻止されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic および Lightning Experience の両方</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Contact Manager</strong> Edition、<strong>Group</strong> Edition、<strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d105541e81" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d105541e81" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">セキュリティ設定を変更する</td>
+
+              <td headers="d105541e81" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>COOP は、一種のセキュリティの脆弱性であるクロスサイトスクリプティング (XSS) から Visualforce ページを防御するのに役立ちます。攻撃者は XSS を使用して正規の Web ページまたは Web アプリケーションのクライアント側スクリプトに悪意のあるコードを含めます。ユーザーがこのページまたはアプリケーションにアクセスすると、Web ページまたはアプリケーションによって悪意のあるスクリプトがユーザーのブラウザーに配信されます。</p><p>COOP を使用すると、最上位のカスタム Visualforce ページがそれぞれ新しい参照コンテキストグループで開きます。Visualforce ページで iframe 内で開かれたブラウザーコンテンツは、親ページにアクセスできます。ただし、潜在的なクロスオリジン攻撃を阻止するために、ページを新しいタブまたはポップアップウィンドウで開こうとするプロセスはそのページにアクセスすることはできません。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 必要なコンテンツへのユーザーのアクセスを維持するには、この機能を本番で有効にする前に、予測される動作を確認し、Sandbox で COOP をテストすることをお勧めします。<p>ブラウザーのアクセスチェックでは、ページからアクセスする Visualforce サイトと外部サイトの両方のヘッダーが使用されます。クロスオリジンオープナーポリシー (COOP) とクロスオリジンエンベッダーポリシー (COEP) ヘッダーの組み合わせによって、Visualforce ページと外部サイトがやりとりできるかどうかが決まります。COOP および COEP についての詳細は、MDN Web ドキュメントの<a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Opener-Policy">「Cross-Origin-Opener-Policy」</a>および<a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Embedder-Policy">「Cross-Origin-Embedder-Policy」</a>を参照することをお勧めします。</p></div></div></div>
+</div>
+    <ol><li>
+        <span>[設定] で、[クイック検索] ボックスに<kbd>「セッションの設定」</kbd>と入力して、<strong class="uicontrol">[セッションの設定]</strong> をクリックします。</span>
+      </li><li>
+        <span>[Visualforce Cross-Origin Security ヘッダー] セクションで、<strong class="uicontrol">[Cross-Origin Opener Policy (COOP)]</strong> を選択します。</span>
+      </li><li>
+        <span>変更内容を保存します。</span>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="コネクテッドな世界では、外部 Web サイトとオリジンとのやりとりが不可欠です。ネットワークとデータを保護するには、許可リストを設定し、Salesforce と外部オリジンのやりとりの方法を制限する設定を有効にします。また、Salesforce から発生するリダイレクトを信頼できる URL に制限します。" href="#security_external_interactions">外部 URL とオリジンとのやりとりの制限</a></li><li><a title="カスタム Visualforce ページを保護するために、各自のページを信頼する外部ソースからのコンテンツのみを許可します。クロスオリジンエンベッダーポリシー (COEP) の設定を有効にすると、外部ソースの埋め込みコンテンツは、各自のページまたはドメインに読み込み可能であることがオリジンで明示的に指定されている場合にのみ読み込まれます。埋め込みコンテンツには、画像、ドキュメント、ウィジェットなどが該当します。" href="#security_coep">クロスオリジンエンベッダーポリシー (COEP) を使用したページリソース要求の制限</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="security_external_interactions">
+<h1 class="slds-text-heading_large">外部 URL とオリジンとのやりとりの制限</h1>
+  <p>コネクテッドな世界では、外部 Web サイトとオリジンとのやりとりが不可欠です。ネットワークとデータを保護するには、許可リストを設定し、Salesforce と外部オリジンのやりとりの方法を制限する設定を有効にします。また、Salesforce から発生するリダイレクトを信頼できる URL に制限します。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="network_access.html#security_trusted_urls_manage">信頼済み URL の管理</a></strong><br>ユーザーやネットワークとのやりとりを信頼する URL を指定します。コンテンツセキュリティポリシー (CSP) ディレクティブを使用して、Lightning コンポーネント、サードパーティ API、WebSocket 接続で各信頼済み URL から読み込むことができるリソースの種別を制御します。[セッションの設定] で Permissions-Policy HTTP ヘッダーを有効にしている場合は、Salesforce からブラウザー機能にアクセスできる URL も制御できます。</li><li class="slds-p-bottom_small"><strong><a href="network_access.html#security_trusted_urls_csp_directives_updated">更新された CSP ディレクティブによる組織の保護</a></strong><br>クロスサイトスクリプティングやその他のコードインジェクション攻撃から組織を保護するために、SalesforceはSummer '24でLightningページに配信されるコンテンツセキュリティポリシー(CSP)ディレクティブを更新しました。 本番組織が2024年6月より前に作成されている場合は、最新のディレクティブを採用する設定を有効にしてください。</li><li class="slds-p-bottom_small"><strong><a href="#security_external_redirects">外部 URL へのリダイレクトの管理</a></strong><br>Salesforce から離れる信頼できない外部リダイレクトからユーザーを保護します。まず、自動的に制限されるリダイレクトの種別と、Salesforce のハイパーリンクの制限オプションを確認します。信頼する外部 URL を許可リストに追加します。次に、ユーザーが Salesforce 組織外に移動するハイパーリンクをクリックしたときの動作を指定します。</li><li class="slds-p-bottom_small"><strong><a href="network_access.html#security_trusted_urls_csp_violations">信頼済み URL およびブラウザーポリシー違反の管理</a></strong><br>ユーザーを保護するために、2 つの許可リストで Salesforce のリソースを読み込むための Trust URL とリダイレクト用の Trust URL を指定します。ブロックされたリダイレクトと、コンテンツセキュリティポリシー (CSP) ディレクティブでブロックされたリソース要求を確認します。次に、必要なリソースを許可するために、信頼済み URL を更新します。</li><li class="slds-p-bottom_small"><strong><a href="overview_misc.html#extend_code_cors">Salesforce CORS 許可リストの設定</a></strong><br>     <span>クロスオリジンリソース共有 (CORS) を使用すると、Web ブラウザーで他のオリジンからのリソースを要求できます。たとえば、CORS を使用すると、<samp class="filepath">https://www.example.com</samp> にある Web アプリケーションの JavaScript スクリプトで <samp class="filepath">https://www.salesforce.com</samp> からのリソースを要求できます。Web ブラウザの JavaScript コードから、サポートされている Salesforce API、Apex REST リソース、および Lightning Out へのアクセスを許可するには、要求元のオリジンを Salesforce CORS 許可リストに追加します。自分の組織から Web ブラウザーで要求を送信できる Lightning アプリケーションの場合、Lightning アプリケーションへの要求は承認された URL からでない限り CORS 許可リストによって阻止されます。許可リストは [私のドメイン] の URL と api.salesforce.com で有効になっています。</span>   </li><li class="slds-p-bottom_small"><strong><a href="#security_settings_referrer_policy">URL 内の機密情報の保護</a></strong><br>組織 ID など、URL 内の機密情報を保護するには、Referrer-Policy HTTP ヘッダーを有効にします。Salesforce のアクションで別の URL に対するリクエストが行われると、そのリクエストを受信する Web サイトではオリジンに関する情報を表示できます。たとえば、Salesforce ページで画像が読み込まれた場合、画像がある Web サイトではその Salesforce ページの URL を表示できます。また、リンクをクリックすると、訪問しているウェブサイトでリンク先の Salesforce ページの URL が表示されることがあります。Referrer-Policy HTTP ヘッダーにより、そのリクエスト中にその URL、つまり参照元をどの程度共有するかが制御されます。</li><li class="slds-p-bottom_small"><strong><a href="#security_coop">クロスオリジンオープナーポリシー (COOP) を使用した Visualforce ページの保護</a></strong><br>外部攻撃からカスタム Visualforce ページを防御できるようにします。クロスオリジンオープナーポリシー (COOP) を有効にすると、最上位のカスタム Visualforce ページがそれぞれ新しい参照コンテキストグループで開きます。このプロセスにより、他のブラウザータブと Visualforce ページやページのコンテンツ間の直接的なアクセスが阻止されます。</li><li class="slds-p-bottom_small"><strong><a href="#security_coep">クロスオリジンエンベッダーポリシー (COEP) を使用したページリソース要求の制限</a></strong><br>カスタム Visualforce ページを保護するために、各自のページを信頼する外部ソースからのコンテンツのみを許可します。クロスオリジンエンベッダーポリシー (COEP) の設定を有効にすると、外部ソースの埋め込みコンテンツは、各自のページまたはドメインに読み込み可能であることがオリジンで明示的に指定されている場合にのみ読み込まれます。埋め込みコンテンツには、画像、ドキュメント、ウィジェットなどが該当します。</li><li class="slds-p-bottom_small"><strong><a href="#security_cookies_test_blocked_salesforce">ブロックされた Salesforce セッション Cookie の影響のテスト</a></strong><br>サードパーティの Cookie をブロックするユーザーをサポートするには、Salesforce セッションの Cookie を使用するカスタム機能とコードをテストします。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="security_external_redirects">
+<h1 class="slds-text-heading_large">外部 URL へのリダイレクトの管理</h1>
+  
+  <p>Salesforce から離れる信頼できない外部リダイレクトからユーザーを保護します。まず、自動的に制限されるリダイレクトの種別と、Salesforce のハイパーリンクの制限オプションを確認します。信頼する外部 URL を許可リストに追加します。次に、ユーザーが Salesforce 組織外に移動するハイパーリンクをクリックしたときの動作を指定します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: すべてのエディション</td>
+
+            </tr>
+          </tbody></table></div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="network_access.html#security_trusted_urls_external_redirections_understand">Salesforce での外部リダイレクトの制限</a></strong><br>Salesforce でのリダイレクトの対象、リダイレクトがブロックされる状況、およびリダイレクトを許可および制限するオプションについて説明します。</li><li class="slds-p-bottom_small"><strong><a href="network_access.html#security_trusted_urls_external_redirections_orgs">リダイレクトを許可する組織間 URL の特定</a></strong><br>潜在的な攻撃からユーザーを保護するために、URL が信頼されない限り、ユーザーは Salesforce 組織とは異なる Salesforce 組織にリダイレクトされません。この制限には、2 番目の組織の公開されているページとコンテンツへのリダイレクトが含まれます。所有する別の Salesforce 組織にユーザーをリダイレクトするリンク、アクション、またはプロセスを許可するには、対象 URL を [信頼されたリダイレクトの URL] 許可リストに追加します。</li><li class="slds-p-bottom_small"><strong><a href="network_access.html#security_trusted_urls_external_redirections_specify">リダイレクトの信頼済み URL の指定</a></strong><br>ユーザーがリダイレクトを介して外部 URL や組織間 URL にアクセスできるようにします。信頼済み URL を [信頼されたリダイレクトの URL] 許可リストに追加します。許可リスト内の Salesforce から URL へのリダイレクトは、常に警告なしで許可されます。</li><li class="slds-p-bottom_small"><strong><a href="network_access.html#security_trusted_urls_external_redirections_secure">Salesforce のハイパーリンクからの外部リダイレクトの保護</a></strong><br>[信頼されたリダイレクトの URL] 許可リストに入力したら、信頼できない URL へのリダイレクトからユーザーを保護します。Salesforce のハイパーリンクから実行されるリダイレクトを警告してブロックしたり、リダイレクト時にユーザーに警告したりできます。</li><li class="slds-p-bottom_small"><strong><a href="network_access.html#security_trusted_urls_external_redirections_test">外部リダイレクトのテスト</a></strong><br>[信頼されたリダイレクトの URL] 許可リストを更新したら、対応するリダイレクトが許可されていることを確認します。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="コネクテッドな世界では、外部 Web サイトとオリジンとのやりとりが不可欠です。ネットワークとデータを保護するには、許可リストを設定し、Salesforce と外部オリジンのやりとりの方法を制限する設定を有効にします。また、Salesforce から発生するリダイレクトを信頼できる URL に制限します。" href="#security_external_interactions">外部 URL とオリジンとのやりとりの制限</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="security_session_browser_about">
+<h1 class="slds-text-heading_large">セッションとブラウザーのセキュリティ</h1>
+  <p>ユーザーがログインすると、セッションとブラウザーの操作が攻撃の標的になる可能性があります。セッションセキュリティ設定を定義し、クリックジャックから保護し、外部 URL とオリジンの許可リストを管理します。次に、Salesforce Platform が機能を改善して処理時間を短縮するために使用する Cookie を確認します。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="#security_external_interactions">外部 URL とオリジンとのやりとりの制限</a></strong><br>コネクテッドな世界では、外部 Web サイトとオリジンとのやりとりが不可欠です。ネットワークとデータを保護するには、許可リストを設定し、Salesforce と外部オリジンのやりとりの方法を制限する設定を有効にします。また、Salesforce から発生するリダイレクトを信頼できる URL に制限します。</li><li class="slds-p-bottom_small"><strong><a href="#security_clickjack_protection_configure">クリックジャック保護の定義</a></strong><br>クリックジャックは、ユーザーをだまして何か (ボタンまたはリンクなど) をクリックさせる攻撃の一種です。クリックにより、悪意のあるアクションを実行する HTTP 要求が送信され、データ侵入、認証されていないメール、ログイン情報の変更、または同様の結果がもたらされる可能性があります。この種類の攻撃から保護するには、ほとんどの Salesforce ページを同じドメインのページでインラインフレームでのみ提供できます。フレーム化できるページ種別と、関連するクリックジャック設定の定義方法について説明します。</li><li class="slds-p-bottom_small"><strong><a href="overview_misc.html#security_overview_sessions">セッションセキュリティ</a></strong><br>ログイン後、ユーザーはプラットフォームとのセッションを確立します。セッションセキュリティを使用して、ユーザーがログインしたままコンピューターから離れているときにネットワークにさらされる危険を制限します。また、ある従業員が別の従業員のセッションを使用したりする場合などの、内部攻撃の危険も制限します。複数のセッション設定から選択して、セッションの動作を制御します。</li><li class="slds-p-bottom_small"><strong><a href="#platform_cookies">Salesforce Platform の Cookie</a></strong><br>Salesforce Platform では、機能の向上と処理時間の短縮のために Cookie を使用しています。Cookie は、ユーザーの設定を保存することで、ユーザーエクスペリエンスと Salesforce Platform のパフォーマンスを向上させることができます。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="security_session_types">
+<h1 class="slds-text-heading_large">ユーザーセッション種別</h1>
+  <p>組織の監視および保護に役立つ [ユーザーセッション情報] ページのセッション種別について説明します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic および Lightning Experience の両方</td>
+
+          </tr>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>すべての</strong>エディション</td>
+
+          </tr>
+        </tbody></table>
+    <p id="security_session_types__session_types"><a name="security_session_types__session_types" href="https://help.salesforce.com/s?language=ja"></a>[ユーザーセッション情報] ページでは、特定のユーザーのセッション種別を表示できます。このページにアクセスするには、[設定] から、[クイック検索] ボックスに<kbd>「セッション管理」</kbd>と入力し、<strong class="uicontrol">[セッション管理]</strong> を選択します。</p>
+    <p>セッション種別は、ユーザーが組織にアクセスするために使用するセッションの種別です。セッション種別には、永続的なものと一時的なものがあります。ユーザーインターフェース、API、その他の方法 (OAuth 認証プロセスなど) を使用してセッション種別にアクセスできます。</p>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:28.999999999999996%"><col style="width:71%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d95651e70" style="vertical-align:top;" class="slds-cell-wrap" scope="col">セッション種別</th>
+            <th id="d95651e73" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d95651e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="セッション種別">API</td>
+
+            <td headers="d95651e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">API 経由で組織にアクセスするときに作成されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d95651e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="セッション種別">APIOnlyUser</td>
+
+            <td headers="d95651e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">API 限定ユーザーのユーザーインターフェースでパスワードのリセットを有効にするために作成されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d95651e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="セッション種別">Aura</td>
+
+            <td headers="d95651e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Lightning Experience 機能にアクセスするために作成されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d95651e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="セッション種別">ChatterNetworks</td>
+
+            <td headers="d95651e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Chatter ネットワークまたは Chatter サイトを使用するときに作成されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d95651e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="セッション種別">ChatterNetworksAPIOnly</td>
+
+            <td headers="d95651e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Chatter ネットワークまたは Chatter サイト API を使用するときに作成されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d95651e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="セッション種別">ChatterNetworksAPIOnlyOAuth</td>
+
+            <td headers="d95651e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Chatter サイトユーザーによる OAuth アクセスを承認するときに作成されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d95651e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="セッション種別">Content</td>
+
+            <td headers="d95651e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ユーザーがアップロードしたコンテンツを配信するときに作成されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d95651e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="セッション種別">DataDownloadOnly</td>
+
+            <td headers="d95651e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">組織の状況が [ロック]、[サスペンド]、または [保留] の場合にユーザーがデータをダウンロードできるセッション。このセッションは手動で作成することはできません。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d95651e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="セッション種別">LightningContainerComponent</td>
+
+            <td headers="d95651e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Lightning コンテナコンポーネントで使用するために作成されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d95651e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="セッション種別">LivePreview</td>
+
+            <td headers="d95651e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">エクスペリエンスビルダーでライブプレビュー機能を使用するために作成されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d95651e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="セッション種別">Node</td>
+
+            <td headers="d95651e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">NodeJS アクセスのために作成されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d95651e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="セッション種別">OauthApprovalUI</td>
+
+            <td headers="d95651e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">OAuth 承認ページへのアクセスのみを許可するセッション。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d95651e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="セッション種別">Oauth2</td>
+
+            <td headers="d95651e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">OAuth フローを使用して作成されます。たとえば、接続アプリケーションに対して OAuth 認証を使用する場合、このセッション種別が作成されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d95651e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="セッション種別">SamlOauthApprovalUi</td>
+
+            <td headers="d95651e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">SAML フロー中に OAuth アクセスを承認するときに作成されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d95651e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="セッション種別">SiteStudio</td>
+
+            <td headers="d95651e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">エクスペリエンスビルダーユーザーインターフェースを使用するときに作成されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d95651e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="セッション種別">SitePreview</td>
+
+            <td headers="d95651e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">内部キャンバスアプリケーションが呼び出されるときに開始されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d95651e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="セッション種別">STREAMING_API</td>
+
+            <td headers="d95651e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ストリーミング API による使用のために作成されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d95651e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="セッション種別">SubstituteUser</td>
+
+            <td headers="d95651e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">あるユーザーが別のユーザーとしてログインするときに作成されます。たとえば、システム管理者が別のユーザーとしてログインする場合、SubstituteUser セッションが作成されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d95651e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="セッション種別">UI</td>
+
+            <td headers="d95651e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Salesforce Classic UI または Lightning Experience UI にアクセスするために作成されます。ユーザーインターフェースへのログインのためのコアセッションを表します。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d95651e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="セッション種別">UnspecifiedType</td>
+
+            <td headers="d95651e73" style="vertical-align:top;" id="security_session_types__entry_o15_qxj_kdb" class="slds-cell-wrap" data-label="説明">内部プロセスによって作成されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d95651e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="セッション種別">UserSite</td>
+
+            <td headers="d95651e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">キャンバスアプリケーションが呼び出されるときに開始されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d95651e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="セッション種別">Visualforce</td>
+
+            <td headers="d95651e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Visualforce ページにアクセスするために作成されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d95651e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="セッション種別">WDC_API</td>
+
+            <td headers="d95651e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">WDC API を使用するセッションです。</td>
+
+          </tr>
+        </tbody></table>
+    <p>一時的なセッション種別は、ドメインを切り替えるプロセス中に使用されます。たとえば、Lightning Experience にアクセスすると、そのフローの一環として一時的なセッションが作成されます。</p>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:28.999999999999996%"><col style="width:71%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d95651e309" style="vertical-align:top;" class="slds-cell-wrap" scope="col">一時的なセッション種別</th>
+            <th id="d95651e312" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d95651e309" style="vertical-align:top;" class="slds-cell-wrap" data-label="一時的なセッション種別">TempAuraExchange</td>
+
+            <td headers="d95651e312" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Lightning ドメインに切り替えるために作成されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d95651e309" style="vertical-align:top;" class="slds-cell-wrap" data-label="一時的なセッション種別">TempChatterNetworks</td>
+
+            <td headers="d95651e312" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Chatter ネットワークまたは Chatter サイトに切り替えるために作成されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d95651e309" style="vertical-align:top;" class="slds-cell-wrap" data-label="一時的なセッション種別">TempContentExchange</td>
+
+            <td headers="d95651e312" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">コンテンツドメイン (ユーザーがログイン情報を入力するユーザーインターフェースなど) に切り替えるために作成されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d95651e309" style="vertical-align:top;" class="slds-cell-wrap" data-label="一時的なセッション種別">TempLccExchange</td>
+
+            <td headers="d95651e312" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">LCC ドメインに切り替えるために作成されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d95651e309" style="vertical-align:top;" class="slds-cell-wrap" data-label="一時的なセッション種別">TempLivepreviewExchange</td>
+
+            <td headers="d95651e312" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">エクスペリエンスビルダーでのライブプレビュー機能の使用に切り替えるために作成されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d95651e309" style="vertical-align:top;" class="slds-cell-wrap" data-label="一時的なセッション種別">TempNodeExchange</td>
+
+            <td headers="d95651e312" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">NodeJS に切り替えるために作成されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d95651e309" style="vertical-align:top;" class="slds-cell-wrap" data-label="一時的なセッション種別">TempOauthAccessTokenFrontdoor</td>
+
+            <td headers="d95651e312" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">OAuth プロトコルを使用してアプリケーションへのアクセス権を付与しようとしているユーザー用に作成されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d95651e309" style="vertical-align:top;" class="slds-cell-wrap" data-label="一時的なセッション種別">TempSitepreviewExchange</td>
+
+            <td headers="d95651e312" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">内部キャンバスアプリケーションの使用に切り替えるために作成されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d95651e309" style="vertical-align:top;" class="slds-cell-wrap" data-label="一時的なセッション種別">TempSitestudioExchange</td>
+
+            <td headers="d95651e312" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">エクスペリエンスビルダーユーザーインターフェースの使用に切り替えるために作成されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d95651e309" style="vertical-align:top;" class="slds-cell-wrap" data-label="一時的なセッション種別">TempVisualforceExchange</td>
+
+            <td headers="d95651e312" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Visualforce ドメインに切り替えるために作成されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d95651e309" style="vertical-align:top;" class="slds-cell-wrap" data-label="一時的なセッション種別">TempUIFrontdoor</td>
+
+            <td headers="d95651e312" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Salesforce UI に切り替えるために作成されます。</td>
+
+          </tr>
+        </tbody></table>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="[設定] の [セッション管理] ページで有効なセッションとセッションの詳細を確認して、Salesforce を監視および保護します。カスタムリストビューの作成、特定のセッションに関連付けられたユーザーに関する情報の表示、不審なセッションの簡便な終了などを行うことができます。Salesforce システム管理者はすべての有効なユーザーセッションを表示でき、システム管理者以外のユーザーは各自のセッションのみを表示できます。" href="passwords_users.html#security_user_session_info">[セッション管理] ページでのユーザーセッション情報の表示</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="security_settings_referrer_policy">
+<h1 class="slds-text-heading_large">URL 内の機密情報の保護</h1>
+  
+  <p>組織 ID など、URL 内の機密情報を保護するには、Referrer-Policy HTTP ヘッダーを有効にします。Salesforce のアクションで別の URL に対するリクエストが行われると、そのリクエストを受信する Web サイトではオリジンに関する情報を表示できます。たとえば、Salesforce ページで画像が読み込まれた場合、画像がある Web サイトではその Salesforce ページの URL を表示できます。また、リンクをクリックすると、訪問しているウェブサイトでリンク先の Salesforce ページの URL が表示されることがあります。Referrer-Policy HTTP ヘッダーにより、そのリクエスト中にその URL、つまり参照元をどの程度共有するかが制御されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience および Salesforce Classic</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><p style="margin-bottom:0;">使用可能なエディション: <strong>Essentials</strong> Edition、<strong>Personal</strong> Edition、<strong>Contact Manager</strong> Edition、<strong>Group</strong> Edition、<strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、<strong>Developer</strong> Edition、および <strong>Database.com</strong> Edition</p></td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d33867e93" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d33867e93" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">セキュリティ設定を変更する</td>
+
+              <td headers="d33867e93" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>[設定] で、[クイック検索] ボックスに<kbd>「セッションの設定」</kbd>と入力して、<strong class="uicontrol">[セッションの設定]</strong> を選択します。</span>
+      </li><li>
+        <span>[参照元 URL の保護] セクションで、<strong class="uicontrol">[Referrer-Policy HTTP ヘッダーを含める]</strong> を選択します。</span>
+        <div>この設定を有効にすると、Salesforce によって提供されるすべてのページに <code>referrer-policy</code> HTTP ヘッダーが含まれます。この設定を無効にすると、ブラウザーでデフォルトの referrer-policy ディレクティブが使用され、通常はこれによって完全な URL が公開されます。</div>
+      </li><li>
+        <span>HTTP 参照元ポリシーを選択します。</span>
+        <ol>
+          <li>
+            <span>同じオリジンのリクエストで参照元 URL を送信し、同じプロトコルのクロスオリジンリクエストでのみオリジンを送信して、対象 Web サイトがダウングレードされたプロトコルにある場合は参照元を省略するには、<strong class="uicontrol">[strict-origin-when-cross-origin]</strong> を選択します。これはデフォルトです。</span>
+          </li>
+
+          <li>
+            <span>参照元を含めない場合は、<strong class="uicontrol">[no-referrer]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>常にオリジンのみを送信するには、<strong class="uicontrol">[origin]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>クロスオリジンリクエストの参照元を省略するには、<strong class="uicontrol">[same-origin]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>同じプロトコルレベルのリクエストでのみオリジンを送信し、対象 Web サイトがダウングレードされたプロトコルにある場合は参照元を省略するには、<strong class="uicontrol">[strict-origin]</strong> を選択します。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>変更内容を保存します。</span>
+      </li></ol>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-security-262-0-0-production-jajp/700a06dd-cad5-4a0e-b783-e76bf3454c05/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> 
+      <p>strict-origin-when-cross-origin HTTP Referrer Policy を使用した場合に URL がどのように共有されるかを見てみましょう。</p>
+      <p>まずは、URL が <samp class="filepath">https://<var>MyDomainName</var>.my.site.com/<var>pageName</var>/s/profile/<var>userId</var></samp> の Experience Cloud サイトのユーザープロファイルがあるとします。プロファイルで URL が <samp class="filepath">https://<var>MyDomainName</var>.my.site.com/<var>pageName</var></samp> の別の Experience Cloud サイトページへのリンクをクリックすると、両方の URL が site.com ドメインにあるため、両方の URL で HTTPS プロトコルが使用されます。そのため、ユーザープロファイルの完全な URL が参照元として共有されます。</p>
+      <p>その Experience Cloud サイトページには、URL が <samp class="filepath">http://example.com/images/header_image.png</samp> の画像が埋め込まれています。その画像の読み込みは、ダウングレードされたプロトコルに対するリクエストの例です。これは、サイトページでは HTTPS が使用されているのに対して対象 URL では HTTP が使用されているためです。画像を読み込むリクエストには参照元情報が含まれません。</p>
+      <p>次に、その Experience Cloud サイトページのリンクをクリックして、URL が <samp class="filepath">https://<var>MyDomainName</var>.lightning.force.com/lightning/r/Report/<var>reportId</var>/view</samp> のレポートにアクセスします。site.com と force.com は異なるドメインであるため、このアクションではクロスオリジンリクエストが開始されます。さらに、両方の URL で同じプロトコルである HTTPS を使用しています。そのため、この場合はリクエストに参照元としてオリジンのみが含まれます。オリジンはパスのない URL であり、この場合は <samp class="filepath">https://<var>MyDomainName</var>.my.site.com</samp> です。<samp class="filepath">https://www.example.com</samp> などの同じプロトコルの外部 Web サイトへのリクエストにも、参照元としてオリジンのみが含まれます。</p>
+    </div></div></div>
+    <div><p>現在のポリシーを選択できるように、非推奨のポリシーは [HTTP Referer Policy (HTTP 参照元ポリシー)] リストの最後に表示されます。これらのポリシーはお勧めしません。</p><ul>
+        <li>no-referrer-when-downgrade: このポリシーは、ページの完全な URL が同等以上のプロトコルレベルへのクロスオリジン要求にさらされるため、お勧めしません。たとえば、HTTPS から HTTPS への要求や、HTTP から HTTP または HTTPS への要求に公開されるためです。</li>
+
+        <li>origin-when-cross-origin: 複数のブラウザーでこのポリシーがサポートされなくなったため、このポリシーはお勧めしません。代わりに、<strong class="uicontrol">strict-origin-when-cross-origin</strong> を選択します。</li>
+
+        <li>unsafe-url: ページの完全な URL が安全でないオリジンからの要求にさらされるため、このポリシーはお勧めしません。</li>
+
+      </ul>
+<p>例を含む HTTP 参照元ポリシーの値についての詳細は、<cite>『MDN Docs HTTP Guide (MDN ドキュメント HTTP ガイド)』</cite>の<a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy">「Referencer-Policy」</a>エントリを参照してください。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="コネクテッドな世界では、外部 Web サイトとオリジンとのやりとりが不可欠です。ネットワークとデータを保護するには、許可リストを設定し、Salesforce と外部オリジンのやりとりの方法を制限する設定を有効にします。また、Salesforce から発生するリダイレクトを信頼できる URL に制限します。" href="#security_external_interactions">外部 URL とオリジンとのやりとりの制限</a></li></ul></div>
+</div></div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="network_access.html">&larr; ネットワーク・IP制限・信頼済みURL</a><a href="passwords_users.html">パスワード・ユーザアクセス &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_secure_your_org.htm&type=5&language=ja">help.salesforce.com — 組織を保護する（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>

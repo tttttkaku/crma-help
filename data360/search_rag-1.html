@@ -1,0 +1,2121 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>検索・検索インデックス・RAG・ハイブリッド検索（1/2） | Data 360 ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（23）</h2>
+    <ol>
+      <li><a href="#c360_a_add_vector_filters_segmentation">Data 360 セグメントでのベクトル検索条件の使用 (ベータ)</a></li>
+      <li><a href="#c360_a_ai_citations_retriever">取得者の引用による信頼できるAI応答の取得</a></li>
+      <li><a href="#c360_a_ai_retriever">データの取得</a></li>
+      <li><a href="#c360_a_ai_retriever_create">個人取得者の作成</a></li>
+      <li><a href="#c360_a_ai_retriever_data_cloud_one">Data Cloud One での取得者のサポート</a></li>
+      <li><a href="#c360_a_ai_retriever_ensemble_create">アンサンブル取得者の作成</a></li>
+      <li><a href="#c360_a_ai_retriever_test">Retriever Playground を使用した取得者のカスタマイズ、テスト、検証</a></li>
+      <li><a href="#c360_a_ai_retriever_test_create">Retriever Playground での取得者のテスト</a></li>
+      <li><a href="#c360_a_ai_retriever_test_metrics">Retriever の評価指標と結果</a></li>
+      <li><a href="#c360_a_ai_retriever_version">取得者の管理</a></li>
+      <li><a href="#c360_a_ai_retriever_version_activate">Retriever バージョンの有効化または無効化</a></li>
+      <li><a href="#c360_a_ai_retriever_version_edit">取得バージョンの編集または削除</a></li>
+      <li><a href="#c360_a_create_a_vector_search_data_action">Data 360 でのベクトル検索データアクションの作成</a></li>
+      <li><a href="#c360_a_create_cloud_file_storage_activation_target">ファイルストレージ有効化対象の作成</a></li>
+      <li><a href="#c360_a_find_segments_in_cloud_file_storage">ファイルストレージプラットフォームでの Data Cloud セグメントの検索</a></li>
+      <li><a href="#c360_a_hybridsearch_autodrop">ハイブリッド検索の自動ドロップの結果</a></li>
+      <li><a href="#c360_a_hybridsearch_autodrop_best_practices">ハイブリッド検索自動ドロップのベストプラクティス</a></li>
+      <li><a href="#c360_a_hybridsearch_best_practices">ハイブリッド検索のベストプラクティス</a></li>
+      <li><a href="#c360_a_hybridsearch_fusion_ranking">ハイブリッド検索フュージョンランキング</a></li>
+      <li><a href="#c360_a_hybridsearch_index">ハイブリッド検索</a></li>
+      <li><a href="#c360_a_hybridsearch_index_create">高度な設定を使用したハイブリッド検索インデックスの作成</a></li>
+      <li><a href="#c360_a_hybridsearch_relevance_configuration">影響ハイブリッド検索の関連性ランキング</a></li>
+      <li><a href="#c360_a_notebook_ai_research_analyze">ノートブック AI を使用したコンテンツの探索と調査</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>検索・検索インデックス・RAG・ハイブリッド検索（1/2）</h1>
+      <div class="meta">Data 360（旧 Data Cloud）ヘルプ · 23 記事 · 生成 2026-08-12</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="insights_query-3.html">&larr; インサイト・計算インサイト・クエリ・データグラフ・探索（3/3）</a><a href="search_rag-2.html">検索・検索インデックス・RAG・ハイブリッド検索（2/2） &rarr;</a></div>
+<section class="article" id="c360_a_add_vector_filters_segmentation">
+<h1 class="slds-text-heading_large">Data 360 セグメントでのベクトル検索条件の使用 (ベータ)</h1>
+ 
+ <p>ベクトル検索条件により、キーワードの完全一致や手動のデータ整理への依存が軽減され、正確なセグメントを効率的に作成できます。この機能では、セグメント作成で NLP アルゴリズムを使用して非構造化データを並び替えます。1 つのインターフェースとセグメント内で構造化データと非構造化データの両方を絞り込むことができます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+  <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div id="c360_a_add_vector_filters_segmentation__note_kvg_qnp_y2c" style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><a name="c360_a_add_vector_filters_segmentation__note_kvg_qnp_y2c"></a><span class="slds-text-title_caps">メモ</span> セグメントのベクトル検索条件はベータサービスであり、顧客が実行した場合は Agreements - Salesforce.com のベータサービス条件、書面で締結した場合は統合パイロット契約、および商品条件ディレクトリの適用条件が適用されます。このベータサービスは、お客様独自の裁量で使用するものとします。</div></div></div>
+<table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d106459e70" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要な権限セット</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d106459e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要な権限セット">ベクトル検索条件を使用する</td>
+
+       <td headers="d106459e70" style="vertical-align:top;" class="slds-cell-wrap"><p>次の権限セットのいずれか:</p><a name="c360_a_add_vector_filters_segmentation__ul_jjg_cpm_d2c"></a><ul id="c360_a_add_vector_filters_segmentation__ul_jjg_cpm_d2c">
+         <li>Data Cloud アーキテクト</li>
+
+         <li>Data Cloud 有効化マネージャー</li>
+
+         <li>Data Cloud 有効化スペシャリスト</li>
+
+        </ul>
+</td>
+
+      </tr>
+     </tbody></table></div>
+  <ol><li>
+    <span>Data Cloud で <strong class="uicontrol">[セグメント]</strong> をクリックします。</span>
+   </li><li>
+    <span>リストからセグメントを選択します。</span>
+   </li><li>
+    <span><strong class="uicontrol">[ルールを編集]</strong> をクリックします。</span>
+   </li><li>
+    <span><strong class="uicontrol">[Include (包含)]</strong> または <strong class="uicontrol">[Exclude (除外)]</strong> タブをクリックします。各タブに最大 50 個の検索条件を追加できます。</span>
+   </li><li>
+    <span>条件を追加できるのは、次のとおりです。</span>
+    <div>
+     <a name="c360_a_add_vector_filters_segmentation__ul_nth_mbt_w2c"></a><ul id="c360_a_add_vector_filters_segmentation__ul_nth_mbt_w2c">
+      <li>直接属性 — 郵便番号、名、誕生日など、セグメント化されるエンティティに関する 1 つのデータポイントまたは情報。直接属性は、多くの場合デモグラフィック属性です。</li>
+
+      <li>関連属性 — セグメント化されるエンティティに関連付けられた複数のデータポイントまたは情報 (購入履歴、商品番号、メールのやり取りなど) のコレクション。多くの場合、関連属性は行動またはエンゲージメントイベントです。</li>
+
+      <li>Calculated Insights (計算済みインサイト) — 名前で計算済みインサイトを検索するか、SQL で参照されるオブジェクトで計算済みインサイトを見つけます。処理済みの計算済みインサイトはセグメントでのみ使用できます。</li>
+
+     </ul>
+
+    </div>
+   </li><li>
+    <span>[<strong class="uicontrol">Is Similar To (</strong>類似する)] 演算子を選択します。</span>
+   </li><li>
+    <span>必要な値を入力します。たとえば、バックパックなどです。</span>
+   </li><li>
+    <span>スライダーを使用して類似性レベルを選択します。デフォルトでは、100 に設定されています。</span>
+   </li><li>
+    <span>[<strong class="uicontrol">Compute Results</strong> (結果を計算)] をクリックします。</span>
+   </li><li>
+    <span>[<strong class="uicontrol">View Results</strong> (結果の表示)] をクリックします。次の詳細が表示されます。</span>
+    <div>
+     <a name="c360_a_add_vector_filters_segmentation__ul_shl_rqt_w2c"></a><ul id="c360_a_add_vector_filters_segmentation__ul_shl_rqt_w2c">
+      <li>検索語と選択した類似性レベルに基づいて返される類似語の数。</li>
+
+      <li>最も類似する 5 つの用語のサンプル。</li>
+
+      <li>類似度の低い 5 つの語のサンプル。</li>
+
+     </ul>
+
+     <p>必要に応じて、類似性レベルや値の異なる結果を計算できます。</p>
+    </div>
+   </li><li>
+    <span><strong class="uicontrol">［Done］</strong> をクリックしてフィルタを保存します。</span>
+   </li></ol>
+
+  <div><p>検索条件は定義された範囲内で動作し、収集するデータが関連していて、探しているコンテキストに適合することを確認し、セグメントデータの精度を向上させます。</p></div>
+ 
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_citations_retriever">
+<h1 class="slds-text-heading_large">取得者の引用による信頼できるAI応答の取得</h1>
+  <p>引用は、AI で生成された回答を各回答に関連するソースコンテンツにリンクします。引用により、ユーザーは LLM 応答をソースデータと比較して応答の有効性を検証し、潜在的な不正確さや幻覚を特定できます。AI モデル (旧 Einstein Studio) の引用を個々の取得者レベルで有効にして、取得者をコールするソリューションコンポーネント (プロンプトテンプレートなど) への引用へのアクセス権を付与します。</p>
+
+    <p>標準引用では、ソース URL とヘッダーテキストを含む引用が自動的に生成されます。カスタム引用では、ソースデータモデルオブジェクト (DMO) 項目のベース URL、URL パス、表示ラベルを定義できます。Agentforce エージェントやプロンプト テンプレートなどのダウンストリーム アプリケーションでは、引用ヘッダーとリンクがエンドユーザに表示されることがあります。これらの項目が適切に入力され、エンドユーザーがソースリンクにアクセスできることを確認します。</p>
+    <div style="text-align:left;">
+      <a name="c360_a_ai_citations_retriever__image_ofl_d5z_sfc"></a><img alt="Einstein Studio の取得ビルダー構成では、[取得元の結果を設定] オプションにカスタム引用設定が表示されます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_custom_citations.png" id="c360_a_ai_citations_retriever__image_ofl_d5z_sfc" style="width:600px;">
+    </div>
+    <p>Einstein Platform でカスタム アクションと [Knowledge を使用した質問への回答] 標準アクションを使用して引用を設定することもできます。詳細については、「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=ai.generative_ai_trust_citations.htm&amp;language=ja&amp;type=5">Build Trust in</a> AI Responses with Citations」を参照してください。</p>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">使用事例: 画像ソースへの引用を使用したエージェントの応答のグラウンディング</h2><p>ファイナンシャルプランナーが顧客とのミーティングの準備をしていて、投資のおすすめを提供するシナリオを考えてみます。クライアントの財務計画ドキュメントには、ポートフォリオ総額のグラフなど、さまざまなグラフが含まれています。</p><p>高度な検索インデックス設定により、計画ドキュメントのテキストと画像の両方を処理し、クライアントのポートフォリオに関する質問をすることができます。グラフとグラフは、LLM を使用して画像の構造化された説明を生成し、画像への URL リンクを提供することで処理されます。次の一般的なフローを使用してドキュメントを処理します。</p><ul>
+        <li>画像やグラフなどのビジュアルを含むドキュメントを接続して取り込みます。</li>
+
+        <li>Data 360 検索の高度な設定を使用して、ドキュメントの変換とインデックス付けを行います。画像処理を有効にし、チャンク戦略の一環として画像を処理する適切な埋め込みモデルを選択します。<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 画像ファイルでは、拡張インデックスはサポートされていません。</div></div></div>
+</li>
+
+        <li>検索インデックスの個別のリトリーバを作成します。</li>
+
+        <li>取得元をテストするには、プロンプトテンプレートに埋め込みます。</li>
+
+        <li>取得元は、カスタムエージェントまたは他のクライアントアプリケーションで使用します。</li>
+
+      </ul>
+<p>そのため、ファイナンシャルプランナーがポートフォリオの割り当てについてエージェントに質問すると、LLM は画像へのリンクを含むグラフのテキスト説明を取得します。エージェント応答には、ソース引用を含む回答が含まれます。画像の引用は外部リンクとして表示されます。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="特定の使用事例のプロンプトに返されるコンテンツの関連性を向上させるには、AIモデル(旧称Einstein Studio)でカスタムの個人取得機能を作成します。取得者をカスタマイズするには、検索インデックスを選択し、フィルタを定義して、返される情報を指定します。" href="#c360_a_ai_retriever_create">個人取得者の作成</a></li><li><a title="DMO(データ モデル オブジェクト)またはUDMO(非構造化データ モデル オブジェクト)のハイブリッド検索インデックスを設定して、生成AIアプリケーションに関連情報を提供します。Data 360 は、参照されるデータをセマンティックに関連するチャンクに分割して検索可能なベクトルを生成し、ベクトルインデックスとキーワードインデックスを生成します。" href="#c360_a_hybridsearch_index_create">高度な設定を使用したハイブリッド検索インデックスの作成</a></li><li><a title="データ モデル オブジェクトのベクトル検索インデックス設定を作成すると、Data 360によって参照されるデータが意味的に関連するチャンクに分解され、検索可能なベクトルが生成されます。RAG ワークフローとエージェントワークフローでは、クエリを実行するときにこれらのベクトルを使用して、セマンティックに類似する項目を見つけて返します。検索インデックス設定をより詳細に制御するには、プロセスの各ステップをガイドする高度な設定を使用します。" href="search_rag-2.html#c360_a_search_index_create_vector_index_config">高度な設定を使用したベクトル検索インデックスの作成</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=ai.prompt_builder_retriever_citations.htm&amp;language=ja&amp;type=5">Salesforce ヘルプ: プロンプトテンプレート応答への引用の追加</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_retriever">
+<h1 class="slds-text-heading_large">データの取得</h1>
+  <p>取得機能を使用して、検索インデックスから関連データを検索して返します。<span>Data 360</span>でのRAG(拡張生成の取得)のためのAIモデル(旧Einstein Studio)での取得者の作成とカスタマイズ。取得者は、プロンプトに関連する特殊なグラウンディング情報を提供して、プロンプトテンプレートを増強します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table>
+    <p dir="ltr">検索インデックスから取得するためのデータの準備には、検索に最適化された方法でのコンテンツの読み込み、チャンク化、ベクトル化、保存が含まれます。<span>Data 360</span> では、ドキュメントや会話履歴などの非構造化データにベクトルデータストアを使用します。検索インデックスには、他のアプリケーションから検索および取得できるチャンク化されたベクトル化されたデータが保存されます。<span>Data 360</span> で検索インデックスを作成および管理できます。これらはデータスペースで定義され、データモデルオブジェクト (DMO) に関連付けられます。</p>
+    <p dir="ltr"><span>Data 360</span>の高度なドキュメント処理機能とインデックス機能により、取得者はテキストと画像の両方を処理してエージェント応答を取得してグラウンディングできます。非構造化データモデルオブジェクト検索インデックスの画像処理を有効にして、画像や、テーブルやフローチャートなどのビジュアルを含むドキュメントを処理します。検索インデックスの高度な設定の詳細については、「AI、自動化、および<a target="_blank" href="search_rag-2.html#c360_a_search_index_ground_ai"><u>分析の検索</u></a>の使用」を参照してください。</p>
+    <p dir="ltr">検索インデックスは、Knowledgeベース全体のインデックス付けなど、一般的な使用を目的として設計されていることが多いです。取得機能を使用して、検索インデックスで特殊な検索を実行し、関連する結果をエージェント、プロンプトテンプレート、フロー、その他の機能に提供します。検索インデックスの個々の取得者は、多目的検索インデックスを特定の使用事例に適用します。たとえば、取得者は記事のカテゴリや最新情報 (過去 90 日間など)、地域に基づいて絞り込まれたコンテンツを返すことができます。</p>
+    <p>AIモデルで取得者を作成し、有効化してプロンプトビルダー ユーザーが使用できるようにします。プロンプトビルダーで、取得機能を挿入して設定することで、Knowledge を使用してプロンプトテンプレートをグラウンディングします。実行時に、取得者は LLM に正確で最新の関連情報を提供し、LLM 応答の関連性、正確性、価値を向上させます。</p>
+    <p>取得者は、データに設定されたデータガバナンスポリシーに従います。行レベルのアクセス チェックでは、取得者によって返されたデータとKnowledgeへのアクセス権をユーザーが持っていることを確認します。</p>
+    <p><span>Data 360</span> ホーム組織で取得者を作成すると、コンパニオン組織で表示し、プロンプトビルダーおよびフローで使用できます。コンパニオン組織でローカルに取得者を作成して管理することもできます。詳細は、「<a target="_blank" href="#c360_a_ai_retriever_data_cloud_one">Retriever Support in Data Cloud One</a> and <a target="_blank" href="ingest_connect-1.html#c360_a_companion_connections">Data Cloud One Companion Connections</a>」を参照してください。</p>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">個人取得者</h2><p>個々の取得者を使用して、検索インデックスからデータを取得します。AIモデルで個々の取得者を作成するには、その検索インデックスを選択し、検索条件を定義して、返される情報を指定します。検索条件により、より関連性の高いデータに絞り込まれます。検索インデックスでは、 絞り込みに使用できるフィールドを定義します 。プロンプトに返されるデータ (返されるデータの項目や結果の数など) を設定することもできます。個々の取得者を編集して保存するたびに、AI モデルは別のバージョンを作成します。1 つのバージョンの取得者のみを有効にできます。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 
+        検索インデックスの作成時に <span>Data 360 で</span>デフォルトの取得者が自動的に作成されなくなりました。以前は、<span>Data 360</span> で検索インデックスを作成すると、デフォルトの取得者が自動的に作成されていました。プロンプトビルダーやフローなどのアプリケーションでは、既存のデフォルトの取得機能を使用できます。</div></div></div>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">アンサンブルレトリーバー</h2><p>アンサンブル取得者は、個々の取得者のコレクションです。アンサンブル取得を実行すると、個々の取得者が実行され、その結果が 1 つのリストに結合され、検索要求との関連性に従ってリストが再ランク付けされ、プロンプトビルダーやフローなどのアプリケーションに最も関連性の高い情報のみが返されます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">動的取得</h2><p>動的取得では、プロンプトテンプレートの実行時値を受け入れるプレースホルダーを使用します。動的取得には、プロンプトテンプレートのニーズに基づいて実行時に指定された値のプレースホルダーがあります。</p></div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#c360_a_ai_citations_retriever">取得者の引用による信頼できるAI応答の取得</a></strong><br>引用は、AI で生成された回答を各回答に関連するソースコンテンツにリンクします。引用により、ユーザーは LLM 応答をソースデータと比較して応答の有効性を検証し、潜在的な不正確さや幻覚を特定できます。AI モデル (旧 Einstein Studio) の引用を個々の取得者レベルで有効にして、取得者をコールするソリューションコンポーネント (プロンプトテンプレートなど) への引用へのアクセス権を付与します。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_ai_retriever_version">取得者の管理</a></strong><br><span>Data 360</span> で RAG (Retrieval Augmented Generation: 拡張取得生成) の取得者を作成してカスタマイズします。取得者のリストを表示するには、AIモデル(旧称Einstein Studio)の[Retrievers (取得者)]タブに移動します。取得者については、ドロップダウンメニューから [詳細を表示] を選択します。カスタム取得者を編集して変更を保存するたびに、新しいバージョンが作成されます。複数のバージョンを作成できますが、一度に有効にできるバージョンは 1 つのみです。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_ai_retriever_test">Retriever Playground を使用した取得者のカスタマイズ、テスト、検証</a></strong><br>retriever playground を使用して取得拡張生成 (RAG) システムの取得ロジックを微調整および検証し、リリースリスクを軽減し、AI の正確な出力を検証します。AIモデル(旧称Einstein Studio)の取得遊び場を使用して、事前検索条件を設定し、テスト データを選択し、結果パラメーターを調整して、苦情ドキュメントやKnowledge記事の取得など、ドメイン固有の使用事例に合わせて取得ロジックをカスタマイズします。</li><li class="slds-p-bottom_small"><strong><a href="search_rag-2.html#c360_a_retriever_filter_reference">Retriever Filters Reference (取得者検索条件のリファレンス)</a></strong><br>AIモデル(旧称Einstein Studio)で取得者を作成またはテストするときに、取得精度の検索条件を設定します。検索条件を使用して、検索クエリで取得したレコードを絞り込みます。個々の取得者には最大 10 個の検索条件を設定できます。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_ai_retriever_data_cloud_one">Data Cloud One での取得者のサポート</a></strong><br>Data Cloud One ホームおよびコンパニオン組織を使用する場合の取得機能および制限事項について説明します。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=ai.generative_ai_rag.htm&amp;language=ja&amp;type=5">Salesforce ヘルプ: 拡張生成の取得 (RAG)</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=ai.prompt_builder_ground_rag.htm&amp;language=ja&amp;type=5">Salesforce ヘルプ: 取得拡張生成を使用した知識の活用</a></li><li><a target="_blank" href="search_rag-2.html#c360_a_search_index_ground_ai">Salesforce ヘルプ: AI、自動化、分析の検索</a></li><li><a target="_blank" href="#c360_a_ai_retriever_data_cloud_one">Salesforce ヘルプ: Data Cloud One での取得者サポート</a></li><li><a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/modules/retrieval-augmented-generation-quick-look">Trailhead: 取得、拡張生成、クイックルック</a></li><li><a target="_blank" href="https://view.salesforce.com/viewer/da54a79f51b5c2aa4002845258559687#1">Rag Best Practices(ラグのベストプラクティス)ホワイトペーパー: AgentforceとRAG: Best Practices for Better Agents(エージェントを改善するためのベストプラクティス)</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_retriever_create">
+<h1 class="slds-text-heading_large">個人取得者の作成</h1>
+  <p>特定の使用事例のプロンプトに返されるコンテンツの関連性を向上させるには、AIモデル(旧称Einstein Studio)でカスタムの個人取得機能を作成します。取得者をカスタマイズするには、検索インデックスを選択し、フィルタを定義して、返される情報を指定します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div id="c360_a_ai_retriever_create__prereq_ogj_bx4_gfc"><a name="c360_a_ai_retriever_create__prereq_ogj_bx4_gfc"></a><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d185888e60" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d185888e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">AI モデルで取得者またはバージョンを管理する (作成、編集、削除)</td>
+
+              <td headers="d185888e60" style="vertical-align:top;" class="slds-cell-wrap"><p>ユーザーが AI モデルでモデルを管理できるようにする </p><p>または</p><p style="margin-bottom:0;">「Data Cloud アーキテクト」権限セット</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d185888e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">取得者を使用してデータにアクセスする</td>
+
+              <td headers="d185888e60" style="vertical-align:top;" class="slds-cell-wrap"><p>Knowledgeオブジェクトの場合、ユーザーにKnowledgeオブジェクトへの参照アクセス権があり、「Allow View Knowledge」アプリケーション権限があることを確認します。 </p><p style="margin-bottom:0;">その他のすべての標準オブジェクトについては、ユーザーにオブジェクトへの参照アクセス権と適切な共有ルールがあることを確認します。詳細については、「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.admin_sharing.htm&amp;language=ja&amp;type=5"><u>内部組織の</u></a>共有設定」を参照してください。</p></td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>[Retrievers (取得者)] タブの [AI Models (AI モデル)] で、[<strong class="uicontrol">New Retriever (新規</strong>取得者)] をクリックします。</span>
+      </li><li>
+        <span>取得者種別として [<strong class="uicontrol">Individual Retriever (個人</strong>の取得者)] を選択します。<strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>取得者のデータソースとして [Data Cloud] を選択します。</span>
+        <ol>
+          <li>
+            <span>検索インデックスが存在する Data Cloud のデータスペースを選択します。</span>
+          </li>
+
+          <li>
+            <span>検索インデックスに関連付けられたデータモデルオブジェクト (DMO) を選択します。</span>
+          </li>
+
+          <li>
+            <span>検索インデックスを選択します。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>(省略可能) 検索条件を定義して、検索結果を絞り込みます。</span>
+        <div>取得フィルタは、選択した検索インデックスにフィルタフィールドが定義されている場合にのみ使用できます。</div>
+        <ol>
+          <li>
+            <span>[<strong class="uicontrol">Filter Documents to Return</strong> (返すドキュメントの絞り込み)] を選択し、適用する条件を 10 個まで指定します。</span>
+          </li>
+
+          <li>
+            <span>[条件の要件] を選択します。</span>
+            <div>たとえば、特定のサブセット (カテゴリ = ハードウェア AND 言語 = ドイツ語など) を定義するには、[<strong class="uicontrol">すべての条件</strong>に一致] を選択します。異なる条件が同じ目標をサポートする場合 (優先度 = 高 OR エスカレーション済み = True など)、[<strong class="uicontrol">いずれかの条件</strong>に一致] を選択します。</div>
+            <div>
+              <p>番号付き条件 (1. Car Make = Honda、2. Car Model = Civic、3. CarYear greater than 2000 など) を使用してカスタムロジックを作成するには、[<strong class="uicontrol">Custom Condition is Met</strong> (カスタム条件に一致)] を選択します。 1 AND (2 OR 3) などのカスタム条件を作成します。</p>
+            </div>
+          </li>
+
+          <li>
+            <span>条件ごとに、[<strong class="uicontrol">条件を追加</strong>] をクリックし、検索インデックスの項目、演算子、値を選択します。項目のデータ型 (テキストや数値など) によって、使用可能な演算子が決まります。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>どの情報をどの程度返すかを設定します。</span>
+        <ol>
+          <li>
+            <span>返される結果の最大数を指定します。</span>
+          </li>
+
+          <li>
+            <span>プロンプトをグラウンディングする 1 つ以上の項目を指定します。選択した項目ごとに、取得した情報を説明する一意の表示ラベルを入力し、検索インデックスで項目を選択します。</span>
+            <div>使用事例に合わせてプロンプトを補足し、プロンプトへの応答をより正確で関連性の高いものにする項目のみを選択します。</div>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>(省略可能) この取得者の引用を有効にします。</span>
+        <ol>
+          <li>
+            <span>ソース URL とヘッダーテキストを含む引用を自動的に生成するには、[<strong class="uicontrol">標準引用]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>引用をカスタマイズするには、[<strong class="uicontrol">Custom Citations (カスタム引用</strong>)] を選択します。必要に応じて、ベース URL、フルリンクが含まれるソース DMO 項目、またはベース URL と組み合わせることができる URL パス、引用ヘッダーに使用するソース DMO 項目を入力します。</span>
+            <div><p>たとえば、ソース DMO に「<a target="_blank" href="#c360_a_ai_retriever"><u>Retrieve Data</u></a>」などの特定のヘルプページへの引用が含まれている場合、ベース URL に <a target="_blank" href="https://help.salesforce.com/s/articleView?id=sf.&amp;language=ja&amp;type=5"><u>https://help.salesforce.com/s/articleView?id=</u></a> と入力します。URL パスは、ドキュメント ID「data.c360_a_ai_retriever.htm」が含まれるソース DMO 項目になります。ソース DMO に URL パス全体の項目がある場合、ベース URL パスは入力しないでください。URL パス全体を含むソース DMO 項目への URL パスを設定します。</p><p>Agentforce などのダウンストリーム アプリケーションでは、引用ヘッダーとリンクがエンドユーザに表示されることがあります。これらの項目が適切に入力され、エンドユーザーがソースリンクにアクセスできることを確認します。</p></div>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>選択内容を確認します。</span>
+        <ol>
+          <li>
+            <span>選択内容を変更するには、[編集] アイコンをクリックします。</span>
+          </li>
+
+          <li>
+            <span>変更を保存し、取得者の名前と説明 (省略可能) を指定します。</span>
+          </li>
+
+          <li>
+            <span>変更内容を保存します。</span>
+            <div>バージョンを有効化するまで、取得者はプロンプトテンプレートで使用できません。</div>
+          </li>
+
+        </ol>
+      </li></ol>
+
+    <div><p> 取得者を作成すると、AI モデルによって最初のバージョンが作成されます。カスタム取得者を編集して保存するたびに、AI モデルは別のバージョンを作成します。取得者は、データに設定されたデータガバナンスポリシーに従います。取得者をコールするユーザーに、取得者が照会するデータとKnowledgeにアクセスする権限があることを確認します。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="AI モデル (旧 Einstein Studio) で取得バージョンを有効化し、プロンプトテンプレートで使用します。一度に有効化できる取得バージョンは 1 つのみです。新しいバージョンを有効化すると、現在のバージョンが無効になります。プロンプトテンプレートがバージョンに依存していない場合にのみ、バージョンを無効化します。" href="#c360_a_ai_retriever_version_activate">Retriever バージョンの有効化または無効化</a></li><li><a title="AIモデル(旧称Einstein Studio)で取得者を作成またはテストするときに、取得精度の検索条件を設定します。検索条件を使用して、検索クエリで取得したレコードを絞り込みます。個々の取得者には最大 10 個の検索条件を設定できます。" href="search_rag-2.html#c360_a_retriever_filter_reference">Retriever Filters Reference (取得者検索条件のリファレンス)</a></li><li><a title="取得者設定をテストして、AI エージェントからの正確な応答を確認します。取得者の設定を新しいバージョンの取得者として AI モデル (旧 Einstein Studio) に保存し、プロンプトテンプレート、フロー、およびアプリケーションでエージェントが使用できるように有効化します。" href="#c360_a_ai_retriever_test_create">Retriever Playground での取得者のテスト</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_retriever_data_cloud_one">
+<h1 class="slds-text-heading_large">Data Cloud One での取得者のサポート</h1>
+  <p>Data Cloud One ホームおよびコンパニオン組織を使用する場合の取得機能および制限事項について説明します。</p>
+
+    <div><p>Data Cloud One 環境での取得者の動作を理解するには、2 つの基本的なルールに基づきます。</p><ul>
+        <li>取得者は、自分が作成した組織でのみ編集または削除できます。</li>
+
+        <li>Data Cloud One メタデータの同期は、ホーム組織からコンパニオン組織への一方向のみで実行され、その逆方向やコンパニオン組織間では実行されません。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">制約と影響</h2><p>これらの制約は、Data Cloud One で取得者を作成および管理する方法に影響します。</p><ul>
+        <li>取得者は、基幹業務 (LOB) 組織からホーム組織、または LOB 組織間で同期されません。各 LOB 組織は、ローカルで作成された取得者用に分離されています。</li>
+
+        <li>ホーム組織で作成されたアンサンブル取得者は、コンパニオン組織に表示されます。ホーム組織でアンサンブル取得者を作成すると、コンパニオン組織に同期されます。同じデータスペースに取得者があるローカル LOB 組織でアンサンブル取得者を作成できます。</li>
+
+        <li>エージェントアクションでリモート取得者を参照することはできません。LOB エージェントはアクションにローカルで作成された取得者を使用する必要があります。</li>
+
+        <li>編集は所有組織でのみ可能です。自宅組織と LOB 組織を切り替えて、取得元を調整およびテストします。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">ホーム組織で作成された取得者</h2><p>次の表に、ホーム組織で作成された取得者に対して実行できるアクションを示します。アクセスする場所によって異なります。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:30%"><col style="width:20%"><col style="width:30%"><col style="width:20%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d236691e86" style="vertical-align:top;" class="slds-cell-wrap" scope="col">アクション</th>
+              <th id="d236691e89" style="vertical-align:top;" class="slds-cell-wrap" scope="col">自宅組織</th>
+              <th id="d236691e92" style="vertical-align:top;" class="slds-cell-wrap" scope="col">LOB 内またはコンパニオン組織</th>
+              <th id="d236691e95" style="vertical-align:top;" class="slds-cell-wrap" scope="col">他の LOB 組織</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d236691e86" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクション">ビュー (AI モデル)</td>
+
+              <td headers="d236691e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="自宅組織">はい</td>
+
+              <td headers="d236691e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="LOB 内またはコンパニオン組織">はい</td>
+
+              <td headers="d236691e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="他の LOB 組織">はい</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d236691e86" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクション">表示 (プロンプトビルダー/フローピッカー)</td>
+
+              <td headers="d236691e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="自宅組織">はい</td>
+
+              <td headers="d236691e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="LOB 内またはコンパニオン組織">はい</td>
+
+              <td headers="d236691e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="他の LOB 組織">はい</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d236691e86" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクション">実行時に使用 (プロンプトビルダー、フロー)</td>
+
+              <td headers="d236691e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="自宅組織">はい</td>
+
+              <td headers="d236691e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="LOB 内またはコンパニオン組織">はい</td>
+
+              <td headers="d236691e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="他の LOB 組織">はい</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d236691e86" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクション">エージェントアクションでの使用</td>
+
+              <td headers="d236691e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="自宅組織">あり</td>
+
+              <td headers="d236691e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="LOB 内またはコンパニオン組織">いいえ</td>
+
+              <td headers="d236691e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="他の LOB 組織">不可</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d236691e86" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクション">編集</td>
+
+              <td headers="d236691e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="自宅組織">あり</td>
+
+              <td headers="d236691e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="LOB 内またはコンパニオン組織">いいえ </td>
+
+              <td headers="d236691e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="他の LOB 組織">不可 </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d236691e86" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクション">削除</td>
+
+              <td headers="d236691e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="自宅組織">はい。ただし、コンパニオン組織にリモート参照が存在する場合は除きます。</td>
+
+              <td headers="d236691e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="LOB 内またはコンパニオン組織">いいえ</td>
+
+              <td headers="d236691e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="他の LOB 組織">不可</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d236691e86" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクション">新しいバージョンの作成</td>
+
+              <td headers="d236691e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="自宅組織">あり</td>
+
+              <td headers="d236691e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="LOB 内またはコンパニオン組織">いいえ</td>
+
+              <td headers="d236691e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="他の LOB 組織">不可</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">基幹業務組織またはコンパニオン組織でローカルに作成された取得者</h2><p>次の表に、LOB またはコンパニオン組織で作成された取得者に対して実行できるアクションを示します。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:18.181818181818183%"><col style="width:27.27272727272727%"><col style="width:36.36363636363637%"><col style="width:18.181818181818183%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d236691e237" style="vertical-align:top;" class="slds-cell-wrap" scope="col">アクション</th>
+              <th id="d236691e240" style="vertical-align:top;" class="slds-cell-wrap" scope="col">その LOB 組織 (所有者)</th>
+              <th id="d236691e243" style="vertical-align:top;" class="slds-cell-wrap" scope="col">自宅組織</th>
+              <th id="d236691e246" style="vertical-align:top;" class="slds-cell-wrap" scope="col">他の LOB 組織</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d236691e237" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクション">ビュー</td>
+
+              <td headers="d236691e240" style="vertical-align:top;" class="slds-cell-wrap" data-label="その LOB 組織 (所有者)">あり</td>
+
+              <td headers="d236691e243" style="vertical-align:top;" class="slds-cell-wrap" data-label="自宅組織">いいえ</td>
+
+              <td headers="d236691e246" style="vertical-align:top;" class="slds-cell-wrap" data-label="他の LOB 組織">不可</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d236691e237" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクション">実行時に使用</td>
+
+              <td headers="d236691e240" style="vertical-align:top;" class="slds-cell-wrap" data-label="その LOB 組織 (所有者)">あり</td>
+
+              <td headers="d236691e243" style="vertical-align:top;" class="slds-cell-wrap" data-label="自宅組織">いいえ</td>
+
+              <td headers="d236691e246" style="vertical-align:top;" class="slds-cell-wrap" data-label="他の LOB 組織">不可</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d236691e237" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクション">編集</td>
+
+              <td headers="d236691e240" style="vertical-align:top;" class="slds-cell-wrap" data-label="その LOB 組織 (所有者)">作成方法によって異なります。</td>
+
+              <td headers="d236691e243" style="vertical-align:top;" class="slds-cell-wrap" data-label="自宅組織">いいえ</td>
+
+              <td headers="d236691e246" style="vertical-align:top;" class="slds-cell-wrap" data-label="他の LOB 組織">不可</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d236691e237" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクション">削除</td>
+
+              <td headers="d236691e240" style="vertical-align:top;" class="slds-cell-wrap" data-label="その LOB 組織 (所有者)">あり </td>
+
+              <td headers="d236691e243" style="vertical-align:top;" class="slds-cell-wrap" data-label="自宅組織">いいえ</td>
+
+              <td headers="d236691e246" style="vertical-align:top;" class="slds-cell-wrap" data-label="他の LOB 組織">不可</td>
+
+            </tr>
+          </tbody></table><p>取得者がLOB組織のADL(Agentforceデータ ライブラリ)によって作成されている場合、AIモデルでは編集できません。ADL を編集して変更します。取得者が retriever Connect API (プロコード) を使用して作成されている場合は、直接編集できます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">アンサンブルレトリーバー</h2><p>次の表に、アンサンブル取得者の表示機能と実行時機能を示します。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:25%"><col style="width:25%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d236691e343" style="vertical-align:top;" class="slds-cell-wrap" scope="col">アクション</th>
+              <th id="d236691e346" style="vertical-align:top;" class="slds-cell-wrap" scope="col">自宅組織</th>
+              <th id="d236691e349" style="vertical-align:top;" class="slds-cell-wrap" scope="col">LOB 内またはコンパニオン組織</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d236691e343" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクション">表示</td>
+
+              <td headers="d236691e346" style="vertical-align:top;" class="slds-cell-wrap" data-label="自宅組織">はい</td>
+
+              <td headers="d236691e349" style="vertical-align:top;" class="slds-cell-wrap" data-label="LOB 内またはコンパニオン組織">はい </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d236691e343" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクション">実行時の使用</td>
+
+              <td headers="d236691e346" style="vertical-align:top;" class="slds-cell-wrap" data-label="自宅組織">はい</td>
+
+              <td headers="d236691e349" style="vertical-align:top;" class="slds-cell-wrap" data-label="LOB 内またはコンパニオン組織">はい</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d236691e343" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクション">アンサンブル取得者の管理</td>
+
+              <td headers="d236691e346" style="vertical-align:top;" class="slds-cell-wrap" data-label="自宅組織">作成、編集、削除: ホーム組織が所有する取得者の場合は [はい]。</td>
+
+              <td headers="d236691e349" style="vertical-align:top;" class="slds-cell-wrap" data-label="LOB 内またはコンパニオン組織">作成、編集、削除: LOB 組織またはコンパニオン組織が所有する取得者の場合、[はい]。</td>
+
+            </tr>
+          </tbody></table></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_retriever_ensemble_create">
+<h1 class="slds-text-heading_large">アンサンブル取得者の作成</h1>
+  <p>アンサンブル取得を使用して、複数の検索またはデータソースから最も関連性の高い情報を取得します。AIモデル(旧Einstein Studio)では、アンサンブル レトリーバーは個々のレトリーバーのコレクションです。アンサンブル取得を実行すると、すべての個々の取得者が実行され、結果が 1 つのリストに結合され、検索要求との関連性に従ってリストが再ランク付けされ、最も関連性の高い情報のみがプロンプトまたはエージェントに返されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div id="c360_a_ai_retriever_ensemble_create__prereq_ogj_bx4_gfc"><a name="c360_a_ai_retriever_ensemble_create__prereq_ogj_bx4_gfc"></a><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d105048e60" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d105048e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">AI モデルで取得者またはバージョンを管理する (作成、編集、削除)</td>
+
+              <td headers="d105048e60" style="vertical-align:top;" class="slds-cell-wrap"><p>ユーザーが AI モデルでモデルを管理できるようにする </p><p>または</p><p style="margin-bottom:0;">「Data Cloud アーキテクト」権限セット</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d105048e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">取得者を使用してデータにアクセスする</td>
+
+              <td headers="d105048e60" style="vertical-align:top;" class="slds-cell-wrap"><p>Knowledgeオブジェクトの場合、ユーザーにKnowledgeオブジェクトへの参照アクセス権があり、「Allow View Knowledge」アプリケーション権限があることを確認します。 </p><p style="margin-bottom:0;">その他のすべての標準オブジェクトについては、ユーザーにオブジェクトへの参照アクセス権と適切な共有ルールがあることを確認します。詳細については、「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.admin_sharing.htm&amp;language=ja&amp;type=5"><u>内部組織の</u></a>共有設定」を参照してください。</p></td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>[Retrievers (取得者)] タブの [AI Models (AI モデル)] で、[<strong class="uicontrol">New Retriever (新規</strong>取得者)] をクリックします。</span>
+      </li><li>
+        <span>取得種別として [<strong class="uicontrol">Ensemble Retriever]</strong> を選択します。<strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>アンサンブル取得者のデータソースがある Data Cloud のデータスペースを選択します。<strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>このアンサンブル取得者に追加する 2 人以上の個人取得者を選択します。<strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+        <div>
+          <p> アンサンブル取得では、コード種別の取得はサポートされません。</p>
+        </div>
+      </li><li>
+        <span>どの情報をどの程度返すかを設定します。</span>
+        <ol>
+          <li>
+            <span>返される結果の最大数を指定します。</span>
+          </li>
+
+          <li>
+            <span>プロンプトをグラウンディングする 1 つ以上の項目を指定します。選択した項目ごとに、取得した情報を説明する一意の表示ラベルを入力します。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>選択内容を確認します。</span>
+        <ol>
+          <li>
+            <span>選択内容を変更するには、[編集] アイコンをクリックします。</span>
+          </li>
+
+          <li>
+            <span>変更を保存し、取得者の名前と説明 (省略可能) を指定します。</span>
+          </li>
+
+          <li>
+            <span>変更内容を保存します。</span>
+          </li>
+
+        </ol>
+      </li></ol>
+
+    <div><p>アンサンブル取得者を作成すると、AI モデルによって最初のバージョンが作成されます。更新された取得者を編集して保存するたびに、AI モデルは別のバージョンを作成します。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> アンサンブル取得は、バージョンを有効化するまでプロンプトテンプレートで使用できません。</div></div></div>
+</div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_retriever_test">
+<h1 class="slds-text-heading_large">Retriever Playground を使用した取得者のカスタマイズ、テスト、検証</h1>
+  <p>retriever playground を使用して取得拡張生成 (RAG) システムの取得ロジックを微調整および検証し、リリースリスクを軽減し、AI の正確な出力を検証します。AIモデル(旧称Einstein Studio)の取得遊び場を使用して、事前検索条件を設定し、テスト データを選択し、結果パラメーターを調整して、苦情ドキュメントやKnowledge記事の取得など、ドメイン固有の使用事例に合わせて取得ロジックをカスタマイズします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table>
+    <p dir="ltr">ソースリコールスコアやコンテキストリコールスコアなどの中間出力と主要な評価指標を確認し、取得者が想定されたソースドキュメントから情報を見つけたことを確認します。retriever playground で取得ロジックを微調整すると、取得者をテストおよびデバッグするためのコスト効率の高い方法になります。Retriever Playground では、エージェントのパフォーマンスと検索の関連性が向上し、信頼性が高く有意義な生成 AI 結果が確立されます。</p>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">使用事例: 二重扉冷蔵庫の設置に関する Field Service の質問にエージェントが回答し、不完全な結果になる</h2><p>ビジネス管理者は、会社の冷蔵庫を設置する現場のコントラクターからの質問に回答するエージェントを設定します。</p><p>問題: Company Knowledge Base にはインストール手順が完全に記載されている記事が含まれていますが、Field Service からエージェントからの応答が不完全であるというフィードバックが提供されています。ビジネス管理者は、エージェント用に設定した取得者を、取得者のプレイグラウンドでテストします。</p><p>このテストでは、11 ステップの記事から 5 ステップのみが取得されることが示されています。</p><p>取得者の結果パネルを確認すると、検索インデックスによって記事が 2 つのチャンクに分割されていることがわかります。上部のチャンクには「double-door refrigerator」キーワードが含まれます。2 番目のチャンクには質問の必要なキーワードが含まれていないため、結果セットでスコアが低くなり、応答に表示されません。</p><p>解決策: システム管理者は、残りの命令が含まれるチャンクを含めるようにテスト結果の数を増やします。その後、システム管理者は 2 扉冷蔵庫の設置に関するサンプル質問を使用して新しい設定をテストし、回答が完了していることを確認します。</p></div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#c360_a_ai_retriever_test_create">Retriever Playground での取得者のテスト</a></strong><br>取得者設定をテストして、AI エージェントからの正確な応答を確認します。取得者の設定を新しいバージョンの取得者として AI モデル (旧 Einstein Studio) に保存し、プロンプトテンプレート、フロー、およびアプリケーションでエージェントが使用できるように有効化します。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_ai_retriever_test_metrics">Retriever の評価指標と結果</a></strong><br>取得された総計値と取得されたデータチャンクを確認して、テストの結果を理解します。最適な応答を取得するために、さまざまなテスト設定とテストデータを試すように取得元設定を変更します。設定を新しいバージョンの取得者として保存します。</li><li class="slds-p-bottom_small"><strong><a href="billing.html#c360_a_ai_retriever_test_billing">取得者のテストに関する請求の考慮事項</a></strong><br>検索インデックスを照会して取得者をテストする場合、データは Data 360 で処理されます。 取得者テストの主な使用種別はデータクエリです。retriever playground の使用は、次の使用量種別の請求に使用されるクレジットの消費に影響します。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=ai.generative_ai_rag.htm&amp;language=ja&amp;type=5">Salesforce ヘルプ: 拡張生成の取得 (RAG)</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=ai.prompt_builder_ground_rag.htm&amp;language=ja&amp;type=5">Salesforce ヘルプ: 取得拡張生成を使用した知識の活用</a></li><li><a target="_blank" href="search_rag-2.html#c360_a_search_index_ground_ai">Salesforce ヘルプ: AI、自動化、分析の検索</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_retriever_test_create">
+<h1 class="slds-text-heading_large">Retriever Playground での取得者のテスト</h1>
+  <p>取得者設定をテストして、AI エージェントからの正確な応答を確認します。取得者の設定を新しいバージョンの取得者として AI モデル (旧 Einstein Studio) に保存し、プロンプトテンプレート、フロー、およびアプリケーションでエージェントが使用できるように有効化します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div id="c360_a_ai_retriever_test_create__prereq_ogj_bx4_gfc"><a name="c360_a_ai_retriever_test_create__prereq_ogj_bx4_gfc"></a><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d145345e60" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d145345e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">AI モデルで取得者またはバージョンを管理する (作成、編集、テスト、削除)</td>
+
+              <td headers="d145345e60" style="vertical-align:top;" class="slds-cell-wrap"><p>ユーザーが AI モデルでモデルを管理できるようにする </p><p>または</p><p style="margin-bottom:0;">「Data Cloud アーキテクト」権限セット</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d145345e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">取得者を使用してデータにアクセスする</td>
+
+              <td headers="d145345e60" style="vertical-align:top;" class="slds-cell-wrap"><p>Knowledgeオブジェクトの場合、ユーザーにオブジェクトへの参照アクセス権があり、「アプリケーション権限: Allow View Knowledge」があることを確認します。 </p><p style="margin-bottom:0;">その他のすべての標準オブジェクトについては、ユーザーにオブジェクトへの参照アクセス権と適切な共有ルールがあることを確認します。詳細については、「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.admin_sharing.htm&amp;language=ja&amp;type=5"><u>内部組織の</u></a>共有設定」を参照してください。</p></td>
+
+            </tr>
+          </tbody></table></div>
+  
+  <div id="configure-retriever" aria-labelledby="ariaid-title2" class="nested1"><a name="configure-retriever"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">Retriever の設定</h2>
+    
+    <p>検索条件と期待される結果を使用して、取得者設定をカスタマイズします。</p>
+
+      <ol><li>
+          <span>[Retrievers (取得者)] タブの [AI Models (AI モデル)] で、[<strong class="uicontrol">Test Retriever (テスト</strong>取得者)] を選択します。または、ドロップダウンアクションメニューから [個々の取得者の<strong class="uicontrol">テスト取得者</strong>] を選択します。</span>
+          <div>テストする有効な個人取得者のみを選択できます。自動的に作成されたデフォルトの取得者はテストできません。</div>
+        </li><li>
+          <span>取得者をテストするモードを選択します。基本モードでは、取得元プレイグラウンドは取得元リコールスコアと応答時間を返します。詳細モードでは、Playground はテストの質問に対する予想回答に基づいて AI が生成したコンテキストの取り消しスコアを返します。総計値とコストの詳細については、「<a target="_blank" href="#c360_a_ai_retriever_test_metrics">Retriever Metrics and Results</a> and <a target="_blank" href="billing.html#c360_a_ai_retriever_test_billing">Billing Considerations</a> for Testing Retrievers (取得者の総計値と結果およびテスト取得者の請求に関する考慮事項)」を参照してください。</span>
+        </li><li>
+          <span>テストおよび検証する取得者を選択します。</span>
+          <div>取得者を検索すると、有効な取得者のみが表示されます。取得者設定パネルには、確認用の検索インデックスと取得者の詳細が表示されます。</div>
+        </li><li>
+          <span>すべてのレコードを含めるか、条件を満たすレコードを絞り込んで取得者設定をカスタマイズします。検索条件に基づいてレコードを取得するための検索条件を最大 10 個設定します。</span>
+          <div>たとえば、「ドキュメントの公開日が 2022 年以降である」や「会社名が Salesforce と一致する」などの簡単な検索条件を定義します。</div>
+          <div>実行時に項目値を選択するには、動的検索条件を定義します。たとえば、 走行距離に関する質問に対して実行時に車種とモデルを選択するには、 1 「 次の文字列と一致する {!$Make}」 や 2 「 次の文字列と一致する {!$Model}」 などの検索条件を定義します 。</div>
+          <div>すべての条件を満たした場合、いずれかの条件を満たした場合、またはカスタム条件ロジックを満たした場合に検索条件を使用する条件ロジックを選択します。たとえば、自動車の走行距離に関するテストの質問で、3 番目の条件「3. ModelYear greater than 2000」を追加します。 条件 1 AND (2 OR 3) を満たすカスタム条件を設定できます。</div>
+        </li><li>
+          <span>取得者が返す結果の数を変更します。</span>
+          <div>質問の結果に期待される回答が含まれていない場合、返される結果の数を増やします。</div>
+        </li><li>
+          <span>既存の項目を追加または削除して、取得者が返す項目をカスタマイズします。</span>
+          <div>
+            <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div id="configure-retriever__note_whq_jsf_dgc" style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><a name="configure-retriever__note_whq_jsf_dgc"></a><span class="slds-text-title_caps">メモ</span>  設定を保存してエージェントで使用すると、取得者はこれらの新しい項目を返します。</div></div></div>
+
+          </div>
+        </li><li>
+          <span>(省略可能) 引用を設定して、取得者の引用をプレビューおよび検証します。</span>
+          <ol>
+            <li>
+              <span>ソース URL とヘッダーテキストを含む引用を自動的に生成するには、[<strong class="uicontrol">標準引用]</strong> を選択します。</span>
+            </li>
+
+            <li>
+              <span>引用をカスタマイズするには、[<strong class="uicontrol">Custom Citations (カスタム引用</strong>)] を選択します。必要に応じて、ベース URL、フルリンクが含まれるソース DMO 項目、またはベース URL と組み合わせることができる URL パス、引用ヘッダーに使用するソース DMO 項目を入力します。たとえば、ソース DMO に「<a target="_blank" href="#c360_a_ai_retriever"><u>Retrieve Data</u></a>」などの特定のヘルプページへの引用が含まれている場合、ベース URL に「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=sf.&amp;language=ja&amp;type=5">https://help.salesforce.com/s/articleView?id=&amp;language=ja</a>」と入力します。URL パスは、ドキュメント ID data.c360_a_ai_retriever.htm が含まれるソース DMO 項目になります。ソース DMO に URL パス全体の項目がある場合、ベース URL パスは入力しないでください。URL パス全体を含むソース DMO 項目への URL パスを設定します。</span>
+            </li>
+
+            <li>
+              <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+            </li>
+
+          </ol>
+        </li></ol>
+
+    
+  </div>
+
+  <div id="test-retriever" aria-labelledby="ariaid-title3" class="nested1"><a name="test-retriever"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">取得者のテスト</h2>
+    
+    <p>テストデータを設定し、自然言語クエリを入力して取得者をテストします。テストデータは、正しい回答が期待されるソースです。</p>
+
+      <ol><li>
+          <span>予想されるソースからの取得者の応答をテストするには、[<strong class="uicontrol">Configure Test Data</strong> (テストデータを設定)] を選択します。</span>
+        </li><li>
+          <span>回答が含まれるレコードがわかっている場合、または予想される回答を選択する場合は、データモデルオブジェクトレコードを選択します。</span>
+          <div>
+            <p>キーワードが一致するハイブリッド検索取得者の場合、予想される応答またはデータモデルオブジェクトレコードでテストデータを選択します。それ以外の場合は、データモデルオブジェクトレコードでのみ選択できます。テストの質問への回答が含まれるレコードがわかっている場合は、データモデルオブジェクトレコードを選択します。有給休暇に関連する質問に「PTO or Time-off」 (PTO または休暇) と入力するなど、回答に含めるべき内容がわかっている場合は、予想される回答に基づいてレコードを選択します。</p>
+          </div>
+        </li><li>
+          <span>必要に応じて、[Test Retriever (テスト取得者)] パネルに動的検索条件値を入力します。</span>
+        </li><li>
+          <span>テストの質問をします。詳細モードでは、テストの質問に対する予想回答に基づいて取得者の回答をテストできます。</span>
+          <div>テストを実行すると、[Test Retriever (テスト取得者)] パネルに、取得者によって取得されたドキュメントの数が表示されます。</div>
+        </li></ol>
+
+      <div><p>[結果] パネルで、取得者が返した上位チャンクとテストデータチャンクの重複を確認します。取得したチャンクの引用へのリンクを使用して、ソースの有効性を確認します。テストデータを使用して取得者設定をカスタマイズし、最適な応答を取得します。テスト済み設定を新しいバージョンとして保存します。</p></div>
+    
+  <div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="AIモデル(旧称Einstein Studio)で取得者を作成またはテストするときに、取得精度の検索条件を設定します。検索条件を使用して、検索クエリで取得したレコードを絞り込みます。個々の取得者には最大 10 個の検索条件を設定できます。" href="search_rag-2.html#c360_a_retriever_filter_reference">Retriever Filters Reference (取得者検索条件のリファレンス)</a></li><li><a title="取得者設定をテストして、AI エージェントからの正確な応答を確認します。取得者の設定を新しいバージョンの取得者として AI モデル (旧 Einstein Studio) に保存し、プロンプトテンプレート、フロー、およびアプリケーションでエージェントが使用できるように有効化します。" href="#c360_a_ai_retriever_test_create">Retriever Playground での取得者のテスト</a></li></ul></div>
+</div>
+
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_retriever_test_metrics">
+<h1 class="slds-text-heading_large">Retriever の評価指標と結果</h1>
+  <p>取得された総計値と取得されたデータチャンクを確認して、テストの結果を理解します。最適な応答を取得するために、さまざまなテスト設定とテストデータを試すように取得元設定を変更します。設定を新しいバージョンの取得者として保存します。</p>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Retriever Metrics (取得者評価指標)</h2><p> 取得者は、基本モードと拡張モードでテストできます。詳細モードで取得者をテストすると、取得者の Playground で参照回答に基づいてコンテキストの取り消しスコアが生成されます。詳細モードで取得者をテストすると、フレックスクレジットが消費されます。</p><div>
+        <p><strong>高度なテストモードでの結果と評価指標の取得</strong></p>
+        <img alt="次の画像は、高度なテストモードでの取得者の遊び場と取得者の設定例を示しています。テスト取得パネルにテスト問題のサンプルと回答が表示されます。取得テストパネルが空です。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/retrievers-adv-mode.png" style="height:400px;width:600px;">
+      </div><div>
+        <img alt="次の画像は、ユーザーがテスト問題のサンプルを入力した取得者の遊び場を示しています。取得元の総計値パネルには、応答時間と取得されたチャンクの総計値と共にコンテキストリコールスコアが表示されます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/retriever-adv-metrics.png" style="height:400px;width:600px;">
+      </div><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d48983e61" style="vertical-align:top;" class="slds-cell-wrap" scope="col">指標</th>
+              <th id="d48983e64" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+              <th id="d48983e67" style="vertical-align:top;" class="slds-cell-wrap" scope="col">詳細</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d48983e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="指標">取得元リコールスコア</td>
+
+              <td headers="d48983e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">基本モードでのみ使用できます。テストデータの合計チャンク数に対する、取得された上位チャンクに含まれるテストデータチャンクの割合を測定します。</td>
+
+              <td headers="d48983e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細"><p>たとえば、[Retriever Metrics and Results In Basic Test Mode (基本テストモードでの評価指標と結果の取得)] 画像では、テストデータのチャンクの合計数は 49 個で、そのうち 4 個のみが取得者によって取得されたチャンクに含まれます。</p><p>そのため、計算されたソースリコールスコアは 4/49=0.08 になります。</p><p>ソースリコールスコアが 0 の場合、取得されたチャンクにはテストデータのチャンクは含まれません。</p><p style="margin-bottom:0;">取得されたチャンクとテストデータチャンクに共通のチャンクがあっても、テストデータチャンクの数が多いとスコアが低下します。</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d48983e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="指標">応答時間</td>
+
+              <td headers="d48983e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">取得者が結果で応答する時間 (ミリ秒)。</td>
+
+              <td headers="d48983e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">2589 ms</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d48983e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="指標">コンテキストの取り消し</td>
+
+              <td headers="d48983e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">詳細モードでのみ使用できます。参照回答に基づいて関連ドキュメントが正常に取得された数を測定します。</td>
+
+              <td headers="d48983e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">リコールが多いほど、見逃された関連ドキュメントが少なくなります。詳細については、「Ragas <a target="_blank" href="https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/context_recall/"><u>Context Recall</u></a>」を参照してください。</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">取得されたチャンク総計値</h2><div>
+        <p><strong>基本テストモードでの評価指標と結果の取得</strong></p>
+        <img alt="次の画像は、サンプルテストの質問の取得総計値と取得されたチャンクの詳細を示しています。取得元の総計値には、基本テストモードで使用できるソースリコールスコアが表示されます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/Retriever-metrics.png" style="height:400px;width:550px;">
+      </div><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d48983e158" style="vertical-align:top;" class="slds-cell-wrap" scope="col">指標</th>
+              <th id="d48983e161" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+              <th id="d48983e164" style="vertical-align:top;" class="slds-cell-wrap" scope="col">詳細</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d48983e158" style="vertical-align:top;" class="slds-cell-wrap" data-label="指標"># Chunks to Display (表示するチャンク数)</td>
+
+              <td headers="d48983e161" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">テーブルに表示するテストデータチャンクの最大数を決定します。</td>
+
+              <td headers="d48983e164" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">たとえば、次の図では、252 個のテストデータチャンクのうち 10 個がテーブルに表示されています。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d48983e158" style="vertical-align:top;" class="slds-cell-wrap" data-label="指標">すべてのチャンク</td>
+
+              <td headers="d48983e161" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">テーブルには、すべてのソースチャンク、テストデータのチャンク、取得者が選択したチャンク、チャンクスコア、チャンクのソースに関するデータが表示されます。</td>
+
+              <td headers="d48983e164" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">たとえば、次の画像では、テストの質問で 28 個のソースチャンクが返されます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d48983e158" style="vertical-align:top;" class="slds-cell-wrap" data-label="指標">取得者による選択</td>
+
+              <td headers="d48983e161" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">次の表に、取得者が選択したソースチャンクの絞り込まれた列データを示します。</td>
+
+              <td headers="d48983e164" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">返されたすべてのソースチャンクから 20 個のチャンクが選択されました。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d48983e158" style="vertical-align:top;" class="slds-cell-wrap" data-label="指標">テストデータチャンク</td>
+
+              <td headers="d48983e161" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">次の表に、テストデータチャンクで絞り込まれた列データを示します。</td>
+
+              <td headers="d48983e164" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">たとえば、次の画像では、テストデータの合計チャンク数は 252 です。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d48983e158" style="vertical-align:top;" class="slds-cell-wrap" data-label="指標">チャンク</td>
+
+              <td headers="d48983e161" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">取得者が取得するドキュメントチャンク。これらのチャンクには、質問への回答が含まれます。</td>
+
+              <td headers="d48983e164" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">&nbsp;</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d48983e158" style="vertical-align:top;" class="slds-cell-wrap" data-label="指標">チャンクスコア</td>
+
+              <td headers="d48983e161" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">関連性ランキングを決定するチャンクのスコア値。</td>
+
+              <td headers="d48983e164" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">チャンクの上位スコアは 0.91 です。 チャンクスコアで並び替えることができます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d48983e158" style="vertical-align:top;" class="slds-cell-wrap" data-label="指標">引用</td>
+
+              <td headers="d48983e161" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">取得されたチャンクに関連するソースコンテンツへのリンク。取得元をリリースするときにソースの有効性を検証して、信頼できる応答が得られるようにします。</td>
+
+              <td headers="d48983e164" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">画像の [引用] 列は、取得者が選択したチャンクのソースリンクを参照しています。</td>
+
+            </tr>
+          </tbody></table></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_retriever_version">
+<h1 class="slds-text-heading_large">取得者の管理</h1>
+  <p><span>Data 360</span> で RAG (Retrieval Augmented Generation: 拡張取得生成) の取得者を作成してカスタマイズします。取得者のリストを表示するには、AIモデル(旧称Einstein Studio)の[Retrievers (取得者)]タブに移動します。取得者については、ドロップダウンメニューから [詳細を表示] を選択します。カスタム取得者を編集して変更を保存するたびに、新しいバージョンが作成されます。複数のバージョンを作成できますが、一度に有効にできるバージョンは 1 つのみです。</p>
+
+    <p>取得者は、データに設定されたデータガバナンスポリシーに従います。結果に対するアクセスチェックでは、ユーザーが標準オブジェクトとレコードに安全にアクセスできることを確認します。取得者をコールしている AI エージェントまたはユーザーに取得元レコードへのアクセス権がない場合、取得者の結果には表示されません。詳細については、「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=ai.agent_user.htm&amp;language=ja&amp;type=5">Best Practices for</a> Agent User Permissions (エージェントユーザー権限のベストプラクティス)」を参照してください。</p>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#c360_a_ai_retriever_create">個人取得者の作成</a></strong><br>特定の使用事例のプロンプトに返されるコンテンツの関連性を向上させるには、AIモデル(旧称Einstein Studio)でカスタムの個人取得機能を作成します。取得者をカスタマイズするには、検索インデックスを選択し、フィルタを定義して、返される情報を指定します。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_ai_retriever_ensemble_create">アンサンブル取得者の作成</a></strong><br>アンサンブル取得を使用して、複数の検索またはデータソースから最も関連性の高い情報を取得します。AIモデル(旧Einstein Studio)では、アンサンブル レトリーバーは個々のレトリーバーのコレクションです。アンサンブル取得を実行すると、すべての個々の取得者が実行され、結果が 1 つのリストに結合され、検索要求との関連性に従ってリストが再ランク付けされ、最も関連性の高い情報のみがプロンプトまたはエージェントに返されます。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_ai_retriever_version_activate">Retriever バージョンの有効化または無効化</a></strong><br>AI モデル (旧 Einstein Studio) で取得バージョンを有効化し、プロンプトテンプレートで使用します。一度に有効化できる取得バージョンは 1 つのみです。新しいバージョンを有効化すると、現在のバージョンが無効になります。プロンプトテンプレートがバージョンに依存していない場合にのみ、バージョンを無効化します。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_ai_retriever_version_edit">取得バージョンの編集または削除</a></strong><br>AIモデル(旧称Einstein Studio)で取得元のバージョンを編集し、プロンプト内でさまざまな構成と応答をテストするためのバージョンを作成します。編集できるのはカスタムの個人取得者のみです。取得者に依存するプロンプトテンプレートがない場合は、削除できます。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_retriever_version_activate">
+<h1 class="slds-text-heading_large">Retriever バージョンの有効化または無効化</h1>
+  <p>AI モデル (旧 Einstein Studio) で取得バージョンを有効化し、プロンプトテンプレートで使用します。一度に有効化できる取得バージョンは 1 つのみです。新しいバージョンを有効化すると、現在のバージョンが無効になります。プロンプトテンプレートがバージョンに依存していない場合にのみ、バージョンを無効化します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div id="c360_a_ai_retriever_version_activate__prereq_ogj_bx4_gfc"><a name="c360_a_ai_retriever_version_activate__prereq_ogj_bx4_gfc"></a><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d117080e60" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d117080e60" style="vertical-align:top;" rowspan="2" class="slds-cell-wrap" data-label="必要なユーザー権限">AI モデルで取得者またはバージョンを管理する (作成、編集、削除)</td>
+
+              <td headers="d117080e60" style="vertical-align:top;" class="slds-cell-wrap">ユーザーが AI モデルでモデルを管理できるようにする</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d117080e60" style="vertical-align:top;" class="slds-cell-wrap"><p>または </p><p>権限セット</p><a name="c360_a_ai_retriever_version_activate__ul_rgj_bx4_gfc"></a><ul id="c360_a_ai_retriever_version_activate__ul_rgj_bx4_gfc">
+                  <li>Data Cloud アーキテクト</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>AI モデルで、取得者の詳細ページに移動します。</span>
+      </li><li>
+        <span>有効化または無効化するバージョンを選択します。</span>
+      </li><li>
+        <span>無効なバージョンを有効化するには、[<strong class="uicontrol">有効化]</strong> をクリックします。</span>
+      </li><li>
+        <span>有効なバージョンを無効化するには、<strong class="uicontrol">[無効化</strong>] をクリックします。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_ai_retriever_version_edit">
+<h1 class="slds-text-heading_large">取得バージョンの編集または削除</h1>
+  <p>AIモデル(旧称Einstein Studio)で取得元のバージョンを編集し、プロンプト内でさまざまな構成と応答をテストするためのバージョンを作成します。編集できるのはカスタムの個人取得者のみです。取得者に依存するプロンプトテンプレートがない場合は、削除できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div id="c360_a_ai_retriever_version_edit__prereq_ogj_bx4_gfc"><a name="c360_a_ai_retriever_version_edit__prereq_ogj_bx4_gfc"></a><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d209580e60" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d209580e60" style="vertical-align:top;" rowspan="2" class="slds-cell-wrap" data-label="必要なユーザー権限">AI モデルで取得者またはバージョンを管理する (作成、編集、削除)</td>
+
+              <td headers="d209580e60" style="vertical-align:top;" class="slds-cell-wrap">ユーザーが AI モデルでモデルを管理できるようにする</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d209580e60" style="vertical-align:top;" class="slds-cell-wrap"><p>または </p><p>権限セット</p><a name="c360_a_ai_retriever_version_edit__ul_rgj_bx4_gfc"></a><ul id="c360_a_ai_retriever_version_edit__ul_rgj_bx4_gfc">
+                  <li>Data Cloud アーキテクト</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>AI モデルで、取得者の詳細ページに移動します。</span>
+        <div>
+          <p>または、[取得者] リストページから有効な取得者バージョンを編集することもできます。有効なバージョンがない場合、最後に変更されたバージョンが選択されます。</p>
+        </div>
+      </li><li>
+        <span>編集または削除するバージョンを選択します。</span>
+      </li><li>
+        <span>取得バージョンを編集するには、[<strong class="uicontrol">Edit Version (バージョン</strong>の編集)] をクリックします。</span>
+      </li><li>
+        <span>検索条件または結果の設定を変更するには、関連付けられた [編集] アイコンをクリックして変更します。</span>
+      </li><li>
+        <span>変更を保存します。</span>
+      </li><li>
+        <span>(省略可能) 取得者の名前と説明を更新します。新しいバージョンの取得者として変更を保存します。</span>
+      </li><li>
+        <span>取得バージョンを削除するには、[<strong class="uicontrol">バージョンを削除</strong>] をクリックします。</span>
+        <div>
+          <p>または、プロンプトテンプレートからの連動関係がない場合は、[取得者] リストページから取得者とそのすべてのバージョンを削除できます。削除された取得者は復元できません。</p>
+        </div>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_create_a_vector_search_data_action">
+<h1 class="slds-text-heading_large">Data 360 でのベクトル検索データアクションの作成</h1>
+  
+  <p>非構造化データに対してほぼリアルタイムでアクションを実行し、アラートまたはイベントを送信するベクトル検索データアクションを作成します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d32652e61" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限セット</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d32652e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限セット">ベクトル検索データアクションを作成する</td>
+
+              <td headers="d32652e61" style="vertical-align:top;" class="slds-cell-wrap"><p>次のいずれかの権限セット:</p><ul>
+                  <li>Data Cloud アーキテクト</li>
+
+                  <li>Data Cloud 有効化マネージャー</li>
+
+                  <li>Data Cloud 有効化スペシャリスト </li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span><span>Data 360</span> の [データアクション] タブで、<strong class="uicontrol">[新規]</strong> をクリックします。</span>
+      </li><li>
+        <span>[Vector Search Data Action (ベクトル検索データアクション)] を選択し、<strong class="uicontrol">[次へ</strong>] をクリックします。</span>
+      </li><li>
+        <span>WebhookまたはSalesforce Platform Eventデータ アクション ターゲットを選択し、[<strong class="uicontrol">次へ]</strong>をクリックします。</span>
+      </li><li>
+        <span>データスペースを選択します。</span>
+      </li><li>
+        <span>検索インデックスを選択します。ベクトル検索タイプの検索インデックスを選択できます。</span>
+      </li><li>
+        <span>検索パラメーターを設定し、[<strong class="uicontrol">次へ]</strong>をクリックします。</span>
+        <div>
+          <ul>
+            <li>検索コンテキスト: 関連する結果を返す検索テキスト。</li>
+
+            <li>Results Limit (結果の制限): 検索から返される上位の結果の数。0 ～ 10 の数値を入力します。</li>
+
+            <li>Score Threshold (スコアしきい値): ベクトル検索の類似性のしきい値スコア。0 ～ 1 の小数を入力します。</li>
+
+          </ul>
+
+        </div>
+      </li><li>
+        <span>アクション名を入力します。[アクション API 参照名] 項目は自動入力されます。</span>
+      </li><li>
+        <span> <strong class="uicontrol">[保存して公開]</strong> をクリックします。</span>
+        <div>データアクションはレコードホームページに表示できます。<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Agentforce データライブラリを介してデータを取り込む場合は、検索インデックスを再構築してベクトル検索データアクションをトリガーする必要があります。</div></div></div>
+</div>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="search_rag-2.html#c360_a_search_index_create_vector_index_config">Salesforce ヘルプ: 高度な設定を使用したベクトル検索インデックスの作成</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_create_cloud_file_storage_activation_target">
+<h1 class="slds-text-heading_large">ファイルストレージ有効化対象の作成</h1>
+    <p><span>Data 360</span> で有効化対象を作成し、セグメントと一括処理データモデルオブジェクト (DMO) を Amazon S3、SFTP、Google Cloud Storage (GCS)、Microsoft Azure Blob Storage などの外部ファイルストレージ有効化プラットフォームに公開します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+        <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+                        <tr class="">
+                            <th id="d83507e68" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+                        </tr>
+                    </thead><tbody>
+                        <tr class="">
+                            <td headers="d83507e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">有効化対象を作成する</td>
+
+                            <td headers="d83507e68" style="vertical-align:top;" class="slds-cell-wrap"><p>次のいずれかの権限セット:</p><ul>
+                                    <li>Data Cloud アーキテクト</li>
+
+                                    <li>Data Cloud 有効化マネージャー</li>
+
+                                </ul>
+</td>
+
+                        </tr>
+                    </tbody></table><p>前提条件:</p><ul>
+                <li>
+                    <p>システム管理者として、Data 360 のファイル ストレージ ターゲットへの接続を設定します。 「<a target="_blank" href="data360_general-1.html#c360_a_data_target_configuration_in_data_cloud"><u>Data Target Configuration in Data 360</u></a>」を参照してください。</p>
+                </li>
+
+                <li>
+                    <p><strong>S3 (従来)</strong>: アクセスキーと秘密鍵を用意します。S3 ログイン情報に PutObject、GetObject、ListBucket、DeleteObject、GetBucketLocation の権限があることを確認します。サーバー側暗号化 (SSE-S3) を有効にすることをお勧めします。<a target="_blank" href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/default-bucket-encryption.html">SSE-S3 暗号化の有効化</a>についての詳細を確認してください。</p>
+                </li>
+
+                <li>
+                    <p><strong>Amazon S3</strong>: 有効化されたファイルが存在するフォルダまたはディレクトリに対する「変更/更新」権限を付与します。</p>
+                </li>
+
+                <li>
+                    <p><strong>SFTP、GCS、Microsoft Azure</strong>: 有効化されたファイルのターゲットシステムでの「名前変更」権限と、有効化されたファイルが存在するフォルダーまたはディレクトリに対する「変更/更新」権限を付与します。</p>
+                </li>
+
+            </ul>
+</div>
+        <ol><li>
+                <span>[有効化対象] タブに移動し、[<strong class="uicontrol">新規]</strong> をクリックします。</span>
+            </li><li>
+                <span>[File Storage]で、有効化プラットフォームを選択し、[<strong class="uicontrol">Next]</strong>をクリックします。</span>
+                <div>注意: ファイルストレージ対象は、それぞれの対象接続が設定されている場合にのみ存在します。詳細は、「<a target="_blank" href="data360_general-1.html#c360_a_data_target_configuration_in_data_cloud"><u>Data 360 のデータターゲット</u></a>の設定」を参照してください。</div>
+            </li><li>
+                <span>一意の名前と説明 (省略可能) を入力します。</span>
+            </li><li>
+                <span>有効化対象プラットフォーム固有の設定を定義します。</span>
+                <ul>
+                    <li>S3 (従来)<ol>
+                            <li>S3 バケットとフォルダーの詳細を入力します。</li>
+
+                            <li>S3 アクセスキーと秘密鍵を指定します。</li>
+
+                            <li>変換先ファイル形式を選択します。</li>
+
+                            <li>有効化対象を関連付けるデータスペースを選択し、[保存] をクリックします。</li>
+
+                        </ol></li>
+
+                    <li>Amazon S3、SFTP、GCS、Microsoft Azure Blob Storage<ol>
+                            <li>コネクタとデータスペースを選択し、[次へ] をクリックします。</li>
+
+                            <li>親ディレクトリ: 対象接続設定から継承されます。ルート以外の親ディレクトリが必要です。詳細は、「<a target="_blank" href="data360_general-1.html#c360_a_data_target_configuration_in_data_cloud"><u>Data 360 のデータターゲット</u></a>の設定」を参照してください。</li>
+
+                            <li>子ディレクトリ: ディレクトリ名は大文字と小文字が区別されます。SFTP、GCS、および Azure ターゲットの場合、指定した子ディレクトリが対象ロケーションにすでに存在している必要があります。これは、ディレクトリがない場合、Data 360 によってディレクトリが作成されないためです。Amazon S3 ターゲットの場合、子ディレクトリに任意の値を入力できます。この値がない場合、Data 360 は有効化プロセス中にフォルダーを作成します。<ul>
+                                    <li>子ディレクトリ内にフォルダーを作成: 選択すると、有効化されたファイルが別のフォルダーに追加されます。フォルダ名では、セグメントベースの有効化には <code>&lt;SegmentName_ActivationName&gt;</code> が使用され、セグメント以外の有効化には <code>&lt;ActivationName&gt;</code> が使用されます。選択しない場合、ファイルは子ディレクトリに残ります。英数字とアンダースコアを除くすべての文字を含むフォルダー名は、ハイフン (-) に自動的に置き換えられます。&lt;SegmentName_ActivationName&gt; が 200 文字を超える場合、フォルダー名は 200 文字に制限され、それ以上の文字は自動的に切り捨てられます。</li>
+
+                                </ul>
+</li>
+
+                            <li>ファイル形式: CSV ファイルの有効化されたファイル形式と区切り文字を選択します。</li>
+
+                            <li>圧縮形式: 有効化されたファイルの圧縮形式を選択します。PGP 暗号化は CSV と JSON でのみサポートされますが、Parquet ではサポートされません。</li>
+
+                            <li>ファイル名の種類: [<strong class="uicontrol">事前決定</strong>済み] または [<strong class="uicontrol">カスタム</strong>ファイル名] を選択します。事前に決定されたファイル名の場合、SegmentName と ActivationName の文字 (英数字とアンダースコアを除く) はハイフン (-) に置き換えられます。<ul>
+                                    <li>[<code>&lt;ActivationName&gt;</code>] を選択した場合、ファイル名ではすべての有効化種別に <code>&lt;ActivationName&gt;</code> が使用されます。</li>
+
+                                    <li>[<code>&lt;SegmentName&gt;</code>] を選択した場合、セグメント以外の有効化ではファイル名として <code>&lt;ActivationName&gt;</code> が使用されます。</li>
+
+                                    <li>[<code>&lt;SegmentName_ActivationName&gt;</code>] を選択した場合、セグメント以外の有効化ではファイル名として <code>&lt;ActivationName&gt;</code> が使用されます。</li>
+
+                                </ul>
+
+                            </li>
+
+                            <li>データ/タイムサフィックス: ファイル名のサフィックス形式を選択します。これはセグメント更新タイムスタンプを UTC 形式で表します。タイムスタンプの範囲は、特定の日付からミリ秒です。</li>
+
+                            <li>制限種別: ファイルあたりの最大レコード数 (デフォルト: 100,000) や最大ファイルサイズ (デフォルト: 500 MB) など、設定された制限に達すると、有効化されたデータは自動的に複数のファイルに分割されます。<p>たとえば、</p><ul>
+                                    <li>有効化ペイロードのレコード数が 45 万件で、レコード制限が 100,000 件の場合、ペイロードは複数のファイルに分割され、1 つのファイルが 100,000 件のレコードを超えないようにします。</li>
+
+                                    <li>有効化ペイロードの合計が 3 GB で 500 MB の制限がある場合、ペイロードは複数のファイルに分割され、1 つのファイルが 500 MB のサイズ制限を超えないようにします。</li>
+
+                                </ul>
+<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> ファイル分割は非確定的であり、出力ファイルの最終的な数とサイズは、データの特性、ファイル形式、圧縮、暗号化、処理動作に応じて実行ごとに異なる場合があります。</div></div></div>
+</li>
+
+                        </ol></li>
+
+                </ul>
+
+            </li><li>
+                <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+            </li></ol>
+
+        <div><p>セグメントが有効化されると、有効化対象が作成され、次の項目がファイルストレージ有効化プラットフォームに追加されます。</p><ul>
+                <li>追加の属性を持つセグメントメンバーを含むデータファイル。<ul>
+                        <li>S3(従来)ターゲットの場合、データ ファイルは、最初のセグメントが有効化されたときに自動的に作成される<code>Salesforce-c360-Segments</code>というサブフォルダーに保存されます。</li>
+
+                    </ul>
+</li>
+
+                <li>有効化されたデータファイルと同じディレクトリにあるセグメントメタデータ JSON ファイル。<ul>
+                        <li>Amazon S3 ターゲットの場合、このメタデータ JSON ファイルは、対象への書き込み操作が完了し、データを消費する準備が整っていることを確認する役割を果たします。</li>
+
+                        <li>SFTP、GCS、Azure ターゲットの場合、メタデータファイルと有効化されたデータファイルは任意の順序で到着できます。そのため、メタデータファイルがあっても、有効化が完了したことを示すものではありません。</li>
+
+                    </ul>
+<p>セグメントメタデータ JSON ファイルには次のものが含まれます。</p><ul>
+                        <li>セグメント ID と名前</li>
+
+                        <li>データスペース ID と名前</li>
+
+                        <li>レコード件数</li>
+
+                        <li>更新 ID と公開更新種別</li>
+
+                        <li>属性名と対応するデータ型</li>
+
+                    </ul>
+</li>
+
+            </ul>
+<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> CSV 形式で生成される有効化されたファイルの場合、項目値は標準の引用符ルールに従って二重引用符で囲まれます。<div><ul>
+                        <li>項目にカンマまたは改行文字が含まれている場合、値全体が引用符で囲まれます。例: value1,value2 → "value1,value2"。</li>
+
+                        <li>項目に二重引用符が含まれている場合、各引用符はバックスラッシュ (\) でエスケープされます。例: "value1","value2" → "\"value1\",\"value2\""</li>
+
+                    </ul>
+</div></div></div></div>
+</div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-encryption.html">外部: AWS ヘルプ: Amazon S3 バケットのデフォルトのサーバー側暗号化動作の設定</a></li><li><a title="Data 360 でセグメントを作成したら、セグメントを有効化対象に公開できます。" href="segment_activation-1.html#c360_a_add_activation_target">ファイルストレージ対象の有効化の作成</a></li><li><a target="_blank" href="data360_general-1.html#c360_a_file_name_examples">Salesforce ヘルプ: ファイルストレージ有効化のファイル名の例</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_find_segments_in_cloud_file_storage">
+<h1 class="slds-text-heading_large">ファイルストレージプラットフォームでの Data Cloud セグメントの検索</h1>
+ <p>ファイルストレージプラットフォームに対してセグメントを作成および有効化したら、それぞれのストレージの場所でセグメントを表示します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+  <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table></div>
+  <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Salesforce コンテンツ外のステップとリンクは定期的に更新されず、正確でない可能性があります。</div></div></div>
+<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> バッチ DMO や API の有効化など、セグメント以外の有効化では、有効化対象の事前設定されたファイル名の選択に関係なく、出力ファイル名に常に<code>&lt;ActivationName&gt;</code>が使用されます。</div></div></div>
+</div>
+ 
+ <div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="有効化対象 (Amazon S3、SFTP、GCS、Azure) の項目に設定された値に基づいて、Data 360 外部有効化のファイル名の例を次に示します。" href="data360_general-1.html#c360_a_file_name_examples">ファイルストレージ有効化のファイル名の例</a></li></ul></div>
+<div id="oc3_kvm_1zb" aria-labelledby="ariaid-title2" class="nested1"><a name="oc3_kvm_1zb"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">Amazon S3 でのセグメントの検索</h2>
+  
+   <div><p>Amazon S3 に対するセグメントを作成して有効化すると、最初のセグメントが Amazon S3 に対して有効化されるときに Salesforce-c360-Segments というサブフォルダーが自動的に作成されます。</p></div>
+   <ol><li>
+     <span>Amazon S3 にアクセスします。</span>
+    </li><li>
+     <span>Amazon S3 有効化対象で設定したバケット名に移動します。</span>
+    </li><li>
+     <span>/first_party/Salesforce_c360_Segments に移動します。</span>
+     <div>セグメントは YYYY/MM/DD/HH/{セグメント名の最初の 100 文字}/{20 文字の有効化名}_{yyyyMMddHHmmssSS 形式のタイムスタンプ} で作成されます。</div>
+    </li></ol>
+
+  
+ </div>
+
+ <div id="g4l_5tm_1zb" aria-labelledby="ariaid-title3" class="nested1"><a name="g4l_5tm_1zb"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">SFTP サーバーでのセグメントの検索</h2>
+  
+   <div><p>SFTP サーバーに対するセグメントを作成して有効化すると、有効化されたファイルは設定に基づいて親ディレクトリまたは子ディレクトリに配置されます。</p></div>
+   <ol><li>
+     <span>SFTP サーバーにアクセスします。</span>
+    </li><li>
+     <span>SFTP 対象で設定したサーバーに移動します。</span>
+    </li><li>
+     <span>設定に基づいて、/親ディレクトリ/子ディレクトリ/自動フォルダーのパスに移動します。</span>
+     <div>セグメントファイルは <samp class="filepath">/FileName_DateTimeSuffix_Part#.FileFormat.CompressionFormat.PGPEncryption</samp> の形式で作成されます。<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div id="g4l_5tm_1zb__note_rsb_1w1_s3c" style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><a name="g4l_5tm_1zb__note_rsb_1w1_s3c"></a><span class="slds-text-title_caps">メモ</span> ファイル名の日時サフィックスは UTC 時間で提供されます。</div></div></div>
+<div><p>ファイル名の例: <samp class="filepath">/TeenagersInNewyork_EmailCampaign_2023-07-30-17-55-45-216_00000.csv.gz.pgp</samp></p><div style="text-align:left;"><img alt="データエクスプローラーでの有効化されたプロファイルの表示" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_file_name_example.png" style="width:600px;"></div></div></div>
+    </li></ol>
+
+  
+ </div>
+
+ <div id="e1d_x5m_1zb" aria-labelledby="ariaid-title4" class="nested1"><a name="e1d_x5m_1zb"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">Google Cloud Storage でのセグメントの検索</h2>
+  
+   <div><p>Google Cloud Storage バケットに対するセグメントを作成して有効化すると、有効化されたファイルは設定に応じて親ディレクトリまたは子ディレクトリに配置されます。</p></div>
+   <ol><li>
+     <span>Google Cloud Storage バケットにアクセスします。</span>
+    </li><li>
+     <span>Google Cloud Storage で設定したバケットに移動します。</span>
+    </li><li>
+     <span>設定に基づいて、/親ディレクトリ/子ディレクトリ/自動フォルダーのパスに移動します。</span>
+     <div>セグメントファイルは <samp class="filepath">/FileName_DateTimeSuffix_Part#.FileFormat.CompressionFormat</samp> の形式で作成されます。<p>CompressionFormat は省略可能です。</p><p>ファイル名の例: <samp class="filepath">/TeenagersInNewyork_EmailCampaign_2023-07-30-17-55-45-216_00000.csv.gz</samp></p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> ファイルが有効化されているフォルダーに <samp class="filepath">aws-datasync</samp> というシステム生成フォルダーが作成されます。実行中の有効化がない場合、このフォルダーは自動的に削除されるため、このフォルダーに対するアクションを実行しないでください。</div></div></div>
+</div>
+    </li></ol>
+
+  
+ </div>
+
+ <div id="kzb_2vm_1zb" aria-labelledby="ariaid-title5" class="nested1"><a name="kzb_2vm_1zb"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">Microsoft Azure Blob Storage でのセグメントの検索</h2>
+  
+   <div><p>Microsoft Azure Blob Storage コンテナに対するセグメントを作成して有効化すると、有効化されたファイルは設定に応じて親ディレクトリまたは子ディレクトリに配置されます。</p></div>
+   <ol><li>
+     <span>Microsoft Azure Blob Storage コンテナにアクセスします。</span>
+    </li><li>
+     <span>Microsoft Azure Blob Storage で設定したコンテナに移動します。</span>
+    </li><li>
+     <span>設定に基づいて、/コンテナパス/子ディレクトリ/自動フォルダーのパスに移動します。</span>
+     <div>セグメントファイルは <samp class="filepath">/FileName_DateTimeSuffix_Part#.FileFormat.CompressionFormat</samp> の形式で作成されます。<p>CompressionFormat は省略可能です。</p><p>ファイル名の例: <samp class="filepath">/TeenagersInNewyork_EmailCampaign_2023-07-30-17-55-45-216_00000.csv.gz</samp></p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> ファイルが有効化されているフォルダーに <samp class="filepath">aws-datasync</samp> というシステム生成フォルダーが作成されます。実行中の有効化がない場合、このフォルダーは自動的に削除されるため、このフォルダーに対するアクションを実行しないでください。</div></div></div>
+</div>
+    </li></ol>
+
+  
+ </div>
+
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_hybridsearch_autodrop">
+<h1 class="slds-text-heading_large">ハイブリッド検索の自動ドロップの結果</h1>
+  <p>関連性スコアの急減を示す結果を動的に除外して、プロンプトと RAG の使用事例の検索結果の精度を高めます。<span>Data 360</span>ハイブリッド検索の自動ドロップは、プロンプトビルダーなどのアップストリームアプリケーションがそれらの結果を使用して誤解を招く可能性がある無関係な検索結果を除外する方法です。</p>
+
+    <p>検索クエリを開始すると、<a target="_blank" href="#c360_a_hybridsearch_fusion_ranking"><u>ハイブリッド検索フュージョンランキング</u></a>モデルでは、取得する検索結果ごとに最適なランキングスコアが導出されます。ハイブリッド検索の自動ドロップオプションを使用すると、スコアが大幅に低下する 1 つ以上のスコアカットオフポイントから結果をドロップできます。このカットオフポイントを超える結果は、クエリとの関連性が低いと見なすことができます。</p>
+    <div style="text-align:left;">
+      <a name="c360_a_hybridsearch_autodrop__image_u3r_clg_dgc"></a><img alt="グラフには、クエリのハイブリッド検索結果スコアがプロットされ、スコアが大幅に低下する切り口が含まれます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/HS-autodrop.png" id="c360_a_hybridsearch_autodrop__image_u3r_clg_dgc" style="height:400px;width:600px;">
+    </div>
+    <p>自動ドロップは、ハイブリッド検索でのみ使用できます。ハイブリッド検索はベクトル検索とキーワード検索の両方を兼ね備えているため、クエリ API を使用して、ベクトル検索結果、キーワード検索結果、融合ハイブリッド検索結果など、ハイブリッド検索の各検索種別の結果の自動ドロップを設定できます。ハイブリッド検索では、検索結果スコアを分析し、無関係な結果を絞り込みます。ハイブリッド検索の自動ドロップはデフォルトで無効になっています。Data Cloud クエリ API を使用して自動ドロップを有効にします。</p>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="insights_query-2.html#c360_a_hybridsearch_autodrop_query">自動ドロップのハイブリッド検索クエリ式</a></strong><br><span>Data 360</span> クエリ API を使用して、ハイブリッド検索結果の自動ドロップを設定します。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="次のベストプラクティスを使用して、Data 360 ハイブリッド検索結果の自動ドロップを設定します。" href="#c360_a_hybridsearch_autodrop_best_practices">ハイブリッド検索自動ドロップのベストプラクティス</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_hybridsearch_autodrop_best_practices">
+<h1 class="slds-text-heading_large">ハイブリッド検索自動ドロップのベストプラクティス</h1>
+  <p>次のベストプラクティスを使用して、<span>Data 360</span> ハイブリッド検索結果の自動ドロップを設定します。</p>
+
+    <ul>
+      <li>自動ドロップでは次の推奨値を使用し、キーワード検索結果では 2、ベクトル検索結果では 5 を使用します。 これらの設定をテストし、使用事例とクエリに応じて調整します。<ul>
+          <li>キーワード検索結果では自動ドロップ値を 2、ベクトル検索結果では自動ドロップ値を 5 にすることをお勧めします。
+            <pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>{ "autodrop_keyword": {"num_drops": 2},  "autodrop_vector":{"num_drops": 5 }}</code></pre></li>
+
+          <li>デフォルトの自動ドロップ値は、キーワード検索結果に対して攻撃的ではありません。<pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>{ "autodrop_keyword": {"num_drops": 5},  "autodrop_vector":{"num_drops": 5 }}</code></pre></li>
+
+        </ul>
+</li>
+
+      <li>ハイブリッド検索結果配信の性質上、自動ドロップによって予期しない動作が発生する可能性があります。「autodrop_hybrid」パラメーターの代わりに「autodrop_vector」パラメーターと「autodrop_keyword」パラメーターを使用することをお勧めします。<pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>select * from hybrid_search(
+    table(&lt;Search_index_DMO&gt;), 
+    ‘&lt;Search String&gt;’,
+    '&lt;PreFilteringColumn&gt;&lt;Operator&gt;&lt;Value&gt;', 
+    '&lt;Limit Results&gt;', 
+    ‘{ "autodrop_keyword": {"num_drops": 2},  "autodrop_vector":{"num_drops": 5 }}’
+);
+</code></pre></li>
+
+      <li>検索結果に最も関連性の高い結果が表示されるようにするには、一連のテストクエリを使用して自動ドロップの数を調整し、関連する結果が結果セットに表示されるまで値を徐々に変更します。<p>ハイブリッド検索の自動ドロップをあまり積極的にせず、より多くの結果を保持するには、<var>num_drops</var> 値を大きくすることを検討してください。特に、スコアドロップがデータセットで発音されない場合や、関連する結果の定義が広い場合は、過度に積極的な自動ドロップによって重要な文書が切り捨てられる可能性があります。関連する結果の消失に気付いた場所に基づいて、「autodrop_keyword」、「autodrop_vector」、「autodrop_hybrid」を調整できます。</p><p>ハイブリッド検索の自動ドロップをより積極的にして、最も関連性の高い結果を保持するには、<var>num_drops</var> の値を減らします。たとえば、最初の自動削除後も検索結果に無関係のドキュメントが多数含まれ、デフォルトの <var>num_drops で</var>ノイズを効果的に除去できない場合は、<var>num_drops</var> 値を減らす必要があります。</p></li>
+
+      <li>autodrop の値がリスト内の実際のスコアドロップ数を超える場合、切り捨てが適用されません。</li>
+
+      <li>ドキュメントに類似する用語が多数含まれている場合、キーワード結果に自動ドロップを適用すると、最も関連性の高い結果のみを保持できます。</li>
+
+      <li>または、クエリで返される結果数の制限を設定することで、結果セットを減らすこともできます。詳細については、「<a target="_blank" href="insights_query-3.html#c360_a_hybridsearch_index_query"><u>Run Hybrid Search Queries</u></a> with Query API」を参照してください。この例では、制限はクエリの 2 つの結果に設定されています。<pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>select * from hybrid_search(
+       table(Knowledge_full_index__dlm),
+       'How to input special mark/character when using keyboard input data field','', 2)</code></pre></li>
+
+    </ul>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> 次の例は、自動ドロップ設定を使用しないハイブリッド検索クエリを示しています。<pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-sql">select Chunk__c, hybrid_score__c, keyword_score__c, vector_score__c, chk.SourceRecordId__c
+        from hybrid_search(table(Indeed_English_index__dlm), 'Maximize', '', 100, '{ "dfr" : {} }') hsearch 
+        join Indeed_English_chunk__dlm chk on hsearch.RecordId__c = chk.RecordId__c
+        ORDER BY hybrid_score__c DES</code></pre><p>ベクトル検索結果とキーワード検索結果の自動ドロップが設定されている場合、検索結果は最も関連性の高い結果に絞り込まれます。</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>select Chunk__c, hybrid_score__c, keyword_score__c, vector_score__c, chk.SourceRecordId__c
+        from hybrid_search(table(Indeed_English_index__dlm), 'Maximize', '', 100, '{ "autodrop_keyword": {"num_drops": 2},  "autodrop_vector":{"num_drops": 5 }}') hsearch 
+        join Indeed_English_chunk__dlm chk on hsearch.RecordId__c = chk.RecordId__c
+        ORDER BY hybrid_score__c DESC</code></pre></div></div></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_hybridsearch_best_practices">
+<h1 class="slds-text-heading_large">ハイブリッド検索のベストプラクティス</h1>
+  <p>適切な項目を分割し、事前絞り込み項目を選択し、ランキング要素を追加して、ハイブリッド検索の取得と検索の関連性を強化します。</p>
+
+    <p>コンテキストと意味を提供するチャンク項目を使用します。データをチャンクにするために複数の項目を選択できます。取得した結果が生成 AI アプリケーションでどのように使用されるかを検討します。たとえば、レコードのタイトル、本文、説明などの項目を選択します。Open や Closed など、値のセットが小さい項目はチャンクには適していません。</p>
+    <p>結果を絞り込むための条件項目を追加して、検索結果の精度を高めます。アプリケーションに適した検索条件を使用します。たとえば、ケース状況項目で事前に絞り込むことで、ケースの会話トランスクリプトの検索結果の関連性を改善できます。</p>
+    <p>関連性固有のパラメーターを送信して、ランキングモデルを使用して結果の関連性を絞り込みます。相互関係ランクフュージョン (RRF) モデルと線形フュージョンランカー (LFR) モデルの高度な数式を使用して、パラメーター値を調整し、関連する結果を実現します。</p>
+    <p>検索インデックス設定にランキング要素を追加して、関連性を高めます。</p>
+    <ul>
+      <li>ViewCount を追跡する項目を選択するなど、レコードの人気度を要素として追加します。たとえば、CRM ナレッジ記事から作成された DMO にインデックスを付ける場合、エンティティ KnowledgeArticleViewStat を <span>Data 360</span> にインポートし、KnowledgeArticleViewStat.ViewCount を人気係数として使用します。</li>
+
+      <li>要素としてレコードの最近性を追加します。たとえば、CRM Knowledge 記事から作成された DMO にインデックスを付ける場合、最新係数として LastModifiedDate__C フィールドを使用します。</li>
+
+    </ul>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> この POST 要求では、Knowledge＿kav＿Home オブジェクトにハイブリッド検索インデックス設定が作成されます。この設定では、Content 項目を使用してデータを分割し、LastModifiedDate__c 項目を使用して最新性を追跡します。<pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>{
+"label": "record9357",
+"developerName": "record9357",
+"description": "A sample description",
+"sourceDmoDeveloperName": "Knowledge_kav_Home__dlm",
+"chunkDmoName": "chunk9357",
+"vectorDmoName": "vector9357",
+"chunkDmoDeveloperName": "chunk9357",
+"vectorDmoDeveloperName": "vector9357",
+"searchType": "HYBRID"
+"vectorEmbedding": {
+"vectorEmbeddingRelatedFields": [
+{
+"relatedDmoDeveloperName": "Knowledge_kav_Home__dlm",
+"relatedDmoFieldDeveloperName": "ssot__Name__c",
+"relationships": [
+{
+"sourceDmoDeveloperName": "Knowledge_kav_Home__dlm",
+"sourceDmoFieldDeveloperName": "Content_c__c",
+"targetDmoDeveloperName": "Knowledge_kav_Home__dlm",
+"targetDmoFieldDeveloperName": "Content_c__c"
+}
+]
+}
+]
+},
+"rankingConfigurations": [
+{
+"relatedDmoDeveloperName": "Knowledge_kav_Home__dlm",
+"relatedDmoFieldDeveloperName": "LastModifiedDate__c",
+"rankType": "RECENCY",
+"developerName": "rank_time_freshness",
+"relationships": [
+{
+"sourceDmoDeveloperName": "Knowledge_kav_Home__dlm",
+"sourceDmoFieldDeveloperName": "Content_c__c",
+"targetDmoDeveloperName": "Knowledge_kav_Home__dlm",
+"targetDmoFieldDeveloperName": "Content_c__c"
+}
+]
+}
+],
+"chunkingConfiguration": {
+"fieldLevelConfigurations": [
+{
+"sourceDmoDeveloperName": "Knowledge_kav_Home__dlm",
+"sourceDmoFieldDeveloperName": "Content_c__c",
+"config": {
+"id": "passage_extraction",
+"userValues": [
+{
+"id": "max_tokens",
+"value": "512"
+},
+{
+"id": "strip_html",
+"value": "true"
+}
+]
+}
+}
+]
+},
+"vectorEmbeddingConfiguration": {
+"embeddingModel": {
+"id": "e5_large_v2",
+"userValues": [
+{
+"id": "dimension",
+"value": "1024"
+},
+{
+"id": "max_token_limit",
+"value": "512"
+}
+]
+},
+"index": {
+"id": "HNSW",
+"userValues": [
+{
+"id": "hnswEfConstruction",
+"value": "8"
+},
+{
+"id": "M",
+"value": "4"
+}
+</code></pre></div></div></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_hybridsearch_fusion_ranking">
+<h1 class="slds-text-heading_large">ハイブリッド検索フュージョンランキング</h1>
+  <p>ランキングでは、ユーザークエリに最も関連性の高い結果が先頭に表示されるように検索結果が並び替えられます。<span>Data 360</span>ハイブリッド検索では、クエリとの類似性に基づいてキーワードとベクトルの2つのインデックスから結果を取得し、結果をマージ(融合)します。その後、ランキングモデルはマージされた結果をランク付けします。</p>
+
+    <p>設定時に、レコードの最新性や人気度など、ランキングに影響する追加のランキング要素を設定できます。ランキング要素は、検索インデックスオブジェクト項目または関連オブジェクト項目に基づきます。たとえば、インデックス付き DMO の LastModifiedDate 項目を使用して、レコードの最近度を定義できます。</p>
+    <div style="text-align:left;">
+      <img alt="ハイブリッド検索フュージョンランカーは、ベクトル検索とキーワード検索の結果をランキング要素とマージして、関連性の高い検索結果を生成します。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/Hybridsearch-ranking-flow.png" style="width:500px;">
+    </div>
+    <p>Salesforce フュージョンランカーモデルは、さまざまな検索ベースのタスクの内部ベンチマークに基づいて最適化されています。ベンチマークでは、精度、堅牢性、感度のパフォーマンスを測定し、高品質のモデルを生成します。評価の基準は、検索応答とアノテーションに関するユーザーインタラクションの組み合わせから選定されます。トレーニング データと評価データは、Salesforce Einstein SearchとRAGアプリケーション(Einstein Search Answerなど)の両方から取得したクエリに基づいています。</p>
+    <p>ベクトル検索とキーワード検索の類似性スコアに影響する要素は多数あります。たとえば、キーワード類似性スコアは、クエリ テキストと検索インデックス DMO のコンテンツによって異なります。ベクトル類似性スコアは、クエリテキストと検索インデックスの特定の埋め込みモデルによって異なります。フュージョンランカーモデルでは、キーワードとベクトルの類似性スコアをランキング要素と共に線形に組み合わせたハイブリッド検索スコアが返されます。</p>
+    <p>一般的なハイブリッド検索の使用事例で最良の結果を提供するために、モデルは、各スコアの正規化戦略と各スコアの加重を含む最適な組み合わせになるように微調整されます。フュージョンランキングモデルでは、派生したハイブリッド検索スコアに基づいて結果の最終ランクを決定します。モデルでは、いずれかの検索類似性スコアが 0 であっても、ハイブリッド検索スコアが高い結果をランク付けできます。たとえば、キーワードスコアが 0 の結果のベクトルスコアが同じ検索クエリの代替結果のベクトルスコアと比較して十分高い場合、ハイブリッド検索スコアが高くなる可能性があります。</p>
+    <table summary="ハイブリッド検索スコア" class="slds-table slds-table_bordered slds-m-bottom_small"><caption>ハイブリッド検索スコア</caption><colgroup><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d52612e65" style="vertical-align:top;" class="slds-cell-wrap" scope="col">検索種別</th>
+            <th id="d52612e68" style="vertical-align:top;" class="slds-cell-wrap" scope="col">スコアパラメーター</th>
+            <th id="d52612e71" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d52612e65" style="vertical-align:top;" class="slds-cell-wrap" data-label="検索種別">ベクトル検索</td>
+
+            <td headers="d52612e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="スコアパラメーター">vector_score__c</td>
+
+            <td headers="d52612e71" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">特定のクエリの基礎となるベクトル検索インデックスによって返される類似性スコア。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d52612e65" style="vertical-align:top;" class="slds-cell-wrap" data-label="検索種別">キーワード検索</td>
+
+            <td headers="d52612e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="スコアパラメーター">keyword_score__c</td>
+
+            <td headers="d52612e71" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">特定のクエリの基礎となるキーワード検索インデックスによって返される類似性スコア。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d52612e65" style="vertical-align:top;" class="slds-cell-wrap" data-label="検索種別">ハイブリッド検索</td>
+
+            <td headers="d52612e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="スコアパラメーター">hybrid_score__c</td>
+
+            <td headers="d52612e71" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">キーワードスコアとベクトルスコアを組み合わせて得られるスコア。このスコアはランキング要素を使用します。ドキュメントの人気度や最新度などを考慮する必要があります。このスコアによって結果のランクが決まります。</td>
+
+          </tr>
+        </tbody></table>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> 「V2MOM」など、特定のドメイン用語を含む検索文字列が含まれるハイブリッド検索クエリについて考えてみます。ランキングモデルでは、ベクトルスコア、キーワードスコア、ハイブリッド検索スコアが返され、結果セットがランク付けされます。<pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-sql">select * from hybrid_search(
+      table(&lt;Search_Index_DMO&gt;),
+      "When is the V2MOM due?", 
+      &lt;Pre-Filter Fields&gt;, &lt;Limit Results&gt;);
+
+</code></pre><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:21.118012422360252%"><col style="width:21.73913043478261%"><col style="width:22.51552795031056%"><col style="width:15.527950310559008%"><col style="width:19.099378881987576%"></colgroup><thead class="slds-text-title_caps"><tr class=""><th id="d52612e130" style="vertical-align:top;" class="slds-cell-wrap" scope="col">チャンク ID</th><th id="d52612e132" style="vertical-align:top;" class="slds-cell-wrap" scope="col">ベクトルスコア</th><th id="d52612e134" style="vertical-align:top;" class="slds-cell-wrap" scope="col">キーワードスコア</th><th id="d52612e136" style="vertical-align:top;" class="slds-cell-wrap" scope="col">ハイブリッドスコア</th><th id="d52612e138" style="vertical-align:top;" class="slds-cell-wrap" scope="col">最終ランク</th></tr></thead><tbody><tr class=""><td headers="d52612e130" style="vertical-align:top;" class="slds-cell-wrap" data-label="チャンク ID">A</td>
+<td headers="d52612e132" style="vertical-align:top;" class="slds-cell-wrap" data-label="ベクトルスコア">0.85</td>
+<td headers="d52612e134" style="vertical-align:top;" class="slds-cell-wrap" data-label="キーワードスコア">10.0</td>
+<td headers="d52612e136" style="vertical-align:top;" class="slds-cell-wrap" data-label="ハイブリッドスコア">0.9</td>
+<td headers="d52612e138" style="vertical-align:top;" class="slds-cell-wrap" data-label="最終ランク">1</td>
+</tr><tr class=""><td headers="d52612e130" style="vertical-align:top;" class="slds-cell-wrap" data-label="チャンク ID">B</td>
+<td headers="d52612e132" style="vertical-align:top;" class="slds-cell-wrap" data-label="ベクトルスコア">0.90</td>
+<td headers="d52612e134" style="vertical-align:top;" class="slds-cell-wrap" data-label="キーワードスコア">1.0</td>
+<td headers="d52612e136" style="vertical-align:top;" class="slds-cell-wrap" data-label="ハイブリッドスコア">0.8</td>
+<td headers="d52612e138" style="vertical-align:top;" class="slds-cell-wrap" data-label="最終ランク">2</td>
+</tr><tr class=""><td headers="d52612e130" style="vertical-align:top;" class="slds-cell-wrap" data-label="チャンク ID">C</td>
+<td headers="d52612e132" style="vertical-align:top;" class="slds-cell-wrap" data-label="ベクトルスコア">0.80</td>
+<td headers="d52612e134" style="vertical-align:top;" class="slds-cell-wrap" data-label="キーワードスコア">0.5</td>
+<td headers="d52612e136" style="vertical-align:top;" class="slds-cell-wrap" data-label="ハイブリッドスコア">0.6</td>
+<td headers="d52612e138" style="vertical-align:top;" class="slds-cell-wrap" data-label="最終ランク">3</td>
+</tr><tr class=""><td headers="d52612e130" style="vertical-align:top;" class="slds-cell-wrap" data-label="チャンク ID">D</td>
+<td headers="d52612e132" style="vertical-align:top;" class="slds-cell-wrap" data-label="ベクトルスコア">0.75</td>
+<td headers="d52612e134" style="vertical-align:top;" class="slds-cell-wrap" data-label="キーワードスコア">0.01</td>
+<td headers="d52612e136" style="vertical-align:top;" class="slds-cell-wrap" data-label="ハイブリッドスコア">0.5</td>
+<td headers="d52612e138" style="vertical-align:top;" class="slds-cell-wrap" data-label="最終ランク">4</td>
+</tr></tbody></table></div></div></div>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> この例では、ハイブリッド検索クエリに、最終ランクに影響する人気および最近のランキング要素が含まれています。<pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-sql">select * from hybrid_search(
+          table(&lt;Search_Index_DMO&gt;), 
+          "How do I reset the password for my Acme account?", 
+          &lt;Pre-Filter Fields&gt;, &lt;Limit Results&gt;);
+</code></pre><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:16.042154566744735%"><col style="width:13.583138173302109%"><col style="width:16.042154566744735%"><col style="width:14.75409836065574%"><col style="width:11.7096018735363%"><col style="width:13.348946135831383%"><col style="width:14.519906323185014%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d52612e213" style="vertical-align:top;" class="slds-cell-wrap" scope="col">チャンク ID</th>
+              <th id="d52612e216" style="vertical-align:top;" class="slds-cell-wrap" scope="col">ベクトルスコア</th>
+              <th id="d52612e219" style="vertical-align:top;" class="slds-cell-wrap" scope="col">キーワードスコア</th>
+              <th id="d52612e222" style="vertical-align:top;" class="slds-cell-wrap" scope="col">人気</th>
+              <th id="d52612e225" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Recency(Days)</th>
+              <th id="d52612e229" style="vertical-align:top;" class="slds-cell-wrap" scope="col">ハイブリッドスコア</th>
+              <th id="d52612e232" style="vertical-align:top;" class="slds-cell-wrap" scope="col">最終ランク</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d52612e213" style="vertical-align:top;" class="slds-cell-wrap" data-label="チャンク ID">A</td>
+
+              <td headers="d52612e216" style="vertical-align:top;" class="slds-cell-wrap" data-label="ベクトルスコア">0.91</td>
+
+              <td headers="d52612e219" style="vertical-align:top;" class="slds-cell-wrap" data-label="キーワードスコア">10.0</td>
+
+              <td headers="d52612e222" style="vertical-align:top;" class="slds-cell-wrap" data-label="人気">1000 (非常に人気)</td>
+
+              <td headers="d52612e225" style="vertical-align:top;" class="slds-cell-wrap" data-label="Recency(Days)">10 (最近)</td>
+
+              <td headers="d52612e229" style="vertical-align:top;" class="slds-cell-wrap" data-label="ハイブリッドスコア">0.9</td>
+
+              <td headers="d52612e232" style="vertical-align:top;" class="slds-cell-wrap" data-label="最終ランク">1</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d52612e213" style="vertical-align:top;" class="slds-cell-wrap" data-label="チャンク ID">B</td>
+
+              <td headers="d52612e216" style="vertical-align:top;" class="slds-cell-wrap" data-label="ベクトルスコア">0.90</td>
+
+              <td headers="d52612e219" style="vertical-align:top;" class="slds-cell-wrap" data-label="キーワードスコア">10.5</td>
+
+              <td headers="d52612e222" style="vertical-align:top;" class="slds-cell-wrap" data-label="人気">1</td>
+
+              <td headers="d52612e225" style="vertical-align:top;" class="slds-cell-wrap" data-label="Recency(Days)">15</td>
+
+              <td headers="d52612e229" style="vertical-align:top;" class="slds-cell-wrap" data-label="ハイブリッドスコア">0.875</td>
+
+              <td headers="d52612e232" style="vertical-align:top;" class="slds-cell-wrap" data-label="最終ランク">2</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d52612e213" style="vertical-align:top;" class="slds-cell-wrap" data-label="チャンク ID">C</td>
+
+              <td headers="d52612e216" style="vertical-align:top;" class="slds-cell-wrap" data-label="ベクトルスコア">0.80</td>
+
+              <td headers="d52612e219" style="vertical-align:top;" class="slds-cell-wrap" data-label="キーワードスコア">2</td>
+
+              <td headers="d52612e222" style="vertical-align:top;" class="slds-cell-wrap" data-label="人気">5</td>
+
+              <td headers="d52612e225" style="vertical-align:top;" class="slds-cell-wrap" data-label="Recency(Days)">25</td>
+
+              <td headers="d52612e229" style="vertical-align:top;" class="slds-cell-wrap" data-label="ハイブリッドスコア">0.8</td>
+
+              <td headers="d52612e232" style="vertical-align:top;" class="slds-cell-wrap" data-label="最終ランク">3</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d52612e213" style="vertical-align:top;" class="slds-cell-wrap" data-label="チャンク ID">D</td>
+
+              <td headers="d52612e216" style="vertical-align:top;" class="slds-cell-wrap" data-label="ベクトルスコア">0.80</td>
+
+              <td headers="d52612e219" style="vertical-align:top;" class="slds-cell-wrap" data-label="キーワードスコア">1</td>
+
+              <td headers="d52612e222" style="vertical-align:top;" class="slds-cell-wrap" data-label="人気">10</td>
+
+              <td headers="d52612e225" style="vertical-align:top;" class="slds-cell-wrap" data-label="Recency(Days)">100</td>
+
+              <td headers="d52612e229" style="vertical-align:top;" class="slds-cell-wrap" data-label="ハイブリッドスコア">0.75</td>
+
+              <td headers="d52612e232" style="vertical-align:top;" class="slds-cell-wrap" data-label="最終ランク">4</td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> この例では、ハイブリッド検索スコアがキーワードとベクトルの類似性スコアからどのように派生するかをランキング要素と共に示します。スコア値は絶対ではなく、実際には同じクエリのランキング結果を比較するためだけに使用する必要があります。</div></div></div>
+</div></div></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://engineering.salesforce.com/how-data-cloud-hybrid-search-combines-keyword-and-vector-retrieval-to-elevate-the-search-experience/">Salesforce エンジニアリングブログ投稿: How Data Cloud Hybrid Search Combines Keyword and Vector Retrieval to Elevate the Search Experience (Data Cloud ハイブリッド検索でキーワードとベクトルの取得を組み合わせて検索エクスペリエンスを向上)</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_hybridsearch_index">
+<h1 class="slds-text-heading_large">ハイブリッド検索</h1>
+  <p>gen AI アプリケーションを使用して LLM に関連情報を提供し、正しい応答を生成するには、ベクトル検索とキーワード検索の両方が必要です。ベクトル検索ではセマンティックの類似点とコンテキストは理解されますが、特定のドメインの語彙はありません。キーワード検索は語彙的類似性では優れていますが、意味的類似性では優れていません。Data 360 では、ハイブリッド検索はセマンティックアウェアなベクトル検索の強みとキーワード検索の精度と速度を兼ね備えています。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+          </tr>
+        </tbody></table>
+    <p>たとえば、ベクトル検索では「アカウントへのログイン方法」が理解されます。「How can I sign on? (サインオン方法は?)」は同様のクエリです。ただし、ベクトル検索では、「LaserPrinter TX 400」と「LaserPrinter TX 440」の検索も、数値や LaserPrinter などの特定のドメイン用語にうまく一致せず、キーワード検索で類似していることが理解できない場合があります。</p>
+    <p>ハイブリッド検索では、DMO または UDMO の情報がインデックス付けされ、関連する結果が取得されます。ハイブリッド検索インデックスを作成する前に、DMO と UDMO に保存されている非構造化データがチャンクされます。チャンクにより、DMO と UDMO が管理可能で意味的な単位に分割されます。</p>
+    <p>次に、データインデックス付けによって、ベクトル検索インデックスと DMO および UDMO のキーワード検索インデックスのベクトル埋め込みが生成されます。検索インデックスの作成、削除、ハイドレーションは、Data 360 検索インデックス UI インターフェースと API を使用して管理します。</p>
+    <p>ハイブリッド検索では、ベクトル検索インデックスは意味的な類似性に基づいて情報を取得するために照会され、キーワード検索インデックスは語彙的な類似性に基づいて情報を取得するために照会されます。ハイブリッド検索では、両方の種別の検索で提供された結果がマージされてランク付けされ、最適な応答が生成されます。また、返される検索結果に影響を与えるために、レコードの最近性や人気度などの追加のランキング要素を設定することもできます。</p>
+    <p>Data 360 で検索インデックスを作成したら、プロンプトビルダー、AI エージェント、Tableau などのアプリケーションからそのデータに対して検索を実行できます。</p>
+    <div style="text-align:left;">
+      <img alt="図は、ハイブリッド検索インデックスを作成するフローを示しています。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/hs-queryflow-v2.png" style="width:600px;">
+    </div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#c360_a_hybridsearch_index_create">高度な設定を使用したハイブリッド検索インデックスの作成</a></strong><br>DMO(データ モデル オブジェクト)またはUDMO(非構造化データ モデル オブジェクト)のハイブリッド検索インデックスを設定して、生成AIアプリケーションに関連情報を提供します。<span>Data 360 は</span>、参照されるデータをセマンティックに関連するチャンクに分割して検索可能なベクトルを生成し、ベクトルインデックスとキーワードインデックスを生成します。</li><li class="slds-p-bottom_small"><strong><a href="insights_query-3.html#c360_a_hybridsearch_index_query">クエリ API を使用したハイブリッド検索クエリの実行</a></strong><br>Data 360 でハイブリッド検索を実行するには、クエリ API を使用します。 次の例を出発点として使用します。</li><li class="slds-p-bottom_small"><strong><a href="insights_query-3.html#c360_a_hybridsearch_query_expressions">ハイブリッド検索クエリ式</a></strong><br>事前絞り込み項目と結合式を使用してハイブリッド検索クエリを強化し、項目にアクセスします。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_hybridsearch_fusion_ranking">ハイブリッド検索フュージョンランキング</a></strong><br>ランキングでは、ユーザークエリに最も関連性の高い結果が先頭に表示されるように検索結果が並び替えられます。<span>Data 360</span>ハイブリッド検索では、クエリとの類似性に基づいてキーワードとベクトルの2つのインデックスから結果を取得し、結果をマージ(融合)します。その後、ランキングモデルはマージされた結果をランク付けします。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_hybridsearch_relevance_configuration">影響ハイブリッド検索の関連性ランキング</a></strong><br>関連性固有のパラメーターを送信することで、検索インデックススクエリ結果の精度を高め、RAG アプリケーションの品質を向上させます。SQL を使用して、サポートされるフュージョンランカーモデルの関連性設定を送信し、特定の使用事例の結果の関連性を改善できます。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_hybridsearch_autodrop">ハイブリッド検索の自動ドロップの結果</a></strong><br>関連性スコアの急減を示す結果を動的に除外して、プロンプトと RAG の使用事例の検索結果の精度を高めます。<span>Data 360</span>ハイブリッド検索の自動ドロップは、プロンプトビルダーなどのアップストリームアプリケーションがそれらの結果を使用して誤解を招く可能性がある無関係な検索結果を除外する方法です。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_hybridsearch_best_practices">ハイブリッド検索のベストプラクティス</a></strong><br>適切な項目を分割し、事前絞り込み項目を選択し、ランキング要素を追加して、ハイブリッド検索の取得と検索の関連性を強化します。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_hybridsearch_autodrop_best_practices">ハイブリッド検索自動ドロップのベストプラクティス</a></strong><br>次のベストプラクティスを使用して、<span>Data 360</span> ハイブリッド検索結果の自動ドロップを設定します。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_hybridsearch_index_create">
+<h1 class="slds-text-heading_large">高度な設定を使用したハイブリッド検索インデックスの作成</h1><p>DMO(データ モデル オブジェクト)またはUDMO(非構造化データ モデル オブジェクト)のハイブリッド検索インデックスを設定して、生成AIアプリケーションに関連情報を提供します。<span>Data 360 は</span>、参照されるデータをセマンティックに関連するチャンクに分割して検索可能なベクトルを生成し、ベクトルインデックスとキーワードインデックスを生成します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d14947e60" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d14947e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">検索インデックス設定を作成する</td>
+
+              <td headers="d14947e60" style="vertical-align:top;" class="slds-cell-wrap"><p>権限セット</p><ul>
+                  <li>Data Cloud アーキテクト</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table><p>検索インデックスを作成する前に、『検索リファレンス』で検索インデックスの考慮事項を確認してください<a title="Data 360の検索では、非構造化データ、モデルの埋め込み、検索結果の事前絞り込み操作など、さまざまなファイル形式がサポートされます。" href="search_rag-2.html#c360_a_search_index_reference">。</a>非構造化データのチャンク、ベクトル化、チャンクおよびインデックスデータモデルオブジェクトの概念を理解しておきましょう。</p></div>
+  <div id="task_uwt_vqm_khc" aria-labelledby="ariaid-title2" class="nested1"><a name="task_uwt_vqm_khc"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">生成 AI 機能の Agentforce の有効化 (省略可能)</h2>
+    
+      <div><p>検索インデックスの一部の機能 (画像処理、強化インデックス、LLM ベースのコンテンツ処理および解析など) では、Agentforce で使用できる生成 AI 機能が必要です。これらの機能を使用する場合は、組織で <a target="_blank" href="https://help.salesforce.com/s/articleView?id=ai.agent_setup_enable.htm&amp;language=ja&amp;type=5">Agentforce を有効</a>にするようにシステム管理者にお問い合わせください。Einstein 設定で Amazon Bedrock Models (Amazon および Anthropic) を有効にして、強化されたインデックスを使用します。</p></div>
+    
+  </div>
+
+  <div id="hybrid_search_source" aria-labelledby="ariaid-title3" class="nested1"><a name="hybrid_search_source"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">検索種別とソースオブジェクトの選択</h2>
+    
+    <p>開始するには、実行する検索の種類を指定し、ソース DMO を選択します。</p>
+
+      <a name="hybrid_search_source__steps_gpj_5zv_jfc"></a><ol id="hybrid_search_source__steps_gpj_5zv_jfc"><li>
+          <span>アプリケーションランチャーで、[<strong class="uicontrol">Data Cloud]</strong> を選択します。</span>
+        </li><li>
+          <span><strong class="uicontrol">検索インデックス</strong>&gt; <strong class="uicontrol">[新規]</strong> をクリックします。</span>
+        </li><li>
+          <span>[<strong class="uicontrol">高度な設定</strong>]&gt; [<strong class="uicontrol">次へ]</strong> をクリックします。</span>
+        </li><li>
+          <span>[<strong class="uicontrol">検索種別]</strong> で [ハイブリッド検索] を選択します。</span>
+        </li><li>
+          <span>データスペースとソースオブジェクトを選択します。</span>
+          <div>
+            <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span>  1 つ以上の外部 DLO からのマッピングがある DMO は、それらのすべての外部 DLO でキャッシュが有効になっている場合にのみデータソースとして使用できます。詳細は、「<a target="_blank" href="model_mapping-1.html#c360_a_accelerated_data_lake_objects">データフェデレーションのキャッシュ</a>」を参照してください。</div></div></div>
+
+          </div>
+        </li><li>
+          <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+        </li></ol>
+
+    
+  </div>
+
+  <div id="task_myc_xqm_khc" aria-labelledby="ariaid-title4" class="nested1"><a name="task_myc_xqm_khc"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">解析とビジュアルデータの前処理の設定</h2>
+    
+    <p>次に、非構造化ドキュメントからチャンク用のテキスト、メタデータ、テーブル、画像を抽出して準備します。</p>
+
+      <div><p>LLM 解析および前処理オプションは、UDMO の PDF、HTML、DOCX、PPTX ファイルの種類と DMO レコードに添付されたファイルで使用できます。これらのオプションは、DMO レコードでは使用できません。</p><p>1 つの検索インデックスに LLM ベースの解析オプションと LLM ベースのビジュアル データ前処理オプションの両方を選択することはできません。これらのオプションの詳細については、「<a title="LLM ベースの解析と前処理を使用して、非構造化ドキュメントからテキスト、メタデータ、テーブル、画像を抽出し、チャンク用に準備します。" href="transform_prep-2.html#c360_a_llm_parsing_preprocessing">LLM ベースの解析</a>および前処理」を参照してください。</p><p> LLM ベースの解析と LLM ベースのビジュアルデータ前処理を使用すると、デフォルトの GPT-4o モデルを上書きして、ビジネスニーズとコンテンツに最も適したサポート対象の LLM を使用できます。システム管理者が使用を承認した LLM のみを選択できます。組織管理者が現在使用中のモデルを無効にしても、以前に処理したコンテンツは引き続きアクセスできます。ただし、検索インデックスはそれ以降のコンテンツの処理に失敗します。サポートされるモデルの詳細については、「<a target="_blank" href="search_rag-2.html#c360_a_search_index_reference">検索インデックス リファレンス</a>」を参照してください。</p></div>
+      <ol><li>
+          <span>[解析] ページで、次のいずれかのオプションを選択します。</span>
+          <table class="slds-table slds-table_bordered slds-m-bottom_small"><tbody><tr class="">
+              <th id="d14947e246" headers="d14947e242-option" style="vertical-align:top;">デフォルトパーサー</th>
+
+              <td headers="d14947e242-desc d14947e246" style="vertical-align:top;">組み込み設定でテキストを抽出します。</td>
+
+            </tr><tr class="">
+              <th id="d14947e255" headers="d14947e242-option" style="vertical-align:top;">LLM ベースのパーサー</th>
+
+              <td headers="d14947e242-desc d14947e255" style="vertical-align:top;">LLM を使用して、すべてのテキスト、画像、その他の視覚要素を抽出します。</td>
+
+            </tr><tr class="">
+              <th id="d14947e264" headers="d14947e242-option" style="vertical-align:top;">Docling Parser</th>
+
+              <td headers="d14947e242-desc d14947e264" style="vertical-align:top;">テーブル、スプレッドシート、スライドデッキからテキストを抽出します。ドキュメントパーサーを使用してドキュメントレイアウトを理解します。</td>
+
+            </tr></tbody></table>
+        </li><li>
+          <span>[Default Parser (デフォルトパーサー)] を選択した場合は、[<strong class="uicontrol">Next (次</strong>へ)] をクリックします
+          </span>
+        </li><li>
+          <span>LLM を使用して文書を解析する場合は、次の手順を実行します。</span>
+          <ol>
+            <li>
+              <span>ドロップダウンリストから、適切なモデルを選択します。</span>
+            </li>
+
+            <li>
+              <span>デフォルトのプロンプトをそのまま使用するか、特定の使用事例に合わせて編集します。</span>
+              <div>使用事例とドキュメントに合わせてプロンプトをカスタマイズすることを強くお勧めします。</div>
+            </li>
+
+            <li>
+              <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+            </li>
+
+          </ol>
+        </li><li>
+          <span>Docling パーサーを選択する場合は、<strong class="uicontrol">[次へ</strong>] をクリックします。</span>
+          <div>デフォルトでは、追加の前処理は無効になっています。必要に応じて、画像や複雑なテーブルを解析するチャンク戦略を設定するときに、画像処理を有効にします。</div>
+        </li><li>
+          <span>デフォルトのパーサーを選択した場合は、[前処理] ページで次のいずれかのオプションを選択します。</span>
+          <table class="slds-table slds-table_bordered slds-m-bottom_small"><tbody><tr class="">
+              <th id="d14947e335" headers="d14947e331-option" style="vertical-align:top;">前処理なし</th>
+
+              <td headers="d14947e331-desc d14947e335" style="vertical-align:top;">解析されたテキストおよびビジュアルデータをそのまま使用します。</td>
+
+            </tr><tr class="">
+              <th id="d14947e344" headers="d14947e331-option" style="vertical-align:top;">LLM ベースのビジュアルデータ前処理</th>
+
+              <td headers="d14947e331-desc d14947e344" style="vertical-align:top;">LLM を使用してビジュアルデータからコンテキストを取得します。(前のステップでデフォルトのパーサーを選択した場合のみ使用可能)。</td>
+
+            </tr></tbody></table>
+        </li><li>
+          <span>[前処理なし] を選択した場合は、<strong class="uicontrol">[次へ</strong>] をクリックします。</span>
+        </li><li>
+          <span>LLM を使用してドキュメントを前処理する場合は、次の手順を実行します。</span>
+          <ol>
+            <li>
+              <span>ドロップダウンリストから、適切なモデルを選択します。</span>
+            </li>
+
+            <li>
+              <span>デフォルトのプロンプトをそのまま使用するか、特定の使用事例に合わせて編集します。</span>
+              <div>使用事例とドキュメントに合わせてプロンプトをカスタマイズすることを強くお勧めします。</div>
+            </li>
+
+            <li>
+              <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+            </li>
+
+          </ol>
+        </li></ol>
+
+    
+  </div>
+
+  <div id="hybrid_setup_chunk_vector" aria-labelledby="ariaid-title5" class="nested1"><a name="hybrid_setup_chunk_vector"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">チャンクとベクトル化の設定</h2>
+    
+    <p> 次に、データのチャンクを設定し、埋め込みモデルを選択して各チャンクの検索可能なベクトルを作成します。</p>
+
+      <a name="hybrid_setup_chunk_vector__steps_i4q_yzv_jfc"></a><ol id="hybrid_setup_chunk_vector__steps_i4q_yzv_jfc"><li>
+          <span> 検索インデックスが DMO 上にある場合は、[チャンク] ページでチャンクするフィールドと<a title="Data 360 では、いくつかのチャンク戦略がサポートされています。Data 360 では、使用しているコンテンツタイプに基づいて最適なチャンク戦略が自動的に選択されます。" href="search_rag-2.html#c360_a_search_index_supported_chunking_strategies">チャンク戦略</a>を選択します。</span>
+          <a name="hybrid_setup_chunk_vector__substeps_j4q_yzv_jfc"></a><ol id="hybrid_setup_chunk_vector__substeps_j4q_yzv_jfc">
+            <li>
+              <span> フィールドを追加または削除するには、[<strong class="uicontrol">フィールドの管理</strong>] をクリックして作業を保存します。</span>
+              <div>検索インデックスでは、チャンクの日付項目と日時項目はサポートされていません。チャンクデータに使用できるのは、数値項目とテキスト項目のみです。</div>
+            </li>
+
+            <li>
+              <span>(省略可能) チャンク戦略を更新し、設定を変更します。</span>
+            </li>
+
+            <li>
+              <span> 検索インデックスに含める添付ファイルがある Salesforce オブジェクトの DMO 上にある場合は、[<strong class="uicontrol">Include Attachments</strong> (添付ファイルを含める)] をクリックして ContentDocumentVersion UDMO を選択します。</span>
+            </li>
+
+            <li>
+              <span> ファイル拡張子を追加するか、ファイルの種類に基づいてチャンク戦略を設定します。新しいファイル タイプのファイル拡張子を追加するには、[<strong class="uicontrol">Add File Extension</strong> (ファイル拡張子の追加)] をクリックし、必要に応じてチャンク戦略を更新し、既存のファイル タイプの設定を変更します。</span>
+            </li>
+
+            <li>
+              <span> (省略可能) チャンクにフィールドを追加するには、[各チャンクの先頭にフィールドを追加] 切り替え<strong class="uicontrol">ボタン</strong>をオンにして、リストからフィールドを選択します。最大 2 つの項目を追加できます。</span>
+            </li>
+
+            <li>
+              <span>生成されたチャンクを追加のメタデータで強化するには、[<strong class="uicontrol">コンテンツチャンクを強化</strong>] 切り替えを有効にします。</span>
+            </li>
+
+            <li>
+              <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+            </li>
+
+          </ol>
+        </li><li>
+          <span> 検索インデックスが UDMO 上にある場合は、ファイル拡張子を追加するか、ファイル タイプに基づいて<a title="Data 360 では、いくつかのチャンク戦略がサポートされています。Data 360 では、使用しているコンテンツタイプに基づいて最適なチャンク戦略が自動的に選択されます。" href="search_rag-2.html#c360_a_search_index_supported_chunking_strategies">チャンク戦略</a>を設定します。</span>
+          <a name="hybrid_setup_chunk_vector__substeps_k4q_yzv_jfc"></a><ol id="hybrid_setup_chunk_vector__substeps_k4q_yzv_jfc">
+            <li>
+              <span>新しいファイル形式のファイル拡張子を追加するには、[<strong class="uicontrol">Add File Extension</strong> (ファイル拡張子を追加)] をクリックします。処理する画像がある場合は、JPEG、JPG、PNG ファイル拡張子を追加します。</span>
+            </li>
+
+            <li>
+              <span>(省略可能) チャンク戦略を更新し、既存のファイルの種類の設定を変更します。</span>
+              <div><p>JPEG、JPG、PNG などの拡張子を持つファイルの場合、画像処理はデフォルトで有効になっています。PDF ファイルの画像処理を含めるには、画像処理を有効にします。</p> 前のステップで [LLM ベースの解析] または [LLM ベースのビジュアルデータ前処理] を選択した場合、有効にしても画像処理は適用されません。</div>
+            </li>
+
+            <li>
+              <span> (省略可能) チャンクにフィールドを追加するには、[各チャンクの先頭にフィールドを追加] 切り替え<strong class="uicontrol">ボタン</strong>をオンにして、リストからフィールドを選択します。最大 2 つの項目を追加できます。</span>
+            </li>
+
+            <li>
+              <span>生成されたチャンクを追加のメタデータで強化するには、[<strong class="uicontrol">コンテンツチャンクを強化</strong>] 切り替えを有効にします。</span>
+            </li>
+
+            <li>
+              <span> Docling パーサーを選択した場合、必要に応じて LLM ベースの画像処理をオンにして、LLM を使用して画像や複雑なテーブルを解析できます。テーブルを使用したデータ抽出を改善するには、[セクション対応チャンク] を選択します。セクション対応チャンクでは、テーブルチャンク間でヘッダー情報を保持するなど、テーブルを最適に処理します。サポートされるファイル形式の詳細については、「<a target="_blank" href="data360_general-1.html#c360_a_docling_parser">Docling Parser」</a>を参照してください。</span>
+            </li>
+
+          </ol>
+        </li><li>
+          <span>文字起こしするオーディオまたはビデオ ファイルがある場合は、[設定(<strong class="uicontrol">Configure)]</strong> をクリックし、文字起こしウィンドウで次を選択します。</span>
+          <a name="hybrid_setup_chunk_vector__substeps_l4q_yzv_jfc"></a><ol id="hybrid_setup_chunk_vector__substeps_l4q_yzv_jfc">
+            <li>
+              <span>ドロップダウンからデフォルトの文字起こしモデルを選択します。</span>
+            </li>
+
+            <li>
+              <span> タイムスタンプを各話者エントリに追加するには、[タイムスタンプを<strong class="uicontrol">含める] を</strong>選択します。</span>
+            </li>
+
+          </ol>
+        </li><li>
+          <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+        </li><li>
+          <span> [ベクトル化] ページで、ドロップダウンリストから埋め込みモデルを選択します。検索インデックスに処理する画像が含まれている場合は、<a href="search_rag-2.html#c360_a_search_index_reference">適切な埋め込みモデル</a> (ベータ) を選択します。</span>
+          <div>
+            <p> このモデルでは、検索結果を作成するときに、Data 360 で非構造化データオブジェクトの意味的な関連性をどのように測定するかを決定します。</p>
+          </div>
+        </li><li>
+          <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+        </li></ol>
+
+    
+  </div>
+
+  <div id="hybrid_ranking_factors" aria-labelledby="ariaid-title6" class="nested1"><a name="hybrid_ranking_factors"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">絞り込み要素とランキング要素の項目の設定</h2>
+    
+    <p> 検索結果の精度と関連性を高めるために、ユーザーが検索を絞り込むために使用できる項目を指定します。</p>
+
+      <a name="hybrid_ranking_factors__steps_iws_scv_nfc"></a><ol id="hybrid_ranking_factors__steps_iws_scv_nfc"><li>
+          <span> [絞り込みの項目] ページで、必要に応じてソースオブジェクトまたは関連オブジェクトの項目を追加して、検索を絞り込む方法を増やします。最大 10 個の検索条件項目を選択できます。</span>
+          <div>
+            <p> Data 360 では、ベクトル埋め込みを生成するときに事前検索条件項目が選択されます。これらの事前絞り込み項目の値を変更すると、ベクトル埋め込みを生成または更新するときに Data 360 によって値が選択されます。取得元オブジェクトと関連オブジェクト間のオブジェクトリレーションのカーディナリティは、1:1 または N:1 である必要があります。</p>
+            <p> たとえば、インデックス付けされた非構造化データにケースの会話トランスクリプトが含まれている場合、ケースオブジェクトの [状況] 項目で絞り込むと、会話トランスクリプトを検索するときのセマンティック検索結果の関連性を改善できます。</p>
+          </div>
+        </li><li>
+          <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+        </li><li>
+          <span>(省略可能) ハイブリッド検索結果の順位を変更するには、[<strong class="uicontrol">Add Ranking Factor</strong> (ランキング係数を追加)] をクリックします。</span>
+          <div>たとえば、ランキング要素として <strong class="uicontrol">RECENCY</strong> を選択し、検索結果をランク付けするために DMO の <strong class="uicontrol">LastModifiedDate</strong> フィールドを選択できます。ランキング要素に寄与するオブジェクトでは、検索インデックスの構築元のオブジェクトまたは関連オブジェクトを選択できます。関連オブジェクトを選択する場合、リレーションの項目を選択します。<p>最大 2 つのランキング要素 (レコードの最近性と人気度) を追加できます。</p></div>
+        </li></ol>
+
+    
+  </div>
+
+  <div id="hybrid_review_build" aria-labelledby="ariaid-title7" class="nested1"><a name="hybrid_review_build"></a>
+    <h2 class="slds-text-heading_medium slds-p-top_small">インデックスの確認と作成</h2>
+    
+      <a name="hybrid_review_build__steps_g1m_vcv_nfc"></a><ol id="hybrid_review_build__steps_g1m_vcv_nfc"><li>
+          <span> 設定と対象データモデルオブジェクトを確認します。</span>
+        </li><li>
+          <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+        </li></ol>
+
+      <div id="hybrid_review_build__result_h1m_vcv_nfc"><a name="hybrid_review_build__result_h1m_vcv_nfc"></a><p>検索インデックスを作成すると、<span>Data 360</span>によってデータのハイブリッド検索インデックスが作成されます。次に、[<strong class="uicontrol">AI Models</strong> (AI モデル)] タブで取得者を作成します。Agentforce エージェントは、プロンプトテンプレートで取得者と共に検索インデックスを使用できます。</p></div>
+    
+  </div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_hybridsearch_relevance_configuration">
+<h1 class="slds-text-heading_large">影響ハイブリッド検索の関連性ランキング</h1>
+  <p>関連性固有のパラメーターを送信することで、検索インデックススクエリ結果の精度を高め、RAG アプリケーションの品質を向上させます。SQL を使用して、サポートされるフュージョンランカーモデルの関連性設定を送信し、特定の使用事例の結果の関連性を改善できます。</p>
+
+    <p>ハイブリッド検索では、業界標準の相互関係ランクフュージョン (RRF) モデル、カスタマイズ可能な線形フュージョンランカー (LFR) モデル、より堅牢なディープフュージョンランカー (DFR) モデルの 3 つのフュージョンランキングモデルがサポートされます。</p>
+    <p>ハイブリッド検索クエリでは、関連性設定を表す JSON 文字列を使用できます。</p>
+    <pre id="c360_a_hybridsearch_relevance_configuration__codeblock_i54_2nm_m2c" class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><a name="c360_a_hybridsearch_relevance_configuration__codeblock_i54_2nm_m2c"></a><code>select * from hybrid_search(
+    table(&lt;Search_index_DMO&gt;),
+    ‘&lt;Search_string&gt;’,
+    '&lt;PreFilteringColumn&gt;&lt;Operator&gt;&lt;Value&gt;', 
+    '&lt;Limit_results&gt;', 
+    ‘&lt;”Relevance Ranking Configuration” (JSON)&gt;’
+);
+</code></pre>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">相互ランクフュージョンモデル</h2><p>相互ランクフュージョン (RRF) モデルでは、最も関連性の高い結果を得るために各検索種別の加重が考慮された相互ランクフュージョン数式が使用されます。</p><p>往復順位フュージョン数式は、デフォルトの減衰が k=60 のキーワード検索 (スパース) とベクトル検索 (デンス) の両方の往復順位スコアの合計です。 また、2 つのスコアの凸の組み合わせでスパース加重を制御するアルファパラメーターも提供します。検索結果は、RRF ランクフュージョン数式から派生した合計を使用してランク付けされます。</p><div style="text-align:left;">
+        <a name="c360_a_hybridsearch_relevance_configuration__image_kxs_zty_l2c"></a><img alt="結果ランクを派生させるための減衰係数を含むキーワードとベクトル検索の相互ランクスコアを含む相互ランクフュージョン数式が表示されている画像。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/hybridsearch-rrf-formula.png" id="c360_a_hybridsearch_relevance_configuration__image_kxs_zty_l2c">
+      </div><p>たとえば、次のハイブリッド検索クエリ式は、RRF モデルのキーワード検索 (スパース) 加重パラメーターを渡します。</p><pre id="c360_a_hybridsearch_relevance_configuration__codeblock_fhs_2mm_m2c" class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><a name="c360_a_hybridsearch_relevance_configuration__codeblock_fhs_2mm_m2c"></a><code>select * from hybrid_search(
+    table(&lt;Search_index_DMO&gt;), 
+    ‘&lt;Search String&gt;’,
+    '&lt;PreFilteringColumn&gt;&lt;Operator&gt;&lt;Value&gt;', 
+    '&lt;Limit Results&gt;', 
+    ‘{ "rrf": { "keyword_weight": 0.4 } }’
+);
+</code></pre><p>関連性設定の入力パラメーター:</p><ul>
+        <li><strong>rrf</strong>: Enable Reciprocal Ranking Fusion model (相互関係ランキングフュージョンモデルの有効化)</li>
+
+        <li><strong>keyword_weight</strong>: ハイブリッド検索でのキーワード検索コンポーネントの重要性または加重。範囲は 0 ～ 1 です。ベクトル検索の重要度は、1.0 からキーワードの加重を差し引いて自動的に計算されます。</li>
+
+      </ul>
+<p>RRF モデルでは、検索インデックスの作成時に設定するランキング要素に影響する高度な数式もサポートされています。ランキング要素についての詳細は、「<a title="ランキングでは、ユーザークエリに最も関連性の高い結果が先頭に表示されるように検索結果が並び替えられます。Data 360ハイブリッド検索では、クエリとの類似性に基づいてキーワードとベクトルの2つのインデックスから結果を取得し、結果をマージ(融合)します。その後、ランキングモデルはマージされた結果をランク付けします。" href="#c360_a_hybridsearch_fusion_ranking">ハイブリッド Search Fusion ランキング</a>」を参照してください。</p><div style="text-align:left;">
+        <a name="c360_a_hybridsearch_relevance_configuration__image_y4v_45r_tfc"></a><img alt="キーワード検索、ベクトル検索の相互ランクスコアを使用した相互ランクフュージョン数式では、ランキング要素、人気度、最近度、各コンポーネントの重要度が考慮されます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/HS-Advance-rrf-formula.png" id="c360_a_hybridsearch_relevance_configuration__image_y4v_45r_tfc" style="width:800px;">
+      </div><p>高度な RRF 数式の関連性設定の入力パラメーター:</p><a name="c360_a_hybridsearch_relevance_configuration__ul_qwy_s5r_tfc"></a><ul id="c360_a_hybridsearch_relevance_configuration__ul_qwy_s5r_tfc">
+        <li><strong>アルファ (a)</strong>: キーワード検索に与えられた重要度を表します。デフォルトは 0.5f</li>
+
+        <li><strong>ベータ (B)</strong>: ベクトル検索に与えられた重要度を表し、キーワード検索に与えられた重要度 (1-alpha) に基づいて計算されます。</li>
+
+        <li><strong>Gamma (Y)</strong>:ランキング要素の人気度の重要性を表します。デフォルトは 0.00074478f です。最大値は 1 です。</li>
+
+        <li><strong>Delta (D)</strong>:ランキング要素の最新性に付与される重要度を表します。デフォルトは 0.00028472f です。最大値は 1 です。</li>
+
+      </ul>
+<p>クエリの加重の重要度を指定します。結果に対する適切な関連性が得られるように、値を小さい単位で調整および調整します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">線形核融合ランキングモデル</h2><p>線形フュージョンランキング (LFR) モデルは、ベクトル検索 (稠密) とキーワード検索 (疎) の両方から変換されたスコアの加重合計を計算するデフォルトのフュージョンランカーモデルのカスタマイズ可能な形式です。検索結果は、LFR 数式から派生した合計を使用してランク付けされます。</p><div style="text-align:left;">
+        <a name="c360_a_hybridsearch_relevance_configuration__image_my5_g5y_l2c"></a><img alt="ベクトルとキーワードの検索スコアが加重変換された線形フュージョンランキング数式を示す画像。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/hybridsearch-lfr-formula.png" id="c360_a_hybridsearch_relevance_configuration__image_my5_g5y_l2c">
+      </div><p>デフォルトでは、ハイブリッド検索では、内部実験とベンチマークに基づく変換と加重を使用して、最適な線形フュージョンランカー設定が提供されます。LFR では、キーワード検索 (スパース) スコアとベクトル検索 (デンス) スコア、およびそれらの加重の変換関数を使用して、ランキングをさらに設定できます。</p><p>LFR モデルでは、DMO のハイブリッド検索の設定時に設定できる最新および人気のあるランキング要素を使用することもできます。追加のランキング要素は、変換関数と加重を使用して設定できます。</p><div style="text-align:left;">
+        <a name="c360_a_hybridsearch_relevance_configuration__image_ayv_n5y_l2c"></a><img alt="結果のランクを導き出すために、加重および変換されたランキング要素 (人気と最近度) を含む線形フュージョンランキング数式が表示されている画像。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/hybridsearch-lfr-rankingfactors-formula.png" id="c360_a_hybridsearch_relevance_configuration__image_ayv_n5y_l2c">
+      </div><p>たとえば、次のハイブリッド検索クエリ式は LFR モデルの関連性パラメーターを渡します。</p><pre id="c360_a_hybridsearch_relevance_configuration__codeblock_qpr_5dg_m2c" class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><a name="c360_a_hybridsearch_relevance_configuration__codeblock_qpr_5dg_m2c"></a><code>
+select * from hybrid_search (
+    table(&lt;Search_index_DMO&gt;), 
+    ‘&lt;Search String&gt;’,
+    '&lt;PreFilteringColumn&gt;&lt;Operator&gt;&lt;Value&gt;', 
+    '&lt;Limit Results&gt;',                          
+‘{
+  "lfr": {
+    "vector": {
+      "score_transform": {
+        "type": "reciprocal_rank",
+        "decay": 60
+      },
+      "weight": 0.66913
+    },
+    "keyword": {
+      "score_transform": {
+        "type": "query_min_max",
+        "theoretical_min": 0.1
+      },
+      "weight": 4.0343633
+    }
+  }
+}’);</code></pre><p>関連性設定の入力パラメーター:</p><ul>
+        <li><strong>lfr</strong> - 線形フュージョンランキングモデルを有効化</li>
+
+        <li><strong>vector</strong>: ベクトル検索のランキングを設定します。</li>
+
+        <li><strong>keyword</strong>: キーワード検索のランキングを設定します。</li>
+
+      </ul>
+<p>ベクトル検索とキーワード検索の各ランキング設定では、次のパラメーターを使用できます。</p><a name="c360_a_hybridsearch_relevance_configuration__ul_krj_mfv_l2c"></a><ul id="c360_a_hybridsearch_relevance_configuration__ul_krj_mfv_l2c">
+        <li><strong>score_transform</strong>: 検索コンポーネントのスコア変換の設定</li>
+
+        <li><strong>type</strong>: score 変換の種別 <a name="c360_a_hybridsearch_relevance_configuration__ul_lrj_mfv_l2c"></a><ul id="c360_a_hybridsearch_relevance_configuration__ul_lrj_mfv_l2c">
+            <li>reciprocal_rank</li>
+
+            <li>query_min_max</li>
+
+          </ul>
+
+        </li>
+
+        <li><strong>decay</strong>: 相互関係ランク変換でのみサポートされ、decay パラメータで結果ランク間の勾配を制御します。たとえば、ランク 1 の結果とランク 2 の結果の相互順位スコアは、減衰が 10 なのに対し、減衰が 20 と大きく離れています。<a name="c360_a_hybridsearch_relevance_configuration__ul_apn_2qs_m2c"></a><ul id="c360_a_hybridsearch_relevance_configuration__ul_apn_2qs_m2c">
+            <li>クエリに減衰パラメーターが含まれている場合、スコア = 1/(rank+decay) になります。</li>
+
+          </ul>
+</li>
+
+        <li><strong>theoretical_min</strong>: 理論最小/最大変換でのみサポートされ、基盤となる検索機能の理論上の最小スコアを表します。このパラメーターを使用して、[0,1] の範囲で特徴分布を拡大または縮小します。そのため、最適な結果を得るには、機能の最小値を選択します。キーワード検索スコアの場合、0 が適切な値です。値が大きいほど関連性が高いことを示すデータがない限り、この値は調整しないでください。</li>
+
+        <li><strong>weight</strong>: ハイブリッド検索のこのコンポーネントに与える重要度</li>
+
+      </ul>
+</div>
+    <div id="c360_a_hybridsearch_relevance_configuration__section_hck_bjl_m2c"><a name="c360_a_hybridsearch_relevance_configuration__section_hck_bjl_m2c"></a><h2 class="slds-text-heading_medium slds-p-top_small">Deep Fusion ランカーモデル</h2><p>Deep Fusion Ranker (DFR) モデルでは、ベクトルの類似性、キーワードの一致、人気、最新性などの従来のシグナルとクエリテキストの深い理解を統合することで、検索の関連性を高めます。このモデルでは、ディープラーニングの手法とトランスフォーマーアーキテクチャを活用して、複雑な特徴のインタラクションを取得し、レコードを共同でスコアリングします。検索結果が正確で、絞り込まれ、コンテキストに関連する。このモデルでは、欠損データやノイズの多いデータを効果的に処理できるため、さまざまな検索シナリオで信頼性の高いパフォーマンスが保証されます。</p><p>dfr 関連性設定を使用して、Deep Fusion Ranker モデルを有効にします。このモデルに使用できる他のカスタマイズはありません。</p><p>たとえば、次のハイブリッド検索クエリ式は、Deep Fusion Ranker モデルの関連性パラメーターを渡します。</p><pre id="c360_a_hybridsearch_relevance_configuration__codeblock_z1d_gnm_m2c" class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><a name="c360_a_hybridsearch_relevance_configuration__codeblock_z1d_gnm_m2c"></a><code>select * from hybrid_search (
+    table(&lt;Search_index_DMO&gt;), 
+    ‘&lt;Search String&gt;’,
+    '&lt;PreFilteringColumn&gt;&lt;Operator&gt;&lt;Value&gt;', 
+    '&lt;Limit Results&gt;)', 
+    ‘{  "dfr": {}}’
+);
+</code></pre><p>関連性設定の入力パラメーター:</p><a name="c360_a_hybridsearch_relevance_configuration__ul_ick_bjl_m2c"></a><ul id="c360_a_hybridsearch_relevance_configuration__ul_ick_bjl_m2c">
+        <li><strong>dfr</strong>: ディープフュージョンランカーモデルの有効化</li>
+
+      </ul>
+</div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="関連性スコアの急減を示す結果を動的に除外して、プロンプトと RAG の使用事例の検索結果の精度を高めます。Data 360ハイブリッド検索の自動ドロップは、プロンプトビルダーなどのアップストリームアプリケーションがそれらの結果を使用して誤解を招く可能性がある無関係な検索結果を除外する方法です。" href="#c360_a_hybridsearch_autodrop">ハイブリッド検索の自動ドロップの結果</a></li><li><a target="_blank" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/rrf.html">弾性検索: 相互ランクフュージョン方法</a></li><li><a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/modules/hybrid-search-for-rag-quick-look">Trailhead: RAG のハイブリッド検索: クイックルック</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_notebook_ai_research_analyze">
+<h1 class="slds-text-heading_large">ノートブック AI を使用したコンテンツの探索と調査</h1>
+  <p><span>Data 360</span> Notebook AIは、個人、エンタープライズ、公開コンテンツのアップロード、調査、インサイトの生成を行うための生成AIノートブックです。</p>
+
+    <p>ノートブック AI は、営業、サポート、マーケティングなどの個人ビジネスユーザーやチーム向けです。質問してコンテンツを探索したり、ソースコンテンツを選択して概要を生成したりするための個人用の専用ワークスペースを作成します。</p>
+    <p>ユーザーは、ノートブックに非公開リソースライブラリを作成し、企業全体のコンテンツと組み合わせて、信頼できるコンテンツを 1 つのスペースで生成します。</p>
+    <p>ノートブック AI は、短期の期限付きのプロジェクトや長期の研究およびコンテンツ作成用であり、AI を駆使した研究に柔軟性、制御性、コラボレーションをもたらします。</p>
+    <p>Notebook AI は、<span>Data 360</span> または Web アプリケーションとして使用できます。</p>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">使用事例: 繰り返されるカスタマーサポートの問題を調査するためのノートブック AI</h2><p>カスタマーサポート担当者は、商品や設定の根本的なギャップに起因する顧客の反復的な問題に対処することがよくあります。</p><p>サポートケース、JIRA チケット、Slack スレッド、商品に関連するエラーログなど、複数のシステムとソースで顧客の問題が記録されます。個人メモ、製品マニュアル、コミュニティ記事など、さまざまな方法で問題の解決方法を見つけて文書化できます。</p><p>サポート担当者が使用、再利用、共有できる明確なKnowledgeが1か所にない場合、対応やエスカレーションが異なる場合があります。サポートエンジニアは、次の一般的なフローを使用して Notebook AI を操作します。</p><ul>
+        <li>研究ノートを作成する</li>
+
+        <li>すべてのソースをリソースライブラリにアップロードする</li>
+
+        <li>質問、回答の確認、ソース引用の検証によるソースの探索</li>
+
+      </ul>
+<p>分析をコピーまたはダウンロードして、解決を検証し、信頼できる記事を作成します。新しいコンテンツをKnowledgeベース記事として共有してエンタープライズリソースに追加し、他のユーザーが調査からメリットを得られるようにします。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">使用事例: 提案依頼 (RFP) 商談を調査するためのノートブック AI</h2><p>営業担当は Notebook AI を使用して、新しい商談の販売提案を調査できます。</p><p>営業担当は、AI で生成されたノートブックを使用して、さまざまなドキュメントをリソースライブラリにアップロードできます。これらのドキュメントには、顧客とのミーティングメモ、市場トレンドの詳細が記載された Web ページ、競合他社の分析レポート、RFP が含まれます。</p><p>質問、回答の確認、引用元の検証を行ってソースを探索します。調査を使用してレポートを生成し、チームと共有して確認します。</p></div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="data360_general-2.html#c360_a_notebook_ai_custom_user_perm">データスペースとユーザーのノートブック AI の有効化</a></strong><br><span>Data 360</span> Notebook AIにデータスペースのデータへのアクセス権を付与し、カスタム権限セットを使用してエンタープライズユーザーにNotebook AIへのアクセス権を付与します。マルチ組織アーキテクチャでは、ホーム組織とコンパニオン組織の両方でノートブック AI を有効にします。</li><li class="slds-p-bottom_small"><strong><a href="data360_general-2.html#c360_a_notebook_ai_web_access">ノートブック AI Web アクセスの有効化</a></strong><br>エンタープライズユーザーに <span>Data 360</span> Notebook AI Web アプリケーションへのアクセス権を付与します。Notebook AI Web アプリケーションが Salesforce 組織に接続することを承認し、ユーザーが Web からアプリケーションにログインできるようにします。</li><li class="slds-p-bottom_small"><strong><a href="data360_general-2.html#c360_a_notebook_ai_manage_notebooks">AI ノートブックの管理</a></strong><br><span>Data 360</span> Notebook AIで生成AIノートブックを管理します。デフォルトでは、ノートブックは作成者のユーザーに非公開です。</li><li class="slds-p-bottom_small"><strong><a href="getstarted-2.html#c360_a_notebookai_billing_considerations">ノートブック AI の請求に関する考慮事項</a></strong><br>Notebook AIを使用してコンテンツのアップロード、質問、インサイトの保存を行うと、データは<span>Data 360</span>とAgentforceで処理されます。<span>Data 360</span>を使用したデータの処理、コンテンツ ソースのインデックス付け、データの照会には、請求処理が含まれます。</li><li class="slds-p-bottom_small"><strong><a href="data360_general-2.html#c360_a_notebook_ai_troubleshooting">ノートブック AI エラーのトラブルシューティング</a></strong><br>ノートブック AI を設定するときに、最も一般的な問題を診断して修正します。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="非構造化データと検索インデックス設定を使用する場合、データは Data 360 に保存および処理されます。Data 360で非構造化データと検索インデックスを使用すると、次の使用量タイプのクレジットの消費に影響します。" href="https://help.salesforce.com/s/articleView?id=data.c360_a_unstructured_data_billing_considerations.htm&amp;language=ja&amp;type=5">非構造化データと検索インデックスの請求に関する考慮事項</a></li><li><a title="特定の Data 360 機能の使用は、クレジット消費に影響します。2026 年 2 月 24 日より前にクレジットを購入した場合、組織は Data 360 サービスのデータサービスクレジットを消費します。2026 年 2 月 24 日以降に購入または更新する組織には、データサービスまたは Flex Credit のいずれかを使用できます。これらのデータ サービス使用状況カテゴリの使用状況を監視するには、組織の Digital Wallet にアクセスします。組織に Data 360 Profiles タイプのライセンスがある場合、一部の使用量種別は消費されません。使用量の請求方法についての詳細は、契約書を参照いただくか、アカウントエグゼクティブにお問い合わせください。" href="billing.html#c360_a_data_usage_types">Data 360 のデータサービス請求可能利用状況種別</a></li><li><a title="ノートブック AI を設定するときに、最も一般的な問題を診断して修正します。" href="data360_general-2.html#c360_a_notebook_ai_troubleshooting">ノートブック AI エラーのトラブルシューティング</a></li></ul></div>
+</div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="insights_query-3.html">&larr; インサイト・計算インサイト・クエリ・データグラフ・探索（3/3）</a><a href="search_rag-2.html">検索・検索インデックス・RAG・ハイブリッド検索（2/2） &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=data.c360_a_data_cloud.htm&type=5&language=ja">help.salesforce.com — Data 360（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>

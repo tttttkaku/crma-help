@@ -1,0 +1,1943 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>レイヤー・地図表示（マーカー／シェイプ／境界） | Salesforce Maps ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（24）</h2>
+    <ol>
+      <li><a href="#salesforce_maps_setup_base_objects_map_it_plot_layers">プロットされた Salesforce レコードに関連する動的コンテキストの組み込み</a></li>
+      <li><a href="#salesforce_maps_setup_boundary_data">境界データの更新</a></li>
+      <li><a href="#salesforce_maps_setup_folders_create">レイヤーを整理するためのフォルダーを作成する</a></li>
+      <li><a href="#salesforce_maps_setup_folders_manage">フォルダーのレイヤーの整理</a></li>
+      <li><a href="#salesforce_maps_setup_folders_set_permissions">レイヤーの整理に使用する共有フォルダーの権限を設定する</a></li>
+      <li><a href="#salesforce_maps_setup_marker_layers_create">マーカーレイヤーを作成する</a></li>
+      <li><a href="#salesforce_maps_setup_marker_layers_edit">マーカーレイヤーを編集する</a></li>
+      <li><a href="#salesforce_maps_setup_marker_layers_manage">マーカーレイヤーを管理して、地図上にレコードを表示する</a></li>
+      <li><a href="#salesforce_maps_setup_marker_layers_options">マーカーレイヤーのオプション</a></li>
+      <li><a href="#salesforce_maps_setup_plot_on_load">営業担当のセッション開始時に特定のレイヤーをプロット</a></li>
+      <li><a href="#salesforce_maps_setup_polyline_layers_create">多角形レイヤーの作成</a></li>
+      <li><a href="#salesforce_maps_setup_polyline_layers_edit">多角形レイヤーの編集</a></li>
+      <li><a href="#salesforce_maps_setup_polyline_layers_manage">地図上でのユーティリティラインの表示</a></li>
+      <li><a href="#salesforce_maps_setup_postal_code_formats">図形レイヤーでサポートされている郵便番号の形式</a></li>
+      <li><a href="#salesforce_maps_setup_shape_layers_create">図形レイヤーを作成する</a></li>
+      <li><a href="#salesforce_maps_setup_shape_layers_data_source_updates">図形レイヤーとデータソースの更新</a></li>
+      <li><a href="#salesforce_maps_setup_shape_layers_edit">図形レイヤーを編集する</a></li>
+      <li><a href="#salesforce_maps_setup_shape_layers_manage">図形レイヤーを管理して、地図上の特定のエリアを表示する</a></li>
+      <li><a href="#salesforce_maps_setup_what_appears_on_maps">地図に表示する内容を管理する</a></li>
+      <li><a href="#salesforce_maps_setup_what_appears_on_maps_enhanced_framework">強化されたユーザーエクスペリエンスで Salesforce Maps をさらに活用</a></li>
+      <li><a href="#salesforce_maps_setup_what_appears_on_maps_enhanced_framework_advantages">拡張ユーザーエクスペリエンスの概要</a></li>
+      <li><a href="#salesforce_maps_setup_what_appears_on_maps_enhanced_framework_considerations">拡張ユーザーエクスペリエンスの使用に関する考慮事項</a></li>
+      <li><a href="#salesforce_maps_setup_what_appears_on_maps_enhanced_framework_enable">拡張ユーザーエクスペリエンスの有効化</a></li>
+      <li><a href="#salesforce_maps_setup_what_appears_on_maps_enhanced_framework_list_views">拡張ユーザーエクスペリエンスのリストビュー</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>レイヤー・地図表示（マーカー／シェイプ／境界）</h1>
+      <div class="meta">Salesforce Maps ヘルプ · 24 記事 · 生成 2026-08-13</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="field_features.html">&larr; 現場機能（近隣検索・自動割当・チェックイン・スケジュール）</a><a href="reference.html">設定リファレンス &rarr;</a></div>
+<section class="article" id="salesforce_maps_setup_base_objects_map_it_plot_layers">
+<h1 class="slds-text-heading_large">プロットされた Salesforce レコードに関連する動的コンテキストの組み込み</h1>
+  <p>Salesforce Maps で営業担当がレコードをプロットするときには、Salesforce レコードにコンテキストを追加します。所有者 ID や都道府県 (請求先) など、ID および文字列項目に対する動的検索条件を備えたレイヤーを使用して、営業担当が重要な項目に集中できるようにします。たとえば、Salesforce から営業担当は地図上に取引先をプロットできます。プロットされた取引先の都道府県内で、担当者に属する取引先も地図に表示されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d3640e59" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d3640e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">設定をカスタマイズする</td>
+
+              <td headers="d3640e59" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>[設定] から、[クイック検索] ボックスに<kbd>「インストール済みパッケージ」</kbd>と入力し、<strong class="uicontrol">[インストール済みパッケージ]</strong> を選択します。</span>
+      </li><li>
+        <span>Salesforce Maps パッケージの横の <strong class="uicontrol">[設定]</strong> をクリックします。</span>
+      </li><li>
+        <span><span class="menucascade"><strong class="uicontrol">[ベースオブジェクト]</strong> | <strong class="uicontrol">[編集]</strong></span> を選択し、営業担当が地図上にプロットするレコードのベースオブジェクトを選択します。</span>
+      </li><li>
+        <span>[ボタン URL] までスクロールし、<strong class="uicontrol">[選択]</strong> をクリックします。</span>
+        <div><div style="text-align:left;"><img alt="クリップボードにコピーされたボタンの URL" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/setup_base_objects_map_it_layers_1.png"></div>ボタンの URL がクリップボードにコピーされます。後からベースオブジェクトの対応する Salesforce オブジェクトにボタンを作成するときに、その URL を貼り付けます。</div>
+      </li><li>
+        <span>オブジェクトマネージャーの設定で、営業担当がプロットするレコードのオブジェクト (取引先など) を選択します。次に、<span class="menucascade"><strong class="uicontrol">[ボタン、リンク、およびアクション]</strong> | <strong class="uicontrol">[新規ボタンまたはリンク]</strong></span> を選択します。</span>
+      </li><li>
+        <span>表示ラベルと名前を入力し、クリップボードからボタンの URL を貼り付けます。</span>
+        <div> 営業担当が地図上にレコードをプロットするときに読み込まれるレイヤーを指定するには、パラメーター <code>&amp;layerid=</code> とmaps__MarkerLayer__c オブジェクトからコピーするレイヤーの ID を追加します。[所有者 ID] や [都道府県(請求先)] などの動的な絞り込みによって項目を追加するには、各項目を区切るようにパイプ文字を追加して、次に項目を選択します。<div style="text-align:left;"><img alt="クリップボードからのボタン URL の貼り付け" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/setup_base_objects_map_it_layers_2.png"></div></div>
+      </li><li>
+        <span>変更を保存します。</span>
+      </li><li>
+        <span>カスタムボタンをページレイアウトに追加して、変更を保存します。</span>
+        <div>取引先にカスタムボタンが表示されます。<div style="text-align:left;"><img alt="取引先に表示されたカスタムボタン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/setup_base_objects_map_it_layers_result.png"></div></div>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_setup_boundary_data">
+<h1 class="slds-text-heading_large">境界データの更新</h1>
+ <p>サードパーティベンダーは、Salesforce Maps の境界データ (郵便番号など) を提供します。これらのベンダーは、政府や行政の情報源で情報を検証します。Salesforce Maps に更新が表示されるまで数か月かかります。</p>
+
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">Update Frequency by Region (地域別の更新頻度)</h2><p>更新スケジュールは地域によって異なります。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col><col></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d12989e43" style="vertical-align:top;" class="slds-cell-wrap" scope="col">地域</th>
+       <th id="d12989e46" style="vertical-align:top;" class="slds-cell-wrap" scope="col">更新頻度</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d12989e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="地域">北米および西ヨーロッパ</td>
+
+       <td headers="d12989e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="更新頻度">ベンダーは、政府提供元から毎月または毎四半期の更新を受け取ります。</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d12989e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="地域">その他の地域</td>
+
+       <td headers="d12989e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="更新頻度">更新スケジュールは国によって異なり、通常の頻度に従いません。</td>
+
+      </tr>
+     </tbody></table></div>
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">境界の更新が Salesforce Maps に到達する方法</h2><ul>
+    <li>サードパーティベンダーは、各国の政府および行政ソースとの境界データを検証します。</li>
+
+    <li>Salesforce はベンダーから検証済みデータを受け取ります。</li>
+
+    <li>Salesforce がデータをテストおよび検証します。</li>
+
+    <li>Salesforce は、次のメジャーリリースで更新された境界をリリースします。</li>
+
+   </ul>
+</div>
+  <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> 
+   <p>Salesforce が新しい境界をリリースしたら、新規および既存の図形レイヤーに追加します。更新される境界データのタイミングについての詳細は、Salesforce リリースノートを参照してください。</p>
+  </div></div></div>
+ 
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_setup_folders_create">
+<h1 class="slds-text-heading_large">レイヤーを整理するためのフォルダーを作成する</h1>
+  <p>レイヤーを非公開フォルダーに保存、アクセス、整理します。また、フォルダー権限があれば、企業フォルダー内に共有フォルダーを作成できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d17931e59" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d17931e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">設定をカスタマイズする</td>
+
+              <td headers="d17931e59" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>Salesforce Maps で、<span class="menucascade"><strong class="uicontrol">［Layers</strong> | <strong class="uicontrol">Saved］</strong></span> をクリックします。<div><img alt="[レイヤー] タブからフォルダーを作成" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/setup_folders_1.png"></div></span>
+      </li><li>
+        <span>非公開フォルダーを作成するか、共有フォルダーを作成するかに応じて、<strong class="uicontrol">[個人]</strong> または <strong class="uicontrol">[企業]</strong> のいずれかを選択します。</span>
+      </li><li>
+        <span>[新規] にマウスポインターを置いて、[<strong class="uicontrol">フォルダ]</strong> をクリックします。<div><img alt="フォルダーを作成するオプション" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/setup_folders_2.png"></div></span>
+      </li><li>
+        <span>一意の名前を入力し、<strong class="uicontrol">[作成]</strong> をクリックします。</span>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="企業フォルダー内の共有フォルダーとその中にあるレイヤーにアクセスできるユーザーとプロファイルを指定します。" href="#salesforce_maps_setup_folders_set_permissions">レイヤーの整理に使用する共有フォルダーの権限を設定する</a></li><li><a title="マネージャーと担当者が効率的にレコードを見つけてサービスを提供できるように、地図上に示す顧客データとその表示方法を決定します。地図上に表示する、レコードを含む Salesforce Maps ベースオブジェクトを選択します。" href="#salesforce_maps_setup_marker_layers_create">マーカーレイヤーを作成する</a></li><li><a title="地図上にプロットするレイヤーをデザインしてマッピングします。国、フィルター、描画ツール、または郵便番号を使って図形を定義するときにレイヤーを作成します。" href="#salesforce_maps_setup_shape_layers_create">図形レイヤーを作成する</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_setup_folders_manage">
+<h1 class="slds-text-heading_large">フォルダーのレイヤーの整理</h1>
+  <p>非公開フォルダーのレイヤーを整理します。フォルダー権限があれば、Salesforce Maps で企業フォルダー内に公開フォルダーを作成して、そのフォルダーにアクセスできるユーザーを指定できます。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_setup_folders_create">レイヤーを整理するためのフォルダーを作成する</a></strong><br>レイヤーを非公開フォルダーに保存、アクセス、整理します。また、フォルダー権限があれば、企業フォルダー内に共有フォルダーを作成できます。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_setup_folders_set_permissions">レイヤーの整理に使用する共有フォルダーの権限を設定する</a></strong><br>企業フォルダー内の共有フォルダーとその中にあるレイヤーにアクセスできるユーザーとプロファイルを指定します。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Salesforce Maps では、閲覧権限、ルート割り当て権限のほか、担当者が場所を離れた後に自動的にチェックアウトできるかどうかなどを管理できます。" href="setup.html#salesforce_maps_setup_features">機能のアクセス権限やルートの割り当て権限を持つユーザーを決定する</a></li><li><a title="Salesforce Maps でユーザーに影響を与えるオプションについて確認しましょう。" href="setup.html#salesforce_maps_setup_features_options">一般設定オプション</a></li><li><a title="Salesforce Maps のユーザーとプロファイルに対し、アクセス権の付与と制限を行います。デフォルトの権限グループでは社内の各ユーザーに必要なアクセス権を管理できない場合、独自の権限グループを作成します。それから、Salesforce の項目の編集やデータのエクスポートなどを許可するユーザーを指定します。" href="setup.html#salesforce_maps_setup_permission_groups_manage">権限グループを管理する</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_setup_folders_set_permissions">
+<h1 class="slds-text-heading_large">レイヤーの整理に使用する共有フォルダーの権限を設定する</h1>
+  <p>企業フォルダー内の共有フォルダーとその中にあるレイヤーにアクセスできるユーザーとプロファイルを指定します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d17001e59" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d17001e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">設定をカスタマイズする</td>
+
+              <td headers="d17001e59" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d17001e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">フォルダー権限を設定する</td>
+
+              <td headers="d17001e59" style="vertical-align:top;" class="slds-cell-wrap">フォルダー権限</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>Salesforce Maps で、<span class="menucascade"><strong class="uicontrol">［Layers</strong> | <strong class="uicontrol">Saved］</strong></span> をクリックします。<div><img alt="[レイヤー] タブからフォルダーを作成" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/setup_folders_1.png"></div></span>
+      </li><li>
+        <span><strong class="uicontrol">[企業]</strong> を選択します。</span>
+      </li><li>
+        <span>権限を設定するフォルダーを右クリックします。次に、<strong class="uicontrol">[Edit Permissions</strong> (権限の編集)] をクリックします。<div><img alt="権限を編集するオプション" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/setup_folder_permissions_1.png"></div></span>
+      </li><li>
+        <span>権限を追加するには、<span class="menucascade"><strong class="uicontrol">[新規作成]</strong> | <strong class="uicontrol">[ユーザー]</strong></span> または <span class="menucascade"><strong class="uicontrol">[新規作成]</strong> | <strong class="uicontrol">[プロファイル]</strong></span> の順にクリックします。次に、権限を設定するユーザーまたはプロファイルを検索します。</span>
+      </li><li>
+        <span>ユーザーまたはプロファイルに付与する権限を設定します。次に、変更を保存します。<div><img alt="ユーザーまたはプロファイルの権限オプション" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/setup_folder_permissions_2.png"></div></span>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Salesforce Maps では、閲覧権限、ルート割り当て権限のほか、担当者が場所を離れた後に自動的にチェックアウトできるかどうかなどを管理できます。" href="setup.html#salesforce_maps_setup_features">機能のアクセス権限やルートの割り当て権限を持つユーザーを決定する</a></li><li><a title="レイヤーを非公開フォルダーに保存、アクセス、整理します。また、フォルダー権限があれば、企業フォルダー内に共有フォルダーを作成できます。" href="#salesforce_maps_setup_folders_create">レイヤーを整理するためのフォルダーを作成する</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_setup_marker_layers_create">
+<h1 class="slds-text-heading_large">マーカーレイヤーを作成する</h1>
+  <p>マネージャーと担当者が効率的にレコードを見つけてサービスを提供できるように、地図上に示す顧客データとその表示方法を決定します。地図上に表示する、レコードを含む Salesforce Maps ベースオブジェクトを選択します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d8609e59" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d8609e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">設定をカスタマイズする</td>
+
+              <td headers="d8609e59" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8609e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">企業の共有フォルダーにアクセスする</td>
+
+              <td headers="d8609e59" style="vertical-align:top;" class="slds-cell-wrap">フォルダー権限</td>
+
+            </tr>
+          </tbody></table></div>
+        <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> 管理パッケージオブジェクトに関連するレコードを作成するには、必ず Salesforce Maps ユーザーインターフェースを使用してください。ユーザーインターフェース外でのレコードの作成や、管理パッケージオブジェクトへの自動化の追加はサポートされていません。「<cite>Salesforce Knowledge</cite> の Maps ユーザーインターフェースの外部で作成された<a target="_blank" href="https://help.salesforce.com/s/articleView?id=000390023&amp;language=ja&amp;type=1">レコードのサポート</a>」を参照してください。</div></div></div>
+</div>
+    <ol><li>
+        <span><strong class="uicontrol">[レイヤー]</strong> をクリックします。</span>
+      </li><li>
+        <span>マーカーレイヤーを自分以外に非公開にして保存するには、<span class="menucascade"><strong class="uicontrol">[保存済み]</strong> | <strong class="uicontrol">[個人]</strong></span> の順にクリックします。または、マーカーレイヤーを他のマップユーザーと共有するには、<span class="menucascade"><strong class="uicontrol">[保存済み]</strong> | <strong class="uicontrol">[法人]</strong></span> の順にクリックします。</span>
+      </li><li>
+        <span>[<strong class="uicontrol">新規]</strong> にカーソルを合わせ、[<strong class="uicontrol">マーカーレイヤー]</strong> を選択します。<div><img alt="新規とマーカーレイヤーにカーソルを合わせた状態" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/setup_marker_layers_new.png"></div></span>
+      </li><li>
+        <span>名前と説明を入力します。<div><img alt="マーカーレイヤーの作成ダイアログボックス" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/setup_marker_layers_create.png"></div></span>
+      </li><li>
+        <span>地図上に表示するレコードを含むベースオブジェクトを選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>マーカーレイヤーに表示する検索条件とスタイルのオプションを選択します。</span>
+      </li><li>
+        <span>変更内容を保存します。</span>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="営業担当が Salesforce Maps でプロットする必要がある Salesforce レコードに対応するベースオブジェクトを設定および管理します。Salesforce からのデータと独自データおよびサードパーティデータプロバイダーからのデータを含めることで、営業担当の生産性をピークまで高めて維持できます。" href="setup.html#salesforce_maps_setup_base_objects_manage">営業担当が地図上にプロットする内容の決定</a></li><li><a title="担当者が Salesforce Maps でより効率的にマーカーレイヤーをプロットできるよう、形式、検索条件、ビジュアル設定を適用します。" href="#salesforce_maps_setup_marker_layers_options">マーカーレイヤーのオプション</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_setup_marker_layers_edit">
+<h1 class="slds-text-heading_large">マーカーレイヤーを編集する</h1>
+  <p>地図上に表示するレコードとその詳細、表示方法を決定します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d12181e59" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d12181e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">設定をカスタマイズする</td>
+
+              <td headers="d12181e59" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d12181e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">企業の共有フォルダーにアクセスする</td>
+
+              <td headers="d12181e59" style="vertical-align:top;" class="slds-cell-wrap">フォルダー権限</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span><strong class="uicontrol">[レイヤー]</strong> をクリックします。</span>
+      </li><li>
+        <span>編集するマーカーレイヤーの名前を入力するか、<strong class="uicontrol">[保存済み]</strong> をクリックして、編集するマーカーレイヤーを含むフォルダーを選択します。</span>
+      </li><li>
+        <span>マーカーレイヤーメニューにカーソルを合わせ、<strong class="uicontrol">[編集]</strong> をクリックします。<div><img alt="マーカーレイヤーの編集にカーソルを合わせた状態" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/setup_marker_layers_edit.png"></div></span>
+      </li><li>
+        <span>変更内容を保存します。</span>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="営業担当が Salesforce Maps でプロットする必要がある Salesforce レコードに対応するベースオブジェクトを設定および管理します。Salesforce からのデータと独自データおよびサードパーティデータプロバイダーからのデータを含めることで、営業担当の生産性をピークまで高めて維持できます。" href="setup.html#salesforce_maps_setup_base_objects_manage">営業担当が地図上にプロットする内容の決定</a></li><li><a title="担当者が Salesforce Maps でより効率的にマーカーレイヤーをプロットできるよう、形式、検索条件、ビジュアル設定を適用します。" href="#salesforce_maps_setup_marker_layers_options">マーカーレイヤーのオプション</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_setup_marker_layers_manage">
+<h1 class="slds-text-heading_large">マーカーレイヤーを管理して、地図上にレコードを表示する</h1>
+  <p>Salesforce Maps マーカーレイヤーを使用して、営業マネージャー、サービスマネージャー、担当者がビジネスに不可欠なデータを視覚化できるようにします。検索条件やスタイルを適用して、特定のビジネス要件に合わせてマーカーレイヤーを構成します。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_setup_marker_layers_create">マーカーレイヤーを作成する</a></strong><br>マネージャーと担当者が効率的にレコードを見つけてサービスを提供できるように、地図上に示す顧客データとその表示方法を決定します。地図上に表示する、レコードを含む Salesforce Maps ベースオブジェクトを選択します。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_setup_marker_layers_edit">マーカーレイヤーを編集する</a></strong><br>地図上に表示するレコードとその詳細、表示方法を決定します。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_setup_marker_layers_options">
+<h1 class="slds-text-heading_large">マーカーレイヤーのオプション</h1>
+  <p>担当者が Salesforce Maps でより効率的にマーカーレイヤーをプロットできるよう、形式、検索条件、ビジュアル設定を適用します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">検索条件 </h2><p>マーカーレイヤーの結果を特定の範囲に限定するには、検索条件を適用します。マーカーレイヤーの絞り込みは、Salesforce レポートの絞り込みと似ています。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:24.096385542168672%"><col style="width:75.90361445783131%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d21141e65" style="vertical-align:top;" class="slds-cell-wrap" scope="col">検索条件の種別</th>
+              <th id="d21141e68" style="vertical-align:top;" class="slds-cell-wrap" scope="col">実行する内容</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d21141e65" style="vertical-align:top;" class="slds-cell-wrap" data-label="検索条件の種別">項目の検索条件</td>
+
+              <td headers="d21141e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="実行する内容">レコード詳細ページの項目にアクセスして親オブジェクトを参照し、表示するレコードを指定します。ロングテキスト項目では使用できません。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d21141e65" style="vertical-align:top;" class="slds-cell-wrap" data-label="検索条件の種別">活動の検索条件</td>
+
+              <td headers="d21141e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="実行する内容">タスクやイベントの有無にかかわらず、特定の期間中のオブジェクトを表示してレポートを作成します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d21141e65" style="vertical-align:top;" class="slds-cell-wrap" data-label="検索条件の種別">クロス条件セット</td>
+
+              <td headers="d21141e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="実行する内容">関連オブジェクトとその項目のレコードを包含または除外します。マーカーレイヤーに最大 2 つのクロスオブジェクト条件を追加し、それらのオブジェクトの下に追加のサブ条件を追加します。</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">マーカー</h2><p>マーカーに色と図形を割り当てるオプションをご確認ください。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:24.096385542168672%"><col style="width:75.90361445783131%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d21141e126" style="vertical-align:top;" class="slds-cell-wrap" scope="col">オプション</th>
+              <th id="d21141e129" style="vertical-align:top;" class="slds-cell-wrap" scope="col">実行する内容</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d21141e126" style="vertical-align:top;" class="slds-cell-wrap" data-label="オプション">均一</td>
+
+              <td headers="d21141e129" style="vertical-align:top;" class="slds-cell-wrap" data-label="実行する内容">すべてのマーカーを同じ色と図形にします。プリセットマーカー種別からすべてのマーカーに新しい図形と色を選択するか、カスタムマーカー種別を作成します。マーカー種別はマーカーの図形と色を決定します。標準のマーカーの図形と色は、Salesforce のアクセシビリティ基準を満たしています。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d21141e126" style="vertical-align:top;" class="slds-cell-wrap" data-label="オプション">1 項目に基づいて変化</td>
+
+              <td headers="d21141e129" style="vertical-align:top;" class="slds-cell-wrap" data-label="実行する内容">選択した項目のデータ型の値に基づいて、マーカーに色と図形を動的に割り当てます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d21141e126" style="vertical-align:top;" class="slds-cell-wrap" data-label="オプション">2 項目に基づいて変化</td>
+
+              <td headers="d21141e129" style="vertical-align:top;" class="slds-cell-wrap" data-label="実行する内容">2 つの項目値に基づいて、マーカーの色と図形を割り当てます。一方の項目はマーカーの色を決定し、もう一方の項目はマーカーの図形を決定します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d21141e126" style="vertical-align:top;" class="slds-cell-wrap" data-label="オプション">表示ラベル付きピン</td>
+
+              <td headers="d21141e129" style="vertical-align:top;" class="slds-cell-wrap" data-label="実行する内容">選択した表示ラベル項目を表示するか、マーカーの図形の代わりに、このマーカーレイヤーの <span class="menucascade"><strong class="uicontrol">[マーカーポップアップ]</strong> | <strong class="uicontrol">[タイトル項目]</strong></span> からの項目を表示します。表示ラベルに静的なテキストと背景色を割り当てるか、ベースオブジェクトの項目に基づいて表示ラベルに動的に色を割り当てます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d21141e126" style="vertical-align:top;" class="slds-cell-wrap" data-label="オプション">項目で並び替え</td>
+
+              <td headers="d21141e129" style="vertical-align:top;" class="slds-cell-wrap" data-label="実行する内容">項目を選択し、その項目の値に基づいてすべてのマーカーを番号順に表示します。</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">ヒートマップ</h2><p>ヒートマップ上の地理的なポイントのデータ強度を表示します。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:24.096385542168672%"><col style="width:75.90361445783131%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d21141e214" style="vertical-align:top;" class="slds-cell-wrap" scope="col">オプション</th>
+              <th id="d21141e217" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d21141e214" style="vertical-align:top;" class="slds-cell-wrap" data-label="オプション">単位半径 (ピクセル)</td>
+
+              <td headers="d21141e217" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ピクセル単位の各データポイントの影響半径。推奨される半径値は 15 です。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d21141e214" style="vertical-align:top;" class="slds-cell-wrap" data-label="オプション">不透明度</td>
+
+              <td headers="d21141e217" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ヒートマップの不透明度 (0 ～ 100%)。推奨される不透明度値は 80% です。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d21141e214" style="vertical-align:top;" class="slds-cell-wrap" data-label="オプション">最大強度</td>
+
+              <td headers="d21141e217" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>固定の最大値を指定できます。これは、データセットに強度が異常に高い外れ値がいくつか含まれている場合に役立ちます。デフォルトでは、Salesforce Maps は地図上の特定のピクセルにおけるポイントの最大濃度に応じて、ヒートマップの色を動的にスケーリングします。</p><p style="margin-bottom:0;">加重値を割り当てない限り、推奨される最大強度値は 5 です。加重定量値を割り当てる場合は、最大強度を選択した項目の最大値の 90% に変更します。たとえば、最大年間売上が 1,000,000 の場合、最大強度を 900,000 に設定します。</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d21141e214" style="vertical-align:top;" class="slds-cell-wrap" data-label="オプション">ズームに合わせてヒートマップのグラデーションを調整</td>
+
+              <td headers="d21141e217" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ヒートマップをズームしたときに、色の濃度を散逸させるかどうかを指定します。選択を解除すると、Salesforce Maps が特定の地理的な場所で色の濃度を維持できるように、ズームレベルに応じて影響半径が大きくなります。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d21141e214" style="vertical-align:top;" class="slds-cell-wrap" data-label="オプション">重み付け値</td>
+
+              <td headers="d21141e217" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ヒートマップに表示する項目。デフォルトでは、ヒートマップはある場所のレコード数を表します。高密度地域の色は赤、低密度地域の色は黒です。色を変更する場合は、その色をクリックします。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d21141e214" style="vertical-align:top;" class="slds-cell-wrap" data-label="オプション">色のグラデーション</td>
+
+              <td headers="d21141e217" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ヒートマップの色のグラデーション。CSS 色文字列の配列として指定します。Salesforce Maps は、RGBA を含むすべての CSS3 色をサポートします (拡張色名と HSL(A) 値を除く)。</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">近接性</h2><p>マーカーレイヤーの各マーカーの周囲に近接性半径円を表示します。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:24.096385542168672%"><col style="width:75.90361445783131%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d21141e305" style="vertical-align:top;" class="slds-cell-wrap" scope="col">オプション</th>
+              <th id="d21141e308" style="vertical-align:top;" class="slds-cell-wrap" scope="col">実行する内容</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d21141e305" style="vertical-align:top;" class="slds-cell-wrap" data-label="オプション">マーカーの周囲の近接性を表示</td>
+
+              <td headers="d21141e308" style="vertical-align:top;" class="slds-cell-wrap" data-label="実行する内容">地図上の各マーカーの周囲に近接円を表示します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d21141e305" style="vertical-align:top;" class="slds-cell-wrap" data-label="オプション">近接性の中心のマーカーを非表示</td>
+
+              <td headers="d21141e308" style="vertical-align:top;" class="slds-cell-wrap" data-label="実行する内容">近接円を表示しますが、現在プロットされているマーカーレイヤーのマーカーを非表示にします。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d21141e305" style="vertical-align:top;" class="slds-cell-wrap" data-label="オプション">近接性以外のマーカーを非表示</td>
+
+              <td headers="d21141e308" style="vertical-align:top;" class="slds-cell-wrap" data-label="実行する内容">現在プロットされているマーカーレイヤーの近接性の範囲内にあるマーカーを表示します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d21141e305" style="vertical-align:top;" class="slds-cell-wrap" data-label="オプション">半径距離</td>
+
+              <td headers="d21141e308" style="vertical-align:top;" class="slds-cell-wrap" data-label="実行する内容">デフォルトの近接円半径を設定します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d21141e305" style="vertical-align:top;" class="slds-cell-wrap" data-label="オプション">距離単位</td>
+
+              <td headers="d21141e308" style="vertical-align:top;" class="slds-cell-wrap" data-label="実行する内容">近接円半径距離の測定単位を設定します。</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">詳細オプション</h2><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:24.096385542168672%"><col style="width:75.90361445783131%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d21141e382" style="vertical-align:top;" class="slds-cell-wrap" scope="col">オプション</th>
+              <th id="d21141e385" style="vertical-align:top;" class="slds-cell-wrap" scope="col">実行する内容</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d21141e382" style="vertical-align:top;" class="slds-cell-wrap" data-label="オプション">地図の更新</td>
+
+              <td headers="d21141e385" style="vertical-align:top;" class="slds-cell-wrap" data-label="実行する内容">データセットが頻繁に更新される場合、またはエンドユーザーによって監視されている場合に、ページの自動更新を設定します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d21141e382" style="vertical-align:top;" class="slds-cell-wrap" data-label="オプション">ツールチップのデフォルトタブ</td>
+
+              <td headers="d21141e385" style="vertical-align:top;" class="slds-cell-wrap" data-label="実行する内容">マーカーのデフォルトのツールチップタブを設定します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d21141e382" style="vertical-align:top;" class="slds-cell-wrap" data-label="オプション">マーカーの制限</td>
+
+              <td headers="d21141e385" style="vertical-align:top;" class="slds-cell-wrap" data-label="実行する内容">地図上に表示されるマーカーの数を制限します。地図上に表示されるマーカーを、近接境界を使って制限します。</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">マーカーポップアップ</h2><p>ポップアップに表示される情報をカスタマイズします。ポップアップの [詳細] タブに表示する項目を選択するか、インライン編集のユーザー権限が有効な場合は、地図から項目を更新します。[関連] タブに表示するオブジェクトと項目を追加します。[関連] タブには、地図上の各マーカーに表示される最大 10 件の関連レコードが表示されます。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_setup_plot_on_load">
+<h1 class="slds-text-heading_large">営業担当のセッション開始時に特定のレイヤーをプロット</h1>
+  <p>Salesforce Maps で営業担当がセッションを開始するときに、マネージャーや業務を表示させるレイヤーを表示します。これにより、営業担当は重要な詳細を検索することなく作業をすぐに進めることができます。たとえば、マーカーと ArcGIS レイヤーを設定することで、営業担当がそれぞれのエリアで営業やサービス業務を行うためにより多くのコンテキストを参照できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d11929e59" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d11929e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">設定をカスタマイズする</td>
+
+              <td headers="d11929e59" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+            </tr>
+          </tbody></table></div>
+      <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> 読み込み時にデータレイヤーをプロットすることはできません。</div></div></div>
+</div>
+  
+    <div id="single_layer" aria-labelledby="ariaid-title2" class="nested1"><a name="single_layer"></a>
+        <h2 class="slds-text-heading_medium slds-p-top_small">個々のレイヤーのプロット</h2>
+        
+            <ol><li>
+                    <span>[最近] または [保存済み] タブで、Salesforce Maps を開いたときにプロットするマーカーレイヤーに移動します。</span>
+                    <div>[地図上] タブに表示されているレイヤーには、同じメニューオプションはありません。</div>
+                </li><li>
+                    <span>マーカーレイヤーの横にある 3 つの点のメニューをクリックし、[<strong class="uicontrol">Toggle Plot on Load</strong> (読み込み時にプロットを切り替え)] を選択します。</span>
+                </li></ol>
+
+        
+    </div>
+
+    <div id="group_of_layers" aria-labelledby="ariaid-title3" class="nested1"><a name="group_of_layers"></a>
+        <h2 class="slds-text-heading_medium slds-p-top_small">レイヤーのグループのプロット</h2>
+        
+        <p>または、同じ権限グループに割り当てられたレイヤーのグループをプロットします。</p>
+
+            <ol><li>
+                    <span>[設定] の [クイック検索] ボックスに「<kbd>インストール済みパッケージ</kbd>」と入力し、<strong class="uicontrol">[インストール済みパッケージ]</strong> を選択します。</span>
+                </li><li>
+                    <span>Salesforce Maps パッケージを見つけて、[<strong class="uicontrol">設定] を</strong>クリックします。</span>
+                </li><li>
+                    <span>左メニューから、[<strong class="uicontrol">権限グループ]</strong> を選択します。</span>
+                </li><li>
+                    <span>権限グループを選択します。</span>
+                </li><li>
+                    <span>権限グループを編集し、[Layers (レイヤー)] セクションまでスクロールして、プロットするレイヤーを [<strong class="uicontrol">Plot on Load Layers</strong> (読み込みレイヤーにプロット)] で検索します。</span>
+                    <div>
+                        <div style="text-align:left;">
+                            <img alt="権限グループの [読み込みレイヤーにプロット] を編集するオプションが表示されている Salesforce Maps 設定" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/setup_plot_on_load.png">
+                        </div>
+                    </div>
+                </li><li>
+                    <span>変更を保存します。</span>
+                </li></ol>
+
+            <div><p>レイヤーアイコンは、読み込み時にプロットされることを示します。[最近] タブには、現在読み込み時にプロットされている他のレイヤーが表示されます。</p></div>
+        
+    </div>
+
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_setup_polyline_layers_create">
+<h1 class="slds-text-heading_large">多角形レイヤーの作成</h1>
+  <p>地図上にユーティリティラインを表示することで、営業担当が Salesforce Maps でサービスコールをすばやく効率的に管理して、対応できるようになります。特定の州や市外局番の取引先など、地図上に表示する多角形を決定する検索条件を追加します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d12638e59" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d12638e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Salesforce Maps にアクセスする</td>
+
+              <td headers="d12638e59" style="vertical-align:top;" class="slds-cell-wrap">Salesforce Maps</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d12638e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">設定をカスタマイズする</td>
+
+              <td headers="d12638e59" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d12638e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">企業の共有フォルダーにアクセスする</td>
+
+              <td headers="d12638e59" style="vertical-align:top;" class="slds-cell-wrap">フォルダーの権限</td>
+
+            </tr>
+          </tbody></table></div>
+        <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> 管理パッケージオブジェクトに関連するレコードを作成するには、必ず Salesforce Maps ユーザーインターフェースを使用してください。ユーザーインターフェース外でのレコードの作成や、管理パッケージオブジェクトへの自動化の追加はサポートされていません。「<cite>Salesforce Knowledge</cite> の Maps ユーザーインターフェースの外部で作成された<a target="_blank" href="https://help.salesforce.com/s/articleView?id=000390023&amp;language=ja&amp;type=1">レコードのサポート</a>」を参照してください。</div></div></div>
+</div>
+    <ol><li>
+        <span>[設定] から、[クイック検索] ボックスに<kbd>「インストール済みパッケージ」</kbd>と入力し、<strong class="uicontrol">[インストール済みパッケージ]</strong> を選択します。</span>
+      </li><li>
+        <span>Salesforce Maps パッケージの横にある <strong class="uicontrol">[設定]</strong> をクリックします。</span>
+      </li><li>
+        <span>権限グループを選択し、[レイヤー] で多角形レイヤーを有効にします。</span>
+        <div>
+          <div style="text-align:left;">
+            <img alt="地図の設定で多角形レイヤーを有効化" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/setup_polyline_permission.png">
+          </div>
+        </div>
+      </li><li>
+        <span>Salesforce Maps の [ベースオブジェクト] の設定で、多角形レイヤーをプロットする取引先などのベースオブジェクトを選択します。</span>
+        <ol>
+          <li>
+            <span>緯度および経度項目を設定します。</span>
+          </li>
+
+          <li>
+            <span>少なくとも 2 つの地理位置情報項目を 2 つの頂点に割り当てます。続いて、<strong class="uicontrol">[保存]</strong> をクリックします。</span>
+            <div>
+              <div style="text-align:left;">
+                <img alt="地理的位置項目を頂点に対応付ける。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/setup_polyline_layer_create_vertex.png">
+              </div>
+            </div>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>Salesforce Maps で、<strong class="uicontrol">[レイヤー]</strong> をクリックします。</span>
+      </li><li>
+        <span>多角形レイヤーを自分以外に非公開にして保存するには、<span class="menucascade"><strong class="uicontrol">[保存済み]</strong> | <strong class="uicontrol">[個人]</strong></span> の順にクリックします。または、多角形レイヤーを他のマップユーザーと共有するには、 [保存済み] [企業]  の順にクリックします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[新規]</strong> にカーソルを合わせ、<strong class="uicontrol">[Polyline Layer (多角形レイヤー)]</strong> を選択します。</span>
+        <div>
+          <div style="text-align:left;">
+            <img alt="地図上に多角形レイヤーを作成する" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/setup_polyline_layer_create.png">
+          </div>
+        </div>
+      </li><li>
+        <span>名前と説明を入力します。</span>
+      </li><li>
+        <span>プロットするベースオブジェクトを選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+        <div>
+          <div style="text-align:left;">
+            <img alt="多角形レイヤーの名前を指定" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/setup_polyline_layer_create_name.png">
+          </div>
+        </div>
+      </li><li>
+        <span>表示する多角形レイヤーの検索条件とスタイルのオプションを選択します。</span>
+      </li><li>
+        <span>作業内容を保存し、プロットします。</span>
+        <div>
+          <div style="text-align:left;">
+            <img alt="プロットされた多角形レイヤー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/setup_polyline_layer_result.png">
+          </div>
+        </div>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_setup_polyline_layers_edit">
+<h1 class="slds-text-heading_large">多角形レイヤーの編集</h1>
+  <p>多角形レイヤーは、ビジネスの変化や成長に合わせて更新します。Salesforce Maps で地図に表示するレコードを変更し、検索条件、表示オプション、ポップアップを調整します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d16371e59" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d16371e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Salesforce Maps にアクセスする</td>
+
+              <td headers="d16371e59" style="vertical-align:top;" class="slds-cell-wrap">Salesforce Maps</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d16371e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">設定をカスタマイズする</td>
+
+              <td headers="d16371e59" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d16371e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">企業の共有フォルダーにアクセスする</td>
+
+              <td headers="d16371e59" style="vertical-align:top;" class="slds-cell-wrap">フォルダー権限</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span><strong class="uicontrol">[レイヤー]</strong> をクリックします。</span>
+      </li><li>
+        <span>編集する多角形レイヤーの名前を入力するか、<strong class="uicontrol">[保存済み]</strong> をクリックして編集する多角形レイヤーが含まれるフォルダーを選択します。</span>
+      </li><li>
+        <span>多角形レイヤーのメニューにカーソルを合わせ、<strong class="uicontrol">[編集]</strong> をクリックします。</span>
+        <div>
+          <div style="text-align:left;">
+            <img alt="多角形レイヤーの編集。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/setup_polyline_layer_edit_1.png">
+          </div>
+        </div>
+      </li><li>
+        <span>編集するエリアのタブを選択し、変更を加えます。</span>
+        <div>
+          <div style="text-align:left;">
+            <img alt="多角形レイヤーを編集するためのオプション" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/setup_polyline_layer_edit_2png.png">
+          </div>
+        </div>
+      </li><li>
+        <span>変更を保存します。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_setup_polyline_layers_manage">
+<h1 class="slds-text-heading_large">地図上でのユーティリティラインの表示</h1>
+  <p>Salesforce Maps で多角形レイヤーを設定することにより、ユーティリティの問題に迅速に対処する営業担当の取り組みをサポートすることで、顧客を維持し、期待に応えることができます。レコードの多角形を視覚化するスパンをプロットします。これらのレコードは、たとえば送電線の邪魔になる木を伐採するなどの作業を計画する場合に選択します。続いて、一括アクションを使用してラインと木の位置をサービスチームのルートに追加します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_setup_polyline_layers_create">多角形レイヤーの作成</a></strong><br>地図上にユーティリティラインを表示することで、営業担当が Salesforce Maps でサービスコールをすばやく効率的に管理して、対応できるようになります。特定の州や市外局番の取引先など、地図上に表示する多角形を決定する検索条件を追加します。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_setup_polyline_layers_edit">多角形レイヤーの編集</a></strong><br>多角形レイヤーは、ビジネスの変化や成長に合わせて更新します。Salesforce Maps で地図に表示するレコードを変更し、検索条件、表示オプション、ポップアップを調整します。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_setup_postal_code_formats">
+<h1 class="slds-text-heading_large">図形レイヤーでサポートされている郵便番号の形式</h1>
+  <p>Salesforce Maps の図形レイヤーに追加する郵便番号としてサポートされている形式を国別に示します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:24.93765586034913%"><col style="width:75.06234413965088%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" scope="col">国</th>
+              <th id="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" scope="col">サポートされている形式の郵便番号の例</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">アルバニア</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">6402</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">アルゼンチン</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">A4400</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">オーストラリア</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">5950</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">オーストリア</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">6837</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">ベラルーシ</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">2234</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">ベルギー</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">4701</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">バミューダ</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">PG 05</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">ボスニア・ヘルツェゴビナ</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">75211</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">ブラジル</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">01236</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">ブルガリア</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">2873</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">カナダ</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">T5W</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">ケイマン諸島</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">KY1-1700</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">チリ</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">938</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">コロンビア</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">153407</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">コスタリカ</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">60116</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">クロアチア</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">32257</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">キプロス</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">2120</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">チェコ</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">317 00</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">デンマーク</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">8789</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">ドミニカ共和国</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">43000</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">エジプト</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">11</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">エストニア</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">74227</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">フィンランド</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">88615</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">フランス</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">33230</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">フランス領ギアナ</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">97370</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">ドイツ</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">97334</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">ギリシャ</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">460 33</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">グアドループ</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">97136</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">ハンガリー</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">1007</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">アイスランド</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">815</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">インド</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">473775</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">インドネシア</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">16875</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">アイルランド</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">Y21</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">イスラエル</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">47249</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">イタリア</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">09067</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">日本</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">820</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">ヨルダン</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">21682</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">クウェート</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">00</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">ラトビア</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">5052</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">リトアニア</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">99287</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">ルクセンブルグ</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">4057</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">マレーシア</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">31050</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">マルタ</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">QLA</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">マルティニーク</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">97290</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">マヨット</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">97670</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">メキシコ</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">04960</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">モルドバ</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">7414</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">モンテネグロ</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">81104</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">モロッコ</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">33</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">オランダ</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">9673</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">ニュージーランド</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">2019</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">北マケドニア</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">1117</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">ノルウェー</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">6715</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">フィリピン</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">5614</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">ポーランド</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">83-041</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">ポルトガル</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">4650</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">ルーマニア</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">01</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">ロシア</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">950</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">サウジアラビア</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">25396</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">セルビア</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">11223</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">シンガポール</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">21</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">スロバキア</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">987 01</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">スロベニア</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">8256</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">南アフリカ</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">7141</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">スペイン</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">03559</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">スウェーデン</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">982 60</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">スイス</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">3232</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">台湾</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">904</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">トルコ</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">52200</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">ウクライナ</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">210</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">英国</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">RM1</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">英国</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">GU2 4</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">米国</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">59022</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">米国</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">772</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">ウルグアイ</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">75300</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">ベネズエラ</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">3149</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d8170e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="国">ウォリス・フツナ諸島</td>
+
+              <td headers="d8170e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされている形式の郵便番号の例">98600</td>
+
+            </tr>
+          </tbody></table></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_setup_shape_layers_create">
+<h1 class="slds-text-heading_large">図形レイヤーを作成する</h1>
+  <p>地図上にプロットするレイヤーをデザインしてマッピングします。国、フィルター、描画ツール、または郵便番号を使って図形を定義するときにレイヤーを作成します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d15189e59" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d15189e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">設定をカスタマイズする</td>
+
+              <td headers="d15189e59" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d15189e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">企業の共有フォルダーにアクセスする</td>
+
+              <td headers="d15189e59" style="vertical-align:top;" class="slds-cell-wrap">フォルダー権限</td>
+
+            </tr>
+          </tbody></table></div>
+      <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> 管理パッケージオブジェクトに関連するレコードを作成するには、必ず Salesforce Maps ユーザーインターフェースを使用してください。ユーザーインターフェース外でのレコードの作成や、管理パッケージオブジェクトへの自動化の追加はサポートされていません。「<cite>Salesforce Knowledge</cite> の Maps ユーザーインターフェースの外部で作成された<a target="_blank" href="https://help.salesforce.com/s/articleView?id=000390023&amp;language=ja&amp;type=1">レコードのサポート</a>」を参照してください。</div></div></div>
+</div>
+    <a name="salesforce_maps_setup_shape_layers_create__shape_layers_steps"></a><ol id="salesforce_maps_setup_shape_layers_create__shape_layers_steps"><li>
+        <span><strong class="uicontrol">[レイヤー]</strong> をクリックします。</span>
+      </li><li>
+        <span>図形レイヤーを自分以外に非公開にして保存するには、<span class="menucascade"><strong class="uicontrol">[保存済み]</strong> | <strong class="uicontrol">[個人]</strong></span> の順にクリックします。他のマップユーザーと図形レイヤーを共有する場合は、[保存済み] [企業] の順にクリックします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[新規]</strong> にカーソルを合わせ、<strong class="uicontrol">[図形レイヤー]</strong> を選択します。</span>
+        <div>
+          <div style="text-align:left;">
+            <img alt="図形レイヤーを新規作成する" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/setup_shape_layers_new.png">
+          </div>
+        </div>
+      </li><li>
+        <span>名前と説明を入力します。</span>
+        <div>
+          <div style="text-align:left;">
+            <img alt="図形レイヤーの名前と説明を作成する" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/setup_shape_layers_create.png">
+          </div>
+        </div>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>フィルター、地図上での描画を使用するか、郵便番号を貼り付けて図形を選択します。</span>
+        <div>たとえば、サンフランシスコのすべての地域を表示するには、<span class="menucascade"><strong class="uicontrol">[米国]</strong> | <strong class="uicontrol">[Neighborhoods (地域)]</strong></span> の順に選択し、郡フィルターを追加します。<div style="text-align:left;"><img alt="図形レイヤー選択タブ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/setup_shape_layers_select.png"></div></div>
+      </li><li>
+        <span>ラベルの作成、色の調整、図形レイヤーの表示に関するその他のオプションの変更を行う場合は、<strong class="uicontrol">[表示]</strong> をクリックします。</span>
+        <div>
+          <div style="text-align:left;">
+            <img alt="図形レイヤー表示タブ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/setup_shape_layers_display.png">
+          </div>
+        </div>
+      </li><li>
+        <span>変更内容を保存し、プロットします。</span>
+        <div>
+          <div style="text-align:left;">
+            <img alt="地図上にプロットされた図形レイヤー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/setup_shape_layers_result.png">
+          </div>
+        </div>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_setup_shape_layers_data_source_updates">
+<h1 class="slds-text-heading_large">図形レイヤーとデータソースの更新</h1>
+  <p>Salesforce Maps を使用すると、国、都道府県、群、国勢調査の地域区分、郵便番号などの地理上の境界線の変化が営業やサービスの活動にどのように影響するかを予測できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table>
+    <p>Salesforce Maps は、米国政府など、図形レイヤーのデータを提供するプロバイダーと連携しています。これらのプロバイダーは定期的に図形を更新しているため、お使いのデータレイヤーにもその更新が反映されることになります。プロバイダーがデータを更新する場合:</p>
+    <ul>
+      <li>郡や郵便番号などの図形レイヤーへのマイナーな変更は、特定の状況では少しずつ頻繁に行われていることがわかります。</li>
+
+      <li>10 年ごとの国勢調査のように、まれに図形レイヤーが大きく変更される場合があります。</li>
+
+    </ul>
+
+    <p>Salesforce Maps では、このデータ更新の頻度に関係なく、プロバイダーが、図形レイヤーに表示される境界となるデータを更新するかどうかや、いつ更新するかを制御することができません。</p>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_setup_shape_layers_edit">
+<h1 class="slds-text-heading_large">図形レイヤーを編集する</h1>
+  <p>地図に表示される地理的な図形エリアとその詳細、表示方法を設定します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d11826e59" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d11826e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">設定をカスタマイズする</td>
+
+              <td headers="d11826e59" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d11826e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">企業の共有フォルダーにアクセスする</td>
+
+              <td headers="d11826e59" style="vertical-align:top;" class="slds-cell-wrap">フォルダー権限</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span><strong class="uicontrol">[レイヤー]</strong> をクリックします。</span>
+      </li><li>
+        <span>編集する図形レイヤーの名前を入力するか、<strong class="uicontrol">[保存済み]</strong> をクリックして編集する図形レイヤーが含まれるフォルダーを選択します。</span>
+      </li><li>
+        <span>図形レイヤーのメニューにカーソルを合わせ、<strong class="uicontrol">[編集]</strong> をクリックします。<div><img alt="図形レイヤーの [編集] にカーソルを合わせた状態" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/setup_shape_layers_edit.png"></div></span>
+      </li><li>
+        <span>編集するエリアのタブを選択し、次に、変更を加えます。<div><img alt="図形レイヤー編集オプション" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/setup_shape_layers_edit_options.png"></div></span>
+      </li><li>
+        <span>変更内容を保存します。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_setup_shape_layers_manage">
+<h1 class="slds-text-heading_large">図形レイヤーを管理して、地図上の特定のエリアを表示する</h1>
+  <p>Salesforce Maps で国、都道府県、国勢調査の地域区分、郵便番号などの地理的境界線を使用し、特定のエリアをマッピングします。絞り込み、描画、コピー、調整などの機能を使用して、図形レイヤーの境界線の表示方法を管理します。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_setup_shape_layers_data_source_updates">図形レイヤーとデータソースの更新</a></strong><br>Salesforce Maps を使用すると、国、都道府県、群、国勢調査の地域区分、郵便番号などの地理上の境界線の変化が営業やサービスの活動にどのように影響するかを予測できます。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_setup_shape_layers_create">図形レイヤーを作成する</a></strong><br>地図上にプロットするレイヤーをデザインしてマッピングします。国、フィルター、描画ツール、または郵便番号を使って図形を定義するときにレイヤーを作成します。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_setup_shape_layers_edit">図形レイヤーを編集する</a></strong><br>地図に表示される地理的な図形エリアとその詳細、表示方法を設定します。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_setup_what_appears_on_maps">
+<h1 class="slds-text-heading_large">地図に表示する内容を管理する</h1>
+  <p>Salesforce Maps で、担当者が地図上にプロットできるオブジェクトとデータを決定します。フォルダー構造を設定し、整理することで、レイヤーを共有したり、特定の担当者に非公開にしたりできます。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_setup_what_appears_on_maps_enhanced_framework">強化されたユーザーエクスペリエンスで Salesforce Maps をさらに活用</a></strong><br>強化された Salesforce Maps フレームワークを提供することで、スピードとパフォーマンスが向上します。営業担当は、ArcGIS Online レイヤーや複雑な図形レイヤーを含む大量のデータをプロットするときに時間を節約できます。営業担当は、最新かつ堅牢なリストビュー環境にもアクセスできます。</li><li class="slds-p-bottom_small"><strong><a href="setup.html#salesforce_maps_setup_base_objects_manage">営業担当が地図上にプロットする内容の決定</a></strong><br>営業担当が Salesforce Maps でプロットする必要がある Salesforce レコードに対応するベースオブジェクトを設定および管理します。Salesforce からのデータと独自データおよびサードパーティデータプロバイダーからのデータを含めることで、営業担当の生産性をピークまで高めて維持できます。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_setup_shape_layers_manage">図形レイヤーを管理して、地図上の特定のエリアを表示する</a></strong><br>Salesforce Maps で国、都道府県、国勢調査の地域区分、郵便番号などの地理的境界線を使用し、特定のエリアをマッピングします。絞り込み、描画、コピー、調整などの機能を使用して、図形レイヤーの境界線の表示方法を管理します。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_setup_marker_layers_manage">マーカーレイヤーを管理して、地図上にレコードを表示する</a></strong><br>Salesforce Maps マーカーレイヤーを使用して、営業マネージャー、サービスマネージャー、担当者がビジネスに不可欠なデータを視覚化できるようにします。検索条件やスタイルを適用して、特定のビジネス要件に合わせてマーカーレイヤーを構成します。</li><li class="slds-p-bottom_small"><strong><a href="setup.html#salesforce_maps_setup_data_layers_manage">地図への外部データの追加</a></strong><br>ビジネスの成長に役立つ地域分析を設定します。この分析では、特定の独自データとサードパーティのデータが Salesforce Maps 上に表示されます。たとえば、売上データやセンサスデータに着目して、綿密な市場調査を実施したり、新規事業拠点を探したり、見込み顧客を発掘したりできます。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_setup_polyline_layers_manage">地図上でのユーティリティラインの表示</a></strong><br>Salesforce Maps で多角形レイヤーを設定することにより、ユーティリティの問題に迅速に対処する営業担当の取り組みをサポートすることで、顧客を維持し、期待に応えることができます。レコードの多角形を視覚化するスパンをプロットします。これらのレコードは、たとえば送電線の邪魔になる木を伐採するなどの作業を計画する場合に選択します。続いて、一括アクションを使用してラインと木の位置をサービスチームのルートに追加します。</li><li class="slds-p-bottom_small"><strong><a href="field_features.html#salesforce_maps_setup_live_layers_manage">地図上でのアセットの配置</a></strong><br>営業チームとサービスチームの活動状況に関するインサイトを取得します。リアルタイムデータと履歴データを分析して、成長、安全性、効率性の機会を Salesforce Maps で特定します。たとえば、運転者の場所を地図上で確認して、最寄りの運転者を依頼されたサービスの対応に向かわせます。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_setup_folders_manage">フォルダーのレイヤーの整理</a></strong><br>非公開フォルダーのレイヤーを整理します。フォルダー権限があれば、Salesforce Maps で企業フォルダー内に公開フォルダーを作成して、そのフォルダーにアクセスできるユーザーを指定できます。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_setup_what_appears_on_maps_enhanced_framework">
+<h1 class="slds-text-heading_large">強化されたユーザーエクスペリエンスで Salesforce Maps をさらに活用</h1>
+  <p>強化された Salesforce Maps フレームワークを提供することで、スピードとパフォーマンスが向上します。営業担当は、ArcGIS Online レイヤーや複雑な図形レイヤーを含む大量のデータをプロットするときに時間を節約できます。営業担当は、最新かつ堅牢なリストビュー環境にもアクセスできます。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_setup_what_appears_on_maps_enhanced_framework_advantages">拡張ユーザーエクスペリエンスの概要</a></strong><br>高度な Salesforce Maps フレームワークを提供します。これにより、営業担当は大量のデータをプロットするための優れたパフォーマンスと、最新かつ堅牢なリストビュー環境を実現できます。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_setup_what_appears_on_maps_enhanced_framework_considerations">拡張ユーザーエクスペリエンスの使用に関する考慮事項</a></strong><br>拡張 Salesforce Maps フレームワークに何が期待できるかを把握します。営業担当が ArcGIS Online レイヤーや複雑な図形レイヤーなどの大量のデータをプロットするときのパフォーマンスが大幅に向上し、最新のリストビューにアクセスできるようになります。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_setup_what_appears_on_maps_enhanced_framework_list_views">拡張ユーザーエクスペリエンスのリストビュー</a></strong><br>最新のリストビュー環境で特定のマーカーに対してアクションを実行します。リストビューが従来の Salesforce Maps フレームワークとどのように異なるかを特定することで、営業担当が拡張フレームワークに慣れたときにサポートを改善できます。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_setup_what_appears_on_maps_enhanced_framework_enable">拡張ユーザーエクスペリエンスの有効化</a></strong><br>営業担当が Salesforce Maps で ArcGIS Online レイヤーや複雑な図形レイヤーなどの大量のデータをプロットするときにパフォーマンスが劇的に向上するように準備します。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_setup_what_appears_on_maps_enhanced_framework_advantages">
+<h1 class="slds-text-heading_large">拡張ユーザーエクスペリエンスの概要</h1>
+  <p>高度な Salesforce Maps フレームワークを提供します。これにより、営業担当は大量のデータをプロットするための優れたパフォーマンスと、最新かつ堅牢なリストビュー環境を実現できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table>
+    <p>拡張フレームワークを使用すると、営業担当は ArcGIS Online レイヤーや複雑な図形レイヤーを含む大量のデータを短時間でプロットできます。このフレームワークには次の利点もあります。</p>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:18.11594202898551%"><col style="width:81.88405797101449%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d10576e60" style="vertical-align:top;" class="slds-cell-wrap" scope="col">機能領域</th>
+            <th id="d10576e63" style="vertical-align:top;" class="slds-cell-wrap" scope="col">拡張フレームワークの利点</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d10576e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="機能領域">地図</td>
+
+            <td headers="d10576e63" style="vertical-align:top;" class="slds-cell-wrap" data-label="拡張フレームワークの利点"><p>営業担当は、地図にプロットできるデータにアクセスできます。このデータは次のように役立ちます。</p><ul><li>Esri が提供する ArcGIS Living Atlas of the World を使用して、広範な非登録データをプロットできます。たとえば、気象イベントとその履歴経路、人口統計、公益事業や農業インフラをプロットします。</li>
+<li>道路の閉鎖、事故、建設地域など、最近の交通イベントを特定します。</li>
+<li>隣接するマーカーや重なり合う図形レイヤーを切り替えることができます。</li>
+</ul>
+</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d10576e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="機能領域">リストビュー</td>
+
+            <td headers="d10576e63" style="vertical-align:top;" class="slds-cell-wrap" data-label="拡張フレームワークの利点"><p>最新のリストビューにより、営業担当の生産性が向上します。詳細は次のとおりです。</p><ul><li>リストビューでは、どのタブ内の行に対してもアクションを実行できます。たとえば、レコードをキャンペーンに追加したり、レコードの所有者を変更したり、レコードの住所に基づいて近接性の中心を設定したりできます。</li>
+<li>変更のたびに新しいリストビューを作成するのではなく、リストビューを継続的に改善できます。</li>
+</ul>
+</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d10576e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="機能領域">図形描画機能</td>
+
+            <td headers="d10576e63" style="vertical-align:top;" class="slds-cell-wrap" data-label="拡張フレームワークの利点"><p>図形描画機能により、担当者に柔軟性がもたらされます。詳細は次のとおりです。</p><ul><li>描画した図形を編集する際には、地図上の他の領域に図形を移動できます。</li>
+<li>住所または緯度や経度の座標によって、移動時間、移動距離、円形の境界線の図形の中心を設定できます。担当者が住所を入力し始めると、Salesforce Maps がオートコンプリート機能を使って住所を提案します。</li>
+</ul>
+</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d10576e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="機能領域">表示</td>
+
+            <td headers="d10576e63" style="vertical-align:top;" class="slds-cell-wrap" data-label="拡張フレームワークの利点">拡張フレームワークにより、マーカーポップアップ、図形描画機能、リストビュー、マーカークラスターのスタイルが一新され、機能的になりました。</td>
+
+          </tr>
+        </tbody></table>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_setup_what_appears_on_maps_enhanced_framework_considerations">
+<h1 class="slds-text-heading_large">拡張ユーザーエクスペリエンスの使用に関する考慮事項</h1>
+  <p>拡張 Salesforce Maps フレームワークに何が期待できるかを把握します。営業担当が ArcGIS Online レイヤーや複雑な図形レイヤーなどの大量のデータをプロットするときのパフォーマンスが大幅に向上し、最新のリストビューにアクセスできるようになります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table>
+    <p>従来の Salesforce Maps フレームワークと比較して、何が異なっているか、何が使用できないかを特定します。</p>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:18.76172607879925%"><col style="width:81.23827392120076%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d13774e60" style="vertical-align:top;" class="slds-cell-wrap" scope="col">影響を受ける機能領域</th>
+            <th id="d13774e63" style="vertical-align:top;" class="slds-cell-wrap" scope="col">相違点と対応可能状況</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d13774e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="影響を受ける機能領域">地図</td>
+
+            <td headers="d13774e63" style="vertical-align:top;" class="slds-cell-wrap" data-label="相違点と対応可能状況"><ul>
+                <li>マップでは、インポートされたファイルのカスタムデータソースまたはセルフホストデータソースを含むデータレイヤーはサポートされません。</li>
+
+                <li>マーカーが重複している場合、Web ベッド効果は使用できません。代わりに、重複するマーカーがクラスターに表示されます。</li>
+
+                <li>英語以外のロケールでは、一部のコンテンツは英語で表示されます。</li>
+
+                <li>マップを読み込むには、拡張フレームワークで WebGL2 が有効になっているブラウザーが必要です。</li>
+
+                <li>地図とマーカーのポップアップにはストリートビューは含まれません。</li>
+
+                <li>マーカーにマウスポインターを置いても、[タイトル] 項目の詳細は表示されません。</li>
+
+                <li>Salesforce Maps では、CORS、COEP、または COOP はサポートされていません。有効にすると、地図機能が読み込まれない、または正しく機能しない可能性があります。</li>
+
+              </ul>
+</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d13774e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="影響を受ける機能領域">マーカーレイヤー</td>
+
+            <td headers="d13774e63" style="vertical-align:top;" class="slds-cell-wrap" data-label="相違点と対応可能状況"><ul>
+                <li>表示ラベル付きピンおよび数値付きピンでは、マーカーのみがクリック可能です。</li>
+
+                <li>特定のズームレベルで固定表示ラベルが乱雑にならないように、マーカーレイヤーには重ならない固定表示ラベルのみが表示されます。</li>
+
+                <li>ヒートマップの視覚化は若干異なります。</li>
+
+              </ul>
+</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d13774e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="影響を受ける機能領域">レイヤー</td>
+
+            <td headers="d13774e63" style="vertical-align:top;" class="slds-cell-wrap" data-label="相違点と対応可能状況"><ul>
+                <li>個々の境界を含む図形レイヤーの場合、位置揃えの設定に関係なく、固定表示ラベルは中央揃えで表示されます。ただし、マージされた境界を含む図形レイヤーの場合、固定表示ラベルは理由設定に基づいて表示されます。</li>
+
+                <li>テリトリーレイヤーは使用できません。</li>
+
+                <li>多角形レイヤーはまだ使用できません。</li>
+
+                <li>図形内のマーカーのみを表示するには、<strong class="uicontrol">[図形を表示]</strong> オプションと <strong class="uicontrol">[図形内のマーカーのみを表示]</strong> オプションを選択します。</li>
+
+                <li>レイヤーの凡例行は降順で並び替えられません。</li>
+
+              </ul>
+</td>
+
+          </tr>
+                    <tr class="">
+                        <td headers="d13774e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="影響を受ける機能領域">クラスター</td>
+
+                        <td headers="d13774e63" style="vertical-align:top;" class="slds-cell-wrap" data-label="相違点と対応可能状況">拡張 Salesforce Maps フレームワークの表示クラスターでは、標準フレームワークとは異なる分散ブレークポイントが使用されます。</td>
+
+                    </tr>
+          <tr class="">
+            <td headers="d13774e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="影響を受ける機能領域">フォルダー権限</td>
+
+            <td headers="d13774e63" style="vertical-align:top;" class="slds-cell-wrap" data-label="相違点と対応可能状況"><p>Salesforce Maps は、他のユーザーのフォルダーにデータをコピーするときにフォルダーアクセス権を決定します。</p><ul>
+                <li>フォルダー権限を無効にすると、ユーザーに作成および変更権限が付与されます。</li>
+
+                <li>フォルダー権限を有効にすると、ロール階層が有効になっている場合にのみユーザーに作成および変更権限が付与され、[コピー先] 機能を開始したユーザーには下位ユーザーが含まれます。また、「作成」および「変更」権限を取得するには、データのコピー先フォルダーが下位ユーザーのリストに含まれている必要があります。</li>
+
+              </ul>
+</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d13774e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="影響を受ける機能領域">ツールバー</td>
+
+            <td headers="d13774e63" style="vertical-align:top;" class="slds-cell-wrap" data-label="相違点と対応可能状況"><ul>
+                <li>Esri ベースマップは、デスクトップではすべての Google ベースマップを置き換えますが、Salesforce モバイルアプリケーションでは置き換えません。</li>
+
+                <li>Esri ベースマップには、Esri ハイブリッドベースマップの追加が含まれます。</li>
+
+                <li>営業担当が多角形を描画する場合、線は交差できません。元のフレームワークから描画された多角形は参照のみとして表示されます。</li>
+
+                  <li>[元に戻す] アクションは、多角形描画ツールでは使用できません。</li>
+
+              </ul>
+</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d13774e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="影響を受ける機能領域">近接ベースの URL パラメーター</td>
+
+            <td headers="d13774e63" style="vertical-align:top;" class="slds-cell-wrap" data-label="相違点と対応可能状況"><ul>
+                <li>URL に <samp class="filepath">proximityRadius</samp> または <samp class="filepath">proximityUnit</samp> が含まれる場合、<samp class="filepath">proximityOn＝true</samp> パラメーターを省略できます。</li>
+
+                <li>URL に <samp class="filepath">proximityRadius</samp> または <samp class="filepath">proximityUnit</samp> のいずれかが含まれ、両方が含まれていない場合、値は URL をクリックしたユーザーの設定から取得されます。</li>
+
+                <li>URL に <samp class="filepath">proximityAffectMarkerVisiblity</samp> が指定されていて、<samp class="filepath">proximityRadius</samp> または <samp class="filepath">proximityUnit</samp> が指定されていない場合、値は URL をクリックしたユーザーの設定から取得されます。</li>
+
+              </ul>
+</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d13774e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="影響を受ける機能領域">POI 結果</td>
+
+            <td headers="d13774e63" style="vertical-align:top;" class="slds-cell-wrap" data-label="相違点と対応可能状況"><a name="salesforce_maps_setup_what_appears_on_maps_enhanced_framework_considerations__ul_xyk_y3l_fdc"></a><ul id="salesforce_maps_setup_what_appears_on_maps_enhanced_framework_considerations__ul_xyk_y3l_fdc">
+                <li>拡張フレームワークにはさまざまなベンダーのデータが含まれているため、従来のフレームワークと比較して検索結果が異なる可能性があります。</li>
+
+                <li>マーカーポップアップには評価は含まれません。</li>
+
+                <li>一部の検索語は使用できません。</li>
+
+              </ul>
+</td>
+
+          </tr>
+        </tbody></table>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> 
+      <p>クロスオリジンセキュリティ設定 (CORS、COEP、COOP): Salesforce Maps ではサポートされません。有効にすると、地図が正しく読み込まれない場合があります (マーカーの欠落や地図アクションの失敗など)。トラブルシューティングを進める前に、これらの設定を無効にします。</p>
+    </div></div></div>
+
+    <p>Salesforce Maps の権限セットには、追加されたメタデータが含まれます。Salesforce Maps 権限セットをコピーしてカスタマイズした場合は、次の追加を考慮してください。</p>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:18.76172607879925%"><col style="width:81.23827392120076%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d13774e300" style="vertical-align:top;" class="slds-cell-wrap" scope="col">メタデータ型</th>
+            <th id="d13774e303" style="vertical-align:top;" class="slds-cell-wrap" scope="col">追加されたメタデータ</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d13774e300" style="vertical-align:top;" class="slds-cell-wrap" data-label="メタデータ型">クラス</td>
+
+            <td headers="d13774e303" style="vertical-align:top;" class="slds-cell-wrap" data-label="追加されたメタデータ"><ul>
+                <li><samp class="filepath">ma-app/main/default/classes/maps/ContentRest.cls</samp></li>
+
+                <li><samp class="filepath">ma-app/main/default/classes/maps/MapsLabs.cls</samp></li>
+
+                <li><samp class="filepath">ma-app/main/default/classes/maps/MapsLabsTest.cls</samp></li>
+
+                <li><samp class="filepath">ma-app/main/default/classes/maps/MapsLegacyCheck.cls</samp></li>
+
+              </ul>
+</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d13774e300" style="vertical-align:top;" class="slds-cell-wrap" data-label="メタデータ型">コンポーネント</td>
+
+            <td headers="d13774e303" style="vertical-align:top;" class="slds-cell-wrap" data-label="追加されたメタデータ"><ul>
+                <li><samp class="filepath">ma-app/main/default/components/maps/Maps.component</samp></li>
+
+                <li><samp class="filepath">ma-app/main/default/components/maps/MapsMobile.component</samp></li>
+
+                <li><samp class="filepath">ma-app/main/default/components/maps/MapsV2.component</samp></li>
+
+                <li><samp class="filepath">ma-app/main/default/components/maps/Oops.component</samp></li>
+
+              </ul>
+</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d13774e300" style="vertical-align:top;" class="slds-cell-wrap" data-label="メタデータ型">ページ</td>
+
+            <td headers="d13774e303" style="vertical-align:top;" class="slds-cell-wrap" data-label="追加されたメタデータ"><samp class="filepath">ma-app/main/default/pages/maps/MapsLabs.page</samp></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d13774e300" style="vertical-align:top;" class="slds-cell-wrap" data-label="メタデータ型">リモートサイト</td>
+
+            <td headers="d13774e303" style="vertical-align:top;" class="slds-cell-wrap" data-label="追加されたメタデータ"><ul>
+                <li><samp class="filepath">https://lookup.search.hereapi.com</samp></li>
+
+                <li><samp class="filepath">https://autosuggest.search.hereapi.com</samp></li>
+
+                <li><samp class="filepath">https://revgeocode.search.hereapi.com</samp></li>
+
+              </ul>
+</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d13774e300" style="vertical-align:top;" class="slds-cell-wrap" data-label="メタデータ型">静的リソース</td>
+
+            <td headers="d13774e303" style="vertical-align:top;" class="slds-cell-wrap" data-label="追加されたメタデータ"><ul>
+                <li><samp class="filepath">ma-app/main/default/staticresources/Maps3rdPartyPlugins/jquery/jquery-3.7.0.min.js</samp></li>
+
+                <li><samp class="filepath">ma-app/main/default/staticresources/MapsFonts/mapsHeaderIcons.css</samp></li>
+
+                <li><samp class="filepath">ma-app/main/default/staticresources/MapsLabs/README.md</samp></li>
+
+                <li><samp class="filepath">ma-app/main/default/staticresources/MapsStyles/images/MapView/esri_navigation.png</samp></li>
+
+                <li><samp class="filepath">ma-app/main/default/staticresources/MapsStyles/images/MapView/esri_terrain.png</samp></li>
+
+              </ul>
+</td>
+
+          </tr>
+        </tbody></table>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="最新のリストビュー環境で特定のマーカーに対してアクションを実行します。リストビューが従来の Salesforce Maps フレームワークとどのように異なるかを特定することで、営業担当が拡張フレームワークに慣れたときにサポートを改善できます。" href="#salesforce_maps_setup_what_appears_on_maps_enhanced_framework_list_views">拡張ユーザーエクスペリエンスのリストビュー</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_setup_what_appears_on_maps_enhanced_framework_enable">
+<h1 class="slds-text-heading_large">拡張ユーザーエクスペリエンスの有効化</h1>
+  <p>営業担当が Salesforce Maps で ArcGIS Online レイヤーや複雑な図形レイヤーなどの大量のデータをプロットするときにパフォーマンスが劇的に向上するように準備します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d18737e59" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d18737e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">設定をカスタマイズする</td>
+
+              <td headers="d18737e59" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>[設定] の [クイック検索] ボックスに「<kbd>リモートサイトの設定</kbd>」と入力し、<strong class="uicontrol">[リモートサイトの設定]</strong> を選択します。https://lookup.search.hereapi.com、&nbsp;https://autosuggest.search.hereapi.com、https://revgeocode.search.hereapi.com のリモートサイトを見つけて有効化します。</span>
+      </li><li>
+        <span>[設定] の [クイック検索] ボックスに「<kbd>インストール済みパッケージ</kbd>」と入力し、<strong class="uicontrol">[インストール済みパッケージ]</strong> を選択します。</span>
+      </li><li>
+        <span>Salesforce Maps パッケージの横の <strong class="uicontrol">[設定]</strong> をクリックします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[設定]</strong> をクリックし、[<strong class="uicontrol">拡張ユーザーエクスペリエンス</strong>] を選択します。</span>
+      </li><li>
+        <span>変更を保存します。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_setup_what_appears_on_maps_enhanced_framework_list_views">
+<h1 class="slds-text-heading_large">拡張ユーザーエクスペリエンスのリストビュー</h1>
+  <p>最新のリストビュー環境で特定のマーカーに対してアクションを実行します。リストビューが従来の Salesforce Maps フレームワークとどのように異なるかを特定することで、営業担当が拡張フレームワークに慣れたときにサポートを改善できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:15.94896331738437%"><col style="width:84.05103668261563%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d7426e57" style="vertical-align:top;" class="slds-cell-wrap" scope="col">リストビュー関数</th>
+            <th id="d7426e60" style="vertical-align:top;" class="slds-cell-wrap" scope="col">詳細</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d7426e57" style="vertical-align:top;" class="slds-cell-wrap" data-label="リストビュー関数">一般的な機能</td>
+
+            <td headers="d7426e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">Salesforce によって、フィンランド、フランス、ドイツ、アイルランド、スペインの重複ロケールが無効にされました。強化されたユーザーエクスペリエンスはこの標準に準拠しています。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d7426e57" style="vertical-align:top;" class="slds-cell-wrap" data-label="リストビュー関数">選択したマーカー</td>
+
+            <td headers="d7426e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細"><ul>
+                <li>[選択済み] タブは、拡張フレームワークでは [選択済みマーカー] であり、リストビューに常に表示されます。</li>
+
+                <li>選択したマーカーを置き換えるだけでなく、[選択済みのマーカー] 内にマーカーを追加することもできます。</li>
+
+                <li>[選択済みのマーカー] からマーカーを削除するには、それらのマーカーを選択して [<strong class="uicontrol">マーカーをクリア</strong>] をクリックします。</li>
+
+              </ul>
+</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d7426e57" style="vertical-align:top;" class="slds-cell-wrap" data-label="リストビュー関数">基準点</td>
+
+            <td headers="d7426e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細"><ul>
+                <li>営業担当は基準点を設定したら、最大 10,000 個のマーカーの基準点から距離を計算できます。</li>
+
+                <li>距離を計算するには、リストビューに [ドライブ距離] や [ドライブ時間] などの距離項目を含めるか、単に [距離] を含める必要があります。</li>
+
+                <li>営業担当がリストビューのマーカーから基準点を設定すると、そのマーカーの行が強調表示されます。</li>
+
+                <li>開始位置と終了位置が区切られている場所など、道順を確認できない場合、警告メッセージが表示されます。</li>
+
+              </ul>
+</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d7426e57" style="vertical-align:top;" class="slds-cell-wrap" data-label="リストビュー関数">検索条件</td>
+
+            <td headers="d7426e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細"><ul>
+                <li>高度な検索は、拡張フレームワークの検索条件です。改善された検索条件関数は、冗長な検索機能を除外します。</li>
+
+                <li>住所項目や町名・番地項目など、重複する詳細を保存する複合項目がリストビューに含まれる場合、検索条件オプションにはそれらの項目の 1 つのみが含まれます。</li>
+
+                <li>項目検索条件演算子は、データ型に対応します。</li>
+
+                <li>項目のグループは、営業担当がより効率的に絞り込むのに役立ちます。</li>
+
+              </ul>
+</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d7426e57" style="vertical-align:top;" class="slds-cell-wrap" data-label="リストビュー関数">一括アクション</td>
+
+            <td headers="d7426e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細"><ul>
+                  <li>[一括アクション] ボタン ([エクスポート] を含む) は、営業担当が行を選択するまで無効状態のままです。チェックボックス項目を追加するには、Maps リストビューの設定を定義します。「<cite>Salesforce Knowledge</cite> での <a target="_blank" href="https://help.salesforce.com/s/articleView?id=000381362&amp;language=ja&amp;type=1">Maps リストビューの設定</a>」を参照してください。</li>
+
+                <li>営業担当がマーカーを選択してから検索条件を適用するか検索を実行すると、選択内容が失われます。</li>
+
+              </ul>
+</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d7426e57" style="vertical-align:top;" class="slds-cell-wrap" data-label="リストビュー関数">数式項目とテキストエリア項目</td>
+
+            <td headers="d7426e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細"><ul>
+                <li>[数式]、[テキストエリア]、[リッチテキストエリア]、[ロングテキストエリア] 項目の詳細は、最大列幅 500 ピクセルの 1 行で表示されます。</li>
+
+                <li>リッチテキストエリア項目の画像は表示されません。</li>
+
+              </ul>
+</td>
+
+          </tr>
+        </tbody></table>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="拡張 Salesforce Maps フレームワークに何が期待できるかを把握します。営業担当が ArcGIS Online レイヤーや複雑な図形レイヤーなどの大量のデータをプロットするときのパフォーマンスが大幅に向上し、最新のリストビューにアクセスできるようになります。" href="#salesforce_maps_setup_what_appears_on_maps_enhanced_framework_considerations">拡張ユーザーエクスペリエンスの使用に関する考慮事項</a></li></ul></div>
+</div></div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="field_features.html">&larr; 現場機能（近隣検索・自動割当・チェックイン・スケジュール）</a><a href="reference.html">設定リファレンス &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=sales.salesforce_maps_setup_maps.htm&type=5&language=ja">help.salesforce.com — Salesforce Maps（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>

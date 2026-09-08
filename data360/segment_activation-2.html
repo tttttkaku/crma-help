@@ -1,0 +1,2330 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>セグメント・活性化・オーディエンス・配信制御（2/3） | Data 360 ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（35）</h2>
+    <ol>
+      <li><a href="#c360_a_configure_communication_capping">コミュニケーション制限設定の作成</a></li>
+      <li><a href="#c360_a_copy_segment">セグメントのコピー</a></li>
+      <li><a href="#c360_a_create_a_data_action_in_customer_data_platform">Data 360 でのデータアクションの作成</a></li>
+      <li><a href="#c360_a_create_a_data_action_target_of_webhook_type">Web フックデータアクションターゲットの作成</a></li>
+      <li><a href="#c360_a_create_a_dynamic_segment">動的セグメントの作成</a></li>
+      <li><a href="#c360_a_create_a_marketing_cloud_data_action_target">Marketing Cloud Engagement データアクションターゲットの作成</a></li>
+      <li><a href="#c360_a_create_a_real_time_data_action">Data 360 でのリアルタイムデータアクションの作成</a></li>
+      <li><a href="#c360_a_create_a_realtime_segment">リアルタイムセグメントの作成</a></li>
+      <li><a href="#c360_a_create_a_segment">Data 360 での標準セグメントの作成</a></li>
+      <li><a href="#c360_a_create_a_waterfall_segment">ウォーターフォールセグメントの作成</a></li>
+      <li><a href="#c360_a_create_activation_template">有効化テンプレートの作成</a></li>
+      <li><a href="#c360_a_create_audiences_activation_target">Data 360 ロイヤルティ有効化対象の作成</a></li>
+      <li><a href="#c360_a_create_commerce_activation_target">B2C Commerce 有効化対象の作成</a></li>
+      <li><a href="#c360_a_create_communication_capping_rules">通信制限ルールの作成</a></li>
+      <li><a href="#c360_a_create_communication_capping_target">コミュニケーション制限の有効化対象の作成</a></li>
+      <li><a href="#c360_a_create_data_cloud_activation">Data 360 ターゲットの有効化の作成</a></li>
+      <li><a href="#c360_a_create_external_activation_platform_activation_target">外部プラットフォーム有効化対象の作成</a></li>
+      <li><a href="#c360_a_create_external_activation_platform_activations">外部プラットフォームの有効化の作成</a></li>
+      <li><a href="#c360_a_create_marketing_cloud_activation">Marketing Cloud Engagement 対象の有効化の作成</a></li>
+      <li><a href="#c360_a_create_marketing_cloud_activation_target">Marketing Cloud Engagement 有効化対象の作成</a></li>
+      <li><a href="#c360_a_create_mc_personalization_activation_target">Marketing Cloud Personalization 有効化対象の作成</a></li>
+      <li><a href="#c360_a_create_segment_from_data_kit">データキットからのセグメントの作成</a></li>
+      <li><a href="#c360_a_create_segments_to_data_cloud">Data 360 へのビジュアルセグメントの作成</a></li>
+      <li><a href="#c360_a_currency_datatype_segment">セグメンテーションの通貨データ型</a></li>
+      <li><a href="#c360_a_data_action_target_in_customer_data_platform">Data 360 のデータアクションターゲット</a></li>
+      <li><a href="#c360_a_data_action_troubleshooting">データアクションエラーのトラブルシューティング</a></li>
+      <li><a href="#c360_a_data_actions">Salesforce Platform イベントデータアクションターゲットの作成</a></li>
+      <li><a href="#c360_a_data_actions_cdp">Data 360 のデータアクション</a></li>
+      <li><a href="#c360_a_delete_segment">セグメントの削除</a></li>
+      <li><a href="#c360_a_disable_segment">無効化されたセグメント</a></li>
+      <li><a href="#c360_a_edit_segment">セグメントの編集</a></li>
+      <li><a href="#c360_a_examples_of_segmentation_filters">セグメンテーション検索条件の例</a></li>
+      <li><a href="#c360_a_external_activation_platform_custom_metadata">外部有効化プラットフォームのカスタムメタデータの作成</a></li>
+      <li><a href="#c360_a_external_activation_platform_json">JSON を使用した外部有効化プラットフォームの作成 (ISV パートナー)</a></li>
+      <li><a href="#c360_a_external_activation_platform_schedule">手動ワークフローを使用した外部有効化プラットフォームの作成</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>セグメント・活性化・オーディエンス・配信制御（2/3）</h1>
+      <div class="meta">Data 360（旧 Data Cloud）ヘルプ · 35 記事 · 生成 2026-08-12</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="segment_activation-1.html">&larr; セグメント・活性化・オーディエンス・配信制御（1/3）</a><a href="segment_activation-3.html">セグメント・活性化・オーディエンス・配信制御（3/3） &rarr;</a></div>
+<section class="article" id="c360_a_configure_communication_capping">
+<h1 class="slds-text-heading_large">コミュニケーション制限設定の作成</h1>
+  
+  <p>コミュニケーションの上限設定を作成し、Data Cloud のデータスペースに関連付けます。すべての設定済みパラメーターまたは特定のサブセットに適用できます。各組織は、有効なコミュニケーション制限設定を 1 つに制限されています。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d148098e61" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要な権限セット</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d148098e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要な権限セット">コミュニケーション制限を使用する</td>
+
+              <td headers="d148098e61" style="vertical-align:top;" class="slds-cell-wrap"><p>次のいずれかの権限セット:</p><a name="c360_a_configure_communication_capping__ul_jjg_cpm_d2c"></a><ul id="c360_a_configure_communication_capping__ul_jjg_cpm_d2c">
+                  <li>Data Cloud アーキテクト</li>
+
+                  <li>Data Cloud 有効化マネージャー</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div><ol><li><span>Data Cloud で、[<strong class="uicontrol">Communication Capping (コミュニケーション制限</strong>)] をクリックし、<strong class="uicontrol">[新規]</strong> をクリックします。</span></li><li><span>制限ルールを作成するパラメータを選択します。</span></li><li><span>コミュニケーション制限インスタンスが適用されている 1 つ以上のデータスペースを選択します。</span></li><li><span>コミュニケーションの上限の名前と説明 (省略可能) を入力します。</span></li><li><span><strong class="uicontrol">[保存]</strong> をクリックします。</span></li></ol>
+<div><p>通信制限設定を作成したら、制限ルールを作成します。</p></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_copy_segment">
+<h1 class="slds-text-heading_large">セグメントのコピー</h1>
+  
+  <p>Data 360 では、既存のセグメントをコピーして、既存のセグメントと同じ検索条件とカスタマイズを入力できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data Cloud でサポートされている<strong>すべてのエディション</strong>。「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition の可用性</a>」を参照してください。</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">アドオンライセンスで使用可能な機能: <strong>セグメンテーションと有効化</strong></td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d132206e69" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要な権限セット</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d132206e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要な権限セット">セグメントを削除する</td>
+
+              <td headers="d132206e69" style="vertical-align:top;" class="slds-cell-wrap"><p>次の権限セットのいずれか:</p><a name="c360_a_copy_segment__ul_jjg_cpm_d2c"></a><ul id="c360_a_copy_segment__ul_jjg_cpm_d2c">
+                  <li>Data Cloud アーキテクト</li>
+
+                  <li>Data Cloud 有効化マネージャー</li>
+
+                  <li>Data Cloud 有効化スペシャリスト</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div><ol><li><span>[<strong class="uicontrol">Segments]</strong> に移動します。</span></li><li><span>コピーするセグメントを選択します。</span></li><li><span><strong class="uicontrol">[コピー]</strong> をクリックします。</span></li><li><span>新しいセグメントに名前を付け、公開スケジュールを選択します。</span></li><li><span><strong class="uicontrol">[保存]</strong> をクリックします。</span></li></ol>
+
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_create_a_data_action_in_customer_data_platform">
+<h1 class="slds-text-heading_large">Data 360 でのデータアクションの作成</h1>
+  
+  <p>データアクションを使用して、Salesforce Platform、Webhook、Marketing Cloud Engagement などの対象にアラートまたはイベントを送信します。チャネル、商品、取引先、サービス、個人など、さまざまなレベルでほぼリアルタイムのイベントとインサイトに焦点を当てるデータアクションを作成します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d75056e61" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限セット</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d75056e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限セット">データアクションを作成する</td>
+
+              <td headers="d75056e61" style="vertical-align:top;" class="slds-cell-wrap"><p>次のいずれかの権限セット:</p><ul>
+                  <li>Data Cloud アーキテクト</li>
+
+                  <li>Data Cloud 有効化マネージャー</li>
+
+                  <li>Data Cloud 有効化スペシャリスト </li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span><span>Data 360</span> で、[データアクション] タブに移動し、[<strong class="uicontrol">新規]</strong> をクリックします。</span>
+      </li><li>
+        <span>データアクションを最初から作成するか、データキットおよびパッケージからインポートするかを選択します。</span>
+      </li><li>
+        <span>データアクションターゲットを選択し、<strong class="uicontrol">[次へ]</strong> をクリックします。選択したデータアクション対象がドラフト状態の場合、データアクションもドラフト状況に移行します。</span>
+      </li><li>
+        <span>データスペースを選択します。</span>
+      </li><li>
+        <span>データモデルオブジェクト (DMO) または計算済みインサイトオブジェクト (CIO) 種別を選択します。Marketing Cloud Engagement 対象の場合、選択したオブジェクト種別は Marketing Cloud データストリームから取得されている必要があります。</span>
+        <div>Marketing Cloud Engagement インスタンス (EID) が複数あり、登録者キーが CIO から取得されている場合、CIO の作成時に項目 API 参照名「DataSource__c」を式に追加します。</div>
+      </li><li>
+        <span>主オブジェクトを選択し、[<strong class="uicontrol">次へ]</strong> をクリックします。</span>
+        <div>変更イベントが特定されたときにデータアクションをトリガーするには、Amazon Redshift、Google BigQuery、Snowflake、Databricks などの外部データレイクオブジェクト (DLO) にリンクされている DMO、CIO、または加速 DMO を選択します。高速化 DMO を選択した場合は、高速化プロセスが完了していることを確認します。DMO を選択する場合は、DLO の主キー項目が DMO にマッピングされていることを確認します。</div>
+      </li><li>
+        <span>データアクションを強化するには、関連オブジェクトを選択します。</span>
+        <div>外部 DLO に対応付けられた DMO またはデータグラフを関連オブジェクトとして使用できます。オブジェクトがデータアクションで関連オブジェクトとして表示されるには、主オブジェクトが関連オブジェクトと多対一または一対一のリレーションを持っている必要があります。</div>
+        <ol>
+          <li>
+            <span>関連オブジェクトとして DMO を使用する場合:</span>
+            <div>
+              <ul>
+                <li>データアクションに最大 10 個の関連属性を追加します。</li>
+
+                <li>登録者キー値を選択します。登録者キーは、エンゲージメントのメッセージ受信者の一意の識別子です。コミュニケーションに使用するメールアドレスを決定します。</li>
+
+                <li>通貨データ型を選択するときに cdp_sys_record_currency 項目を含めます。このフィールドがない場合、<span>Data 360 は</span>通貨属性を数値として扱います。</li>
+
+              </ul>
+
+            </div>
+          </li>
+
+          <li>
+            <span>関連オブジェクトとしてデータグラフを使用する場合:</span>
+            <div>
+              <ul>
+                <li>データを使用できる関連オブジェクトのルックアップパスを選択します。ペイロード全体がデータアクション対象に送信されるため、属性を個別に選択することはできません。</li>
+
+                <li>Marketing Cloud Engagement データアクションターゲットの場合、データアクションペイロードを保存するようにデータエクステンションを設定します。「データアクションペイロードを保存するためのデータエクステンション<a target="_blank" href="ingest_connect-2.html#c360_a_data_extension_data_action_payload">の設定」を参照してください。</a>を参照してください。</li>
+
+              </ul>
+
+            </div>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>イベントルールとアクションルールを選択します。</span>
+        <div>イベントルールを使用して、レコードの変更に基づいてアクションを作成します。アクションルールはデータアクションを評価し、OR 条件と AND 条件を含めることができます。</div>
+      </li><li>
+        <span>さらに条件を追加するには、<strong class="uicontrol">[条件を追加]</strong> をクリックします。</span>
+      </li><li>
+        <span>オブジェクト、属性、演算子を選択し、データアクションをトリガーできる値を入力します。</span>
+      </li><li>
+        <span>マルチ通貨オプションが有効になっている組織では、データアクション対象の通貨を選択します。出力データには、選択した通貨が反映されます。</span>
+      </li><li>
+        <span>[レコードが更新されました] イベントルールのデータアクションをいつトリガーするかを選択します。</span>
+        <div>[更新済みレコードのデータアクションをトリガー] オプションは、[レコードが更新されました] イベントルールを選択した場合にのみ使用できます。アクションルール条件で [増加した] や [変更済み] などの変更演算子を使用している場合、[更新済みレコードのデータアクションをトリガー] 設定は変更できません。この設定を変更するには、条件からすべての変更演算子を削除します。<div style="text-align:left;"><img alt="[更新済みレコードのデータアクションをトリガー] オプション" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_trigger_data_action_for_updated_records_option1.png" style="width:800px;"></div></div>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>アクション名を入力します。</span>
+        <div>[アクション API 参照名] 項目は自動的に入力されます。</div>
+      </li><li>
+        <span><strong class="uicontrol">[保存して公開]</strong> をクリックします。データアクションはレコードホームページに表示できます。</span>
+        <div>データアクションの作成後、設定が完了するまで約 15 分かかります。その後、ほぼリアルタイムでイベントが送信され、主オブジェクトの行が追加、更新、削除された場合にのみトリガーされます。それ以降の変更では、イベントがすぐにトリガーされます。</div>
+        <div>Flow Builder を使用して項目をコピー強化フローや Data Cloud トリガーフローなど、インテグレーションユーザーが作成したデータアクションは参照のみです。これらのデータアクションは削除、無効化、または編集できません。</div>
+      </li></ol>
+
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=data.c360_a_supported_operators_for_event_and_action_rules.htm&amp;language=ja&amp;type=5">イベントルール条件とアクションルール条件でサポートされる演算子</a></strong><br>データアクションをトリガーするには、レコードアクションに基づいて 1 つ以上のイベントルールを選択し、OR 条件と AND 条件を使用してデータを公開するタイミングを指定できます。</li><li class="slds-p-bottom_small"><strong><a href="segment_activation-3.html#c360_a_monitor_event_activity_data_action">データアクションのイベント活動の監視</a></strong><br>Event Activity ダッシュボードで、識別、処理、公開、失敗したイベントなど、データアクションの主要な総計値を追跡します。データアクションパイプライン内をほぼリアルタイムで移動するデータをより詳細に把握できます。これにより、イベントの量とデータ配信に関する透明性が確保されます。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="model_mapping-1.html#c360_a_accelerated_data_lake_objects">Salesforce ヘルプ: データフェデレーションでのキャッシュまたはアクセラレーション</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_create_a_data_action_target_of_webhook_type">
+<h1 class="slds-text-heading_large">Web フックデータアクションターゲットの作成</h1>
+  
+  <p>データアクションイベントを Web フックターゲットに送信し、Salesforce によって生成された秘密鍵を使用してメッセージの整合性を保護します。Web フックは、要求駆動型ではなくイベント駆動型の API です。秘密鍵は、Salesforce から送信されたペイロード要求を検証します。Web フックは、<code>DataObjectDataChgEvent</code> 形式のイベントを含む HTTP ペイロードを転送します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d83886e70" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限セット</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d83886e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限セット">Web フックデータアクションターゲットを作成する</td>
+
+              <td headers="d83886e70" style="vertical-align:top;" class="slds-cell-wrap"><p>次のいずれかの権限セット:</p><ul>
+                  <li>Data Cloud アーキテクト</li>
+
+                  <li>Data Cloud 有効化マネージャー</li>
+
+                  <li>Data Cloud 有効化スペシャリスト </li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span><span>Data 360</span> で、[データアクション対象] タブに移動し、[<strong class="uicontrol">新規]</strong> をクリックします。</span>
+      </li><li>
+        <span>アクションターゲット名を入力します。</span>
+        <div>[アクションターゲットの API 参照名] 項目は自動入力されます。</div>
+      </li><li>
+        <span><strong class="uicontrol">[Web フック]</strong> を選択します。</span>
+      </li><li>
+        <span>Web フック イベントを公開する URL を入力し、[<strong class="uicontrol">保存]</strong> をクリックします。</span>
+      </li><li>
+        <span>秘密鍵を生成します。</span>
+        <div>有効または無効なデータアクションターゲットの秘密鍵のみを生成できます。</div>
+      </li><li>
+        <span>秘密鍵をコピーして、Web フックシステムを設定します。</span>
+        <div><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>{
+   "creationDateTime": "DateTime: Payload creation time at the service calling webhook",
+   "count": "Number: Count of events in this payload",
+   "schemas": [ { "schemaId": "Action Name of schema", schema : "Schema of Event Payload in Action" } ], //Array of Schemas for different event payload
+   "events": [Array of Data Object Data Change Event],
+}</code></pre></div>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.c360a_api.meta/c360a_api/c360a_api_webhook_data_action_targets_in_customer_data_platform.htm">Salesforce 開発者: Data 360 の Web フックデータアクションターゲット</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_create_a_dynamic_segment">
+<h1 class="slds-text-heading_large">動的セグメントの作成</h1>
+  
+  <p>データモデルオブジェクト (DMO) に基づいて動的セグメントを作成し、セグメントメンバーシップ DMO にデータを保持せずにセグメントクエリを実行します。実行時に動的値を受け入れるプレースホルダーを使用して属性検索条件を定義します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d79560e69" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要な権限セット</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d79560e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要な権限セット">セグメントを作成する</td>
+
+              <td headers="d79560e69" style="vertical-align:top;" class="slds-cell-wrap"><p>次の権限セットのいずれか:</p><a name="c360_a_create_a_dynamic_segment__ul_jjg_cpm_d2c"></a><ul id="c360_a_create_a_dynamic_segment__ul_jjg_cpm_d2c">
+                  <li>Data Cloud アーキテクト</li>
+
+                  <li>Data Cloud 有効化マネージャー</li>
+
+                  <li>Data Cloud 有効化スペシャリスト</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Data 360 ユーザーインターフェースまたは接続 API を使用して動的セグメントをスケジュールまたは公開することはできません。<a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.automate_flow_build_create_broadcast_flow.htm&amp;language=ja&amp;type=5"><u>ブロードキャスト フロー</u></a>を介した API コールを使用して動的セグメントを実行し、実行時に動的値を指定します。</div></div></div>
+</div>
+    <ol><li>
+        <span><span>Data 360</span> で、[<strong class="uicontrol">セグメント]</strong> をクリックします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[新規]</strong> をクリックします。</span>
+      </li><li>
+        <span>[<strong class="uicontrol">ビジュアルビルダーを使用</strong>] を選択します。</span>
+      </li><li>
+        <span>[<strong class="uicontrol">動的セグメント]</strong>を選択し、<strong class="uicontrol">[次へ</strong>]をクリックします。</span>
+      </li><li>
+        <span>セグメントの詳細を入力します。</span>
+        <ol>
+          <li>
+            <span>データスペースを選択します。</span>
+          </li>
+
+          <li>
+            <span>[セグメント対象] で、セグメントの構築の基盤となる DMO を選択します。</span>
+          </li>
+
+          <li>
+            <span>セグメントに識別しやすい一意の名前を付けます。</span>
+          </li>
+
+          <li>
+            <span>セグメントのルックバック期間を入力します。</span>
+            <div>デフォルトは 90 日です。ルックバックは最大で 2 年まで設定できます。&nbsp; ドロップダウンから [<kbd>Days (日数</kbd>)] を選択した場合、最大 360 日の期間を設定できます。</div>
+            <div>セグメントを作成するときのルックバックオプションは、組織の最大許容期間 (最大 2 年など) に基づきます。この設定では、選択可能な初期のデータ範囲を定義します。セグメントでは、コンテナで特定の条件を適用できます。これは、デフォルトのルックバック期間とは異なる場合があります。そのため、セグメントレベルのルックバックが 90 日に設定され、コンテナ条件が 60 日に設定されている場合、コンテナ条件が優先され、データは 60 日間のみ取り込まれます。</div>
+          </li>
+
+        </ol>
+      </li><li>
+        <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_create_a_marketing_cloud_data_action_target">
+<h1 class="slds-text-heading_large">Marketing Cloud Engagement データアクションターゲットの作成</h1>
+  
+  <p><span>Data 360</span>から転送された行動またはトランザクションイベントデータに基づいて、顧客に自動メールとジャーニーを送信します。データモデルオブジェクト (DMO) と計算済みインサイトから顧客へのメールとジャーニーをトリガーします。たとえば、顧客が商品を購入し、Web サイトで「インストールマニュアル」を検索するとします。ハウツー動画またはインストール手順が記載されたメールを顧客に送信するイベントをトリガーします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+  <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d167278e69" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限セット</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d167278e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限セット">Marketing Cloud Engagement データアクションターゲットを作成する</td>
+
+              <td headers="d167278e69" style="vertical-align:top;" class="slds-cell-wrap"><p>次のいずれかの権限セット:</p><ul>
+                  <li>Data Cloud アーキテクト</li>
+
+                  <li>Data Cloud 有効化マネージャー</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table><p>データアクションターゲットを作成する前に、次の前提条件を完了します。</p><ul>
+        <li><span>Data 360</span> で Marketing Cloud Engagement 接続を設定します。</li>
+
+        <li>Email Studio から Content Builder でメールテンプレートを作成し、すべての必須項目を入力します。テンプレートベース、テキストのみ、または HTML メール種別を使用します。</li>
+
+        <li>Marketing Cloud Engagement の登録者リストには、登録者キー、名と姓、メールアドレスが含まれます。</li>
+
+        <li>Marketing Cloud に移動しなくても、<span>Data 360</span> で 1 回のクリックでデータアクションの Journey Builder API イベントのデータエクステンションを作成できます。詳細は、「<a target="_blank" href="ingest_connect-1.html#c360_a_create_a_data_extension_in_data_cloud"><u>Create a Data Extension</u></a> in Data 360」を参照してください。または、Marketing Cloud でデータエクステンションを手動で作成するには、まず API イベントの Journey Builder で目的のジャーニーを作成します。<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> ジャーニーエントリソースが API イベント種別であり、そのデータエクステンションのすべての項目が null 可能である必要があります。主オブジェクトと関連オブジェクトのデータエクステンション属性名は、<span>Data 360</span> で選択したデータモデルオブジェクトのオブジェクト API 参照名で始まり、アンダースコア、属性 API 参照名が続く必要があります。たとえば、Shopping_Events__dlm_deviceId__c や Individual_deviceId__c などです。主オブジェクトと関連オブジェクトに同じデータエクステンションを使用できます。これらのオブジェクトを使用する複数のデータアクションがある場合、データエクステンションを再利用します。</div></div></div>
+</li>
+
+        <li>ビジネスユニットを選択し、<span>Data 360</span> でマッピングを有効にします。</li>
+
+      </ul>
+</div>
+  <ol><li>
+        <span><span>Data 360</span> で、[データアクション対象] タブに移動し、<strong class="uicontrol">[新規]</strong> をクリックします。</span>
+      </li><li>
+        <span>データアクション対象名を入力します。</span>
+        <div>[API 参照名] 項目は自動的に入力されます。</div>
+      </li><li>
+        <span>データアクションターゲット種別として、[<strong class="uicontrol">Marketing Cloud]</strong> を選択します。</span>
+      </li><li>
+        <span>登録者が存在するビジネスユニットを選択します。</span>
+        <div>
+          <p>複数のMarketing Cloud Engagementインスタンス(EID)が<span>Data 360</span>組織に接続されている場合、ビジネスユニットリストには、関連付けられているすべてのビジネスユニットが表示されます。</p>
+        </div>
+      </li><li>
+        <span>対象として <strong class="uicontrol">[メール]</strong> または <strong class="uicontrol"> [Journey Builder API イベント]</strong> を選択します。</span>
+      </li><li>
+        <span>データアクション条件を満たしたときに送信するメールテンプレートまたは Journey Builder API イベントを選択します。</span>
+        <div>
+          <p>[Journey Builder API Event (Journey Builder API イベント)] を選択しない場合、データアクションターゲットおよび対応するデータアクションの状況はドラフトに設定されます。有効に設定するには、<span>Data 360</span> 内でデータアクションの自動的な<a title="Data 360 で直接、データアクションの Journey Builder API イベントのデータエクステンションをすばやく作成します。この自動化プロセスにより、Marketing Cloud Engagement にアクセスする必要がなくなります。" href="ingest_connect-1.html#c360_a_create_a_data_extension_in_data_cloud">データエクステンション作成</a>方法を使用し、データアクションターゲットの Journey Builder API イベントを選択します。</p>
+        </div>
+      </li><li>
+        <span>登録者を絞り込むには、[選択したビジネスユニットの登録者にのみイベントを<strong class="uicontrol">送信] を</strong>選択します。</span>
+        <div>選択したビジネスユニットに登録者キーが対応付けられていないが、エンゲージメントの親ビジネスユニットで使用できる登録者にメールテンプレートまたはジャーニーを送信しない場合、このオプションを選択します。</div>
+      </li><li>
+        <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+      </li></ol>
+
+  <div><p>既存のメールテンプレートを変更して別のメールを送信する場合は、更新されたメールテンプレートを使用して別のデータアクションターゲットを作成します。</p></div>
+ 
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Data 360インスタンスを作成したら、Marketing Cloud Engagementやその他のソースからデータの取り込みと有効化の範囲を制御します。Data 360と統合する前に、エンゲージメント ユーザーのデフォルトのビジネス ユニット(BU)がエンタープライズID(EID)に設定されていることを確認します。データマッピングとセグメントのデータの取得元 (取り込みとも呼ばれる) を Data 360 に指示するようにデータソースを設定します。複数の EID を 1 つの Data 360 組織に接続できます。各 EID には Data 360 への独自の接続があります。これらの接続ごとに、データバンドルまたはデータエクステンションを使用して複数のデータストリームを設定できます。各接続には、独自のビジネスユニットとデータスペースの対応付け設定もあります。Data 360 では、Engagement Enterprise 2.0 アカウント接続のみがサポートされます。" href="setup_admin-2.html#c360_a_set_up_marketing_cloud_connection">Data 360 での Marketing Cloud Engagement 接続の設定</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_create_a_real_time_data_action">
+<h1 class="slds-text-heading_large">Data 360 でのリアルタイムデータアクションの作成</h1>
+ 
+ <p>アラートまたはイベントを送信し、リアルタイムで応答を取得するリアルタイムデータアクションを作成します。リアルタイムデータアクションを使用して、チャネル、商品、取引先、サービス、個人レベルなど、さまざまなレベルのリアルタイムイベントとインサイトに焦点を絞ります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+  <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d30836e68" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d30836e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">リアルタイムデータアクションを作成する</td>
+
+       <td headers="d30836e68" style="vertical-align:top;" class="slds-cell-wrap"><p>次のいずれかの権限セット:</p><ul>
+         <li>Data Cloud アーキテクト</li>
+
+         <li>Data Cloud 有効化マネージャー</li>
+
+        </ul>
+</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d30836e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">カスタムリアルタイムデータグラフイベントをトリガーとする自動化イベントトリガーフローを参照、保存、有効化する</td>
+
+       <td headers="d30836e68" style="vertical-align:top;" class="slds-cell-wrap"><p>Data Cloud アーキテクト</p><p>または</p><p>次のすべての権限。</p><ul>
+         <li>「フローの管理」</li>
+
+         <li>「設定の参照」</li>
+
+         <li>「すべてのデータの参照」</li>
+
+         <li>Data Cloud ユーザー</li>
+
+         <li>データアクション対象、データアクション対象定義、データアクション、データアクション定義、データアクション対象リレーションに対する「作成」、「参照」、「更新」、「削除」、「すべて表示」 </li>
+
+         <li>データモデルオブジェクト、データモデル項目、計算済みインサイトオブジェクトに対する「参照」</li>
+
+        </ul>
+</td>
+
+      </tr>
+     </tbody></table></div>
+  <ol><li>
+    <span><span>Data 360</span> の [データアクション] タブで、<strong class="uicontrol">[新規]</strong> をクリックします。
+    </span>
+   </li><li>
+    <span>[Real-Time Data Action] を選択し、[<strong class="uicontrol">Next] を</strong>クリックします。[フロー] ページにリダイレクトされます。</span>
+   </li><li>
+    <span>イベント [<strong class="uicontrol">Custom Real-Time Data Graph Event</strong> (カスタムリアルタイムデータグラフイベント)] を使用して、自動化イベントトリガーフローを作成します。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.automate_flow_build_create_automation_event_triggered_flow.htm&amp;language=ja&amp;type=5">Create a Automation</a> Event-Triggered Flow (オートメーションイベントトリガーフローの作成)」を参照してください。</span>
+    <div>オートメーションイベントトリガーフローは、Salesforce Foundation が有効になっている場合にのみ使用できます。詳細は、アカウントエグゼクティブにお問い合わせください。</div>
+   </li></ol>
+
+ 
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_create_a_realtime_segment">
+<h1 class="slds-text-heading_large">リアルタイムセグメントの作成</h1>
+  
+  <p>オンデマンドでミリ秒で完了するリアルタイムセグメントを作成します。セグメントをリアルタイムデータグラフで使用できるようにするには、セグメントメンバーシップ DMO オブジェクトの [セグメント ID] 項目と [タイムスタンプ] 項目をリアルタイムデータグラフに追加します。除外条件とネストされたバッチセグメントが含まれるリアルタイムセグメントは使用できません。リアルタイムセグメントでは、セグメント数と手動公開も使用できません。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div id="c360_a_create_a_realtime_segment__prereq_pbt_g1n_zbc"><a name="c360_a_create_a_realtime_segment__prereq_pbt_g1n_zbc"></a><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+                        <tr class="">
+                            <th id="d65973e69" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+                        </tr>
+                    </thead><tbody>
+                        <tr class="">
+                            <td headers="d65973e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">リアルタイムセグメントを作成する</td>
+
+                            <td headers="d65973e69" style="vertical-align:top;" class="slds-cell-wrap"><p>権限セット</p><a name="c360_a_create_a_realtime_segment__ul_rgj_bx4_gfc"></a><ul id="c360_a_create_a_realtime_segment__ul_rgj_bx4_gfc">
+                                    <li>Data Cloud アーキテクト</li>
+
+                                </ul>
+</td>
+
+                        </tr>
+                    </tbody></table></div>
+    <a name="c360_a_create_a_realtime_segment__steps_rbt_g1n_zbc"></a><ol id="c360_a_create_a_realtime_segment__steps_rbt_g1n_zbc"><li>
+        <span><span>Data 360</span> で、[<strong class="uicontrol">セグメント]</strong> をクリックします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[新規]</strong> をクリックします。</span>
+      </li><li>
+        <span>[<strong class="uicontrol">ビジュアルビルダーを使用</strong>] を選択します。</span>
+      </li><li>
+        <span>[<strong class="uicontrol">Real-Time Segment</strong>]を選択し、[<strong class="uicontrol">Next]</strong>をクリックします。</span>
+      </li><li>
+        <span>セグメントの詳細を入力します。</span>
+        <a name="c360_a_create_a_realtime_segment__substeps_sbt_g1n_zbc"></a><ol id="c360_a_create_a_realtime_segment__substeps_sbt_g1n_zbc">
+          <li>
+            <span>データスペースを選択します。</span>
+          </li>
+
+          <li>
+            <span>セグメントに識別しやすい一意の名前を付けます。</span>
+          </li>
+
+          <li>
+            <span>セグメントを作成するリアルタイムデータグラフを選択します。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Data 360 でデータグラフを作成する前に、プライマリ DMO として使用する既存のデータモデルオブジェクト (DMO) を決定します。プライマリ DMO によって、データグラフに含めることができる関連オブジェクトが決まります。" href="insights_query-2.html#c360_a_create_a_data_graph">データグラフの作成</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_create_a_segment">
+<h1 class="slds-text-heading_large">Data 360 での標準セグメントの作成</h1>
+  <p>データモデルオブジェクトに基づいて標準セグメントを作成し、セグメントを有効化対象に公開します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d26603e68" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要な権限セット</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d26603e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要な権限セット">セグメントを作成する</td>
+
+              <td headers="d26603e68" style="vertical-align:top;" class="slds-cell-wrap"><p>次の権限セットのいずれか:</p><a name="c360_a_create_a_segment__ul_jjg_cpm_d2c"></a><ul id="c360_a_create_a_segment__ul_jjg_cpm_d2c">
+                  <li>Data Cloud アーキテクト</li>
+
+                  <li>Data Cloud 有効化マネージャー</li>
+
+                  <li>Data Cloud 有効化スペシャリスト</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+    <div id="c360_a_create_a_segment__context_create_seg_q3c"><a name="c360_a_create_a_segment__context_create_seg_q3c"></a><p>選択したデータモデルオブジェクト (DMO) に基づいて特定の利用者を定義するように統合データを絞り込みます。セグメントを作成したら、定義したスケジュールに従って有効化対象に公開します。セグメントスケジュールを設定するときに、標準公開と高速公開のいずれかを選択できます。</p></div>
+    <ol><li>
+        <span>Data Cloud で <strong class="uicontrol">[セグメント]</strong> をクリックします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[新規]</strong> をクリックします。</span>
+      </li><li>
+        <span>[<strong class="uicontrol">ビジュアルビルダーを使用</strong>] を選択します。</span>
+      </li><li>
+        <span>[<strong class="uicontrol">標準セグメント]</strong>を選択し、<strong class="uicontrol">[次へ</strong>]をクリックします。</span>
+      </li><li>
+        <span>セグメントの詳細を入力します。</span>
+        <ol>
+          <li>
+            <span>データスペースを選択します。</span>
+          </li>
+
+          <li>
+            <span>[セグメント対象] で、セグメントの作成元となるデータモデルオブジェクト (DMO) を選択します。</span>
+          </li>
+
+          <li>
+            <span>セグメントに識別しやすい一意の名前を付けます。</span>
+          </li>
+
+          <li>
+            <span>セグメントの<strong class="uicontrol">ルックバックウィンドウ</strong>を設定します。</span>
+            <div>デフォルトは 90 日です。最大 2 年間設定できます。ドロップダウンから [<kbd>日数]</kbd> を選択した場合、組織の要件に応じて最大 360 日の期間を設定できます。</div>
+            <div>
+              <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div id="c360_a_create_a_segment__note_lookback_window_q3c" style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><a name="c360_a_create_a_segment__note_lookback_window_q3c"></a><span class="slds-text-title_caps">メモ</span> [ルックバック期間] オプションは、組織の最大許容期間に基づきます。この設定では、選択可能な初期のデータ範囲を定義します。セグメントでは、セグメントレベルの [ルックバックウィンドウ] とは異なる可能性があるコンテナで特定の条件を適用できます。たとえば、セグメントレベルの [ルックバック期間] が 90 日に設定され、コンテナが 60 日を指定した場合、コンテナの条件が優先され、データは 60 日間のみ取り込まれます。</div></div></div>
+
+            </div>
+          </li>
+
+        </ol>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>セグメントの公開方法を選択します。</span>
+        <div>標準公開種別と高速公開種別の両方で、セグメンテーションルールで設定可能なルックバック期間がサポートされます。</div>
+      </li><li>
+        <span>有効化対象にセグメントを公開するタイミングと頻度を定義します。</span>
+        <div>セグメント検索条件を追加する場合は、[<strong class="uicontrol">更新しない</strong>] を選択して後でスケジュールを追加することもできます。</div>
+      </li><li>
+        <span>(省略可能) [<strong class="uicontrol">プレビュー] を</strong>クリックしてセグメント利用者を表示し、その正確性を確認します。含めるはずのメンバーに異常や欠落があった場合は、セグメントルールとコンテナ設定を確認します。</span>
+        <div>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div id="c360_a_create_a_segment__note_cnz_5ls_3hc" style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><a name="c360_a_create_a_segment__note_cnz_5ls_3hc"></a><span class="slds-text-title_caps">メモ</span> セグメントプレビュー機能は、セグメント表示または編集ルール権限とデータエクスプローラーのデータへのアクセス権を持つユーザーが使用できます。</div></div></div>
+
+        </div>
+      </li><li>
+        <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+      </li></ol>
+
+    <div id="c360_a_create_a_segment__result_create_seg_q3c"><a name="c360_a_create_a_segment__result_create_seg_q3c"></a><p>Salesforce に設定できる最大セグメント数は、9,950 個です。</p></div>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_example.png" style="margin-bottom:0;"></span></div><div id="c360_a_create_a_segment__example_create_seg_q3c" style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><a name="c360_a_create_a_segment__example_create_seg_q3c"></a><span class="slds-text-title_caps">例</span> 
+      <p>ある小売会社は、過去 60 日間に購入した顧客を対象とする標準セグメントを作成します。統合個人 DMO を選択し、60 日のルックバック期間を設定し、月曜日から金曜日まで 1 時間の間隔で高速公開を選択して、更新されたオーディエンスデータを Marketing Cloud Engagement の有効化対象にすばやく転送します。</p>
+    </div></div></div>
+    <div id="c360_a_create_a_segment__postreq_create_seg_q3c"><a name="c360_a_create_a_segment__postreq_create_seg_q3c"></a><p>セグメントを作成したら、有効化対象に公開して有効化します。同じ DMO を使用して追加のセグメントを作成したり、コンテナ条件を使用してセグメントルールを絞り込んだりすることもできます。</p></div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="segment_activation-3.html#c360_a_segment_on">セグメント基準</a></strong><br>セグメント基準は、セグメントを作成するために使用される対象オブジェクトを定義します。取り込み時にプロファイルまたはエンゲージメント種別としてマークされたオブジェクトを選択できます。たとえば、統合個人、統合世帯、取引先、予約、販売注文などでセグメントを作成できます。</li><li class="slds-p-bottom_small"><strong><a href="segment_activation-3.html#c360_a_manage_segment_schedules">Data 360 セグメントスケジュールの管理</a></strong><br>セグメントスケジュールオプションを使用すると、セグメントの公開頻度を詳細に制御できます。セグメントをスケジュールして、ニーズに最適な頻度で実行できます。</li><li class="slds-p-bottom_small"><strong><a href="segment_activation-3.html#c360_a_publish_segment">Data 360 でのセグメントの公開</a></strong><br><span>Data 360</span> でセグメントを定義したら、いつでも有効化対象に公開したり、セグメントの作成時のスケジュールに基づいて公開したりできます。標準の公開スケジュールは 12 時間または 24 時間です。セグメントスケジュールはそのプロパティを編集して変更することもできます。セグメント公開の同時実行制限に達すると、<span>Data 360</span>は他のセグメントの公開を延期します。この延期は、同時に実行されるセグメント数が制限を下回るまで続行されます。つまり、特定の時間にスケジュールされたセグメントは、そのスケジュールされた時間に公開が開始されない場合があります。</li><li class="slds-p-bottom_small"><strong><a href="segment_activation-3.html#c360_a_segment_membership_data">セグメントメンバーシップデータモデルオブジェクト</a></strong><br>セグメントを公開するたびに、セグメントメンバーシップ情報を保存するデータモデルオブジェクト (DMO) が作成または更新されます。セグメントに含まれるユーザーを識別するには、セグメントメンバーシップ DMO (種別は Segment_Membership) を使用します。DMO に連動関係がない場合は、セグメントメンバーシップ DMO を手動で削除できます。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_edit_segment">セグメントの編集</a></strong><br>Data 360 でセグメントを作成したら、そのルールやプロパティを編集して更新を提供したり、目的を変更したりできます。セグメント名を変更しても、セグメント API 参照名は変更されません。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Data 360 で最も一般的なセグメントエラーを解決するためのヒントを紹介します。" href="segment_activation-3.html#c360_a_segmentation_troubleshooting">セグメントエラーのトラブルシューティング</a></li><li><a title="セグメンテーションにより、データアナリストは Tableau で分析したデータの関連部分を選定し、セグメントとして Data 360 にシームレスに転送できます。" href="#c360_a_create_segments_to_data_cloud">Data 360 へのビジュアルセグメントの作成</a></li><li><a target="_blank" href="https://help.tableau.com/current/online/en-us/segments.htm">Tableau ヘルプ: Data 360 へのビジュアルセグメントの作成</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_create_a_waterfall_segment">
+<h1 class="slds-text-heading_large">ウォーターフォールセグメントの作成</h1>
+  
+  <p>複数のオファーがあるキャンペーンを実行している場合、ウォーターフォールセグメントを使用して既存のセグメントのリストを優先度順に処理します。主な目標は、複数のセグメントの対象となる個人を、一致する優先度が最も高いセグメントにのみ配置することです。これにより、相互に排他的な一連のオーディエンスが作成されます。これは、顧客に最も関連性の高いオファーを 1 つだけ送信したいキャンペーンに最適です。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d132852e69" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要な権限セット</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d132852e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要な権限セット">ウォーターフォールセグメントを作成する</td>
+
+              <td headers="d132852e69" style="vertical-align:top;" class="slds-cell-wrap"><p>次の権限セットのいずれか:</p><a name="c360_a_create_a_waterfall_segment__ul_jjg_cpm_d2c"></a><ul id="c360_a_create_a_waterfall_segment__ul_jjg_cpm_d2c">
+                  <li>Data Cloud アーキテクト</li>
+
+                  <li>Data Cloud 有効化マネージャー</li>
+
+                  <li>Data Cloud 有効化スペシャリスト</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+    <a name="c360_a_create_a_waterfall_segment__steps_xzp_1wq_vbc"></a><ol id="c360_a_create_a_waterfall_segment__steps_xzp_1wq_vbc"><li>
+        <span><span>Data 360</span> で、[<strong class="uicontrol">セグメント]</strong> をクリックします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[新規]</strong> をクリックします。</span>
+      </li><li>
+        <span>[<strong class="uicontrol">ビジュアルビルダーを使用</strong>] を選択します。</span>
+      </li><li>
+        <span>[<strong class="uicontrol">Waterfall Segment</strong> (ウォーターフォールセグメント)] を選択し、[<strong class="uicontrol">Next (次</strong>へ)] をクリックします。</span>
+      </li><li>
+        <span>セグメントの詳細を入力します。</span>
+        <a name="c360_a_create_a_waterfall_segment__substeps_yzp_1wq_vbc"></a><ol id="c360_a_create_a_waterfall_segment__substeps_yzp_1wq_vbc">
+          <li>
+            <span>データスペースを選択します。</span>
+          </li>
+
+          <li>
+            <span>[セグメント対象] で、セグメントの作成元となるデータモデルオブジェクト (DMO) を選択します。リストには、取り込み時にプロファイル種別としてマークされたオブジェクトが表示されます。</span>
+          </li>
+
+          <li>
+            <span>ウォーターフォールセグメントに識別しやすい一意の名前を付けます。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>有効化対象にウォーターフォールセグメントを公開するタイミングと頻度を定義します。</span>
+        <div>セグメント・フィルタを追加する場合は、「<strong class="uicontrol">更新しない</strong>」を選択して後でスケジュールを追加することもできます。処理スケジュールはウォーターフォール全体に適用されます。高速セグメント公開は、ウォーターフォールセグメントでは使用できません。</div>
+      </li><li>
+        <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+      </li><li>
+        <span>セグメントをキャンバスにドラッグし、優先度に従って並び替えて、ウォーターフォールを作成します。</span>
+        <div>最大 20 個のセグメントを追加できます。選択した DMO に基づいており、まだウォーターフォールになっていない有効なセグメントのみが表示されます。セグメントは 1 つのウォーターフォールにのみ存在できます。ネストされたセグメントをウォーターフォールセグメントに含めることはできません。相互に排他的な各セグメントの数は、ウォーターフォールセグメントを保存して公開すると表示されます。</div>
+      </li><li>
+        <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+        <div>ウォーターフォールセグメントの保存には時間がかかります。ウォーターフォールページから移動しても処理には影響しません。</div>
+      </li></ol>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> 
+      <p>この例では、ウォーターフォールセグメントで相互に排他的な利用者を作成し、顧客が 1 つの提案のみを受信する方法を示します。</p>
+      <p>3 つの個別のプロモーションオファーと、対象とする顧客の 3 つのセグメントがあります。</p>
+      <a name="c360_a_create_a_waterfall_segment__ul_o3k_vkj_mhc"></a><ul id="c360_a_create_a_waterfall_segment__ul_o3k_vkj_mhc">
+        <li>オファー 1 (最良のオファー): <dfn>価値の高い顧客</dfn>には 25% 割引</li>
+
+        <li>オファー2(中間オファー):<dfn>新規顧客</dfn>の場合は15%割引(過去90日間に参加)</li>
+
+        <li>オファー 3 (一般オファー): <dfn>すべての有効</dfn>なお客様の 10% 割引</li>
+
+      </ul>
+
+      <p>顧客は一度に複数のセグメントに存在できます。たとえば、価値の高い顧客 (オファー 1) は新規顧客 (オファー 2) でもあり、間違いなくすべての有効な顧客 (オファー 3) でもあります。このユーザーに 3 つの異なる提案をメールで送信するのではなく、対象になる最適な提案 (25% 割引) のみを送信するとします。</p>
+      <p>ウォーターフォールセグメントを作成し、既存のセグメントを次の優先度でキャンバスにドラッグします。</p>
+      <a name="c360_a_create_a_waterfall_segment__ol_id4_glj_mhc"></a><ol id="c360_a_create_a_waterfall_segment__ol_id4_glj_mhc">
+        <li>価値の高い顧客 (優先度 1)</li>
+
+        <li>新規顧客 (優先度 2)</li>
+
+        <li>すべての有効な顧客 (優先度 3)</li>
+
+      </ol>
+      <p>ウォーターフォールセグメントが実行されると、リストに対して各顧客が順番に評価され、一致が見つかるとすぐに停止します。</p>
+      <a name="c360_a_create_a_waterfall_segment__ul_d4v_klj_mhc"></a><ul id="c360_a_create_a_waterfall_segment__ul_d4v_klj_mhc">
+        <li>顧客 A (Sarah): Sarah は価値の高い顧客であり、新規顧客です。<a name="c360_a_create_a_waterfall_segment__ul_p4p_nlj_mhc"></a><ul id="c360_a_create_a_waterfall_segment__ul_p4p_nlj_mhc">
+            <li>優先度 1 (高価値) と一致するか?はい。</li>
+
+            <li> 結果: Sarah は <dfn>High-Value Customers</dfn> グループに配置されます。ウォーターフォールは彼女の処理を停止します。技術的には対象であっても、<dfn>新規顧客</dfn>グループまたは<dfn>すべての有効顧客</dfn>グループには配置されません。彼女は 25% の割引オファーのみを受けています。</li>
+
+          </ul>
+</li>
+
+        <li>顧客 B (David): David は価値の高い顧客ではありませんが、新規顧客です。<a name="c360_a_create_a_waterfall_segment__ul_uzs_5lj_mhc"></a><ul id="c360_a_create_a_waterfall_segment__ul_uzs_5lj_mhc">
+            <li> 優先度 1 (高価値) と一致するか?いいえ。</li>
+
+            <li> 優先度 2 (新規顧客) と一致しますか?はい。</li>
+
+            <li> 結果: David は <dfn>New Customers</dfn> グループに配置されます。ウォーターフォールは彼の処理を停止します。彼は 15% の割引オファーのみを受けています。</li>
+
+          </ul>
+</li>
+
+        <li>顧客 C (Maria): Maria は重要顧客でも新規顧客でもないが、有効な顧客である。<a name="c360_a_create_a_waterfall_segment__ul_fpy_1mj_mhc"></a><ul id="c360_a_create_a_waterfall_segment__ul_fpy_1mj_mhc">
+            <li> 優先度 1 (高価値) と一致するか?いいえ。</li>
+
+            <li> 優先度 2 (新規顧客) と一致しますか?いいえ。</li>
+
+            <li> 優先度 3 (すべての有効な顧客) と一致しますか?はい。</li>
+
+            <li> 結果: Maria は [<dfn>すべての有効顧客</dfn>] グループに入れられ、10% 割引のオファーを受け取ります。</li>
+
+          </ul>
+</li>
+
+      </ul>
+
+      <p>ウォーターフォールセグメントの最終出力は、重複しない 3 つの個別の顧客リストで、誰も複数のプロモーションを受け取らないようにします。</p>
+    </div></div></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_create_activation_template">
+<h1 class="slds-text-heading_large">有効化テンプレートの作成</h1>
+ 
+ <p>有効化テンプレートを作成して、チャネルの選択、ソースの優先度、連絡先の検索条件、強化データ、メンバーシップの絞り込みなど、再利用可能な有効化設定ロジックを定義します。新しい有効化を作成するときにこの設定を適用するか、セグメントトリガーフローで参照します。テンプレートは DMO と有効化対象の組み合わせに基づいて作成されます。これにより、特定の有効化対象で同じテンプレートを再利用できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+  <div id="c360_a_create_activation_template__prereq_j3p_v4h_q3c"><a name="c360_a_create_activation_template__prereq_j3p_v4h_q3c"></a><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><p>テンプレートを作成する前に、次のことを確認してください。</p><a name="c360_a_create_activation_template__ul_prereq_q3c"></a><ul id="c360_a_create_activation_template__ul_prereq_q3c">
+    <li>Data 360 組織に 1 つ以上のデータスペースが設定されている。</li>
+
+    <li>有効化に関連するデータモデルオブジェクト (DMO) がマッピングされます。</li>
+
+   </ul>
+<table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d24679e82" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d24679e82" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">有効化テンプレートを作成する</td>
+
+       <td headers="d24679e82" style="vertical-align:top;" class="slds-cell-wrap"><p>次の権限セットのいずれか:</p><a name="c360_a_create_activation_template__ul_jjg_cpm_d2c"></a><ul id="c360_a_create_activation_template__ul_jjg_cpm_d2c">
+         <li>Data Cloud アーキテクト</li>
+
+         <li>Data Cloud 有効化マネージャー</li>
+
+         <li>Data Cloud 有効化スペシャリスト</li>
+
+        </ul>
+</td>
+
+      </tr>
+     </tbody></table></div>
+  <ol><li>
+    <span><span>Data 360</span> で、[<strong class="uicontrol">有効化]</strong> に移動し、[<strong class="uicontrol">新規] を</strong>クリックします。</span>
+   </li><li>
+    <span><strong class="uicontrol">[テンプレート]</strong> を選択し、[<strong class="uicontrol">続行]</strong> をクリックします。</span>
+   </li><li>
+    <span>データスペースを選択します。</span>
+   </li><li>
+    <span>個人や統合個人などのデータモデルオブジェクト (DMO) を選択します。</span>
+    <div>テンプレートは、同じ DMO を使用する有効化またはフローにのみ適用できます。</div>
+   </li><li>
+    <span>有効化プラットフォームを選択します。</span>
+    <div>Marketing Cloud、Data Cloud、S3、エコシステム、戦略的パートナー目標など、有効化先に一致するプラットフォーム種別を選択します。</div>
+   </li><li>
+    <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+   </li><li>
+    <span>テンプレートに含める連絡先 (メール、電話 (SMS)、WhatsApp など) を選択します。</span>
+   </li><li>
+    <span>(省略可能) 連絡先ごとに、<strong class="uicontrol">[編集]</strong> をクリックしてソースの優先順序を定義します。</span>
+    <a name="c360_a_create_activation_template__substeps_td5_crh_q3c"></a><ol id="c360_a_create_activation_template__substeps_td5_crh_q3c">
+     <li>
+      <span>[<strong class="uicontrol">Add Another Source</strong> (別のソースを追加)] をクリックします。</span>
+     </li>
+
+     <li>
+      <span>ソース (Amazon S3 など) を選択し、ソースオブジェクト (リード、見込み客、顧客など) を指定して、特定のレコードタイプに優先度を付けます。</span>
+     </li>
+
+     <li>
+      <span>優先度の高いソースが最初に表示されるように、ソース優先度テーブルの行を配置します。</span>
+     </li>
+
+    </ol>
+   </li><li>
+    <span>(省略可能) 連絡先の [<strong class="uicontrol">Add Filters (検索条件</strong>を追加)] をクリックして、連絡先 DMO または同意 DMO に適用される検索条件を定義します。</span>
+    <a name="c360_a_create_activation_template__substeps_filters_q3c"></a><ol id="c360_a_create_activation_template__substeps_filters_q3c">
+     <li>
+      <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+     </li>
+
+     <li>
+      <span>連絡先ごとに、<strong class="uicontrol">［Add Filters］</strong> をクリックして連絡先フィルタを追加します。</span>
+     </li>
+
+     <li>
+      <span>属性ライブラリからキャンバスに属性をドラッグします。連絡先 DMO または同意 DMO の属性を使用します (GDPR やメッセージング同意検索条件を追加する場合など)。</span>
+     </li>
+
+     <li>
+      <span>検索条件を定義します。ネストされたロジックを適用するには、AND または OR 演算子を使用します。最大 3 つのレベルをネストできます。</span>
+     </li>
+
+     <li>
+      <span><strong class="uicontrol">[完了]</strong> をクリックします。</span>
+     </li>
+
+    </ol>
+   </li><li>
+    <span>(省略可能) 有効化メンバーシップの絞り込みを設定して、セグメントメンバーを含める条件を定義します。</span>
+    <a name="c360_a_create_activation_template__substeps_membership_q3c"></a><ol id="c360_a_create_activation_template__substeps_membership_q3c">
+     <li>
+      <span>[<strong class="uicontrol">Activation Membership</strong>] で、[<strong class="uicontrol">Add Filters]</strong> をクリックします。</span>
+     </li>
+
+     <li>
+      <span>リストから属性をキャンバスにドラッグし、検索条件を定義します。</span>
+     </li>
+
+     <li>
+      <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+     </li>
+
+    </ol>
+   </li><li>
+    <span>(省略可能) テンプレートに直接属性または関連属性を含めるには、[<strong class="uicontrol">属性を追加</strong>] をクリックします。</span>
+    <a name="c360_a_create_activation_template__substeps_enrichment_q3c"></a><ol id="c360_a_create_activation_template__substeps_enrichment_q3c">
+     <li>
+      <span>最大 100 個の属性をキャンバスにドラッグします。</span>
+     </li>
+
+     <li>
+      <span>(省略可能) 選択した DMO ごとに、[<strong class="uicontrol">Add Filters (フィルタ</strong>を追加)] をクリックして属性レベルのフィルタを適用します。属性ライブラリからキャンバスに属性をドラッグし、検索条件を定義し、AND または OR 演算子を使用して最大 3 レベルのネストされたロジックを作成します。</span>
+     </li>
+
+     <li>
+      <span><strong class="uicontrol">[完了]</strong> をクリックして <strong class="uicontrol">[保存]</strong> をクリックします。</span>
+     </li>
+
+    </ol>
+   </li><li>
+    <span>選択した DMO ごとに、属性制限を設定します。</span>
+    <a name="c360_a_create_activation_template__substeps_limits_q3c"></a><ol id="c360_a_create_activation_template__substeps_limits_q3c">
+     <li>
+      <span>連絡先ごとに含める属性の最大値を選択します。</span>
+     </li>
+
+     <li>
+      <span>属性データの並び替え方法を選択します。</span>
+     </li>
+
+    </ol>
+   </li><li>
+    <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+   </li><li>
+    <span>テンプレートの名前と説明を入力します。</span>
+   </li><li>
+    <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+   </li></ol>
+
+  <div id="c360_a_create_activation_template__result_cwf_mrh_q3c"><a name="c360_a_create_activation_template__result_cwf_mrh_q3c"></a><p>有効化テンプレートを保存したら、サポートされるプラットフォームおよび DMO への有効化を作成するときに選択できます。セグメントトリガーフローで使用することもできます。</p></div>
+  <div id="c360_a_create_activation_template__postreq_q3c"><a name="c360_a_create_activation_template__postreq_q3c"></a><p>アクティベーションの作成時にテンプレートを使用するには、「<a title="有効化を作成するときに有効化テンプレートを使用すると、連絡先、ソースの優先度、検索条件、強化データなどの設定が自動的に入力されます。その後、有効化を保存する前にこれらの設定を確認して調整できます。" href="https://help.salesforce.com/s/articleView?id=data.c360_a_use_activation_template.htm&amp;language=ja&amp;type=5">Use an Activation</a> Template When Create an Activation」を参照してください。</p></div>
+ 
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_create_audiences_activation_target">
+<h1 class="slds-text-heading_large">Data 360 ロイヤルティ有効化対象の作成 </h1>
+  
+  <p>Loyalty Cloud で使用するセグメントを公開するには、<span>Data 360</span> で有効化対象を作成します。Salesforce に対して 1 つの有効化対象を作成できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d152237e72" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d152237e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">有効化対象を作成する</td>
+
+              <td headers="d152237e72" style="vertical-align:top;" class="slds-cell-wrap"><p>次のいずれかの権限セット:</p><ul>
+                  <li>Data Cloud アーキテクト</li>
+
+                  <li>Data Cloud 有効化マネージャー</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div><ol><li><span>[有効化対象] タブで、<strong class="uicontrol">[新規]</strong> をクリックします。</span></li><li><span>[<span>Data 360</span> (Loyalty)] を選択し、[<strong class="uicontrol">次へ</strong>] をクリックします。</span></li><li><span>名前と説明 (省略可能) を入力します。</span><ol><li><span>有効化対象を関連付けるデータスペースを選択します。</span><div>各データスペースには、Data Cloud ロイヤルティの有効化対象を 1 つのみ設定できます。</div></li>
+<li><span><strong class="uicontrol">[保存]</strong> をクリックします。</span></li>
+</ol></li></ol>
+<div><p><span>Data 360</span> Loyalty 有効化対象が作成されます。</p><p>DMO を有効化した場合、DMO のその後の有効化は変更されたレコードの更新/挿入になり、変更されていない古いレコードは変更されません。</p></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_create_commerce_activation_target">
+<h1 class="slds-text-heading_large">B2C Commerce 有効化対象の作成</h1>
+  
+  <p>セグメントを Commerce Cloud に公開するには、<span>Data 360</span> で有効化対象を作成します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+        <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+                        <tr class="">
+                            <th id="d228953e72" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+                        </tr>
+                    </thead><tbody>
+                        <tr class="">
+                            <td headers="d228953e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">有効化対象を作成する</td>
+
+                            <td headers="d228953e72" style="vertical-align:top;" class="slds-cell-wrap"><p>次のいずれかの権限セット:</p><ul>
+                                    <li>Data Cloud アーキテクト</li>
+
+                                    <li>Data Cloud 有効化マネージャー</li>
+
+                                </ul>
+</td>
+
+                        </tr>
+                    </tbody></table></div><ol><li><span>[有効化対象] タブで、<strong class="uicontrol">[新規]</strong> をクリックします。</span></li><li><span>[<strong class="uicontrol">B2C Commerce]</strong> を選択し、[<strong class="uicontrol">次へ]</strong> をクリックします。</span></li><li><span>名前と説明 (省略可能) を入力します。</span><ol><li><span>有効化対象を関連付けるデータスペースを選択します。</span></li>
+<li><span>コネクタを選択します。</span><div>選択したデータスペースによって、使用可能なコネクタが決まります。</div></li>
+<li><span><strong class="uicontrol">[保存]</strong> をクリックします。</span></li>
+</ol></li></ol>
+<div><p>Commerce Cloud 有効化対象が作成されます。</p></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_create_communication_capping_rules">
+<h1 class="slds-text-heading_large">通信制限ルールの作成</h1>
+  
+  <p>Data Cloud で通信制限のアクティベーション ターゲットに適用する制限ルールを作成します。上限ルールは、UI で作成するか、ルール条件を含む JSON ファイルをアップロードして作成できます。ルールは各パラメーターレベルで個別に適用することも、エンタープライズレベルで累積的に適用することもできます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d159730e61" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要な権限セット</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d159730e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要な権限セット">コミュニケーション制限ルールを作成する</td>
+
+              <td headers="d159730e61" style="vertical-align:top;" class="slds-cell-wrap"><p>次のいずれかの権限セット:</p><ul>
+                  <li>Data Cloud アーキテクト</li>
+
+                  <li>Data Cloud 有効化マネージャー</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>[Capping Rulesets (上限ルールセット)] タブで、[<strong class="uicontrol">新規] を</strong>選択します。</span>
+      </li><li>
+        <span>UI ワークフローを使用してルールを作成するには、[<strong class="uicontrol">Create from Scratch</strong> (ゼロから作成)] を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>ルールを設定します。</span>
+        <ol>
+          <li>
+            <span>[開始日] と [終了日] に、ルールが有効な期間を入力します。</span>
+          </li>
+
+          <li>
+            <span>ドロップダウンリストからパラメーター値を選択します。</span>
+            <div>使用可能なパラメーターは、コミュニケーション制限の設定方法に基づきます。</div>
+          </li>
+
+          <li>
+            <span>[頻度] で、ルールを適用する頻度を選択します。</span>
+          </li>
+
+          <li>
+            <span>制限種別を選択します。</span>
+            <div>[プロファイル] では、選択したパラメーターで絞り込まれた個人に上限コミュニケーションが制限されます。&nbsp;パラメーター制限は、チャネルおよびその他のパラメーター値に適用されます。</div>
+          </li>
+
+          <li>
+            <span>コミュニケーションチャネルを選択します。</span>
+          </li>
+
+          <li>
+            <span>[制限] に、選択したチャネルを介して送信できる通信の最大数を入力します。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>ルールを保存します。</span>
+      </li></ol>
+
+    <div><p>通信制限ルールが作成されます。必要な数のルールを作成できます。行のドロップダウンメニューを使用して、ルールを編集、削除、コピーできます。</p></div>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> 次のルール設定では、保険契約を購入した個人で富裕層が [中] に分類される個人には、1 日あたり 1 件までの SMS が送信されます。<ul><li>基幹業務: 保険</li>
+<li>純資産カテゴリ: 中</li>
+<li>制限種別: プロファイル</li>
+<li>制限: 1</li>
+<li>チャネル: SMS</li>
+<li>頻度: 毎日</li>
+</ul>
+</div></div></div>
+    <div><p>制限ルールを作成したら、コミュニケーション制限アクティベーション ターゲットを作成します。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_create_communication_capping_target">
+<h1 class="slds-text-heading_large">コミュニケーション制限の有効化対象の作成</h1>
+  
+  <p>Data Cloud の有効化時にセグメントメンバーシップの優先度と絞り込みを行う管理対象を作成します。Marketing Cloud Engagement、Microsoft Azure、および SFTP の目標に上限を設定できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+     <tr class="">
+      <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+     </tr>
+    </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d223034e61" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要な権限セット</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d223034e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要な権限セット">有効化対象を作成してコミュニケーション制限を使用する</td>
+
+              <td headers="d223034e61" style="vertical-align:top;" class="slds-cell-wrap"><p>次のいずれかの権限セット:</p><ul>
+                  <li>Data Cloud アーキテクト</li>
+
+                  <li>Data Cloud 有効化マネージャー</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>Data Cloud で、[<strong class="uicontrol">有効化対象</strong>] をクリックし、[<strong class="uicontrol">新規]</strong> をクリックします。</span>
+      </li><li>
+        <span>有効化プラットフォームを選択し、[<strong class="uicontrol">次へ</strong>] をクリックします。</span>
+      </li><li>
+        <span>[<strong class="uicontrol">Communication Capping Activation Target</strong> (コミュニケーション制限の有効化対象)] を選択し、[<strong class="uicontrol">次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>有効化対象の名前と説明 (省略可能) を入力します。</span>
+      </li><li>
+        <span>データスペースを選択します。</span>
+        <div>コミュニケーション制限の有効化対象は、コミュニケーション制限インスタンスにすでに関連付けられているデータスペースでのみ定義できます。</div>
+      </li><li>
+        <span>SFTP または Microsoft Azure の場合は、コネクタを選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>対象の詳細を入力し、[<strong class="uicontrol">保存] を</strong>クリックします。</span>
+      </li></ol>
+
+    <div><p>コミュニケーション制限の有効化対象はメタデータの関連付けによって取得され、[コミュニケーション制限] ページの [対象対応付け] タブに表示されます。</p></div>
+    <div><p>コミュニケーション上限の有効化対象を作成したら、パラメーターに対応付けます。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_create_data_cloud_activation">
+<h1 class="slds-text-heading_large">Data 360 ターゲットの有効化の作成</h1>
+  
+  <p><span>Data 360</span> でセグメントを作成したら、<span>Data 360</span> 有効化対象に公開できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d177745e74" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d177745e74" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">セグメントを有効化する</td>
+
+              <td headers="d177745e74" style="vertical-align:top;" class="slds-cell-wrap"><p>次のいずれかの権限セット:</p><ul>
+                  <li>Data Cloud アーキテクト</li>
+
+                  <li>Data Cloud 有効化マネージャー</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div><ol><li>
+        <span>Data Cloud で、[<strong class="uicontrol">セグメント]</strong> をクリックし、セグメントを選択します。</span>
+      </li><li><span>[有効化] で、<strong class="uicontrol">[新規]</strong> をクリックします。</span></li><li><span>データスペースを選択します。</span></li><li><span>Data Cloud 有効化対象を選択します。</span></li><li>
+        <span>[有効化メンバーシップ] で、データモデルオブジェクト (DMO) を選択します。</span>
+      </li><li><span><strong class="uicontrol">[続行]</strong> をクリックします。</span></li><li><span>このアクティベーションに連絡先を含める場合は、アクティベーションの連絡先の横にある <strong class="uicontrol">［Select］</strong> をクリックします。</span><div>連絡先を追加する場合は、既存のパスを選択するか、<strong class="uicontrol">[編集]</strong> をクリックして、連絡先ごとにソースの追加、並び替え、削除、ソース種別と優先度の変更を行います。</div></li><li><span><strong class="uicontrol">[次へ]</strong> をクリックします。</span></li><li><span>他の属性を有効化するには、<strong class="uicontrol">[属性を追加]</strong> をクリックします。</span><div>有効化には 2 種類の属性を追加できます。</div><a name="c360_a_create_data_cloud_activation__choices_bkp_n4x_tcc"></a><ul id="c360_a_create_data_cloud_activation__choices_bkp_n4x_tcc"><li>直接属性: 有効化メンバーシップ DMO の属性。</li>
+<li>関連属性 — 有効化対象オブジェクトからそのオブジェクトへのパスが存在し、そのパスに沿ったすべてのリレーションが 1 対 1 または N 対 1 の場合、DMO の任意のオブジェクトからの属性。有効化トリガーフローで Data Cloud 有効化を使用する場合、フローでは 2 レベルまでの関連属性のみがサポートされます。</li>
+<li>計算済みインサイト — 有効化に計算済みインサイトメトリクスを追加し、ディメンション検索条件を適用してより詳細なインサイトを取得します。</li>
+</ul>
+<a name="c360_a_create_data_cloud_activation__substeps_ckp_n4x_tcc"></a><ol id="c360_a_create_data_cloud_activation__substeps_ckp_n4x_tcc"><li><span>最大 100 個の追加属性をキャンバスにドラッグします。同様の情報を持つ異なる列を選択すると、すべての一意の組み合わせが出力に追加されます。</span><div>一意の属性名を指定するには、[編集] アイコンをクリックします。</div></li>
+<li><span>変更を保存します。</span></li>
+</ol></li><li>
+        <span>キャンペーン固有のデータを含めるには、[Campaign Data (キャンペーンデータ)] を展開し、[<strong class="uicontrol">Add Data (</strong>データの追加)] をクリックします。&nbsp;</span>
+        <div>キャンペーン ID と説明、対象オーディエンスの特性、プロモーションのフラグが設定された商品、地理的分布などの詳細を含めることができます。最大 20 個の一意の名前と値のペアを追加できます。各キャンペーン属性は、有効化されたペイロードと Marketing Cloud Engagement のデータエクステンションの新しい列を形成します。</div>
+        <ol>
+          <li>
+            <span>有効化を編集するときに、キャンペーン属性を変更または削除できます。すべてのキャンペーン属性を削除するには、[データを追加] ドロップダウンメニューから [すべて削除] オプションを選択します。
+            </span>
+          </li>
+
+        </ol>
+        <div><a target="_blank" href="https://developer.salesforce.com/docs/data/connectapi/references/spec?meta=Summary">Activation Connect API</a> を使用してキャンペーン固有のデータを管理することもできます。</div>
+      </li><li><span>異なるチャネルで異なる予算の複数の固定サイズのキャンペーンに同じオーディエンスを使用するには、<strong class="uicontrol">[暫定的なオーディエンス制限]</strong> を展開し、<strong class="uicontrol">[属性をランク付け]</strong> をクリックします。</span><ol><li><span>最大 3 つの属性を任意の階層のキャンバスにドラッグしてランク付けします。属性を上下にドラッグして並び替えることができます。&nbsp;</span></li>
+<li><span>各属性と属性パスの並び替え順 (昇順または降順) を選択し、[<strong class="uicontrol">保存]</strong> をクリックします。</span></li>
+<li><span>属性を削除するには、ドロップダウンメニューを選択し、[<strong class="uicontrol">属性を削除</strong>] をクリックします。</span></li>
+</ol><div>ランキング属性では、直接属性と計算済みインサイトを含めることができます。</div></li><li><span>この有効化の利用者を制限するには、1 ～ 10,000 の数値を入力します。 利用者はランダムに選択されます。属性をランク付けした場合、オーディエンスはランキングに基づいて優先順位が付けられます。</span></li><li><span><strong class="uicontrol">[次へ]</strong> をクリックします。</span></li><li><span>有効化の名前と説明を入力します。</span><div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> 名前に + ! @ # $ % ^ * ( ) = { } [ ] \ の文字を含めないでください。&lt; &gt; / " : ?| , _ &amp;</div></div></div>
+</div></li><li><span><strong class="uicontrol">[保存]</strong> をクリックします。</span>      </li></ol>
+<div><p>選択した有効化対象に対してスケジュールされた次の公開でセグメントが公開されます。セグメントが Data Cloud 有効化対象に公開されると、有効化されたレコードでオーディエンス DMO が更新されます。これらのレコードを表示するには、[データエクスプローラー] ページに移動して、対応するオーディエンス DMO を選択します。クエリ API を使用して、有効化されたレコードを取得します。</p><p>Data 360 有効化を使用して有効化トリガーフローを作成する場合、有効化が完了すると、有効化トリガーフローが自動的に開始され、有効化されたデータがフローで設定された API ベースの送信先に送信されます。詳細は、「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.automate_flow_build_create_activation_triggered_flow.htm&amp;language=ja&amp;type=5">Create an Activation-Triggered Flow</a> (有効化トリガーフローの作成)」を参照してください。</p></div>
+<ul><li class="slds-p-bottom_small"><strong><a href="ingest_connect-3.html#c360_a_mulesoft_connectors_for_flow">フローの MuleSoft コネクタ</a></strong><br>MuleSoft コネクタは Flow Builder 内で使用できます。有効化トリガーフローでアクションを設定するときに、次のコネクタから選択できます。サポートされるコネクタと対応するアクションについては、「<span class="doc_external_link"><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.automate_flow_ref_third_party_connectors.htm&amp;language=ja&amp;type=5">サードパーティコネクタ</a></span>」を参照してください。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=data.c360_a_view_your_data.htm&amp;language=ja&amp;type=5">Salesforce ヘルプ: データエクスプローラーでのデータの表示</a></li><li><a target="_blank" href="model_mapping-1.html#c360_a_audience_data_model_object">Salesforce ヘルプ: 利用者データモデルオブジェクト</a></li><li><a target="_blank" href="https://developer.salesforce.com/docs/platform/connectapi/references/spec?meta=getAudienceDmoActivationRecords">Salesforce 開発者: Audience DMO API を使用して有効化されたデータを照会する</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_create_external_activation_platform_activation_target">
+<h1 class="slds-text-heading_large">外部プラットフォーム有効化対象の作成</h1>
+  
+  <p>Amazon 広告などの外部広告プラットフォームにセグメントを公開するには、Data 360 で外部プラットフォームの有効化対象を作成します。 外部プラットフォームには複数の有効化対象を設定できますが、外部プラットフォームアカウントに添付できる有効化対象は 1 つのみです。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">アドオンライセンスで使用可能: <strong>Ad Audiences</strong></td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d140507e67" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要な権限セット</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d140507e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要な権限セット">有効化対象を作成する</td>
+
+              <td headers="d140507e67" style="vertical-align:top;" class="slds-cell-wrap"><p>次の権限セットのいずれか:</p><a name="c360_a_create_external_activation_platform_activation_target__ul_jjg_cpm_d2c"></a><ul id="c360_a_create_external_activation_platform_activation_target__ul_jjg_cpm_d2c">
+                  <li>Data Cloud アーキテクト</li>
+
+                  <li>Data Cloud 有効化マネージャー</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table><p>外部有効化対象を作成する前に、次の作業が完了していることを確認します。</p><a name="c360_a_create_external_activation_platform_activation_target__ul_kp5_xwq_42c"></a><ul id="c360_a_create_external_activation_platform_activation_target__ul_kp5_xwq_42c">
+        <li>AppExchange ベースの外部有効化プラットフォームを使用するために必要な<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.distribution_installing_packages.htm&amp;language=ja&amp;type=5">管理パッケージをインストール</a>します。</li>
+
+        <li>インストール後に外部有効化プラット<a target="_blank" href="ingest_connect-1.html#c360_a_connect_external_activation_platform">フォームを設定</a>します。プラットフォームパラメーター、認証の詳細、必要な対応付けを設定します。</li>
+
+        <li><a title="標準 ContactPointDigitalId データモデルオブジェクト (DMO) を使用して、デジタル識別子データを取り込んでモデル化します。独立系ソフトウェアベンダー (ISV) は、有効化ツールキットを使用して、この DMO を照会し、デジタルメディアプラットフォーム全体でデジタル ID を解決する有効化を構築します。" href="segment_activation-3.html#c360_a_map_digital_identifiers_activation_toolkit">JSON ベースの外部有効化対象</a>のデジタル識別子の取り込みとモデル化。</li>
+
+      </ul>
+</div>
+    <ol><li>
+        <span>[有効化対象] タブで、<strong class="uicontrol">[新規]</strong> をクリックします。</span>
+      </li><li>
+        <span>外部有効化プラットフォームを選択し、<strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>名前と説明 (省略可能) を入力します。</span>
+        <div>プライバシー種別が設定されていない場合、プライバシー種別を含めるように外部有効化プラットフォームを更新します。</div>
+      </li><li>
+        <span>プラットフォームのアカウントとログインの詳細を追加し、<strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>特定の広告プラットフォームでは、そのサイトにリダイレクトしてログインの詳細を入力します。必要に応じて、ログインの詳細を入力します。</span>
+        <ol>
+          <li>
+            <span>Data 360 へのアクセス権限を付与し、サービス規約に同意します。</span>
+            <div>Data 360 にリダイレクトされ、オーディエンスのアップロード権限を持つアカウントが提供されます。</div>
+          </li>
+
+          <li>
+            <span>有効化対象を関連付けるデータスペースを選択します。</span>
+          </li>
+
+          <li>
+            <span>[取引先名] と [ID] を選択します。</span>
+            <div>選択したデータスペースによって、1 回限りの一意の組み合わせを作成するために使用できる取引先 ID が決まります。</div>
+            <div>広告オーディエンスの外部有効化対象では、個人 DMO からのみ有効化メンバーシップを作成できます。</div>
+          </li>
+
+          <li>
+            <span>Amazon 広告では、Amazon DSP アカウントと AMC インスタンスの両方にアクセスできる場合、それぞれのアカウントを選択するように促されます。</span>
+            <div>新しい有効化対象に DSP と AMC の両方を選択する場合、アカウントが Amazon 広告でリンクされていることを確認します。その後、AMC インスタンスで DSP 取引先パフォーマンスデータを表示できます。</div>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>AppExchange からインストールされたプラットフォームを使用している場合は、アカウント ID を入力します。</span>
+        <div>各アカウント ID は一意であり、1 つの有効化対象にのみ使用できます。</div>
+        <ol>
+          <li>
+            <span>有効化対象を関連付けるデータスペースを選択します。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+      </li></ol>
+
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="segment_activation-3.html#c360_a_requirements_for_external_activation_targets">外部有効化対象の要件</a></strong><br>Data 360 で外部プラットフォームアカウントに対して有効化対象を作成するときは、次の要件を考慮してください。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_create_external_activation_platform_activations">
+<h1 class="slds-text-heading_large">外部プラットフォームの有効化の作成</h1>
+  
+  <p>Data 360 で、AppExchange パートナー (Liveramp、Criteo、Tradedesk) や戦略的パートナー (Google、LinkedIn、Meta、Amazon 広告) ターゲットなどの外部プラットフォームにセグメントを公開するための有効化を作成します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+            <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+                                    <tr class="">
+                                          <th id="d166320e67" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要な権限セット</th>
+                                    </tr>
+                              </thead><tbody>
+                                    <tr class="">
+                                          <td headers="d166320e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要な権限セット">有効化を作成する</td>
+
+                                          <td headers="d166320e67" style="vertical-align:top;" class="slds-cell-wrap"><p>次の権限セットのいずれか:</p><a name="c360_a_create_external_activation_platform_activations__ul_jjg_cpm_d2c"></a><ul id="c360_a_create_external_activation_platform_activations__ul_jjg_cpm_d2c">
+                                                  <li>Data Cloud アーキテクト</li>
+
+                                                  <li>Data Cloud 有効化マネージャー</li>
+
+                                                </ul>
+</td>
+
+                                    </tr>
+                              </tbody></table><p>有効化を作成する前に、次の作業が完了していることを確認します。</p><a name="c360_a_create_external_activation_platform_activations__ul_s5x_jwq_42c"></a><ul id="c360_a_create_external_activation_platform_activations__ul_s5x_jwq_42c">
+                        <li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.distribution_installing_packages.htm&amp;language=ja&amp;type=5">管理パッケージのインストール</a> - 外部有効化プラットフォームを使用するために必要な管理パッケージをインストールします。</li>
+
+                        <li><a target="_blank" href="ingest_connect-1.html#c360_a_connect_external_activation_platform">Set Up an External Activation Platform</a> (外部有効化プラットフォームの設定) - インストール後に外部有効化プラットフォームを設定します。プラットフォームパラメーター、認証の詳細、必要な対応付けを設定します。</li>
+
+                        <li><a target="_blank" href="#c360_a_create_external_activation_platform_activation_target">Create an External Activation Target in Data 360</a> (Data 360 での外部有効化対象の作成) - 対象システム、データマッピング、スケジュールの詳細を指定して有効化対象を定義します。</li>
+
+                  </ul>
+</div>
+            <ol><li>
+                        <span>[有効化] タブで、<strong class="uicontrol">[新規]</strong> をクリックします。</span>
+                  </li><li>
+                        <span>データスペースを選択します。</span>
+                  </li><li>
+                        <span>有効化するセグメントを選択します。</span>
+                        <div>
+                              <p>ほぼリアルタイムのメンバーシップデータが確実に送信されるように、セグメントには有効な公開スケジュールが必要です。</p>
+                        </div>
+                  </li><li>
+                        <span>有効化対象を選択します。</span>
+                        <div>
+                              <p>プライバシー種別が設定されていない場合、プライバシー種別を含めるように外部プラットフォームを更新します。</p>
+                        </div>
+                  </li><li>
+                        <span>[有効化メンバーシップ] からデータモデルオブジェクト (DMO) を選択します。統合個人 DMO は、AppExchange パートナー目標の取引先オブジェクトまたは統合取引先オブジェクトに基づいて構築されたセグメントでは使用できません。</span>
+                  </li><li>
+                        <span><strong class="uicontrol">[続行]</strong> をクリックします。</span>
+                  </li><li>
+                        <span>戦略的パートナー ターゲットまたは AppExchange パートナー ターゲットを使用している場合、各データ モデル属性をそのパートナー フィールドにマッピングします。マッピング画面で、各パートナー項目 (右側) を対応する Data 360 データモデル属性 (左側) にマッピングします。事前に選択された属性は選択解除できません。必要に応じて、省略可能な項目を選択して対応付けます。[<strong class="uicontrol">ユーザー識別子</strong>] セクションで、少なくとも 1 つの属性が選択されていることを確認します。</span>
+                        <ol>
+                              <li>
+                                    <span>鉛筆アイコンをクリックして編集し、データが存在するオブジェクトと項目を選択します。</span>
+                              </li>
+
+                              <li>
+                                    <span>オブジェクトからデータを取得するためのパスを選択します。</span>
+                              </li>
+
+                              <li>
+                                    <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+                              </li>
+
+                              <li>
+                                    <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+                              </li>
+
+                        </ol>
+                  </li><li>
+                        <span>他の属性を有効化するには、<strong class="uicontrol">[属性を追加]</strong> をクリックします。有効化には 2 種類の属性を追加できます。</span>
+                        <div><a name="c360_a_create_external_activation_platform_activations__ul_sm5_yfq_j2c"></a><ul id="c360_a_create_external_activation_platform_activations__ul_sm5_yfq_j2c">
+                                    <li>直接属性: 有効化メンバーシップ DMO の属性。</li>
+
+                                    <li>関連属性 — DMO の任意のオブジェクトの属性 (有効化オブジェクトからそのオブジェクトへのパスがあり、そのパスに沿ったすべてのリレーションが 1:1 または N:1 のいずれかである場合)。</li>
+
+                              </ul>
+JSON ベースの外部有効化プラットフォームの有効化に連絡先としてデジタル ID を含めるには、連絡先デジタル ID DMO から関連属性を追加します。 </div>
+                  </li><li>
+                        <span>出力をさらに絞り込むには、有効化メンバーシップ検索条件を追加します。[<strong class="uicontrol">Add Filters (フィルタ</strong>を追加)] をクリックし、リストからキャンバスに属性をドラッグして、フィルタを保存します。詳細は、「<a title="Data 360 アクティベーション メンバーシップ フィルタを使用すると、カスタム フィルタをアクティベーション メンバーシップに追加して、よりパーソナライズされたコミュニケーションを送信できます。検索条件を追加して、対象利用者のみが対象になるようにします。" href="segment_activation-1.html#c360_a_activation_membership_filtering">Add Filters to the Activation Membership</a>」を参照してください。</span>
+                  </li><li>
+                        <span>対応付けられた連絡先ごとに検索条件を追加する</span>
+                        <ol>
+                              <li>
+                                    <span>連絡先ごとに送信される属性値の最大数を選択します。これは、JSON ベースの外部有効化プラットフォームを有効化するための連絡先デジタル ID でのみ有効になっています。</span>
+                              </li>
+
+                              <li>
+                                    <span>属性値の並び替えオプションを選択します。</span>
+                              </li>
+
+                              <li>
+                                    <span>ISV によって作成された外部プラットフォームの連絡先デジタル ID がマッピングされている場合、デジタル ID 種別属性の検索条件を追加します。ID 種別の値を正規化するために、ID 種別の対応付けの Data Cloud Architect で定義された外部有効化プラットフォーム設定に基づいて検索条件値を指定します。絞り込みに基づいて、対応するレコードが外部有効化プラットフォームに対して有効化されます。詳細は、「<a title="Data 360セグメントを有効化するときに、連絡先の絞り込みと並び替えを行って、適切な権限を持つ適切なチャネルの適切な利用者を対象にすることができます。この機能は、顧客の同意を管理し、メッセージの重複を防止し、キャンペーンのパーソナライズを改善するために不可欠です。" href="marketing_omni.html#c360_a_contact_point_filtering">Add Filters to</a> Contact Points in Activation」を参照してください。</span>
+                              </li>
+
+                              <li>
+                                    <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+                              </li>
+
+                        </ol>
+                  </li><li>
+                        <span>有効化の名前と説明 (省略可能) を入力して保存します。</span>
+                        <div>
+                              <p>有効化名を使用して、戦略的パートナー目標内の有効化された利用者を見つけます。</p>
+                        </div>
+                  </li></ol>
+
+            <div><p>セグメントが公開されると、<a title="オーディエンスデータモデルオブジェクト (DMO) を使用して、有効化されたオーディエンスを経時的に理解および分析します。関連 DMO には、オーディエンスとオーディエンス最新 DMO の 2 種類があります。" href="model_mapping-1.html#c360_a_audience_data_model_object">利用者 DMO</a> は有効化されたレコードで更新されます。これらのレコードを表示するには、[データエクスプローラー] ページに移動して、対応するオーディエンス DMO を選択します。クエリ API を使用して、有効化されたレコードを取得します。</p></div>
+      
+<ul><li class="slds-p-bottom_small"><strong><a href="segment_activation-3.html#c360_a_map_digital_identifiers_activation_toolkit">JSON ベースの外部有効化対象のデジタル識別子の取り込みとモデル化</a></strong><br>標準 <code>ContactPointDigitalId</code> データモデルオブジェクト (DMO) を使用して、デジタル識別子データを取り込んでモデル化します。独立系ソフトウェアベンダー (ISV) は、有効化ツールキットを使用して、この DMO を照会し、デジタルメディアプラットフォーム全体でデジタル ID を解決する有効化を構築します。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_create_marketing_cloud_activation">
+<h1 class="slds-text-heading_large">Marketing Cloud Engagement 対象の有効化の作成</h1>
+  
+  <p><span>Data 360</span> でセグメントを作成したら、セグメントを有効化対象に公開できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d198273e71" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d198273e71" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">有効化を作成する</td>
+
+              <td headers="d198273e71" style="vertical-align:top;" class="slds-cell-wrap"><p>次のいずれかの権限セット:</p><ul>
+                  <li>Data Cloud アーキテクト</li>
+
+                  <li>Data Cloud 有効化マネージャー</li>
+
+                  <li>Data Cloud 有効化スペシャリスト</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table><ul>
+        <li><span>Data 360</span> の [設定] で、[<strong class="uicontrol">プロファイルビジネスユニットデータマッピング</strong>を許可] が有効になっていることを確認します。</li>
+
+        <li>セグメントは、ビジネスユニット (BU) で絞り込まれます。</li>
+
+      </ul>
+</div>
+    <ol><li>
+        <span><span>Data 360</span> で、[<strong class="uicontrol">セグメント]</strong> をクリックしてセグメントを選択します。</span>
+      </li><li>
+        <span>[有効化] で、<strong class="uicontrol">[新規]</strong> をクリックします。</span>
+      </li><li>
+        <span>有効化対象を選択します。</span>
+      </li><li>
+        <span>[有効化メンバーシップ] からデータモデルオブジェクト (DMO) を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[続行]</strong> をクリックします。</span>
+      </li><li>
+        <span>有効化の連絡先の横にある [<strong class="uicontrol">選択]</strong> をクリックします。</span>
+        <ol>
+          <li>
+            <span>連絡先がマッピングされている場合は、既存のパスを選択するか、<strong class="uicontrol">[編集]</strong> をクリックして、連絡先ごとにソースの追加、並び替え、削除、ソース種別と優先度の変更を行います。デフォルトでは、ソース種別として Marketing Cloud が選択されます。</span>
+          </li>
+
+          <li>
+            <span>ソースの優先順序が Marketing Cloud になるように有効化を変更します。有効化対象で設定された EID と BU に基づいて、取得元の優先度を更新します。</span>
+          </li>
+
+          <li>
+            <span>他のソースから Marketing Cloud Engagement に新しい取引先責任者を導入しないようにするには、[<dfn>任意のソース</dfn>と<dfn>任意の種別</dfn>] を削除します。</span>
+            <div>有効化で有効化対象の他の BU からの連絡先を導入できるようにするには、[<dfn>Any Source</dfn> (任意のソース)] と [<dfn>Any Type (</dfn>任意の種別)] をソースの優先度に保ちます。</div>
+          </li>
+
+        </ol>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>他の属性を有効化するには、<strong class="uicontrol">[属性を追加]</strong> をクリックします。</span>
+        <div>有効化には 2 種類の属性を追加できます。</div>
+        <ul>
+          <li>直接属性: 有効化メンバーシップ DMO の属性。</li>
+
+          <li>関連属性 — DMO の任意のオブジェクトの属性 (有効化オブジェクトからそのオブジェクトへのパスがあり、そのパスに沿ったすべてのリレーションが 1:1 または N:1 のいずれかである場合)。</li>
+
+          <li>計算済みインサイト — 有効化に計算済みインサイトメトリクスを追加し、ディメンション検索条件を適用してより詳細なインサイトを取得します。</li>
+
+        </ul>
+
+        <ol>
+          <li>
+            <span>最大 100 個の追加属性をキャンバスにドラッグします。同様の情報を持つ異なる列を選択すると、すべての一意の組み合わせが出力に追加されます。</span>
+            <div>一意の属性名を指定するには、鉛筆 (編集) アイコンをクリックします。</div>
+          </li>
+
+          <li>
+            <span>変更を保存します。</span>
+          </li>
+
+        </ol>
+        <div>
+          <p>Engagementに対して有効化されたセグメントの日時値は、常<span>にData 360</span>組織のタイムゾーンからEngagementサーバーの時刻(CST(UTC-6))に変換されます。</p>
+        </div>
+      </li><li>
+        <span>キャンペーン固有のデータを含めるには、[Campaign Data (キャンペーンデータ)] を展開し、[<strong class="uicontrol">Add Data (</strong>データの追加)] をクリックします。&nbsp;</span>
+        <div>キャンペーン ID と説明、対象オーディエンスの特性、プロモーションのフラグが設定された商品、地理的分布などの詳細を含めることができます。最大 20 個の一意の名前と値のペアを追加できます。各キャンペーン属性は、有効化されたペイロードと Marketing Cloud Engagement のデータエクステンションの新しい列を形成します。</div>
+        <ol>
+          <li>
+            <span>有効化を編集するときに、キャンペーン属性を変更または削除できます。すべてのキャンペーン属性を削除するには、[データを追加] ドロップダウンメニューから [すべて削除] オプションを選択します。
+            </span>
+          </li>
+
+        </ol>
+        <div><a target="_blank" href="https://developer.salesforce.com/docs/data/connectapi/references/spec?meta=Summary">Activation Connect API</a> を使用してキャンペーン固有のデータを管理することもできます。</div>
+      </li><li>
+        <span>異なるチャネルで異なる予算の複数の固定サイズのキャンペーンに同じオーディエンスを使用するには、<strong class="uicontrol">[暫定的なオーディエンス制限]</strong> を展開し、<strong class="uicontrol">[属性をランク付け]</strong> をクリックします。</span>
+        <a name="c360_a_create_marketing_cloud_activation__substeps_ogw_ddr_hdc"></a><ol id="c360_a_create_marketing_cloud_activation__substeps_ogw_ddr_hdc">
+          <li>
+            <span>最大 3 つの属性を任意の階層のキャンバスにドラッグしてランク付けします。属性を上下にドラッグして並び替えることができます。&nbsp;</span>
+          </li>
+
+          <li>
+            <span>各属性と属性パスの並び替え順 (昇順または降順) を選択し、[<strong class="uicontrol">保存]</strong> をクリックします。</span>
+          </li>
+
+          <li>
+            <span>属性を削除するには、ドロップダウンメニューを選択し、[<strong class="uicontrol">属性を削除</strong>] をクリックします。</span>
+          </li>
+
+        </ol>
+        <div>ランキング属性では、直接属性と計算済みインサイトを含めることができます。</div>
+      </li><li>
+        <span>この有効化の利用者を制限するには、1 ～ 10,000 の数値を入力します。 利用者はランダムに選択されます。属性をランク付けした場合、オーディエンスはランキングに基づいて優先順位が付けられます。</span>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>有効化の名前と説明を入力します。</span>
+        <div>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_important.png" style="margin-bottom:0;"></span></div><div id="c360_a_create_marketing_cloud_activation__note_yyq_4nx_tcc" style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><a name="c360_a_create_marketing_cloud_activation__note_yyq_4nx_tcc"></a><span class="slds-text-title_caps">重要</span> 名前項目に + ! @ # $ % ^ * ( ) = { } [ ] \ . の文字を含めることはできません。&lt; &gt; / " : ?| , _ &amp;</div></div></div>
+
+        </div>
+      </li><li>
+        <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+      </li></ol>
+
+    <div><p>選択した有効化対象に対してスケジュールされた次の公開でセグメントが公開されます。セグメントが初めて公開されたときに有効化数が 0 より大きい場合、Marketing Cloud Engagement にデータエクステンションが作成され、セグメントレコードが追加されます。アクティベーションが実行されたかどうかを確認するには、<a target="_blank" href="segment_activation-1.html#c360_a_activations_publish_history">Publish History</a> of Your Activation を確認します。関連属性は、エンゲージメントの有効化されたデータエクステンションの項目に保存されます。</p><div><p>セグメントが Engagement に公開、有効化されるたびに、データエクステンションはセグメントに現在含まれているレコードで更新されます。その結果、データエクステンションには最新の成功した有効化からのセグメントのレコードが含まれ、以前の有効化のレコードは削除されます。メールのパーソナライズで属性と値を使用するには、AMPscript、GTL、または SSJS を使用してデータエクステンションの JSON を解析します。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div id="c360_a_create_marketing_cloud_activation__note_kyr_sxp_2hc" style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><a name="c360_a_create_marketing_cloud_activation__note_kyr_sxp_2hc"></a><span class="slds-text-title_caps">メモ</span> 既知のプロファイルのみが有効化に含まれます。セグメント内の匿名プロファイルは、最終的な利用者から自動的に除外されます。</div></div></div>
+</div></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Marketing Cloud Engagement に対してセグメントを作成および有効化したら、Contact Builder でセグメントを表示します。Data 360 セグメント サブフォルダは、最初のアクティベーションを公開するときに作成されます。" href="segment_activation-3.html#c360_a_segments_in_marketing_cloud">Marketing Cloud Engagement での Data Cloud セグメントの検索</a></li><li><a target="_blank" href="https://resources.docs.salesforce.com/242/latest/en-us/sfdc/pdf/cdp_bu_aware_guide.pdf">Salesforce ヘルプ: ビジネスユニット対応インテグレーション: Marketing Cloud と Data 360</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_create_marketing_cloud_activation_target">
+<h1 class="slds-text-heading_large">Marketing Cloud Engagement 有効化対象の作成</h1>
+  
+  <p>セグメントと一括処理データモデルオブジェクト(DMO)をMarketing Cloud Engagementビジネスユニットに公開するには、<span>Data 360</span>で有効化対象を作成します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d180243e72" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d180243e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">有効化対象を作成する</td>
+
+              <td headers="d180243e72" style="vertical-align:top;" class="slds-cell-wrap"><p>次のいずれかの権限セット:</p><ul>
+                  <li>Data Cloud アーキテクト</li>
+
+                  <li>Data Cloud 有効化マネージャー</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div><ol><li><span>[有効化対象] タブで、<strong class="uicontrol">[新規]</strong> をクリックします。</span></li><li>
+        <span>[<strong class="uicontrol">Marketing Cloud Engagement]</strong>を選択し、[<strong class="uicontrol">次へ]</strong>をクリックします。</span>
+      </li><li><span>名前と説明 (省略可能) を入力します。</span><div>名前は、128 文字を超えたり、アンダースコアで始めたり、すべて数字にしたりすることはできず、次の文字を含めることはできません: @ %^ = &lt; ' * + # $ / \\ ! ? ( ) { } [ ] , . \ \ </div><ol><li><span>有効化対象を関連付けるデータスペースを選択します。</span>
+            <div>データストリーム設定に基づく各ビジネスユニット (BU) に関連付けられたデータスペース。1 つ以上のデータスペースに対応付けられた各 BU が表示されます。つまり、複数の MCE 組織 (EID と BU) のデータを同じデータスペース内で組み合わせることができます。異なる EID のレコードが同じデータスペースにマージされるリスクを示す警告が表示されます。</div></li>
+<li>
+            <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+          </li>
+</ol></li><li>
+        <span>Marketing Cloud 接続を選択し、使用可能なリストから必要なビジネスユニットを含めます。</span>
+      </li><li>
+        <span>公開セグメントまたは DMO を受信するビジネスユニットを追加または削除するには、2 つの列の間の矢印をクリックします。</span>
+        <div>有効化対象に複数の BU がある場合、有効化によって取引先責任者が BU で絞り込まれます。セグメントは、Engagement へのデータエクステンション (DE) ではなく、共有データエクステンション (SDE) として有効化されます。有効化対象に複数のビジネスユニットが設定されている場合は、有効化対象設定を変更して 1 つのビジネスユニットのみを含めます。</div>
+      </li><li><span><strong class="uicontrol">[保存]</strong> をクリックします。</span></li></ol>
+
+<ul><li class="slds-p-bottom_small"><strong><a href="segment_activation-1.html#c360_a_activation_data_mixing_multieid">Marketing Cloud Engagement の有効化での整合性の確保</a></strong><br>複数の Marketing Cloud Engagement (MCE) 組織 (EID) が有効化に関与する場合、意図しないデータが混在してしまう可能性があります。これは、異なる EID の登録者キーが同じデータスペースに取り込まれ、後で特定の EID に対して有効化された場合に発生します。これにより、データの整合性の問題が発生する可能性があります。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Data 360 でセグメントを作成したら、セグメントを有効化対象に公開できます。" href="#c360_a_create_marketing_cloud_activation">Marketing Cloud Engagement 対象の有効化の作成</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_create_mc_personalization_activation_target">
+<h1 class="slds-text-heading_large">Marketing Cloud Personalization 有効化対象の作成</h1>
+  <p>Marketing Cloud Personalization (旧称 Interaction Studio) にセグメントを公開するには、<span>Data 360</span> で有効化対象を作成します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d146139e71" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d146139e71" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">有効化対象を作成する</td>
+
+              <td headers="d146139e71" style="vertical-align:top;" class="slds-cell-wrap"><p>次のいずれかの権限セット:</p><ul>
+                  <li>Data Cloud アーキテクト</li>
+
+                  <li>Data Cloud 有効化マネージャー</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>[有効化対象] タブで、<strong class="uicontrol">[新規]</strong> をクリックします。</span>
+      </li><li>
+        <span>[<strong class="uicontrol">Marketing Cloud Personalization</strong>]を選択し、[<strong class="uicontrol">次へ]</strong>をクリックします。</span>
+      </li><li>
+        <span>わかりやすい一意の名前を入力します。</span>
+        <ol>
+          <li>
+            <span>有効化対象を関連付けるデータスペースを選択します。</span>
+          </li>
+
+          <li>
+            <span>組織を選択します。</span>
+          </li>
+
+          <li>
+            <span>データセットを選択します。</span>
+            <div>組織とデータセットは、選択したデータスペースに関連付けられており、まだ一緒に使用されていない場合にのみ使用できます。</div>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+          </li>
+
+        </ol>
+      </li></ol>
+
+    <div><p>Marketing Cloud Personalization 有効化対象が作成されます。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=mktg.mc_pers_etl_activation_data_feed.htm&amp;language=ja&amp;type=5">Salesforce ヘルプ: Data 360 有効化 ETL データフィード</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_create_segment_from_data_kit">
+<h1 class="slds-text-heading_large">データキットからのセグメントの作成</h1>
+  
+  <p>Data 360 でセグメントを最初から作成する代わりに、データキットの定義済みセグメントを使用します。セグメントを編集して微調整できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d144275e69" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要な権限セット</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d144275e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要な権限セット">セグメントを作成する</td>
+
+              <td headers="d144275e69" style="vertical-align:top;" class="slds-cell-wrap"><p>次の権限セットのいずれか:</p><a name="c360_a_create_segment_from_data_kit__ul_jjg_cpm_d2c"></a><ul id="c360_a_create_segment_from_data_kit__ul_jjg_cpm_d2c">
+                  <li>Data Cloud アーキテクト</li>
+
+                  <li>Data Cloud 有効化マネージャー</li>
+
+                  <li>Data Cloud 有効化スペシャリスト</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+    <a name="c360_a_create_segment_from_data_kit__steps_xzp_1wq_vbc"></a><ol id="c360_a_create_segment_from_data_kit__steps_xzp_1wq_vbc"><li>
+        <span>Data Cloud で <strong class="uicontrol">[セグメント]</strong> をクリックします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[新規]</strong> をクリックします。</span>
+      </li><li>
+        <span>[<strong class="uicontrol">Create from a Data Kit</strong>]を選択し、[<strong class="uicontrol">Next]</strong>をクリックします。</span>
+      </li><li>
+        <span>データキットと定義済みセグメントを選択します。</span>
+        <div>セグメントに子セグメントまたは計算済みインサイトがある場合、API 参照名がこのセグメントと同じであることを確認します。</div>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>セグメントの詳細を入力します。</span>
+        <a name="c360_a_create_segment_from_data_kit__substeps_yzp_1wq_vbc"></a><ol id="c360_a_create_segment_from_data_kit__substeps_yzp_1wq_vbc">
+          <li>
+            <span>データスペースを選択します。</span>
+          </li>
+
+          <li>
+            <span>[セグメント対象] で、データモデルオブジェクト (DMO) を選択します。</span>
+            <div>取引先や取引先責任者など、統合されていないオブジェクトを使用している場合、そのオブジェクトはすでに選択されています。</div>
+          </li>
+
+          <li>
+            <span>セグメントにわかりやすい一意の名前を付けて、必要に応じて説明を入力します。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[次へ</strong>] をクリックし、連動関係を確認します。</span>
+            <div>セグメントに連動関係エラーがある場合は、システム管理者にお問い合わせください。</div>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>公開種別とスケジュールを選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_create_segments_to_data_cloud">
+<h1 class="slds-text-heading_large">Data 360 へのビジュアルセグメントの作成
+ </h1>
+  <p>セグメンテーションにより、データアナリストは Tableau で分析したデータの関連部分を選定し、セグメントとして <span>Data 360</span> にシームレスに転送できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Tableau Cloud</td>
+
+          </tr>
+        </tbody></table>
+    <p>Salesforce <span>Data 360</span>コネクタを使用して、Tableau の堅牢な分析機能と <span>Data 360</span> マーケティングを組み合わせます。データアナリストは、<span>Data 360</span> データを探索して Tableau で視覚的にリッチなセグメントを作成し、セグメントを <span>Data 360</span> に送信できます。<span>Data 360</span>では、マーケティング担当者はセグメントを他のSalesforceクラウドまたはプラットフォームに公開し、対象を絞ったマーケティング キャンペーンを顧客に送信して、詳細な分析とアクションを実行できます。</p>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.tableau.com/current/online/en-us/segments.htm">Tableau ヘルプ: Data 360 へのビジュアルセグメントの作成</a></li><li><a target="_blank" href="segment_activation-3.html#c360_a_segments">Salesforce ヘルプ: セグメンテーション</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_currency_datatype_segment">
+<h1 class="slds-text-heading_large">セグメンテーションの通貨データ型</h1>
+  <p>セグメンテーション検索条件で集計を実行して必要なグループを作成するときに、通貨データ型を使用して通貨を変換できます。</p>
+
+    <p>デフォルトの通貨換算データモデルオブジェクト (DMO) に必要なすべての換算レートが含まれていることを確認します。これにより、正確な結果を得ることができます。換算レートが通貨換算 DMO にない場合、誤った結果になる可能性があります。</p>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div id="c360_a_currency_datatype_segment__note_xpx_nfq_dfc" style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><a name="c360_a_currency_datatype_segment__note_xpx_nfq_dfc"></a><span class="slds-text-title_caps">メモ</span> 
+      <p>現在、API を使用して作成されたセグメントでは通貨データ型はサポートされていません。</p>
+    </div></div></div>
+
+    <div id="c360_a_currency_datatype_segment__section_uqk_sfq_dfc"><a name="c360_a_currency_datatype_segment__section_uqk_sfq_dfc"></a><h2 class="slds-text-heading_medium slds-p-top_small">検索条件の通貨属性</h2><p>通貨データ型属性を使用してデータをセグメント化できます。検索条件を作成するときに、[通貨] ドロップダウンメニューから通貨コードを選択します。この通貨コードは、データを正規化するために使用されます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">例</h2><p>検索条件が [注文合計] = $500 で、[収入] 属性にマルチ通貨の値が含まれている場合、通貨換算 DMO を使用してすべての値が米ドル (検索条件で選択した通貨) に変換されます。変換後、検索条件がセグメントに適用されます。</p><div>
+        <a name="c360_a_currency_datatype_segment__image_rwn_hhq_dfc"></a><img alt="[セグメント] 検索条件での通貨データ型の利用状況を示すスクリーンショット。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/seg_filter_currency_datatype.png" id="c360_a_currency_datatype_segment__image_rwn_hhq_dfc" style="width:600px;">
+      </div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div id="c360_a_currency_datatype_segment__note_orh_4wq_dfc" style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><a name="c360_a_currency_datatype_segment__note_orh_4wq_dfc"></a><span class="slds-text-title_caps">メモ</span> 
+        <p dir="ltr">条件通貨項目が使用されている場合、セグメント数とセグメント公開結果に不一致が生じる可能性があります。</p>
+      </div></div></div>
+</div>
+    <div id="c360_a_currency_datatype_segment__section_dbd_hfr_dfc"><a name="c360_a_currency_datatype_segment__section_dbd_hfr_dfc"></a><h2 class="slds-text-heading_medium slds-p-top_small">集計の通貨属性</h2><p>通貨属性を使用して合計や平均などの集計操作を実行する場合、[通貨] ドロップダウンメニューから通貨コードを選択します。この通貨コードは、集計を実行する前にデータを正規化するために使用されます。</p><div id="c360_a_currency_datatype_segment__fig_jny_yfr_dfc"><a name="c360_a_currency_datatype_segment__fig_jny_yfr_dfc"></a>
+        <a name="c360_a_currency_datatype_segment__image_t4j_yfr_dfc"></a><img alt="集計での通貨データ型の利用状況を示すスクリーンショット。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/Segment_aggregation_currency.png" id="c360_a_currency_datatype_segment__image_t4j_yfr_dfc" style="width:600px;">
+      </div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div id="c360_a_currency_datatype_segment__note_uvj_dgr_dfc" style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><a name="c360_a_currency_datatype_segment__note_uvj_dgr_dfc"></a><span class="slds-text-title_caps">メモ</span> 
+        <a name="c360_a_currency_datatype_segment__ul_p3n_2gr_dfc"></a><ul id="c360_a_currency_datatype_segment__ul_p3n_2gr_dfc">
+          <li>他の操作の一部として暗黙的な通貨変換は行われません。</li>
+
+          <li>通貨変換中に丸めエラーが発生すると、セグメンテーションで結果が不正確になることがあります。</li>
+
+        </ul>
+
+      </div></div></div>
+</div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_data_action_target_in_customer_data_platform">
+<h1 class="slds-text-heading_large">Data 360 のデータアクションターゲット</h1>
+  <p>データアクションの結果は、データアクションターゲットでトリガーされます。ターゲットはデータアクションをほぼリアルタイムで受信します。データアクションをターゲットに送信して、イベントベースのオーケストレーションを促進できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+          </tr>
+        </tbody></table>
+    <p>サポートされるターゲットは次のとおりです。</p>
+    <ul>
+      <li>Salesforce Platform イベント — データアクションをコアイベントバスに送信し、<span>Data 360</span> で生成されたほぼリアルタイムのインサイトに基づいてフローアプリケーションを構築します。</li>
+
+      <li>Web フック — データアクションを Web フックターゲットに送信し、Salesforce によって生成された秘密鍵を使用してメッセージの整合性を保護します。Web フックは、要求駆動型ではなくイベント駆動型の API です。</li>
+
+      <li>Marketing Cloud Engagement — エンゲージメントメッセージングおよびジャーニー機能を使用して、イベントやインサイトに基づいたシナリオを管理します。</li>
+
+    </ul>
+
+    <p>インテグレーションユーザーが作成したデータアクションターゲット ([項目をコピー] 強化、Salesforce CRM 強化、Flow Builder を使用した Data Cloud トリガーフローなど) は参照のみです。これらのターゲットは削除、無効化、または編集できません。</p>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">例</h2><p>データアクションによってほぼリアルタイムのイベント駆動型の使用事例をいくつか紹介します。</p><ul>
+        <li>アクション情報に基づいたエンゲージメント<p>インストールが複雑な品目を購入した顧客が、Web サイトで「インストールマニュアル」を検索したとします。顧客にハウツー動画やインストール手順を記載したメールを送信できます。</p></li>
+
+        <li>サービスとサポート<p>顧客が特定の期間に複数のトラブルシューティングページにアクセスした。顧客のケースを自動的に登録できます。</p></li>
+
+        <li>金融サービス<p>顧客が Web サイトで $1,000 を超える商品を購入すると、カスタマージャーニーイベントをトリガーできます。</p></li>
+
+        <li>Account engagement (取引先エンゲージメント)<p>顧客が複数の品目を選択してカートに入れますが、購入はしません。顧客に購入の完了を促すジャーニーをトリガーできます。</p></li>
+
+        <li>ロケーションベースのエンゲージメント<p>顧客がホテルにチェックインする。ホテルのバーを訪れたり、豪華な休暇やアクティビティを確認したりするためのプロンプトを含むジャーニーを顧客に送信できます。</p></li>
+
+      </ul>
+</div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#c360_a_data_actions">Salesforce Platform イベントデータアクションターゲットの作成</a></strong><br>データアクションをコアイベントバスに送信し、<span>Data 360</span> で生成されたトリガーに基づいてフローアプリケーションを作成します。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_create_a_data_action_target_of_webhook_type">Web フックデータアクションターゲットの作成</a></strong><br>データアクションイベントを Web フックターゲットに送信し、Salesforce によって生成された秘密鍵を使用してメッセージの整合性を保護します。Web フックは、要求駆動型ではなくイベント駆動型の API です。秘密鍵は、Salesforce から送信されたペイロード要求を検証します。Web フックは、<code>DataObjectDataChgEvent</code> 形式のイベントを含む HTTP ペイロードを転送します。</li><li class="slds-p-bottom_small"><strong><a href="segment_activation-3.html#c360_a_marketing_cloud_data_action_targets">Marketing Cloud Engagement データアクションターゲット</a></strong><br>データとインサイトを使用してビジネス評価指標を向上させ、Marketing Cloud Engagement で Journey Builder API イベントと取引メールを送信することによって顧客とのやりとりの遅延を減らします。<span>Data 360</span>とエンゲージメントを組み合わせて、トランザクションを自動化およびパーソナライズします。データトリガーのメールメッセージとジャーニーを使用して単純な運用タスクを自動化したり、取引開始数を最大化したり、顧客の離脱率を最小限に抑えたりすることが可能です。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_data_action_troubleshooting">
+<h1 class="slds-text-heading_large">データアクションエラーのトラブルシューティング</h1>
+  <p>よくあるデータアクションおよびデータアクションターゲットのエラーを解決するためのヒントを紹介します。</p>
+
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d18114e35" style="vertical-align:top;" class="slds-cell-wrap" scope="col">エラー</th>
+            <th id="d18114e38" style="vertical-align:top;" class="slds-cell-wrap" scope="col">トラブルシューティングの提案</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d18114e35" style="vertical-align:top;" class="slds-cell-wrap" data-label="エラー">Web フックデータアクションターゲット経由でイベントが来ない。</td>
+
+            <td headers="d18114e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="トラブルシューティングの提案"><ul>
+                <li>Web フックデータアクションターゲットに秘密鍵があることを確認します。</li>
+
+                <li>秘密鍵がない場合は、署名の検証のために秘密鍵を生成します。</li>
+
+              </ul>
+</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d18114e35" style="vertical-align:top;" class="slds-cell-wrap" data-label="エラー">イベントが Marketing Cloud Engagement データアクションターゲットで生成されない。</td>
+
+            <td headers="d18114e38" style="vertical-align:top;" class="slds-cell-wrap" data-label="トラブルシューティングの提案"><ul>
+                <li>Journey Builder のデータエクステンション属性名で正しい命名形式が使用されているかどうかを確認します。名前は、Data Cloud で選択されたデータモデルオブジェクトのオブジェクト API 参照名で始まり、その後にアンダースコアと属性 API 参照名が続く必要があります。例: Shopping_Events__dlm_deviceId__c。</li>
+
+                <li>イベントペイロードに必須項目があることを確認します。</li>
+
+                <li>イベントペイロードの取り込み中に、データアクションの作成時に選択した購読者キー値が null でないことを確認します。</li>
+
+                <li>Engagement と Data Cloud で設定されている項目のデータ型が一致する必要があります。</li>
+
+                <li>属性の長さは、Journey Builder のデータエクステンションで定義した値を超えることはできません。</li>
+
+              </ul>
+</td>
+
+          </tr>
+        </tbody></table>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="データアクションイベントを Web フックターゲットに送信し、Salesforce によって生成された秘密鍵を使用してメッセージの整合性を保護します。Web フックは、要求駆動型ではなくイベント駆動型の API です。秘密鍵は、Salesforce から送信されたペイロード要求を検証します。Web フックは、DataObjectDataChgEvent 形式のイベントを含む HTTP ペイロードを転送します。" href="#c360_a_create_a_data_action_target_of_webhook_type">Web フックデータアクションターゲットの作成</a></li><li><a title="Data 360から転送された行動またはトランザクションイベントデータに基づいて、顧客に自動メールとジャーニーを送信します。データモデルオブジェクト (DMO) と計算済みインサイトから顧客へのメールとジャーニーをトリガーします。たとえば、顧客が商品を購入し、Web サイトで「インストールマニュアル」を検索するとします。ハウツー動画またはインストール手順が記載されたメールを顧客に送信するイベントをトリガーします。" href="#c360_a_create_a_marketing_cloud_data_action_target">Marketing Cloud Engagement データアクションターゲットの作成</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_data_actions">
+<h1 class="slds-text-heading_large">Salesforce Platform イベントデータアクションターゲットの作成</h1>
+  <p>データアクションをコアイベントバスに送信し、<span>Data 360</span> で生成されたトリガーに基づいてフローアプリケーションを作成します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d235873e69" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限セット</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d235873e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限セット">Salesforce Platform イベントデータアクションターゲットを作成する</td>
+
+              <td headers="d235873e69" style="vertical-align:top;" class="slds-cell-wrap"><p>権限セット</p><ul>
+                  <li>Data Cloud アーキテクト</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span><span>Data 360</span> で、[データアクション対象] タブに移動し、[<strong class="uicontrol">新規]</strong> をクリックします。</span>
+      </li><li>
+        <span>データアクションターゲットを最初から作成するか、データキットおよびパッケージからインポートするかを選択します。</span>
+      </li><li>
+        <span>データアクション対象名を入力します。</span>
+        <div>[アクションターゲットの API 参照名] 項目は自動入力されます。</div>
+      </li><li>
+        <span>対象種別として [<strong class="uicontrol">Salesforce Platform Event</strong>] を選択します。</span>
+      </li><li>
+        <span>Salesforce 組織を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[保存して公開]</strong> をクリックします。</span>
+        <div><p>データアクションを使用してイベントを Salesforce Platform に送信すると、Data Cloud で標準イベント <samp class="parmname">DataObjectDataChgEvent</samp> が定義され、メッセージの公開に使用されます。</p></div>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_data_actions_cdp">
+<h1 class="slds-text-heading_large">Data 360 のデータアクション</h1>
+  <p><span>Data 360</span> のデータモデルオブジェクトと計算済みインサイトオブジェクトのデータ変更を監視し、変更データイベントを Salesforce Platform イベント、Marketing Cloud Engagement、または Web フックに送信します。</p>
+
+    <p>豊富なペイロードが含まれるデータアクションは、特定の条件に基づいてトリガーできます。また、このデータアクションにより、ダウンストリームシステムでアクションやオーケストレーションを促進できます。</p>
+    <p>データアクションを使用すると、チャネル、商品、取引先、サービス、販売、履行、エンゲージメント、支払、個人レベルなど、さまざまなレベルでほぼリアルタイムのイベントとインサイトに焦点を絞ることができます。</p>
+    <div><p>データアクションでは、さまざまな種別のイベント駆動型インテグレーションおよびオーケストレーションを有効にできます。</p><ul>
+        <li><span>Data 360</span>からのインサイトとデータ イベントを使用して、Salesforce CRMワークフローを調整します。</li>
+
+        <li>条件に基づいて集計イベントデータを外部パートナーと共有することで、Mulesoft Anypoint のデータアクションを統合します。</li>
+
+        <li><span>Data 360</span>からのシグナルを使用してSaaSアプリケーションと統合します。</li>
+
+        <li><span>Data 360</span> のインサイトに基づいて Web フックと連携するサーバーレス関数をトリガーします。</li>
+
+        <li><span>Data 360</span>で便利なイベントが発生したら、マルチクラウド ワークフローまたはサービスを接続します。</li>
+
+        <li>絞り込まれていないインサイトとエンゲージメントをデータレークに転送し、分析および保存できます。</li>
+
+      </ul>
+</div>
+    <p>データアクションを使用してイベントを Salesforce Platform に公開すると、Salesforce は標準イベント<code>DataObjectDataChgEvent</code>を使用してメッセージを公開します。</p>
+    <p>イベントがホーム組織またはコンパニオン組織に公開されている場合、Data 360 では特にプラットフォームで (フローなどを介して) イベントが消費されるときに、公開制限や割り当て制限が適用されません。ただし、イベントがプラットフォームの外部 (Mulesoft や AWS Lambda など) 登録者に配信される場合、Data 360 では配信割り当て制限が適用されます。</p>
+    <p>Data Cloud トリガーフローを介してイベントを Salesforce Platform イベントに公開すると、データアクション機能が使用されます。データアクションレコードホームページの [管理対象] 列に公開済みレコードが [フローインテグレーション] として表示されます。</p>
+    <p>データアクションを使用するには、まず結果を受信するデータアクションターゲットを作成します。</p>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#c360_a_data_action_target_in_customer_data_platform">Data 360 のデータアクションターゲット</a></strong><br>データアクションの結果は、データアクションターゲットでトリガーされます。ターゲットはデータアクションをほぼリアルタイムで受信します。データアクションをターゲットに送信して、イベントベースのオーケストレーションを促進できます。</li><li class="slds-p-bottom_small"><strong><a href="insights_query-2.html#c360_a_data_actions_data_graph">データグラフを使用した Data 360 のデータアクションの強化</a></strong><br>データグラフを関連オブジェクトとして含めることで、<span>Data 360</span> のデータアクションを関連データグラフ属性で強化できます。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_create_a_data_action_in_customer_data_platform">Data 360 でのデータアクションの作成</a></strong><br>データアクションを使用して、Salesforce Platform、Webhook、Marketing Cloud Engagement などの対象にアラートまたはイベントを送信します。チャネル、商品、取引先、サービス、個人など、さまざまなレベルでほぼリアルタイムのイベントとインサイトに焦点を当てるデータアクションを作成します。</li><li class="slds-p-bottom_small"><strong><a href="search_rag-1.html#c360_a_create_a_vector_search_data_action">Data 360 でのベクトル検索データアクションの作成</a></strong><br>非構造化データに対してほぼリアルタイムでアクションを実行し、アラートまたはイベントを送信するベクトル検索データアクションを作成します。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_create_a_real_time_data_action">Data 360 でのリアルタイムデータアクションの作成</a></strong><br>アラートまたはイベントを送信し、リアルタイムで応答を取得するリアルタイムデータアクションを作成します。リアルタイムデータアクションを使用して、チャネル、商品、取引先、サービス、個人レベルなど、さまざまなレベルのリアルタイムイベントとインサイトに焦点を絞ります。</li><li class="slds-p-bottom_small"><strong><a href="segment_activation-3.html#c360_a_integrate_salesforce_cdp_data_actions_with_salesforce_flow">Data 360 データアクションとフローの統合</a></strong><br><span>Data 360</span>データ アクションは、ストリーミング イベントとインサイトをSalesforceフローに送信してオーケストレーションを促進できます。オーケストレーションでは、フェーズ、ステップ、決定を使用して複雑なビジネスプロセスを整理します。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_data_action_troubleshooting">データアクションエラーのトラブルシューティング</a></strong><br>よくあるデータアクションおよびデータアクションターゲットのエラーを解決するためのヒントを紹介します。</li><li class="slds-p-bottom_small"><strong><a href="getstarted-1.html#c360_a_billing_considerations_for_data_actions">データアクションの請求に関する考慮事項</a></strong><br>データアクションの使用は、次の使用量種別のクレジットの消費に影響します。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.248.0.platform_events.meta/platform_events/platform_event_limits.htm">Salesforce ヘルプ: プラットフォームイベントの割り当て</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_delete_segment">
+<h1 class="slds-text-heading_large">セグメントの削除</h1>
+  <p>不要になったセグメントを削除します。セグメントが有効化に関連付けられている場合は、有効化を先に削除します。</p>
+
+    <div><p>セグメントを再度使用する場合は、代わりに公開スケジュールを停止します。セグメントを削除するには、セグメント名の横にあるドロップダウンメニューを使用して [削除] を選択します。</p><p>
+        <span style="vertical-align:text-bottom;display:inline-block;"><img alt="セグメントのドロップダウンメニューと、[削除] テキストに置かれたカーソル" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_delete_segment.png" style="width:400px;margin-bottom:0;"></span>
+      </p><p>セグメントを削除すると、再度有効にすることはできません。削除したセグメントをごみ箱から復元した場合、編集または削除を再び行うことはできません。セグメントを新たに作成する必要があります。</p></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_disable_segment">
+<h1 class="slds-text-heading_large">無効化されたセグメント</h1>
+  <p>セグメントが不要になった場合は、<span>Data 360</span>で無効化でき、選択したすべてのターゲットに適用されます。無効になったセグメントは公開されなくなり、有効化の選択と再有効化はできなくなります。セグメントを再度使用する場合は、代わりに公開スケジュールを停止します。</p>
+
+    <div><div><p>セグメント名の横にあるドロップダウンメニューを使用してセグメントを無効化し、<strong class="uicontrol">[無効化]</strong> をクリックします。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> セグメントを無効化すると、再度有効にすることはできません。無効化でエラーが発生した場合、セグメントを再作成する必要があります。</div></div></div>
+</div><div id="c360_a_disable_segment__fig_md3_lsr_1dc" style="text-align:left;"><a name="c360_a_disable_segment__fig_md3_lsr_1dc"></a>
+        <a name="c360_a_disable_segment__image_nd3_lsr_1dc"></a><img alt="セグメンテーションのドロップダウンメニューと、[無効化] というテキストに置かれたマウスアイコン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/c360_a_inactivate_segment.png" id="c360_a_disable_segment__image_nd3_lsr_1dc" style="width:800px;">
+      </div></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_edit_segment">
+<h1 class="slds-text-heading_large">セグメントの編集</h1>
+  
+  <p>Data 360 でセグメントを作成したら、そのルールやプロパティを編集して更新を提供したり、目的を変更したりできます。セグメント名を変更しても、セグメント API 参照名は変更されません。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d98071e67" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要な権限セット</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d98071e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要な権限セット">セグメントを編集する</td>
+
+              <td headers="d98071e67" style="vertical-align:top;" class="slds-cell-wrap"><p>次の権限セットのいずれか:</p><a name="c360_a_edit_segment__ul_jjg_cpm_d2c"></a><ul id="c360_a_edit_segment__ul_jjg_cpm_d2c">
+                  <li>Data Cloud アーキテクト</li>
+
+                  <li>Data Cloud 有効化マネージャー</li>
+
+                  <li>Data Cloud 有効化スペシャリスト</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div><ol><li>
+        <span>Data Cloud で、[<strong class="uicontrol">セグメント</strong>] タブに移動します。</span>
+      </li><li><span>セグメントを選択します。</span></li><li><span>属性ルールまたはセグメントプロパティを編集するには、<strong class="uicontrol">[ルールを編集]</strong> または <strong class="uicontrol">[プロパティを編集]</strong> をクリックします。</span><div>これらのオプションが表示されていない場合、セグメントは API を介して作成されており、サポートされるアクションのセットが制限されています。</div></li></ol>
+
+<ul><li class="slds-p-bottom_small"><strong><a href="#c360_a_copy_segment">セグメントのコピー</a></strong><br>Data 360 では、既存のセグメントをコピーして、既存のセグメントと同じ検索条件とカスタマイズを入力できます。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_delete_segment">セグメントの削除</a></strong><br>不要になったセグメントを削除します。セグメントが有効化に関連付けられている場合は、有効化を先に削除します。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_disable_segment">無効化されたセグメント</a></strong><br>セグメントが不要になった場合は、<span>Data 360</span>で無効化でき、選択したすべてのターゲットに適用されます。無効になったセグメントは公開されなくなり、有効化の選択と再有効化はできなくなります。セグメントを再度使用する場合は、代わりに公開スケジュールを停止します。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_examples_of_segmentation_filters">
+<h1 class="slds-text-heading_large">セグメンテーション検索条件の例</h1>
+  <p>さまざまな種類のセグメンテーション使用事例の検索条件の例を確認します。セグメントの開始点として次の例を使用し、キャンペーンに合わせて検索条件を追加して調整できます。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="marketing_omni.html#c360_a_b2c_commerce_engagement_filters">販売と注文の検索条件</a></strong><br>一般的な購入注文とサービスの使用事例として、次のようなものがあります。</li><li class="slds-p-bottom_small"><strong><a href="marketing_omni.html#c360_a_campaign_engagement_filters">キャンペーンエンゲージメントの検索条件</a></strong><br>一般的なキャンペーンエンゲージメントシナリオの使用事例として、次のようなものがあります。</li><li class="slds-p-bottom_small"><strong><a href="ai_models-2.html#c360_a_einstein_filters">Data 360 セグメントでの Einstein エンゲージメントスコアの検索条件</a></strong><br>一般的なメールエンゲージメント使用事例の例をいくつか示します。</li><li class="slds-p-bottom_small"><strong><a href="marketing_omni.html#c360_a_email_engagement_filters">メールエンゲージメントの検索条件</a></strong><br>一般的なメールエンゲージメント使用事例の例として、次のようなものがあります。</li><li class="slds-p-bottom_small"><strong><a href="data360_general-2.html#c360_a_miscellaneous_filters">ロイヤルティ検索条件</a></strong><br>一般的なロイヤルティの使用事例として、次のようなものがあります。</li><li class="slds-p-bottom_small"><strong><a href="data360_general-2.html#c360_a_purchases_filters">購入検索条件</a></strong><br>一般的な購入の使用事例として、次のようなものがあります。</li><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=data.c360_a_sms_engagement_filters.htm&amp;language=ja&amp;type=5">SMS エンゲージメント検索条件</a></strong><br>一般的な SMS エンゲージメントシナリオの使用事例として、次のようなものがあります。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="データモデルオブジェクト (DMO) を作成、表示、管理します。DMO は Data 360 の基本です。 DMO を作成または操作する前に、DMO に関連する定義、概念、リソースについてよく理解してください。" href="model_mapping-2.html#c360_a_data_model_objects">データモデルオブジェクト (DMO)</a></li><li><a title="Marketing Cloud Engagementからデータを取り込むと、Data 360は各スターター バンドルのデータ ストリームとデータ レイク オブジェクト(DLO)、およびデータ モデル オブジェクト(DMO)へのスキーマとマッピングを作成します。" href="data360_general-2.html#c360_a_mc_bundle_data_categories">Marketing Cloud Engagement データバンドルの情報</a></li><li><a target="_blank" href="https://trailhead.salesforce.com/ja/users/mcguide2/trailmixes/customer-360-audiences-and-the-ethical-use-of-data">Trailhead: Data 360 とデータの倫理的な使用</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_external_activation_platform_custom_metadata">
+<h1 class="slds-text-heading_large">外部有効化プラットフォームのカスタムメタデータの作成</h1>
+  
+  <p>Data 360 管理者が使用するためにプラットフォームをパッケージ化する前に、外部有効化プラットフォームのカスタムメタデータを作成します。これは、手動ワークフローを使用して作成されたプラットフォームにのみ適用されます。</p>
+
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 有効化スケジュールでは、24 時間ごとの公開がサポートされます。</div></div></div>
+</div>
+    <ol><li>
+        <span>歯車アイコンをクリックし、<strong class="uicontrol">[設定]</strong> をクリックします。</span>
+      </li><li>
+        <span>[設定] で、<strong class="uicontrol">[カスタムメタデータ型]</strong> に移動します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[新規カスタムメタデータ型]</strong> をクリックします。</span>
+      </li><li>
+        <span>[表示ラベル] に<kbd>「ActivationPlatformCredential」</kbd>と入力し、[表示ラベル(複数形)] に<kbd>「ActivationPlatformCredentials」</kbd>と入力します。</span>
+      </li><li>
+        <span>[表示] で、<strong class="uicontrol">[同じ管理パッケージ内の Apex コードのみがこの種別を参照できます。この種別の名前とレコードは数式で参照されている場合に表示できます。</strong></span>
+        <div>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 別のオプションを選択すると、パッケージをインストールするユーザーに Amazon S3 バケットのログイン情報が公開される可能性があります。</div></div></div>
+
+        </div>
+      </li><li>
+        <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+      </li><li>
+        <span>[ActivationPlatformCredential] をクリックします。</span>
+      </li><li>
+        <span>[カスタム項目] で、<strong class="uicontrol">[新規]</strong> をクリックします。</span>
+        <ol>
+          <li>
+            <span>[テキスト] を選択して、<strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+          </li>
+
+          <li>
+            <span>[項目の表示ラベル] と [項目名] に「AccessKey」と入力し、<strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+            <div>
+              <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> [長さ] の値は 150 にすることをお勧めしますが、他の任意の制限値も設定できます。</div></div></div>
+
+            </div>
+          </li>
+
+          <li>
+            <span>[ActivationPlatformCredential ページレイアウト] が選択されていることを確認します。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[保存 &amp; 新規]</strong> をクリックします。</span>
+          </li>
+
+          <li>
+            <span>[テキスト] を選択して、<strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+          </li>
+
+          <li>
+            <span>[項目の表示ラベル] と [項目名] に「SecretKey」と入力し、<strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+            <div>
+              <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> [長さ] の値は 50 にすることをお勧めしますが、他の任意の制限値も設定できます。</div></div></div>
+
+            </div>
+          </li>
+
+          <li>
+            <span>[ActivationPlatformCredential ページレイアウト] が選択されていることを確認します。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span><strong class="uicontrol">[ActivationPlatformCredentials を管理]</strong> をクリックします。</span>
+        <ol>
+          <li>
+            <span><strong class="uicontrol">[新規]</strong> をクリックします。</span>
+          </li>
+
+          <li>
+            <span>表示ラベルと ActivationPlatformCredential 名は、<span>Data 360</span> で外部有効化プラットフォームを作成するときに選択した開発者名と一致する必要があります。</span>
+          </li>
+
+          <li>
+            <span>AccessKey と SecretKey の値を入力します。</span>
+            <div>
+              <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> <span>Data 360</span> で外部有効化プラットフォームを作成したときに入力した S3 バケット名のログイン情報を使用します。</div></div></div>
+
+            </div>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+          </li>
+
+        </ol>
+      </li></ol>
+
+    <div><p>外部有効化プラットフォームのカスタムメタデータが作成されます。</p></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_external_activation_platform_json">
+<h1 class="slds-text-heading_large">JSON を使用した外部有効化プラットフォームの作成 (ISV パートナー)</h1>
+ 
+ <p>Data 360 Developer Editionで有効化ツールキットを使用して外部有効化プラットフォームを構築し、顧客とエンゲージします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+  <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Developer Edition</td>
+
+      </tr>
+     </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col><col></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d113982e55" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d113982e55" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Data 360 の設定にアクセスする</td>
+
+       <td headers="d113982e55" style="vertical-align:top;" class="slds-cell-wrap"><p>システム管理者プロファイルまたは </p><p style="margin-bottom:0;">「Data Cloud アーキテクト」権限セット</p></td>
+
+      </tr>
+     </tbody></table></div>
+  <ol><li>
+    <span>歯車アイコンをクリックし、[<strong class="uicontrol">Data Cloud 設定</strong>] をクリックします。</span>
+   </li><li>
+    <span><strong class="uicontrol">[外部有効化プラットフォーム]</strong> をクリックします。</span>
+   </li><li>
+    <span><strong class="uicontrol">[新規]</strong> をクリックします。</span>
+   </li><li>
+    <span>[<strong class="uicontrol">JSON] を</strong>選択します。</span>
+   </li><li>
+    <span>テキストボックスで JSON をアップロードまたはコピーします。</span>
+   </li><li>
+    <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+   </li></ol>
+
+  <div><p dir="ltr">JSON ファイルに基づく新しい外部有効化プラットフォームが作成されます。項目の詳細と JSON の例については、「<a title="外部有効化プラットフォームを定義するのに役立つ項目の説明とベストプラクティスに続く JSON の例を次に示します。" href="segment_activation-1.html#c360_a_activation_toolkit_isv">JSON メタデータの</a>使用と例」を参照してください。</p></div>
+ 
+<ul><li class="slds-p-bottom_small"><strong><a href="segment_activation-1.html#c360_a_activation_toolkit_isv">外部有効化プラットフォームの JSON メタデータの利用状況と例</a></strong><br>外部有効化プラットフォームを定義するのに役立つ項目の説明とベストプラクティスに続く JSON の例を次に示します。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_external_activation_platform_schedule">
+<h1 class="slds-text-heading_large">手動ワークフローを使用した外部有効化プラットフォームの作成</h1>
+  
+  <p><span>Data 360</span> Developer Edition組織で外部有効化プラットフォームを作成し、プラットフォームで顧客にリーチできるようにします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Developer Edition</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li><span>歯車アイコンをクリックし、[<span>Data 360</span> 設定] をクリックします。</span></li><li><span><strong class="uicontrol">[外部有効化プラットフォーム]</strong> をクリックします。</span></li><li><span><strong class="uicontrol">[新規]</strong> をクリックします。</span></li><li>
+        <span><strong class="uicontrol">［Manual］</strong> をクリックします。</span>
+      </li><li><span><span>Data 360</span> 管理者に表示するプラットフォームに関する情報を入力します。プレビューが右側に表示されます。</span><div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> <span>Data 360</span> で作成した開発者名は、後でカスタムメタデータを作成するときに必要になります。</div></div></div>
+</div></li><li><span><strong class="uicontrol">[次へ]</strong> をクリックします。</span></li><li><span>各項目は、次のようになっています。</span><ol><li><span>ドロップダウンボタンをクリックして、必須の AccountId 項目を設定します。<strong class="uicontrol">[編集]</strong> をクリックします。</span></li>
+<li><span>ヘルプテキストで、<span>Data 360</span> 管理者に AccountId を見つける方法の手順を説明します。</span><div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> AccountId 項目に保存されている値はファイルパスとメタデータファイルの形式で記述されているため、データを取得する場所を把握できます。</div></div></div>
+</div></li>
+<li><span>項目をさらに追加する場合は、<strong class="uicontrol">[保存して追加]</strong> をクリックします。項目を追加し終えたら、<strong class="uicontrol">[保存して閉じる]</strong> をクリックします。</span></li>
+</ol></li><li><span><strong class="uicontrol">[次へ]</strong> をクリックします。</span></li><li><span>受信する連絡先 (ID) を 1 つ以上選択します。</span><div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 電話番号とメールアドレスの連絡先のハッシュ方法を選択します。メールアドレスは空白が切り取られ、小文字に変換されます。</div></div></div>
+</div></li><li><span><strong class="uicontrol">[次へ]</strong> をクリックします。</span></li><li><span>[有効化スケジュール]、[配信プラットフォーム]、および [データ配信オプション] を選択します。</span><div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-error"><img alt="警告" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_warning.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">警告</span> セグメントを配信する S3 バケット名を入力します。カスタムメタデータを作成するときには、S3 AccessKey と SecretKey の入力を求められます。</div></div></div>
+</div></li><li><span><strong class="uicontrol">[保存]</strong> をクリックします。</span></li></ol>
+
+    <div><p>外部有効化プラットフォームが作成されます。</p></div>
+  
+</div></div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="segment_activation-1.html">&larr; セグメント・活性化・オーディエンス・配信制御（1/3）</a><a href="segment_activation-3.html">セグメント・活性化・オーディエンス・配信制御（3/3） &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=data.c360_a_data_cloud.htm&type=5&language=ja">help.salesforce.com — Data 360（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>

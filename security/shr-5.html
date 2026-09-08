@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>セキュリティ状態レビュー (SHR)（5/5） | セキュリティ（組織を保護する）ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（42）</h2>
+    <ol>
+      <li><a href="#shr_security_enable_refresh_token_rotation">セキュリティ: 更新トークンの循環制御の有効化</a></li>
+      <li><a href="#shr_security_insight_security_center_extension_add_on">Security Insight - Security Center Extension (アドオン) Control (セキュリティインサイト - セキュリティセンター拡張機能 (アドオン) コントロール)</a></li>
+      <li><a href="#shr_security_issue_json_web_token_jwt_based_access_tokens_for_named_users">セキュリティ: 指定ユーザー制御用の JSON Web トークン (JWT) ベースのアクセストークンの発行</a></li>
+      <li><a href="#shr_security_require_proof_key_for_code_exchange_pkce">セキュリティ: コード交換 (PKCE) 制御用の証明鍵が必要</a></li>
+      <li><a href="#shr_security_require_secret_for_refresh_token_flow">セキュリティ: 更新トークンフロー制御の秘密が必要</a></li>
+      <li><a href="#shr_security_require_secret_for_web_server_flow">セキュリティ: Web サーバーフロー制御の秘密が必要</a></li>
+      <li><a href="#shr_select_enable_lightning_logger_events">[Lightning Logger Events Control を有効化] を選択します。</a></li>
+      <li><a href="#shr_self_registration">セルフ登録制御</a></li>
+      <li><a href="#shr_session_security_level_policies">セッションセキュリティレベルのポリシー制御</a></li>
+      <li><a href="#shr_session_security_settings">セッションセキュリティ設定の確認</a></li>
+      <li><a href="#shr_session_settings">セッション設定コントロール</a></li>
+      <li><a href="#shr_session_timeout_settings">セッションタイムアウト設定の制御</a></li>
+      <li><a href="#shr_set_up_audit_trail">監査履歴コントロールの設定</a></li>
+      <li><a href="#shr_shield_platform_encryption_add_on_encryption_policy_database_encryption">Shield Platform Encryption(アドオン)暗号化ポリシー:データベースの暗号化</a></li>
+      <li><a href="#shr_shield_platform_encryption_add_on_encryption_policy_enable_encryption_on_supported_features">Shield Platform Encryption (アドオン) Encryption ポリシー - サポートされる機能での暗号化の有効化</a></li>
+      <li><a href="#shr_shield_platform_encryption_add_on_encryption_policy_enable_opt_out_key_derivation_and_byok">Shield Platform Encryption (アドオン) Encryption ポリシー - 鍵派生のオプトアウトと BYOK の有効化</a></li>
+      <li><a href="#shr_shield_platform_encryption_add_on_encryption_policy_manage_data_360_keys">Shield Platform Encryption (アドオン) Encryption ポリシー:Data 360 鍵の管理</a></li>
+      <li><a href="#shr_shield_platform_encryption_add_on_encryption_policy_restrict_access_to_encryption_policy_settings">Shield Platform Encryption (アドオン) Encryption ポリシー - 暗号化ポリシー設定へのアクセスの制限</a></li>
+      <li><a href="#shr_shield_platform_encryption_add_on_encryption_policy_salesforce_managed_keys">Shield Platform Encryption(アドオン)暗号化ポリシー - Salesforce管理鍵</a></li>
+      <li><a href="#shr_single_logout">シングルログアウト制御</a></li>
+      <li><a href="#shr_single_sign_on">シングルサインオンコントロールの確認</a></li>
+      <li><a href="#shr_single_sign_on_for_salesforce_customer_identity">Salesforce Customer Identity Control のシングルサインオン</a></li>
+      <li><a href="#shr_single_sign_on_settings">シングルサインオン設定の制御</a></li>
+      <li><a href="#shr_sso_scenarios_salesforce_as_the_identity_provider">サポートされる SSO シナリオ: ID プロバイダー制御としての Salesforce (OpenID Connect または SAML)</a></li>
+      <li><a href="#shr_sso_scenarios_salesforce_as_the_service_provider">サポートされる SSO シナリオ: サービスプロバイダー制御としての Salesforce (証明書利用者)</a></li>
+      <li><a href="#shr_strongly_recommended_mobile_app_security_controls">強く推奨されるモバイルアプリケーションセキュリティコントロール</a></li>
+      <li><a href="#shr_third_party_apps_and_managed_app_security_controls">サードパーティアプリケーションと管理アプリケーションセキュリティコントロールの確認</a></li>
+      <li><a href="#shr_track_object_field_history">追跡オブジェクトの項目履歴の確認</a></li>
+      <li><a href="#shr_track_troubleshoot_and_audit_your_company_s_user_activity_add_on">会社のユーザー活動の追跡、トラブルシューティング、監査の確認 (アドオン)</a></li>
+      <li><a href="#shr_use_any_api_restriction">任意の API クライアントの使用 - 制限コントロール</a></li>
+      <li><a href="#shr_user_access_policies">ユーザーアクセスポリシー制御</a></li>
+      <li><a href="#shr_user_provisioning_for_connected_apps_enable_user_provisioning">接続アプリケーションのユーザープロビジョニング: ユーザープロビジョニング制御の有効化</a></li>
+      <li><a href="#shr_user_sharing_and_visibility">ユーザー共有と表示制御</a></li>
+      <li><a href="#shr_verify_the_ownership_of_email_sending_domains_by_dkim_keys">DKIM 鍵制御によるメール送信ドメインの所有権の確認</a></li>
+      <li><a href="#shr_view_event_log_data_in_analytics_apps">Analytics アプリケーションコントロールでのイベントログデータの表示</a></li>
+      <li><a href="#shr_waf_define_custom_firewall_rules_based_on_asn_or_ip">WAF: ASN または IP 制御に基づくカスタムファイアウォールルールの定義</a></li>
+      <li><a href="#shr_waf_firewall_managed_ruleset">WAF ファイアウォールによるルールセット管理</a></li>
+      <li><a href="#shr_web_app_saml_policy_strengthening_single_logout_signature_verification_and_encrypting_response">Web アプリケーション: SAML ポリシーの強化、シングルログアウト、署名検証、応答の暗号化</a></li>
+      <li><a href="#shr_web_app_settings_after_enabling_saml_configure_the_required_policies">Web アプリケーション設定: SAML を有効にした後、必要なポリシーコントロールを設定する</a></li>
+      <li><a href="#shr_web_app_settings_encrypt_saml_response_select">Web アプリケーション設定: Encrypt SAML Response - Select Control (SAML 応答を暗号化 - 制御を選択)</a></li>
+      <li><a href="#shr_web_app_settings_signing_algorithm_for_saml_messages_select_sha256">Web アプリケーション設定: SAML メッセージの署名アルゴリズム - SHA256 制御の選択</a></li>
+      <li><a href="#shr_web_app_settings_verify_request_signatures_select">Web アプリケーション設定: 要求署名の検証 - 制御の選択</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>セキュリティ状態レビュー (SHR)（5/5）</h1>
+      <div class="meta">Salesforce セキュリティ（組織を保護する）ヘルプ · 42 記事 · 生成 2026-08-13</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="shr-4.html">&larr; セキュリティ状態レビュー (SHR)（4/5）</a><a href="overview_misc.html">概要・その他 &rarr;</a></div>
+<section class="article" id="shr_security_enable_refresh_token_rotation">
+<h1 class="slds-text-heading_large">セキュリティ: 更新トークンの循環制御の有効化</h1>
+    
+    <p>このセキュリティ設定では、クライアントが新しいアクセストークンを取得するために更新トークンを使用するたびに、各更新トークンが無効になり、新しい 1 回限りのトークンに置き換えられます。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>外部クライアントアプリケーション: セキュリティ: 更新トークンの循環の有効化</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><p>[更新トークンの循環] を有効にします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>このセキュリティ設定では、クライアントが新しいアクセストークンを取得するために更新トークンを使用するたびに、各更新トークンが無効になり、新しい 1 回限りのトークンに置き換えられます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>循環を使用しない場合、侵害された更新トークンは無期限または期限切れになるまで有効なままであるため、攻撃者は再認証することなく、環境への永続的な不正アクセスを維持できます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>攻撃者は、ローカルデバイスまたはアプリケーションログから静的更新トークンを抽出し、そのトークンを使用してプログラムで有効なアクセストークンの連続ストリームを生成し、Salesforce インスタンスへの永続的なバックドアを効果的に確立します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>高 (7.0 ～ 8.9)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>循環を実装しないと、正当なユーザーがパスワードを変更したり、多要素認証のチャレンジを完了したりした場合でも、攻撃者はログインしたままでいられるため、長期的なデータの持ち出しやアカウント乗っ取りの検出が容易になります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>セキュリティレベルの低いローカル環境にトークンを保存するモバイルアプリケーションや単一ページアプリケーションなどの公開クライアントや、広範な管理権限が付与されているインテグレーションでは、リスクが高くなります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">低リスク</h2><p>会社がすべての更新トークンに非常に短い絶対有効期間を適用し、トークンが既知の信頼できるネットワークからのみ使用されるように厳格な IP アドレス制限を使用している場合。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>循環を有効にするには、クライアントアプリケーションがすべての交換で返された更新トークンを処理し、同期の失敗を回避するために新しい値を正常に保持できる必要があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨される修復</h2><p>外部クライアントアプリケーションの OAuth 設定に移動し、更新トークンの循環をオンにするチェックボックスをオンにします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>セキュリティ状態レビューでは、更新トークンの循環がセッション管理の必須の多重防御標準として識別されるため、盗まれたベアラートークンの商談期間は 1 つのトランザクションに制限されます。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.configure_external_client_app_oauth_settings.htm&amp;language=ja&amp;type=5">外部クライアントアプリケーション OAuth 設定の定義</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_security_insight_security_center_extension_add_on">
+<h1 class="slds-text-heading_large">Security Insight - Security Center Extension (アドオン) Control (セキュリティインサイト - セキュリティセンター拡張機能 (アドオン) コントロール)</h1>
+    
+    <p>詳細なインサイトレンズには、一連のスコアが表示されます。このスコアは、各セキュリティインサイトのリスク評価に基づいており、改善活動で優先される事項を見つけて優先順位を付けるのに役立ちます。</p>
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>Security Insight - Security Center Extension (アドオン)</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>Salesforce のセキュリティ体制に関する自動スコアリングとリスク優先のインサイト。設定ミス、過剰なアクセス、ベストプラクティスやポリシーとのギャップを特定するのに役立ちます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">説明</h2><p>セキュリティセンター拡張機能のセキュリティインサイトを使用して組織の設定、データ分類、アクセス設定を評価し、スコアと定性的なリスク評価を割り当てて主要なリスクと修復の優先度を強調します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><p>各インサイトの定性的なリスク評価としきい値スコアを定義し、会社のリスク許容度に合わせて、レンズまたはインサイトカテゴリごとに目標スコアを設定します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">セキュリティへの影響</h2><p>設定ミスや権限過剰なアクセスに対する可視性が向上し、データ漏洩やポリシー違反の可能性が低くなり、最小限の権限とコンプライアンスのセキュリティ体制を維持できます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスへの影響</h2><p>監査と侵害対応の作業を削減し、規制レポートをサポートし、修復とセキュリティ技術負債作業の優先順位付けを効率化して、全体的な運用リスクとコンプライアンスリスクを軽減します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>データインサイトの定性的なリスク評価の欠如、一貫性のないリスクの優先順位付け、高リスクの設定ミスやアクセスパターンを検出して焦点を絞る能力の低下。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>設定ミスや不在のデータ分類では、機密データの識別と保護に失敗し、重要な情報への不正アクセスを許してしまいます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>高 (7.0 ～ 8.9)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>誤った設定や過剰なアクセスに対する可視性が制限されるとリスクが高まり、全体的なセキュリティ体制に影響する可能性があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>組織で機密性の高いデータや規制対象のデータが保存されている、多くの管理者やインテグレーションがいる、手動でのセキュリティレビュープロセスが制限されている、強力な変更管理が行われていない、頻繁に設定を変更している。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">低リスク</h2><p>組織は、機密性の低いデータのみを保持し、シンプルで厳密に制御されたアクセスモデル、強力な独立したセキュリティ監視、最小限の設定またはインテグレーションの変更速度を備えています。組織にはすでに強力な状態チェックスコアがあり、ATHR とセキュリティ状態レビューレポートを完了し、調査結果に対処しています。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>強くお勧めします。セキュリティインサイトの出力を既存のリスク登録、SIEM または GRC ワークフロー、セキュリティ運用プロセスに統合して、修正を追跡します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>強くお勧めします。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.sc_ext_score_insights.htm&amp;language=ja&amp;type=5">Security Insights Lens Information and Scoring in Secure (セキュリティインサイトのレンズ情報と安全なスコアリング)</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_security_issue_json_web_token_jwt_based_access_tokens_for_named_users">
+<h1 class="slds-text-heading_large">セキュリティ: 指定ユーザー制御用の JSON Web トークン (JWT) ベースのアクセストークンの発行</h1>
+    
+    <p>このセキュリティ設定により、Salesforce 認証サーバーは不透明な参照ベースのアクセストークンの発行から、暗号化で署名された自己完結型の JSON Web トークンの発行に移行します。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>外部クライアントアプリケーション: セキュリティ: 指定ユーザーの JSON Web トークン (JWT) ベースのアクセストークンを発行</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><p>指定ユーザーの JSON Web トークン (JWT) ベースのアクセストークンを発行します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>このセキュリティ設定により、Salesforce 認証サーバーは、不透明な参照ベースのアクセストークンの発行から、ユーザー ID と権限要求を含む自己完結型の暗号署名済み JSON Web トークンの発行に移行します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>このオプションが有効になっていない場合、外部システムはトークンの有効性を検証する要求ごとに Salesforce イントロスペクションエンドポイントへのステートフルコールアウトを実行する必要があります。これにより、遅延が増大し、認証のリアルタイムの可用性に連動関係が生じます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>外部リソースサーバーは、ネットワークパーティション中に従来の不透明トークンの整合性や範囲を独立して検証できないため、フェールオープンロジックが誤って実装された場合に、サービスが完全に停止したり、不正な要求が処理されたりする可能性があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>高 (7.0 ～ 8.9)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>高度に分散されたアーキテクチャで不透明なトークンに依存すると、処理オーバーヘッドが増加し、標準の JWT クレームに基づいてきめ細かくローカライズされた認証チェックを実行する外部マイクロサービスの機能が制限されます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>バックチャネルイントロスペクションコールが頻繁に発生する遅延によってアプリケーションのパフォーマンスが低下し、認証サーバーがサービス拒否状態に陥る可能性がある大規模のマルチクラウド環境では、リスクが高くなります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">低リスク</h2><p>リソースサーバーと認証サーバーが同じ信頼済みネットワーク内にあり、トークンイントロスペクションのオーバーヘッドが無視できる単純なモノリシックインテグレーションの場合、このシナリオのリスクは低くなります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>JWT ベースのトークンを有効にすると、標準化されたステートレストークンを必要とする最新の API ゲートウェイやプラットフォーム外サービスとの互換性が向上しますが、署名検証用の公開鍵を管理するにはこれらのシステムが必要です。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨される修復</h2><p>外部クライアントアプリケーションの OAuth 設定に移動し、指定ユーザーに JSON Web トークン (JWT) ベースのアクセストークンを発行するチェックボックスをオンにします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>Security Health Review では、JWT ベースのアクセストークンの使用が最新の相互運用可能なアーキテクチャの必須標準として識別されるため、さまざまなテクノロジースタックで ID と認証データをステートレスに検証できます。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.jwt_eca_configuration.htm&amp;type=5&amp;language=ja">JWT ベースのアクセストークンを発行するための外部クライアントアプリケーションの設定</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_security_require_proof_key_for_code_exchange_pkce">
+<h1 class="slds-text-heading_large">セキュリティ: コード交換 (PKCE) 制御用の証明鍵が必要</h1>
+    
+    <p>このセキュリティ設定では、互換性のあるすべての OAuth 2 で暗号ハンドシェイクが必須です。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>外部クライアントアプリケーション: セキュリティ: コード交換の証明鍵が必要 (PKCE)</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><p>サポートされる認証フローのコード交換用プルーフキー (PKCE) 拡張が必要。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>このセキュリティ設定では、すべての互換性のある OAuth 2.0 許可種別で暗号化ハンドシェイクが必須です。クライアントは、最初の要求時にハッシュコードチャレンジを送信し、トークン交換時にプレーンテキストコード検証を送信して、要求を特定のクライアントインスタンスにバインドします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>サポートされているすべてのフローで PKCE を適用しない場合、認証サーバーには元の通話者の ID を検証する技術的なメカニズムがないため、傍受された認証コードまたは中間ログイン情報が悪意のあるアクターによってアクセストークンに正常に交換される可能性があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>攻撃者は、ブラウザー履歴、システムログ、またはカスタム URI スキームの代行受信を介して、成功したログインから有効な認証コードまたは代行受信可能なログイン情報を取得し、正当なクライアントがハンドシェイクを完了する前にプログラムで有効なセッショントークンを取得します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>高 (7.0 ～ 8.9)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>該当するすべてのフローで PKCE を適用しないと、セッションハイジャックや不正なデータアクセスが横行する可能性があります。特に、静的クライアントの秘密が使用されていないインテグレーションや侵害されたインテグレーションが標的になります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>ネイティブモバイルアプリケーションや単一ページ Web アプリケーション (SPA) などの公開クライアントでは、クライアントの秘密を安全に保存できず、トラフィックのリダイレクトが監視可能な環境で頻繁に動作するため、リスクは高くなります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">低リスク</h2><p>必須のクライアントの秘密をすでに適用し、厳格に隔離されたネットワーク境界内で業務を行うセキュアなバックエンドサーバーで機密クライアントを排他的に使用する組織の場合は、リスクが低くなります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>サポートされるすべてのフローでこの要件を有効にするには、すべての統合クライアントアプリケーションで S256 変換方法がサポートされ、トランザクションごとに一意の高エントロピー文字列が管理されている必要があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨される修復</h2><p>外部クライアントアプリケーションの [OAuth 設定] に移動し、サポートされているすべての認証フローで [コード交換の証明鍵 (PKCE) が必要] チェックボックスをオンにします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>Security Health Review では、PKCE がすべての最新の ID および認証フローの必須アーキテクチャ標準として識別されるため、すべてのトークン交換が特定のクライアントインスタンスに暗号でバインドされ、ログイン情報の挿入と傍受が防止されます。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.configure_external_client_app_oauth_settings.htm&amp;language=ja&amp;type=5">外部クライアントアプリケーション OAuth 設定の定義</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.remoteaccess_pkce.htm&amp;language=ja&amp;type=5">Proof Key for Code Exchange (PKCE) 拡張</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_security_require_secret_for_refresh_token_flow">
+<h1 class="slds-text-heading_large">セキュリティ: 更新トークンフロー制御の秘密が必要</h1>
+    
+    <p>このセキュリティ設定では、Salesforce 認証サーバーから新しい有効なアクセストークンを取得するために、更新トークンと共に有効なクライアントの秘密をアプリケーションに提供する必要があります。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>外部クライアントアプリケーション: セキュリティ: 更新トークンフローの秘密が必要</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><p>更新トークンフローの秘密が必要。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>このセキュリティ設定では、Salesforce 認証サーバーから新しい有効なアクセストークンを取得するために、更新トークンと共に有効なクライアントの秘密をアプリケーションに提供する必要があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>必須の秘密がないと、侵害された更新トークンが不正なアクターによって使用され、セカンダリサーバー側の認証を必要とせずに、延々と有効なセッションが生成される可能性があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>エンドポイントはアプリケーションの非公開ログイン情報を検証しないため、攻撃者はローカルデバイスまたはアプリケーションログから有効期間の長い更新トークンを抽出し、独自のインフラストラクチャからプログラムで新しいアクセストークンを正常に生成します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>高 (7.0 ～ 8.9)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>秘密のない更新サイクルを許可すると、ユーザーの最初のログインセッションが期限切れになった後も、検出されない永続的なデータの持ち出しや、不正なアカウントアクセスが引き続き有効になります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>アプリケーションが更新トークンの循環 (RTR) を実装していない場合、または更新トークンの有効期限が無期限の場合、攻撃者に永続的なバックドアが提供されます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">低リスク</h2><p>会社がインテグレーションユーザーに厳しい IP アドレス制限を適用し、頻繁に対話型再認証を必要とする有効期間の短い更新トークンを使用している場合。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>この要件を有効にすると、バックエンドサーバーで秘密が確実に保護されますが、モバイルアプリケーションや単一ページアプリケーションなどの公開クライアントは、セキュアなプロキシを使用せずにセッションを直接更新できなくなります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨される修復</h2><p>外部クライアントアプリケーションの OAuth 設定に移動し、更新トークンフローにクライアントの秘密を要求するチェックボックスをオンにします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>セキュリティ状態レビューでは、更新された操作にクライアントの秘密が必須で使用されることが重要な多層防御標準として識別されるため、盗まれたベアラートークンは、対応する非公開アプリケーションログイン情報なしでは武器化できません。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.configure_external_client_app_oauth_settings.htm&amp;language=ja&amp;type=5">外部クライアントアプリケーション OAuth 設定の定義</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_security_require_secret_for_web_server_flow">
+<h1 class="slds-text-heading_large">セキュリティ: Web サーバーフロー制御の秘密が必要</h1>
+    
+    <p>このセキュリティ設定では、アクセストークンの認証コードの交換を完了するために、Web サーバーまたはアプリケーションが一意のクライアントの秘密を Salesforce に提供する必要があります。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>外部クライアントアプリケーション: セキュリティ: Web サーバーフローの秘密が必要</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><p>Web サーバーフローの秘密が必要。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>このセキュリティ設定では、アクセストークンの認証コードの交換を完了するために、Web サーバーまたはアプリケーションが一意のクライアントの秘密を Salesforce に提供する必要があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>必須の秘密がない場合、Web サーバーフローは認証コードのみに依存します。認証コードは、ブラウザー履歴、参照元ヘッダー、またはログファイルを介して傍受され、後で未承認のアクターによってセッションと交換される可能性があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>攻撃者はユーザーのリダイレクト URI から有効な認証コードを取得し、アプリケーションになりすましてアクセストークンを要求します。これは、Salesforce エンドポイントでセカンダリサーバー側認証を必要としないためです。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>高 (7.0 ～ 8.9)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>秘密のない Web サーバーフローを許可すると、トークンの交換中に要求元のアプリケーションの ID が暗号学的または管理的に検証されないため、広範なセッションハイジャックや不正なデータアクセスが可能になります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>アプリケーションが共有ドメインでホストされている場合、または暗号化されていないリダイレクト URI を使用している場合、攻撃者は複数のベクトルを使用して、転送中の認証コードを監視および盗取できます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">低リスク</h2><p>アプリケーションがすべてのトランザクションにすでに Proof Key for Code Exchange (PKCE) を適用している場合、認証コードは攻撃者にとって未知の高エントロピー検証者にバインドされます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>この要件を有効にすると、バックエンドサーバーで秘密が確実に保護されますが、アプリケーションアーキテクチャで秘密をクライアント側のブラウザーに公開せずに安全に保存および転送できる必要があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨される修復</h2><p>外部クライアントアプリケーションの OAuth 設定に移動し、Web サーバーフローにクライアントの秘密を要求するチェックボックスをオンにします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>Security Health Review では、基本的な多層防御標準としてサーバー側フローのクライアントの秘密の使用が必須であることが識別されるため、機密性の高い認証コードは二次的な非公開ログイン情報なしでは武器化できません。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.configure_external_client_app_oauth_settings.htm&amp;language=ja&amp;type=5">外部クライアントアプリケーション OAuth 設定の定義</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_select_enable_lightning_logger_events">
+<h1 class="slds-text-heading_large">[Lightning Logger Events Control を有効化] を選択します。</h1>
+    
+    <p>LWC（Lightning Webコンポーネント）およびAuraコンポーネントから、クライアント側の詳細なJavaScriptエラー、パフォーマンス評価指標、カスタム・ログ・イベントを取得します。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>イベント モニタリング設定([Enable Lightning Logger Events]を選択)</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>LWC(Lightning Webコンポーネント)およびAuraコンポーネントからクライアント側の詳細なJavaScriptエラー、パフォーマンス評価指標、カスタム ログ イベントを取得し、フロントエンド アプリケーションの動作と障害を可視化します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">説明</h2><p>［Setup］＞ ［Event Monitoring Settings］ で有効にすると、Lightning Logger はブラウザーの console.log（） コール、未対応の例外、ネットワーク障害、および LWC ライフサイクルイベントをイベントログファイルに記録します。これは、セキュリティ制御またはユーザーワークフローに影響する UI の問題を診断するために不可欠です。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><p>[Enable Lightning Logger Events]を選択します。開発者は、<code>lightning__Logger</code> モジュールを LWC に追加し、コンポーネント設定を使用してログレベル (ERROR、WARN、INFO、DEBUG) を設定します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">セキュリティへの影響</h2><p>クライアント側の攻撃 (XSS、DOM 操作)、カスタム UI のセキュリティ制御の破綻、サーバー側のログだけでは認識できない認証の失敗を明らかにします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスへの影響</h2><p>Lightning Experienceの問題のトラブルシューティングを迅速化し、アプリケーションの信頼性を向上させ、重要なワークフローをブロックするUI障害からのサポート チケットを削減します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>UIでLightningコンポーネント イベントのログを無効にすると、クライアント側の攻撃やアプリケーションの障害の死角が発生します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>悪意のある JavaScript インジェクション、破損した MFA プロンプト、カスタムコンポーネントの権限昇格の脆弱性、DOM ベースの XSS は、サーバー側で検出されずに動作します。ユーザーは、セキュリティ制御バイパスをマスクするときにサイレントエラーが発生します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>重大 (9.0 ～ 10.0)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>カスタムLightningアプリケーション、Experience Cloudポータル、CPQ/Service Cloudコンソールに不可欠。オーバーヘッドは最小限ですが、診断価値は高くなります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>ヘビーカスタム LWC/Aura 開発、外部 Experience Cloud ユーザー、iframe/ポータルへの Salesforce の組み込み、セキュリティワークフローを含む複雑なコンソールアプリケーション。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">低リスク</h2><p>純粋なClassic環境、カスタム コンポーネントなし、Lightningが無効の内部ユーザーのみ。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>ストレージへの影響は最小限 (ELF 全体の 1% 未満)。重要な障害に関する自動アラートをエラーログと統合します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>Lightning Experience 組織で必要です。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">影響を受けるユーザー</h2><p>LWC/Aura 開発者、Experience Cloud 管理者、Service Cloud コンソールオペレーター、クライアント側のインシデントを調査するセキュリティアナリスト。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.object_reference.meta/object_reference/sforce_api_objects_eventlogfile_lightninglogger.htm">開発者リファレンス: LightningLogger EventLogFile</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_self_registration">
+<h1 class="slds-text-heading_large">セルフ登録制御</h1>
+    
+    <p>この制御では、セルフ登録機能と関連するVisualforceコンポーネントを無効化して、承認された管理者主導の招待プロセスを介してのみ新しいサイト メンバーを追加できるようにします。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>セルフ登録</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><p>Experience Cloud サイトへの新規訪問者の参加を招待するには、セルフ登録を削除/無効化します。</p><p>[設定]&gt; [Visual Force ページ]&gt; [CommunitiesSelfReg] - プロファイルが割り当てられていない、または [Lightning Experience、エクスペリエンスビルダーサイト、およびモバイルアプリケーションで参照されるページと使用できないページ] (チェックなし)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>この制御では、セルフ登録機能と関連するVisualforceコンポーネントを無効化して、承認された管理者主導の招待プロセスを介してのみ新しいサイト メンバーを追加できるようにします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>セルフ登録が有効になっている場合やバックグラウンドで有効のままになっている場合、インターネット上のすべてのユーザー (または自動ボット) が、内部の審査や ID 検証手順をスキップして、Salesforce 組織に有効なユーザーアカウントを作成できます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>攻撃者はスクリプトを使用して何千ものダミーアカウントを一括登録し、そのダミーアカウントを使用して内部サイトの脆弱性を調査したり、ユーザーディレクトリをスクレイピングしたり、ライセンス数に対するサービス拒否 (DoS) 攻撃を開始したりします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>重大 (9.0 ～ 10.0)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>新しい「ユーザー」はすべてオブジェクトレベルの共有ルールを悪用する出発点になる可能性があるため、アカウントの作成が制御されていないと、ライセンスの枯渇、データ汚染、攻撃対象の拡大につながります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>「CommunitiesSelfReg」Visualforce ページがプロファイルにまだ割り当てられている場合、UI で「登録」ボタンが非表示になっていても、直接 URL を介してアクセスできる機能的な「バックドア」のままです。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">低リスク</h2><p>サイトでreCAPTCHAとセルフ登録ハンドラ(Apex)を使用している場合、新しく登録されたアカウントを実際に有効化する前に手動での管理者の承認が必要です。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>セルフ登録を無効にすると、ユーザーオンボーディングの負担が内部チームまたは自動 API 駆動の招待システムに移行され、管理オーバーヘッドが増加する可能性がありますが、優れたセキュリティガバナンスが提供されます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨される修復</h2><p>[Login &amp; Registration (ログイン &amp; 登録)] に移動して、[Allow customers and partners to self-register (顧客とパートナーのセルフ登録を許可)] をオフにし、CommunitiesSelfReg Visualforce ページがどのプロファイルからも参照されていないか、どのプロファイルからもアクセスできないことを確認します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>Security Health Review では、セルフ登録を使用した自動ポータルの悪用に対する主要な防御策として「招待のみ」のアクセス権を特定し、ビジネス上の必要性が確認され、堅牢なボット検出戦略が実行されている場合にのみ [セルフ登録] ウィンドウを開くことを義務付けます。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.external_identity_self_registration_use_cases.htm&amp;language=ja&amp;type=5">セルフ登録</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_session_security_level_policies">
+<h1 class="slds-text-heading_large">セッションセキュリティレベルのポリシー制御</h1>
+    
+    <p>高保証セッションセキュリティの制御目標は、高リスクの操作に「ステップアップ認証」を適用することです。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>セッションセキュリティレベル - 高保証セッションセキュリティ</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><p>
+            [設定] &gt; [ID 検証] で、次の高保証設定を有効にします。 </p><ul><li>レポートおよびダッシュボード — レポートとダッシュボードへのアクセスを制御します。この設定は、レポートおよびダッシュボードの [アクセスポリシー] ページにもあります。この設定は、どちらの場所でも変更できます。</li>
+<li>暗号化鍵の管理 — [プラットフォームの暗号化] ページ、[証明書と鍵の管理] 設定ページ、TenantSecret オブジェクトへのアクセスを制御します。</li>
+<li>認証プロバイダーの管理 — [認証プロバイダー] ページ、[ユーザーの詳細] 設定ページ、AuthProvider オブジェクトへのアクセスを制御します。</li>
+<li>証明書を管理 — [証明書と鍵の管理] 設定ページ、[シングルサインオン設定] 設定ページ、証明書オブジェクトへのアクセスを制御します。</li>
+<li>接続アプリケーションを管理する — [接続アプリケーション] 設定ページや [アプリケーションマネージャー] 設定ページへのアクセスを制御します。</li>
+<li>データのエクスポートを管理 — [データのエクスポート] 設定ページへのアクセスを制御します。</li>
+<li>IP アドレスを管理 — [ネットワークアクセス] 設定ページへのアクセスを制御します。</li>
+<li>ログインアクセスポリシーを管理 — [ログインアクセスポリシー] 設定ページへのアクセスを制御します。</li>
+<li>パスワードポリシーを管理 — [パスワードポリシー] 設定ページと [プロファイルの詳細] へのアクセスを制御します。</li>
+<li>権限セットおよびプロファイルを管理 — [権限セット] および [プロファイル] 設定ページと関連オブジェクトへのアクセスを制御します。</li>
+<li>ロールを管理 — ロール設定、UserRole オブジェクト、およびメタデータ API のロールオブジェクトへのアクセスを制御します。</li>
+<li>共有を管理 — [共有設定] 設定ページ、SharingRules オブジェクト、およびメタデータ API の CustomObject の sharingModel 項目へのアクセスを制御します。</li>
+<li>API で多要素認証を管理 — VerificationHistory オブジェクト、TwoFactorInfo オブジェクト、TwoFactorTempCode オブジェクトへのアクセスを制御します。</li>
+<li>ユーザーインターフェースで多要素認証を管理 — [ID 検証履歴] 設定ページ、VerificationHistory オブジェクト、TwoFactorInfo オブジェクト、TwoFactorTempCode オブジェクトへのアクセスを制御します。</li>
+<li>ユーザーの管理 — [ユーザー] 設定ページへのアクセスを制御します。</li>
+<li>ユーザーのロック解除およびパスワードのリセット — [ユーザー] 設定ページでは、パスワードのリセットとユーザーのロック解除を行う権限を制御します。</li>
+<li>View Health Check (状態チェックを表示) — [状態チェック] 設定ページへのアクセスを制御します。</li>
+</ul>
+</div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>高保証セッションセキュリティの制御目標は、リスクの高い操作に「ステップアップ認証」を適用し、データのエクスポートや管理上の変更などの機密アクションで有効なセッション内でも二次的な多要素認証が必要とされるようにすることです。この詳細なアクセス制御により、1 回ログインに成功すると無条件の権限が付与されなくなり、セッションハイジャックやロック解除されたワークステーションへの不正な物理的アクセスによる脅威を効果的に無効化できます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>高保証セッションセキュリティを使用しない場合、信頼できるデバイスからでも 1 回ログインに成功すると、レポートのエクスポートや暗号化の管理などの機密操作へのアクセス権限がユーザーに付与されます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>有効なユーザーセッションを乗っ取った攻撃者 (またはロック解除された端末の悪意のあるインサイダー) は、これらの特定の操作に二次認証を必要としないため、データの一括エクスポートや権限の変更など、影響の大きいアクションをサイレントに実行できます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>高 (7.0 ～ 8.9)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>リスクの重要度は、ユーザー権限レベル、共有ルール、および使用される認証メカニズムによって異なります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>Salesforce 認証のセキュアな認証の欠如は、脆弱なパスワード標準で使用され、MFA は適用されず、信頼済み IP 範囲は設定されません。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">低リスク</h2><p> 次のような 1 つ以上の補償制御が実装されている場合、この制御は低リスクとみなされます。</p><ul>
+                <li>多要素認証: MFA は IdP で適用されるか、Salesforce 高保証認証ポリシーを介して適用されます。</li>
+
+                <li>Login IP Allowlist (ログイン IP 許可リスト): ユーザープロファイルの IP アドレスを制限して、信頼済みネットワークからアクセスできるようにします。</li>
+
+                <li>シングルログアウト: ユーザーがログアウトしたときにすべてのセッションを終了します。</li>
+
+            </ul>
+</div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>顧客は、ビジネスプロセスと社内の機密業務ポリシーおよび標準を考慮する必要があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨される修復</h2><p>必要に応じて高保証設定を実装し、機密業務を保護し、企業のセキュリティポリシーと標準に準拠します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>必要に応じて高保証設定を実装します。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="組織内のさまざまな設定領域をセキュリティで保護するために、レポートへのアクセスや IP アドレスの管理などの機密情報の操作には高保証レベルのセキュリティが必要です。また、これらの設定領域にアクセスするユーザーをブロックすることもできます。" href="overview_misc.html#security_auth_require_ha_session">機密情報の操作への高保証セッションセキュリティの要求</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_session_security_settings">
+<h1 class="slds-text-heading_large">セッションセキュリティ設定の確認</h1>
+    
+    <p>セッションセキュリティ設定について説明します。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="#shr_session_timeout_settings">セッションタイムアウト設定の制御</a></strong><br>Salesforce セッションタイムアウト制御は、指定された無操作状態の期間が経過した後にユーザーセッションを自動的に終了することで、不正アクセスから保護するセキュリティ対策です。</li><li class="slds-p-bottom_small"><strong><a href="#shr_session_settings">セッション設定コントロール</a></strong><br>ユーザーのセッション ID が最初に確立された特定の IP アドレスからアクセスされた場合にのみ有効なままにすることで、セッションハイジャックを防止するには、[セッションを発信元 IP アドレスへロック] をクリックします。</li><li class="slds-p-bottom_small"><strong><a href="shr-4.html#shr_secure_connections_https_settings">セキュアな接続 (HTTPS) 設定の制御</a></strong><br>この多層制御フレームワークは、すべての要求に継続的な IP 検証を適用し、HTTPOnly 属性を介した不正なスクリプトアクセスからセッショントークンを保護することで、セッションの整合性を強化します。</li><li class="slds-p-bottom_small"><strong><a href="shr-1.html#shr_caching_settings">キャッシュ設定コントロール</a></strong><br>この設定では、グローバルなコンテンツ配信ネットワーク (CDN) と安全なブラウザーキャッシュを使用して静的 Lightning リソースの配信を高速化することで、プラットフォームのパフォーマンスとユーザーの利便性を最適化します。</li><li class="slds-p-bottom_small"><strong><a href="shr-2.html#shr_content_security_policy_protection">コンテンツセキュリティポリシー保護制御</a></strong><br>Salesforce ClassicでInternet Explorerを使用してテンプレートを表示するときにユーザーがセキュリティチェックをスキップしないようにし、プラットフォーム内で不正なスクリプトやリソースが実行されないようにするための厳格なフレームワークを適用します。</li><li class="slds-p-bottom_small"><strong><a href="shr-2.html#shr_content_security_policy_csp_directive_rendering">コンテンツセキュリティポリシー (CSP) ディレクティブの表示制御</a></strong><br>CSP (コンテンツセキュリティポリシー) ディレクティブレンダリングを有効にすると、Salesforce 組織で Lightning ページにリソースを読み込む方法に関する最新の最も制限の厳しいセキュリティ標準を採用できます。</li><li class="slds-p-bottom_small"><strong><a href="shr-2.html#shr_cross_site_request_forgery_csrf_protection">クロスサイトリクエストフォージェリ (CSRF) 保護制御</a></strong><br>Salesforce セッション設定で CSRF 保護を有効にして、環境を保護します。</li><li class="slds-p-bottom_small"><strong><a href="shr-1.html#shr_clickjack_protection">クリックジャック保護制御</a></strong><br>Salesforce には、UI の修正攻撃から組織を保護するためのクリックジャック保護設定が用意されています。</li><li class="slds-p-bottom_small"><strong><a href="shr-3.html#shr_lightning_loader_api_version">Lightning ローダー API バージョン管理</a></strong><br>最新のLightning Locker APIバージョンの有効化は、組織内のすべてのLightningコンポーネントを最新のセキュリティ パッチで管理するためのセキュリティ制御です。</li><li class="slds-p-bottom_small"><strong><a href="shr-3.html#shr_lightning_web_security">Lightning Web セキュリティコントロール</a></strong><br>LWS(Lightning Webセキュリティ)の有効化は、従来のLightning Lockerアーキテクチャを最新の仮想化ベースのLightningコンポーネント向けSandboxに置き換えるセキュリティ制御です。</li><li class="slds-p-bottom_small"><strong><a href="shr-4.html#shr_referer_url_protection">参照元 URL 保護制御</a></strong><br>Salesforce の [Referrer URL Protection (参照元 URL 保護)] コントロールを使用すると、Referrer-Policy HTTP ヘッダーで外部 Web サイトと共有する内部 URL 情報量を規制できます。</li><li class="slds-p-bottom_small"><strong><a href="shr-2.html#shr_cross_origin_security_headers">クロスオリジンセキュリティヘッダーの制御</a></strong><br>Salesforce セッション設定でのクロスオリジンオープナーポリシー (COOP) とクロスオリジン埋め込みポリシー (COEP) の有効化。</li><li class="slds-p-bottom_small"><strong><a href="shr-2.html#shr_content_sniffing_protection">コンテンツ盗聴保護コントロール</a></strong><br>ブラウザーがファイルを実行可能なスクリプトとして誤って解釈しないように、Salesforce システム管理者は [セッションの設定] メニューで [コンテンツ盗聴保護を有効化] を有効にする必要があります。</li><li class="slds-p-bottom_small"><strong><a href="shr-4.html#shr_secure_logout_page">安全なログアウトページの制御</a></strong><br>この制御により、ブラウザータブで Salesforce セッションの有効期限が切れると、ユーザーは定義済みの安全な URL に自動的にリダイレクトされます。</li><li class="slds-p-bottom_small"><strong><a href="shr-4.html#shr_new_user_welcome_email_settings">新規ユーザーお知らせメール設定コントロール</a></strong><br>お知らせメールの Salesforce の [リンクの有効期限] 設定は、新規ユーザーの有効化リンクが有効な期間を定義するセキュリティ制御です。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_session_settings">
+<h1 class="slds-text-heading_large">セッション設定コントロール</h1>
+    
+    <p>ユーザーのセッション ID が最初に確立された特定の IP アドレスからアクセスされた場合にのみ有効なままにすることで、セッションハイジャックを防止するには、[セッションを発信元 IP アドレスへロック] をクリックします。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>セッションの設定</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><ul>
+                <li>セッションの送信元 IP アドレスへのロックを有効にする </li>
+
+                <li>システム管理者がユーザーパスワードをリセットするときにユーザーのすべてのセッションを終了することを有効化 </li>
+
+                <li>セッションが最初に使用されたドメインへのロックセッションを有効にする </li>
+
+            </ul>
+<p>[設定] &gt; [セッションの設定] &gt; [セッションをセッションの送信元の IP アドレスにロック] | [システム管理者がユーザーパスワードをリセットするとユーザーのすべてのセッションを終了する] | [セッションを最初に使用したドメインにロック]。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>[発信元 IP アドレスへのセッションをロック]。
+                </p><p>この制御により、ユーザーのセッション ID が最初に確立された特定の IP アドレスからアクセスされた場合にのみ有効なセッション ID が維持されるようにすることで、セッションハイジャックを回避します。攻撃者が別のネットワーク場所からセッショントークンを再生しようとすると、Salesforce は自動的にアクセスを拒否し、接続を終了します。パスワードのリセット時にセッションを終了するこの設定では、アカウントのセキュリティをすぐに確保するために、システム管理者がパスワードの手動リセットを実行した瞬間にユーザーのすべての有効なセッションが自動的に無効になります。これにより、侵害される可能性のあるユーザーが、ログイン情報が更新された後に既存のセッションからアクセスを維持できなくなります。[初期ドメインへのセッションのロック] この設定では、セッションの有効性を、ユーザーが最初に認証した特定の Salesforce ドメイン (Lightning、Visualforce、Experience Cloud など) に制限します。これは、プラットフォーム内のさまざまな機能ドメインでセッション Cookie が再利用されないようにすることで、クロスサイトスクリプティング (XSS) 攻撃やセッション固定攻撃に対する防御として機能します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>これらのセッションセキュリティコントロールを有効にしないと、攻撃者がさまざまなネットワークや信頼できないドメインで盗取されたトークンを悪用する可能性があるため、セッションハイジャックや不正なデータ保持に対する脆弱性が高まります。また、パスワードのリセット時にセッションが終了しないと、侵害されたアカウントが管理上の修復後も有効なままになり、機密情報への不正アクセスが長期化する可能性があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>セッショントークンを傍受した攻撃者は、ネットワーク境界を迂回して、検出されない任意の場所またはサブドメインから機密データにアクセスできます。さらに、侵害が発見されてユーザーのパスワードが変更された場合でも、攻撃者は既存のセッションが有効でチャレンジされていないままであるため、「すべてのアクセスパス」を保持します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>重大 (9.0 ～ 10.0)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>多くのリモートユーザー、インテグレーションユーザー、API ユーザー、または機密ビジネスプロセスへのアクセス権を持つ組織のリスクは増加します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>ログイン IP アドレスの制限とリアルタイムイベント監視の欠如により、組織は許可されていない地理的な場所からのセッションハイジャックに気が付かなくなるため、リスクが大幅に高まります。ログインを検証する多要素認証 (MFA) を使用しない場合、盗まれたセッションは、セキュリティ侵害が特定されてパスワードがリセットされた後も有効なアクセスパスになり、認証されません。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Low or No Risk When (低リスクまたは無リスクの場合)</h2><p>
+            これらの特定のセッション制御が実装されていない場合のリスクを軽減するには、次の代替制御と補償制御を使用して「多層防御」戦略をリリースできます。  </p><ul><li>IP ロックの場合: プロファイルレベルで [厳格なログイン IP アドレスの制限] を実装し、[すべての要求にログイン IP アドレスの制限を適用] を有効にして、ユーザーがセッション ID に関係なく、信頼できる企業ネットワークからのみシステムにアクセスできるようにします。</li>
+<li>パスワードのリセット解除の場合:Salesforce Shieldトランザクションセキュリティポリシーを使用して、疑わしいイベントに基づいてセッションを自動的に強制終了するか、IDプロバイダー(IdP)レベルでユーザーを無効にするとすべてのダウンストリーム アプリケーション アクセスが即座に終了するようにシングルサインオン(SSO)を義務付けます。</li>
+<li>ドメインロックの場合: ログインおよび機密アクションごとに多要素認証 (MFA) を適用し、CORS (クロスオリジンリソース共有) 許可リストを使用して、Salesforce データおよび API の操作を許可する外部ドメインを厳密に制御します。</li>
+<li>一般的な監視: [設定] の [セッション管理] ページを定期的に監査して、異常なアクティブセッションを手動で終了し、リアルタイムイベント監視を使用して、セッションハイジャックや「リプレイ」の試行をシステム管理者に警告します。</li>
+</ul>
+</div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>これらの制御を実装するとセキュリティが大幅に強化されますが、モバイルユーザーにとって摩擦が生じ、特定の自動インテグレーションが機能しなくなる可能性があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨される修復</h2><p>[セッション] 設定を有効にして、元のドメイン/IP アドレスからセッションを保護し、パスワードのリセット時にセッションを終了します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>セキュリティ状態レビューでは、オリジン IP またはドメインが有効になっていることを確認するプラットフォーム設定関連セッションが特定され、セッションのセキュリティを確保するためにパスワードがリセットされたときにすべてのセッションが終了します。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="[セッションの設定] 画面を使用してセッションのセキュリティを設定します。悪意のある攻撃から保護するために、セッション接続種別、タイムアウト制限、IP アドレス範囲などの設定を定義できます。" href="passwords_users.html#admin_sessions">セッションセキュリティ設定の変更</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_session_timeout_settings">
+<h1 class="slds-text-heading_large">セッションタイムアウト設定の制御</h1>
+    
+    <p>Salesforce セッションタイムアウト制御は、指定された無操作状態の期間が経過した後にユーザーセッションを自動的に終了することで、不正アクセスから保護するセキュリティ対策です。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>セッションタイムアウト</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><ul>
+                <li>[セッションタイムアウト] の値を 15 分以内に設定する </li>
+
+                <li>セッションタイムアウト警告ポップアップを無効化 </li>
+
+                <li>セッションタイムアウト時に強制的にログアウトを有効化 </li>
+
+            </ul>
+<p> [設定]&gt; [セッションの設定]&gt; [セッションタイムアウト]。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>Salesforce セッションタイムアウト制御は、指定された無操作状態の期間が経過した後にユーザーセッションを自動的に終了することで、不正アクセスから保護するセキュリティ対策です。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>Salesforce で適切なセッションタイムアウトを設定しないと、ユーザーがワークステーションを放置したり、デバイスを紛失したりしたときに機密データに不正アクセスするリスクが高まります。このセキュリティギャップは、セッションハイジャックやデータの持ち出しにつながるだけでなく、期限付きのアクセス制御を必要とする業界規制基準への非準拠にもつながります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>攻撃者は、無人の有効なセッショントークンまたは盗まれたセッショントークンを悪用して、機密データへの永続的な不正アクセスを取得します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>重大 (9.0 ～ 10.0)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>ユーザーの行動とユーザーがプラットフォームにアクセスする環境を考慮します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>
+            セッションタイムアウトが設定されていない (または適切に設定されていない) 場合、次の制御の欠如によってセキュリティリスクがさらに高まる可能性があります。 </p><ul><li>多要素認証の欠如 (MFA): MFA を使用しない場合、セッションは 1 つのログイン情報セットによってのみ保護されます。セッションが無期限に有効なままの場合、デバイスへのアクセス権を取得した攻撃者は、追加のセキュリティレイヤーをスキップする必要はありません。</li>
+<li>「セッションタイムアウト時に強制的にログアウト」の欠如: この特定の設定が無効になっている場合、Salesforce はセッションの有効期限が切れたときにセッションを実際に終了できず、ブラウザーでセッションを開いたままでいられます。</li>
+<li>IP アドレス制限の欠如: セッションが元の IP アドレスに固定されていない場合や、企業範囲に制限されていない場合、「永続的」なセッショントークンが盗まれ、世界中のどこからでも異議なく使用される場合があります。</li>
+<li>ワークステーションまたはデバイスの自動ロックの欠如: ユーザーのコンピューターまたはモバイルデバイスを一定期間操作しなかった場合、ロックするための組織ポリシーや技術的な管理 (GPO や MDM など) がない場合、開いている Salesforce セッションは物理的なアクセス権を持つユーザーに完全に公開されます。</li>
+<li>プロファイルレベルの上書きの欠如: 高権限プロファイル (システム管理者など) のより厳格で短いタイムアウトではなく、広範な「組織全体」の設定のみに依存すると、管理者のセッションが乗っ取られた場合の「ブラスト半径」が大きくなります。</li>
+<li>リアルタイムセッション監視の欠如: Salesforce イベント監視やトランザクションセキュリティポリシーなどのツールがないと、組織は異常なほど長い間活動していた疑わしいセッションを検出したり、自動的に強制終了したりできません。</li>
+<li>「ドメインへのセッションのロック」の欠如: セッションを開始した特定のドメインにセッションを制限できない場合、クロスサイトスクリプティング (XSS) 攻撃やセッション固定攻撃のリスクが高まる可能性があります。</li>
+</ul>
+</div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Low or No Risk When (低リスクまたは無リスクの場合)</h2><p>
+            厳格なセッションタイムアウトが実行可能でない場合や設定されていない場合のリスクを軽減するには、次の制御を使用して「多層防御」戦略を実装できます。 1. Salesforce ネイティブセキュリティ制御 </p><ul><li>多要素認証を適用 (MFA): すべてのログインに 2 つ目の要素が必要です。セッションが有効なままであっても、攻撃者は最初に MFA をバイパスしてそのセッションを確立する必要があります。</li>
+<li>セッションタイムアウト時に強制的にログアウト: [セッションの設定] でこの設定が有効になっていることを確認します。これがない場合、一部のブラウザーではバックグラウンドで「タイムアウト」セッションが無期限に有効のままになる可能性があります。</li>
+<li>Lock Sessions to the IP Address (IP アドレスへのセッションのロック): セッションを発信元の特定の IP アドレスからのみ使用できるようにすることで、「セッションハイジャック」を防止します。</li>
+<li>Login IP Ranges (Profile Level) (ログイン IP アドレスの制限 (プロファイルレベル): 特定の信頼できるネットワーク (企業 VPN など) へのアクセスを制限します。これにより、デバイスが信頼できないネットワークに移動された場合に、有効なセッションさえも役に立たないようになります。</li>
+<li>ログイン時間: ユーザーが Salesforce にアクセスできる特定の時間枠 (午前 8 時から午後 6 時など) を定義します。これにより、業務時間外のセッションの保持が自動的に回避されます。</li>
+</ul>
+<p> 2. 高度な監視と自動化 (Shield) </p><ul><li>トランザクションセキュリティポリシー (Salesforce Shield): 疑わしい動作をトリガーするリアルタイムポリシーを作成します。たとえば、ユーザーが大量のデータエクスポートを試みたり、長期間の「アイドル状態」の後に機密レコードにアクセスしたりした場合に、MFA を使用してセッションを自動的にブロックまたはチャレンジできます。</li>
+<li>イベント監視: リアルタイムイベント監視を使用して LoginEvent と SessionHijackingEvent を追跡し、プログラムで異常セッションを特定して終了します。</li>
+</ul>
+<p> 3. ID およびエンドポイントコントロール  </p><ul><li>シングルサインオン (SSO): Okta や Azure AD などの中央 ID プロバイダー (IdP) にセッション管理を委任します。その後、より厳格なグローバルセッションポリシーを適用したり、デバイスが侵害された場合に 1 つのダッシュボードからすべての有効なアプリケーションセッションを「強制終了」したりできます。</li>
+<li>エンドポイント管理 (MDM/GPO): 5 ～ 10 分間無操作状態が続くと、物理的なワークステーションまたはモバイルデバイスを自動的にロックする企業ポリシーを実装します。これにより、長時間セッションの主な脅威である「無人ワークステーション」のリスクが軽減されます。</li>
+</ul>
+</div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>顧客は、ユーザーエンドポイントのエントリポイントと、各ユーザープロファイルが公開されるデータを評価する必要があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨される修復</h2><p>セッションタイムアウトはエンドポイントレベルおよびプラットフォームレベルで実装します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>Security Health Review は、業界のベストプラクティス (15 分) に対してセッションタイムアウトを調べることで、セッションタイムアウトに関連するプラットフォーム設定を識別します。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="[セッションの設定] 画面を使用してセッションのセキュリティを設定します。悪意のある攻撃から保護するために、セッション接続種別、タイムアウト制限、IP アドレス範囲などの設定を定義できます。" href="passwords_users.html#admin_sessions">セッションセキュリティ設定の変更</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_set_up_audit_trail">
+<h1 class="slds-text-heading_large">監査履歴コントロールの設定</h1>
+    
+    <p>Salesforce の [設定] で管理および設定変更を追跡し、誰がいつ何を変更したかに関する監査可能な履歴を提供して、セキュリティ監視とフォレンジック調査をサポートします。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>Setup Audit Trail</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>Salesforce の [設定] で管理および設定変更を追跡し、誰がいつ何を変更したかに関する監査可能な履歴を提供して、セキュリティ監視とフォレンジック調査をサポートします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">説明</h2><p>[設定変更履歴] では、プロファイルと権限の変更、新しいアプリケーションまたはインテグレーションの設定、セキュリティ設定の更新、メタデータの変更など、主要な管理者活動が記録されます。Salesforce ではネイティブで保持される履歴が限られているため、長期的な監査とコンプライアンスの要件を満たすには、これらのログを定期的に外部にエクスポートして保存する必要があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><p>監査履歴は 6 か月ごとにエクスポートします (6 か月後は Salesforce に保持されません)。[設定]&gt; [設定変更履歴を表示]&gt; [ダウンロード]。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">セキュリティへの影響</h2><p>設定監査履歴ログを定期的にエクスポートして保持することで、過去の管理者アクションを可視化し、不正な変更やリスクの高い変更を検出して、セキュリティインシデント後の根本原因分析をサポートできます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスへの影響</h2><p>監査履歴の長期保存により、内部監査、規制審査、変更管理レビューがサポートされ、コンプライアンス評価のリスクが軽減され、Salesforce 設定のガバナンスが向上します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>管理監査履歴ログの保持が不十分。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>不正な設定変更や管理者の不正使用が検出されないようにする失敗のリスクが高まる。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>高 (7.0 ～ 8.9)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>影響は、管理者の数と組織設定の複雑さに応じて大きくなります。監査と保存の要件が厳しい業界 (金融サービス、医療、公共セクターなど) では、ログが保存されていない場合、規制と運用のリスクが高まります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>多くのユーザーが権限を昇格させられている、設定変更が頻繁に行われている、複数のインテグレーションがセキュリティ設定に依存している、または数年間の設定履歴を規制当局や顧客に提示する必要がある。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">低リスク</h2><p>少数の厳格に管理された管理者が比較的シンプルな組織を管理し、設定変更が頻繁に行われず、個別の変更管理システムで適切に文書化され、規制監査要件が最小限に抑えられています。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>エクスポートしたログは、エンタープライズログ管理、SIEM、またはアーカイブシステムに保存する必要があります。可能な場合は、他のセキュリティログやアプリケーションログと相関させる必要があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>強くお勧めします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">影響を受けるユーザー</h2><p>Salesforce システム管理者、セキュリティおよびコンプライアンスチーム、内部および外部監査人、設定履歴を使用する変更管理またはガバナンス委員会。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="設定変更履歴では、自分自身と他のシステム管理者が行った最近の設定変更を追跡します。監査履歴は、複数のシステム管理者がいる場合に特に役立ちます。" href="passwords_users.html#admin_monitorsetup">設定変更履歴を使用した設定変更の監視</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_shield_platform_encryption_add_on_encryption_policy_database_encryption">
+<h1 class="slds-text-heading_large">Shield Platform Encryption(アドオン)暗号化ポリシー:データベースの暗号化</h1>
+    
+    <p>テナントの秘密を有効にして定期的に循環します。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>Shield Platform Encryptionポリシー:トランザクション データベースの暗号化</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><p>[設定]&gt; [暗号化設定]&gt; [暗号化ポリシー]&gt; [トランザクションデータベースの暗号化] を有効にします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>テナントの秘密を有効にして定期的に循環します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>データベースファイルを介して機密データが公開される。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>実行中のファイルシステムへのアクセス権を取得してデータベースファイルをコピーした脅威アクターは、データを参照できます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>重大 (9.0 ～ 10.0)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>プラットフォームに保存されている機密データと、会社が順守する必要がある規制要件に応じて異なります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>暗号化が有効になっていないため、鍵が循環されず、多くのユーザーや外部アプリケーションに公開されません。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Low or No Risk When (低リスクまたは無リスクの場合)</h2><p>
+            この制御は、次のいずれか 1 つ以上が実装されている場合は、低リスクとみなすことができます。 </p><ul><li>項目レベルの暗号化を使用して機密データを暗号化してからデータベースに保存</li>
+</ul>
+</div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>顧客は、項目レベルまたはデータベースでデータを暗号化するビジネス上の正当性を評価する必要があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨される修復</h2><p>[データベースの暗号化] と [項目レベルの暗号化] を有効にして、暗号化鍵を定期的に循環します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>N/A - 現在、セキュリティ状態レビューツールでは検査されません。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.security_pe_tle_set_up_database_encryption.htm&amp;language=ja&amp;type=5">データベースの暗号化の設定</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_shield_platform_encryption_add_on_encryption_policy_enable_encryption_on_supported_features">
+<h1 class="slds-text-heading_large">Shield Platform Encryption (アドオン) Encryption ポリシー - サポートされる機能での暗号化の有効化</h1>
+    
+    <p>サポートされている機能で暗号化を有効にします。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>Shield Platform Encryption ポリシー - サポートされる機能での暗号化の有効化</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><p>ユーザーが共有する情報のセキュリティを強化するために、次の機能で暗号化を有効にします。</p><ul>
+                <li>Chatter([設定]&gt;[暗号化設定]&gt;[高度な暗号化設定]&gt;[Chatter の暗号化を有効化]) </li>
+
+                <li>検索インデックス([設定]&gt;[プラットフォームの暗号化]&gt;[鍵の管理]&gt;検索インデックス&gt;[テナントの秘密を生成]、[設定]&gt;[暗号化設定]&gt;[暗号化ポリシー]&gt;[検索インデックスの暗号化の有効化]) </li>
+
+                <li>CRMA ([設定]&gt; [プラットフォームの暗号化]&gt; [鍵の管理]&gt; [Analytics]&gt; [テナントの秘密を生成]、[設定]&gt; [暗号化設定]&gt; [暗号化ポリシー]&gt; [CRM Analytics の暗号化を有効化]) </li>
+
+                <li>イベントバスデータ ([設定] &gt; [プラットフォームの暗号化] &gt; [鍵の管理] &gt; [イベントバス] &gt; [テナントの秘密を生成]、[設定] &gt; [暗号化ポリシー] &gt; [変更データキャプチャとプラットフォームイベントの暗号化を有効化]) </li>
+
+                <li>ファイルと添付ファイル ([設定] &gt; [暗号化設定] &gt; [暗号化ポリシー] &gt; [ファイルと添付ファイルの暗号化を有効化])</li>
+
+            </ul>
+</div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>サポートされている機能で暗号化を有効にします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>権限のない従業員は、プラットフォームで機密の PII (個人識別情報) データを表示できる可能性があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>ダッシュボードやレポートなど、他の機能によって処理される機密データへのアクセス権を不正に取得しました。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>重大 (9.0 ～ 10.0)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>プラットフォームに保存されている機密データと、会社が順守する必要がある規制要件に応じて異なります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>機密データは、添付ファイル、CRMA、Chatterで幅広く使用されています。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Low or No Risk When (低リスクまたは無リスクの場合)</h2><p>
+            この制御は、次のいずれか 1 つ以上が実装されている場合は、低リスクとみなすことができます。 </p><ul><li>データベースの暗号化が有効 </li>
+<li>機密データは、暗号化された制限された項目にのみ保存されます。</li>
+</ul>
+</div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>顧客は、鍵を管理するプロファイルや暗号化に関連する設定を参照するプロファイルへのユーザーアクセスのビジネス上の正当性を評価する必要があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨される修復</h2><p>サポートされている機能の暗号化を有効にして、その機能の機密データを保護します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>N/A - 現在、セキュリティ状態レビューツールでは検査されません。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.security_pe_enable_files_attachments.htm&amp;language=ja&amp;type=5">新しいファイルと添付ファイルの暗号化</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.security_pe_search_encryption_enable.htm&amp;language=ja&amp;type=5">テナントの秘密を使用した検索インデックスの暗号化</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.security_pe_analytics_enable.htm&amp;language=ja&amp;type=5">CRM Analytics の暗号化</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.security_pe_eventbus_enable.htm&amp;language=ja&amp;type=5">イベントを暗号化</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.security_pe_eventbus_enable.htm&amp;language=ja&amp;type=5">バスデータ</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.security_pe_chatter.htm&amp;language=ja&amp;type=5">Chatter の暗号化</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_shield_platform_encryption_add_on_encryption_policy_enable_opt_out_key_derivation_and_byok">
+<h1 class="slds-text-heading_large">Shield Platform Encryption (アドオン) Encryption ポリシー - 鍵派生のオプトアウトと BYOK の有効化</h1>
+    
+    <p>Bring Your Own Key (BYOK) 機能を最終的なデータ暗号化鍵として使用し、機密データを暗号化します。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>Shield Platform Encryptionポリシー - Salesforce管理鍵 - 確率的テナントの秘密</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><p>[暗号化設定] の [高度な暗号化設定] で、独自の鍵をアップロードし、鍵派生を除外します。KMS で管理されている独自の鍵を設定して使用し、項目、ファイルと添付ファイル、イベントバスデータを暗号化します。</p><p>[設定] &gt; [暗号化設定] &gt; [高度な暗号化設定] &gt; [BYOK による鍵派生のオプトアウトを許可] を有効にします。</p><p>[設定] &gt; [鍵の管理] &gt; [鍵種別] &gt; [Bring Your Own Key (独自の鍵)] &gt; [Salesforce 鍵派生を使用] &gt; [鍵をアップロード] を選択解除します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>BYOK 機能を最終的なデータ暗号化鍵として使用し、機密データを暗号化します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>暗号化が有効になっていない場合、権限のない従業員が機密の PII (個人識別情報) を表示でき、鍵が公開されると暗号化制御が機能しなくなる可能性があります。鍵を定期的に (毎年など) 循環させることで、漏洩した鍵は特定のデータにのみアクセス権を付与します。残りのデータは、異なる鍵の下でも安全なままです。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>暗号化鍵管理を使用しない場合、公開された鍵を脅威アクターが使用して、暗号化された機密データにアクセスできます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>高 (7.0 ～ 8.9)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>プラットフォームに保存されている機密データと、会社が順守する必要がある規制要件に応じて異なります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>暗号化が有効になっていないため、鍵が循環されず、多くのユーザーや外部アプリケーションに公開されません。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Low or No Risk When (低リスクまたは無リスクの場合)</h2><p>
+            この制御は、次のいずれか 1 つ以上が実装されている場合は、低リスクとみなすことができます。 </p><ul><li>Salesforce で生成された鍵を使用 </li>
+<li>MFA を使用してキーへのアクセスを制限する</li>
+</ul>
+</div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>顧客は、データを暗号化するための鍵を管理するビジネス上の正当性を評価する必要があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨される修復</h2><p>要件に応じて、[Salesforce 管理鍵] または [Bring Your Own Keys (独自の鍵を使用)] のいずれかで、会社のポリシーおよびコンプライアンス要件に準拠した鍵の暗号化管理を有効にします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>N/A - 現在、セキュリティ状態レビューツールでは検査されません。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.security_pe_byok_opt_out_derivation.htm&amp;type=5&amp;language=ja">BYOK を使用した鍵派生の除外</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_shield_platform_encryption_add_on_encryption_policy_manage_data_360_keys">
+<h1 class="slds-text-heading_large">Shield Platform Encryption (アドオン) Encryption ポリシー:Data 360 鍵の管理</h1>
+    
+    <p>Data 360 暗号化を有効にして鍵を管理します。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>Shield Platform Encryptionポリシー:データ360鍵の管理</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><p>[Manage Data 360 (Data 360 の管理)] キーを有効にして、定期的に循環します。</p><p>[設定] &gt; [暗号化設定] &gt; [Data Cloud 鍵の管理/外部鍵の管理を許可] を有効にします。</p><p>[設定] &gt; [暗号化設定] &gt; [鍵の管理] &gt; [ルート鍵インベントリ] - [Data Cloud] - [詳細] &gt; [説明を編集]。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>[Data 360 Encryption] と [Manage The Keys (鍵の管理)] を有効にします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>データを暗号化する鍵のチェーンを制御できない。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>組織データを暗号化する鍵チェーンの制御を必要とする内部ポリシーまたは規制要件に準拠していない。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>重大 (9.0 ～ 10.0)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>プラットフォームに保存されている機密データと、会社が順守する必要がある規制要件に応じて異なります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>Data 360 のデータは規制コンプライアンス要件の対象となります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Low or No Risk When (低リスクまたは無リスクの場合)</h2><p>
+            この制御は、次のいずれか 1 つ以上が実装されている場合は、低リスクとみなすことができます。 </p><ul><li>処方箋規制コンプライアンス要件なし</li>
+</ul>
+</div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>顧客は、鍵を管理するプロファイルや暗号化に関連する設定を参照するプロファイルへのユーザーアクセスのビジネス上の正当性を評価する必要があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨される修復</h2><p>Data Cloud 鍵を管理し、定期的に循環します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>N/A - 現在、セキュリティ状態レビューツールでは検査されません。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.security_pe_enable_pe_for_data_cloud.htm&amp;language=ja&amp;type=5">顧客が管理するルート鍵を使用した Data 360 の暗号化</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_shield_platform_encryption_add_on_encryption_policy_restrict_access_to_encryption_policy_settings">
+<h1 class="slds-text-heading_large">Shield Platform Encryption (アドオン) Encryption ポリシー - 暗号化ポリシー設定へのアクセスの制限</h1>
+    
+    <p>暗号化関連の権限の定期的なレビュー。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>Shield Platform Encryption Policy - 暗号化ポリシー設定へのアクセスの制限</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><p>[設定]&gt; [暗号化設定]&gt; [高度な暗号化設定]&gt; [暗号化ポリシー設定へのアクセスを制限] を有効にします。</p></div>
+        <div><p>定期的に次の暗号化関連権限を確認し、ポリシーに従ってユーザーに適切に割り当てられていることを確認します。</p><ul>
+                <li>暗号化鍵の管理 </li>
+
+                <li>「アプリケーションのカスタマイズ」 </li>
+
+                <li>「設定・定義の参照」 </li>
+
+                <li>「証明書の管理」</li>
+
+            </ul>
+</div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>暗号化関連の権限の定期的なレビュー。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>権限のない従業員は、暗号化された機密 PII (個人識別情報) への不正アクセスを許可する秘密の漏洩につながる暗号化設定を参照できる可能性があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>暗号化鍵管理を使用しない場合、公開された暗号化設定データを脅威アクターが使用して、暗号化された機密データにアクセスできます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>重大 (9.0 ～ 10.0)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>プラットフォームに保存されている機密データと、会社が順守する必要がある規制要件に応じて異なります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>暗号化関連の権限を確認するための定期的なガバナンス制御は実施されておらず、ユーザーには「アプリケーションのカスタマイズ」権限が広く割り当てられています。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Low or No Risk When (低リスクまたは無リスクの場合)</h2><p>
+            この制御は、次のいずれか 1 つ以上が実装されている場合は、低リスクとみなすことができます。 </p><ul><li>暗号化に関連するすべての権限が制限される </li>
+<li>MFA を使用してキーへのアクセスを制限する</li>
+</ul>
+</div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>顧客は、鍵を管理するプロファイルや暗号化に関連する設定を参照するプロファイルへのユーザーアクセスのビジネス上の正当性を評価する必要があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨される修復</h2><p>暗号化関連の各権限を定期的に確認し、適切なユーザーに割り当てられていることを確認します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>N/A - 現在、セキュリティ状態レビューツールでは検査されません。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.security_pe_permissions.htm&amp;language=ja&amp;type=5">Shield Platform Encryption に必要なユーザー権限</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_shield_platform_encryption_add_on_encryption_policy_salesforce_managed_keys">
+<h1 class="slds-text-heading_large">Shield Platform Encryption(アドオン)暗号化ポリシー - Salesforce管理鍵</h1>
+    
+    <p>テナントの秘密を有効にして定期的に循環します。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>Shield Platform Encryptionポリシー - Salesforce管理鍵 - 確率的テナントの秘密</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><p>[設定] &gt; [プラットフォームの暗号化] &gt; [暗号化設定] &gt; [Generate Initial Probabilistic Tenant Secret (初期確率的テナントの秘密を生成)] を有効にします。</p><p>[確率的テナントの秘密] を設定して有効化し、結果の [項目とファイル] テナントの秘密を使用して項目、ファイル、添付ファイルを暗号化します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>テナントの秘密を有効にして定期的に循環します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>暗号化が有効になっていない場合、権限のない従業員が機密の PII (個人識別情報) を表示でき、鍵が公開されると暗号化制御が機能しなくなる可能性があります。鍵を定期的に (毎年など) 循環させることで、漏洩した鍵は特定のデータにのみアクセス権を付与します。残りのデータは、異なる鍵の下でも安全なままです。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>暗号化鍵管理を使用しない場合、公開された鍵を脅威アクターが使用して、暗号化された機密データにアクセスできます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>重大 (9.0 ～ 10.0)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>プラットフォームに保存されている機密データと、会社が順守する必要がある規制要件に応じて異なります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>暗号化が有効になっていないため、鍵が循環されず、多くのユーザーや外部アプリケーションに公開されません。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Low or No Risk When (低リスクまたは無リスクの場合)</h2><p>
+            この制御は、次のいずれか 1 つ以上が実装されている場合は、低リスクとみなすことができます。 </p><ul><li>外部鍵管理で独自の暗号化鍵を使用。</li>
+<li>MFA を使用してキーへのアクセスを制限する</li>
+</ul>
+</div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>顧客は、データを暗号化するための鍵を管理するビジネス上の正当性を評価する必要があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨される修復</h2><p>要件に応じて、[Salesforce 管理鍵] または [Bring Your Own Keys (独自の鍵を使用)] のいずれかで、会社のポリシーおよびコンプライアンス要件に準拠した鍵の暗号化管理を有効にします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>N/A - 現在、セキュリティ状態レビューツールでは検査されません。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.security_pe_ui_setup.htm&amp;type=5&amp;language=ja">Salesforce を使用したテナントの秘密の生成</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.security_pe_rotate_keys.htm&amp;type=5&amp;language=ja">暗号化鍵素材の循環</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_single_logout">
+<h1 class="slds-text-heading_large">シングルログアウト制御</h1>
+    
+    <p>外部アプリケーションまたは ID プロバイダーとの接続に適用されるユーザーケースでシングルログアウトを設定します。</p>
+
+
+        <p>Salesforce シングルログアウトは、すべての接続アプリケーションでユーザーのセッションを同時に終了できるようにするセキュリティ設定です。SLO を使用しない場合、Salesforce からログアウトすると、他の統合アプリケーションが有効のままになり、セキュリティギャップが顕著になる可能性があります。</p>
+        <p>Salesforce では、SAML と OpenID Connect (OIDC) の 2 つの主要プロトコルで SLO をサポートしています。使用可能な設定は、Salesforce が ID プロバイダー (IdP) またはサービスプロバイダー (SP) のどちらとして機能しているかによって異なります。</p>
+        <p>セキュリティ状態レビューでは、Salesforce が推奨するベストプラクティスに沿った設定シグナルを使用して、Salesforce インスタンスがシングルログアウト用に設定されているかどうかに関する情報が提供され、セキュリティとビジネスリスクが最も高いギャップが強調表示されます。</p>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>シングルログアウト</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><p>Salesforce シングルログアウトの設定を定義して検証し、定期的にレビューして、Salesforce がサービスプロバイダー、証明書利用者、または ID プロバイダーである会社の該当する各使用事例で正しく設定されていることを確認します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>外部アプリケーションまたは ID プロバイダーとの接続に適用されるユーザーケースでシングルログアウトを設定します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>開いている有効な孤立したセッション。脅威アクターがアプリケーション間で横方向に移動して認証を必要とせずに機密データにアクセスすることから、セッションが乗っ取られます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>ユーザーがすべてのアプリケーションから個別にログアウトすることを忘れた場合、攻撃者は有効な「孤立」セッションを使用して、認証を必要とせずに機密データにアクセスできます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>重大 (9.0 ～ 10.0)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>リスクの重要度は、ログイン時に付与されるユーザー母集団の規模とアクセス権限によって異なります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>
+            セッションは、セッションを制限するセッションコントロールを使用して設定されていません。これには次のものが含まれます。 </p><ul><li>無効なセッションタイムアウトポリシー </li>
+<li>Overly Permissive Access Scope (過度に許可されているアクセス範囲) </li>
+<li>Overly Permission Login IP Restriction (過剰な権限のログイン IP 制限)</li>
+</ul>
+</div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Low or No Risk When (低リスクまたは無リスクの場合)</h2><p> この制御は、次のいずれか 1 つ以上が実装されている場合は、低リスクとみなすことができます。</p><ul>
+                <li>Periodic Review of Service Providers (サービスプロバイダーの定期レビュー): サービスプロバイダーとして Salesforce に接続されているアプリケーションを確認し、リスクを把握します。</li>
+
+                <li>証明書管理: 組織がサービスプロバイダーと通信できるようにするために使用する証明書を定期的に確認し、証明書に信頼できる CA を使用します。</li>
+
+                <li>Forced Authentication Configured (強制認証を設定済み): すでに Salesforce にログインしているユーザーがサービスプロバイダーにアクセスしようとしたときにログイン情報を再入力するようにします。</li>
+
+                <li>ログインタイムアウト: ユーザーが Salesforce からログアウトすると、サービスプロバイダーから自動的にログアウトされます。</li>
+
+                <li>MFA の適用: Salesforce ユーザーに MFA が適用されます。</li>
+
+                <li>IP ログイン制限: プロファイルに基づくユーザーの IP ログイン制限</li>
+
+            </ul>
+</div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>顧客は、アクセスポリシー、規制要件、ユーザーエクスペリエンスの期待に従って継続的な接続を必要とする外部接続アプリケーションのビジネス上の正当性を評価する必要があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨される修復</h2><p>すべての設定済みサービスプロバイダーと ID プロバイダーの設定を確認し、シングルログアウトを設定するか、定期的にログイン情報を循環します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>Security Health Reviewでは、Salesforceで設定されたシングル ログアウトが識別されるため、お客様はIDフェデレーションのリスクを軽減し、Salesforceが推奨するセキュリティのベースラインとZero Trustの原則に従って不正アクセスを防止できます。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Salesforce アカウントへの不正アクセスを防止するために、ユーザーはシングルサインオン (SSO) を介してログインするときに多要素認証 (MFA) を使用することを契約で義務付けられています。サードパーティ ID プロバイダーの MFA サービスを使用して、この要件を満たすことができます。このアプローチには ID プロバイダーと統合する外部アプリケーションに MFA を提供するという利点もあります。" href="mfa.html#mfa_sso_thirdparty_idp">Salesforce 組織での SSO ID プロバイダーの MFA サービスの使用</a></li><li><a title="SAML ID プロバイダーのシングルログアウト (SLO) を設定します。SAML SLO を使用すると、ユーザーは Salesforce または ID プロバイダーのいずれかからログアウトすることで両方からログアウトできます。" href="overview_misc.html#security_auth_slo_saml_sp_configuring">SAML シングルログアウトの設定 (Salesforce がサービスプロバイダーの場合)</a></li><li><a title="OpenID Connect プロバイダーとして機能する認証プロバイダーのシングルログアウト (SLO) を設定します。OpenID Connect SLO を使用すると、ユーザーは Salesforce または OpenID Connect プロバイダーのいずれかからログアウトすることで両方からログアウトできます。" href="overview_misc.html#security_auth_slo_oidc_rp_configuring">OpenID Connect シングルログアウトの設定 (Salesforce が証明書利用者の場合)</a></li><li><a title="SAML サービスプロバイダーのシングルログアウト (SLO) を設定します。SAML SLO を使用すると、ユーザーは Salesforce またはサービスプロバイダーのいずれかからログアウトすることで両方からログアウトできます。" href="overview_misc.html#security_auth_slo_saml_idp_configuring">SAML シングルログアウトの設定 (Salesforce が ID プロバイダーの場合)</a></li><li><a title="OpenID Connect 証明書利用者として機能する既存の接続アプリケーションのシングルログアウト (SLO) を設定します。OpenID Connect SLO を使用すると、ユーザーは Salesforce または証明書利用者のいずれかからログアウトすることで両方からログアウトできます。" href="overview_misc.html#security_auth_slo_oidc_idp_configuring">OpenID Connect シングルログアウトの設定 (Salesforce が OpenID Connect プロバイダーの場合)</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_single_sign_on">
+<h1 class="slds-text-heading_large">シングルサインオンコントロールの確認</h1>
+    
+    <p>シングルサインオン (SSO) は、ローカルログイン情報への依存を軽減しながら、エンタープライズクラスの ID を一元管理できる Salesforce の基本的なセキュリティ制御です。</p>
+
+
+        <p>シングルサインオン (SSO) は、ローカルログイン情報への依存を軽減しながら、エンタープライズクラスの ID を一元管理できる Salesforce の基本的なセキュリティ制御です。Salesforceは、IDプロバイダー チェーンや組織間のTrustリレーションを介したサービスプロバイダー、IDプロバイダー、またはその両方として機能するなど、複数のSSO導入モデルをサポートしています。</p>
+        <p>適切に実装された SSO は、Salesforce と統合システム全体に一貫したパスワード標準、多要素認証 (MFA)、セッション保証、条件付きアクセスポリシーを適用することで、アクセスセキュリティを強化します。SSO が欠落していたり、誤って設定されていたりすると、会社はログイン情報侵害、不正アクセス、ラテラル移動、ID 体制の可視性の低下のリスクが高まります。</p>
+        <p>セキュリティ状態レビューでは、設定シグナルを使用して Salesforce のベストプラクティスに対して SSO 体制を評価し、重要なセキュリティリスクとビジネスリスクを特定します。</p>
+    
+<ul><li class="slds-p-bottom_small"><strong><a href="#shr_sso_scenarios_salesforce_as_the_service_provider">サポートされる SSO シナリオ: サービスプロバイダー制御としての Salesforce (証明書利用者)</a></strong><br>ユーザーが外部エンタープライズ ID プロバイダー (IdP) を使用して Salesforce に対して認証を行い、認証とアクセス制御を一元化できるようにします。</li><li class="slds-p-bottom_small"><strong><a href="#shr_sso_scenarios_salesforce_as_the_identity_provider">サポートされる SSO シナリオ: ID プロバイダー制御としての Salesforce (OpenID Connect または SAML)</a></strong><br>Salesforce がダウンストリームアプリケーションに対してユーザーを認証するための中央 ID 機関として機能します。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_single_sign_on_for_salesforce_customer_identity">
+<h1 class="slds-text-heading_large">Salesforce Customer Identity Control のシングルサインオン</h1>
+    
+    <p>これにより、統合認証 (SAML または OpenID Connect) が有効になり、顧客は外部 ID プロバイダー (IdP) の 1 つの信頼できるログイン情報セットを使用して複数の Salesforce サイトと統合アプリケーションにアクセスできます。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>Salesforce Customer Identity のシングルサインオン (SSO)</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><p>Salesforce Customer Identity の SSO を使用すると、ユーザーは 1 つのログイン情報セットで複数のアプリケーションにログインできます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>これにより、統合認証 (SAML または OpenID Connect) が有効になり、顧客は外部 IdP の 1 つの信頼済みログイン情報セットを使用して複数の Salesforce サイトと統合アプリケーションにアクセスできます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>ユーザーは個々のアプリケーションに固有のパスワードを管理せざるを得ず、パスワードの健全性 (再利用) が低下し、デジタルエコシステム全体で 1 つの統合 MFA ポリシーを適用できなくなります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>攻撃者は、ユーザーのより弱い非 SSO アカウントに対してクレデンシャルスタッフィング攻撃を実行し、そのアカウントがマスター IdP の一元的なセキュリティ制御によって保護されていなかったため、漏洩したログイン情報を使用して Salesforce ポータルに侵入します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>重大 (9.0 ～ 10.0)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>中央認証リンクがない場合、メインシステムでアクセス権を取り消すと対応する Salesforce アカウントを無効にできず、退職後に元従業員またはパートナーが会社の機密データに不正アクセスし続けることができるというセキュリティギャップが生じます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>[パスワードの有効期限なし] は、ローカル Salesforce ユーザーの場合、またはさまざまなプラットフォームで異常なログインパターンを検出する一元的な方法がない場合に有効になります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">低リスク</h2><p>一元化された ID プロバイダーの欠如を補うために、会社がすべてのローカル取引先に Salesforce ネイティブ MFA と厳格なパスワードの複雑さポリシーを適用する場合。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>顧客対応 IdP との統合が必要です。SSO を実装するには、初回ログイン時に手動操作なしでユーザーレコードが Salesforce で正しく作成または更新されるように、ジャストインタイム (JIT) プロビジョニングロジックの技術調整が必要です。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨される修復</h2><p>[設定] で [シングルサインオン設定] に移動し、SAML または認証プロバイダー設定を作成して、サイトの [ログイン &amp; 登録] 設定にリンクし、[SSO] ボタンを有効にします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>セキュリティ状態レビューでは、ID の一元的な管理が優先されます。ポータルの SSO では、MFA や条件付きアクセスなどのエンタープライズクラスのセキュリティチェックを外部ユーザーに適用しながら、手動パスワード管理の手間を省くことができます。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.external_identity_single_sign_on_use_cases.htm&amp;language=ja&amp;type=5">Salesforce Customer Identity のシングルサインオン</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_single_sign_on_settings">
+<h1 class="slds-text-heading_large">シングルサインオン設定の制御</h1>
+    
+    <p>シングルサインオンでは、ユーザーが信頼できる ID プロバイダーを使用して Salesforce および統合アプリケーションにアクセスできるようにすることで、認証を一元化します。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>シングルサインオン (SSO) 設定と ID アーキテクチャ</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><p>エンタープライズ ID プロバイダー (IdP) を使用した一元化された SSO を有効にし、強力な認証ポリシーを適用して、従来の認証メカニズムを回避します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>シングルサインオンでは、ユーザーが信頼済み IdP を使用して Salesforce および統合アプリケーションにアクセスできるようにすることで、認証を一元化します。Salesforce では、サービスプロバイダー、ID プロバイダー、またはその両方としての動作、従来の代理認証など、複数の SSO モデルがサポートされています。SSO を適切に設定することで、ID の一貫した適用、セキュリティ体制の改善、ログイン情報リスクの軽減を実現できます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>SSO が適切に設定されていないと、認証が断片的な制御や従来の制御に依存し、ログイン情報の盗難、脆弱なパスワード、一貫性のない MFA 適用、Salesforce および接続システムへの不正アクセスにさらされる可能性が高くなります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>フィッシングによって悪用される脆弱なローカル パスワード、アプリケーション間でのログイン情報の再利用、意図しないアクセスを可能にする安全でない組織間SAML Trust、従来のLDAPログイン情報の傍受。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>重大 (9.0 ～ 10.0)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>リスクの重要度は、ユーザー母集団の規模、権限レベル、インターネットへの組織の公開状況、統合システム全体で使用される認証メカニズムによって異なります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>ローカル Salesforce 認証が脆弱なパスワード標準で使用されている、MFA が適用されていない、IdP チェーンが過度に許可されている、代理認証が従来の LDAP に依存している。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">低リスク</h2><p> 次のような 1 つ以上の補償制御が実装されている場合、この制御は低リスクとみなされます。</p><ul>
+                <li>エンタープライズ ID プロバイダー: Salesforce は、強力なパスワードポリシーとユーザーライフサイクル管理を適用する一元化された IdP と統合されています。</li>
+
+                <li>多要素認証: MFA は IdP で適用されるか、Salesforce 高保証認証ポリシーを介して適用されます。</li>
+
+                <li>最新の認証標準: 従来の代理認証の代わりに SAML または OpenID Connect が使用されます。</li>
+
+                <li>セキュアなIDプロバイダー チェーン:組織間のSAMLとExperience Cloud Trustリレーションは、明示的に範囲設定され、文書化され、定期的にレビューされます。</li>
+
+                <li>従来の認証の廃止: LDAP を介した代理認証は廃止されるか、保護が強化されて厳格に制御されます。</li>
+
+            </ul>
+</div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>SSO を実装またはモダナイズするときは、ユーザーエクスペリエンス、インテグレーションの互換性、パートナーアクセス、移行計画を考慮する必要があります。レガシー システムでは、最新のIDプラットフォームへの段階的な移行が必要になる場合があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨される修復</h2><p>信頼済み IdP を使用した一元化された SSO の実装、MFA および強力なパスワードポリシーの適用、IdP チェーンの確認と制限、代理認証からの移行、認証ログとアクセスパターンの定期的な確認を行います。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>Security Health Reviewでは、お客様が認証を強化し、ID関連のリスクを軽減し、Salesforceが推奨するセキュリティ ベースラインとZero Trustの原則に準拠するのに役立つSSOとIDアーキテクチャの制御に重点が置かれています。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="自分の組織でシングルサインオン (SSO) を設定しようと考えているのであれば、先に主要な用語について理解しておいてください。" href="sso-2.html#sso_terminology">シングルサインオンの用語</a></li><li><a title="ユーザーが Salesforce 組織とアプリケーションの間を何度もログインし直すことなくシームレスに移動できるようにするには、シングルサインオン (SSO) を設定します。使用事例によっては、ユーザーが企業のポータルなどサードパーティアプリケーションから Salesforce 組織にログインするように SSO を設定できます。また、ユーザーが Salesforce 組織から別のアプリケーションにログインできるように設定することもできます。さらに、SSO チェーンを設定すると、ユーザーはサードパーティアプリケーションにログインして Salesforce にアクセスした後、Salesforce を使用して別の組織にアクセスすることもできます。もしくは、ユーザーが同じログイン情報を使用して複数のアプリケーションにそれぞれログインするようなログイン環境も設定できます。" href="sso-2.html#sso_use_cases">シングルサインオンの使用事例</a></li><li><a title="Salesforce ログイン情報で外部サービスプロバイダーまたは証明書利用者にログインできるようにシングルサインオン (SSO) を設定します。Salesforce 組織を SAML ID プロバイダーとして有効化し、サービスプロバイダーを SAML 外部クライアントアプリケーションまたは接続アプリケーションとして統合できます。また、OpenID Connect を使用して、証明書利用者と組織を統合することもできます。" href="sso-2.html#sso_sfdc_idp_parent">ID プロバイダーとしての Salesforce</a></li><li><a title="ユーザーが ID プロバイダーまたは認証プロバイダーからのログイン情報で Salesforce 組織にログインできるようにシングルサインオン (SSO) を設定します。この使用事例では、Security Assertion Markup Language (SAML) で ID プロバイダーを定義できます。また、定義済み認証プロバイダーを使用したり、OpenID Connect 認証プロバイダーを設定したり、カスタム認証プロバイダーを作成したりすることもできます。" href="sso-2.html#sso_sfdc_sp_rp_parent">サービスプロバイダーとしての Salesforce</a></li><li><a title="認証のニーズに応じて、ID プロバイダーチェーンの作成、複数の組織または Experience Cloud サイトへの SAML シングルサインオン (SSO) の設定、または定義済みの Salesforce 認証プロバイダーの使用を行うことができます。ユーザーがサードパーティ ID プロバイダーから Salesforce にログインしてクライアントアプリケーションにすぐにアクセスできるようにする場合は、ID プロバイダーチェーンを設定します。ユーザーが 1 つのログイン情報セットで複数の組織またはサイトにアクセスできるようにするには、複数の組織またはサイト間で SAML SSO を設定します。また、ユーザーの認証と保護されたデータへのアクセスの承認を行う Salesforce 認証プロバイダーを使用して、2 つの組織間の SSO を設定することもできます。" href="sso-2.html#sso_sfdc_both_sp_idp">SSO 用のサービスプロバイダーおよび ID プロバイダーとしての Salesforce</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_sso_scenarios_salesforce_as_the_identity_provider">
+<h1 class="slds-text-heading_large">サポートされる SSO シナリオ: ID プロバイダー制御としての Salesforce (OpenID Connect または SAML)</h1>
+    
+    <p>Salesforce がダウンストリームアプリケーションに対してユーザーを認証するための中央 ID 機関として機能します。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>アプリケーションの ID プロバイダーとしての Salesforce</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>Salesforce がダウンストリームアプリケーションに対してユーザーを認証するための中央 ID 機関として機能します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">説明</h2><p>Salesforce は、SAML または OpenID Connect を使用して外部サービスプロバイダーまたは内部アプリケーションに対してユーザーを認証します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><p>MFA、高保証セッションポリシー、およびすべての証明書利用者に対する一貫した認証適用を使用して、Salesforce を ID プロバイダー (IdP) として設定します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">セキュリティへの影響</h2><p>統合システム間で認証制御と MFA 適用の一貫性を確保します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスへの影響</h2><p>ID ガバナンスを改善し、断片化された認証モデルによるリスクを軽減します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>認証の適用が一貫性がなく、ダウンストリームアプリケーション全体で MFA が欠落している。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>接続アプリケーションへの不正アクセス、セッションの不正使用、ID 検証の不統一。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>高 (7.0 ～ 8.9)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>影響は、Salesforce ID に依存するダウンストリームアプリケーションの数に応じて大きくなります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>下流アプリケーションは個別に認証されるか、Salesforce ログインレイヤーで MFA が適用されません。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">低リスク</h2><p>Salesforce では、すべての証明書利用者に対して MFA とセッション保証を一貫して適用します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>ハブアンドスポーク ID アーキテクチャと内部 SaaS エコシステムでよく使用されます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>セキュリティ状態レビューでは、欠落している IdP 設定にフラグが付けられ、一貫性のない ID 伝達のリスクが強調表示されます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">影響を受けるユーザー</h2><p>Salesforce ID を使用してサードパーティアプリケーションまたは内部アプリケーションにアクセスするユーザー。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="認証のニーズに応じて、ID プロバイダーチェーンの作成、複数の組織または Experience Cloud サイトへの SAML シングルサインオン (SSO) の設定、または定義済みの Salesforce 認証プロバイダーの使用を行うことができます。ユーザーがサードパーティ ID プロバイダーから Salesforce にログインしてクライアントアプリケーションにすぐにアクセスできるようにする場合は、ID プロバイダーチェーンを設定します。ユーザーが 1 つのログイン情報セットで複数の組織またはサイトにアクセスできるようにするには、複数の組織またはサイト間で SAML SSO を設定します。また、ユーザーの認証と保護されたデータへのアクセスの承認を行う Salesforce 認証プロバイダーを使用して、2 つの組織間の SSO を設定することもできます。" href="sso-2.html#sso_sfdc_both_sp_idp">SSO 用のサービスプロバイダーおよび ID プロバイダーとしての Salesforce</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_sso_scenarios_salesforce_as_the_service_provider">
+<h1 class="slds-text-heading_large">サポートされる SSO シナリオ: サービスプロバイダー制御としての Salesforce (証明書利用者)</h1>
+    
+    <p>ユーザーが外部エンタープライズ ID プロバイダー (IdP) を使用して Salesforce に対して認証を行い、認証とアクセス制御を一元化できるようにします。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>Salesforce 組織アクセスのシングルサインオン (サービスプロバイダーとしての Salesforce)</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>ユーザーが外部エンタープライズ IdP を使用して Salesforce に対して認証を行い、認証とアクセス制御を一元化できるようにします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">説明</h2><p>ユーザーは、Okta、Azure AD、Ping、またはその他の SAML/OpenID Connect 準拠プロバイダーなどの外部 IdP で管理されるログイン情報を使用して Salesforce にログインします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><p>MFA が有効で、12 文字以上のパスワード標準があり、条件付きアクセスポリシーが適用されているすべてのユーザーに SSO を適用します (該当する場合)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">セキュリティへの影響</h2><p>ローカルログイン情報への依存を排除することで、ログイン情報の盗難、フィッシングの成功、不正アクセスを減らします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスへの影響</h2><p>コンプライアンスの整合を改善し、セキュリティインシデントを減らし、ワークフォースアクセスに関するガバナンスを強化します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>パスワードポリシーが弱いローカル認証では、特に特権ユーザーに対してアカウント乗っ取りの可能性が高まります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>クレデンシャルスタッフィング、フィッシングベースのアカウントの乗っ取り、侵害された管理者ログイン情報の悪用。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>重大 (9.0 ～ 10.0)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>多くの管理者、API ユーザー、または機密ビジネスプロセスへのアクセス権を持つ組織では、リスクが高まります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>MFA が適用されていないか、直接ログインが許可されているか、ユーザーが未管理デバイスから Salesforce にアクセスしている。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">低リスク</h2><p>MFA を使用した SSO、IP 制限、Device Trust、およびセッション保証ポリシーが適用されます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>IAM チームとの調整が必要です。Salesforce では、SAML と OpenID Connect のインテグレーションがネイティブでサポートされています。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>Security Health Review (セキュリティ状態レビュー) では、欠落している SSO 適用や弱い SSO 適用を特定し、ワークフォースと特権アクセス権の修復に優先順位を付けます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">影響を受けるユーザー</h2><p>Salesforce に直接アクセスする内部従業員、管理者、開発者、ワークフォースユーザー。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="ユーザーが ID プロバイダーまたは認証プロバイダーからのログイン情報で Salesforce 組織にログインできるようにシングルサインオン (SSO) を設定します。この使用事例では、Security Assertion Markup Language (SAML) で ID プロバイダーを定義できます。また、定義済み認証プロバイダーを使用したり、OpenID Connect 認証プロバイダーを設定したり、カスタム認証プロバイダーを作成したりすることもできます。" href="sso-2.html#sso_sfdc_sp_rp_parent">サービスプロバイダーとしての Salesforce</a></li><li><a title="Salesforce ログイン情報で外部サービスプロバイダーまたは証明書利用者にログインできるようにシングルサインオン (SSO) を設定します。Salesforce 組織を SAML ID プロバイダーとして有効化し、サービスプロバイダーを SAML 外部クライアントアプリケーションまたは接続アプリケーションとして統合できます。また、OpenID Connect を使用して、証明書利用者と組織を統合することもできます。" href="sso-2.html#sso_sfdc_idp_parent">ID プロバイダーとしての Salesforce</a></li><li><a title="代理認証はシングルサインオン (SSO) に似ていますが、ユーザーの操作が若干異なります。代理認証では、システムが別のシステムを使用してユーザーのログイン情報を検証します。たとえば、Lightweight Directory Access Protocol (LDAP) サーバーを使用してログイン情報を検証するように Salesforce 組織を設定できます。SSO と代理認証の両方とも、ユーザーは 1 セットのログイン情報で複数のアプリケーションにログインできます。ただし代理認証では、ユーザーが各アプリケーションに個別にログインする必要があります。" href="sso-1.html#sso_delauthentication">代理認証</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_strongly_recommended_mobile_app_security_controls">
+<h1 class="slds-text-heading_large">強く推奨されるモバイルアプリケーションセキュリティコントロール</h1>
+    
+    <p>このコントロールセットにより、強化されたモバイル環境が適用されます。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>強く推奨されるモバイルアプリケーションセキュリティコントロール</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><ul><li>認証サーバー証明書の固定 - [有効] を選択します。</li>
+<li>Resource Certificate Pinning (リソース証明書の固定) - [Active (有効)] を選択します。</li>
+<li>デバイスパスコードが必要 - [有効] と重要度レベルを選択します。</li>
+<li>Block 3D Touch - [有効] を選択します。</li>
+<li>マイクロホンをブロック - [有効] を選択します。</li>
+<li>カメラをブロック - [有効] を選択します。</li>
+<li>取引先責任者をブロック - [有効] を選択します。</li>
+<li>ブロックカレンダー - [有効] を選択します。</li>
+<li>Mobile Browser URI Scheme (モバイルブラウザーの URI スキーム) - [有効] を選択し、値を指定します。</li>
+<li>[電話アプリケーションハンドラー] - [有効] を選択して値を指定します。</li>
+<li>Block Screenshot (スクリーンショットをブロック) - [有効] を選択します。</li>
+<li>メールを記録 - [有効] を選択します。</li>
+<li>Log Phone Call (通話を記録) - [有効] を選択します。</li>
+<li>SMS を記録 - [有効] を選択します。</li>
+<li>カスタムキーボードをブロック - [有効] を選択します。</li>
+<li>厳格なデータ漏洩保護コントロールの有効化 - [有効] を選択</li>
+</ul>
+</div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>この制御セットでは、暗号化証明書の固定、ローカルデバイスの認証、および不正なデータの持ち出しを防止するためのハードウェアレベルの厳しい制限を義務付けることで、強化されたモバイル環境が適用されます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>これらのポリシーがないと、モバイルデバイスが紛失したり、盗難にあったり、悪意のあるサードパーティアプリケーションによって侵害されたりした場合に、傍受されたネットワークトラフィックやローカルデータの盗難によって中間者攻撃に対して脆弱になります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>攻撃者は侵害されたワイヤレスネットワークを使用して固定されていないアプリケーショントラフィックを傍受したり、不正なカスタムキーボードを悪用してモバイルインターフェースから直接機密キーストロークやログイン情報を記録したりします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>高 (7.0 ～ 8.9)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>これらの保護がない場合、暗号化されたトラフィックの傍受、ローカルデバイスセキュリティのバイパス、カメラ、マイク、クリップボードなどのハードウェア機能を介した企業データの不正な転送が可能になります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>従業員は、個人の未管理デバイスを使用して、機密性の高い顧客情報にアクセスしたり、モバイルアプリケーションを脅威度の高いパブリックネットワーク環境で使用したりします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">低リスク</h2><p>モバイルデバイスが、システム全体の暗号化とリモート消去機能を適用する堅牢なエンタープライズモビリティ管理ソリューションですでに管理されている場合。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>これらの厳格な制御を実装すると、コピーペーストやサードパーティのキーボードなどの一般的な機能が無効になり、ユーザーエクスペリエンスに影響する可能性があるため、派遣作業員向けの特別なトレーニングが必要になる可能性があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨される修復</h2><p>[設定] の [モバイルセキュリティ] セクションに移動し、モバイルアプリケーションの証明書の固定、デバイスパスコード、およびデータ漏洩保護に関する特定のポリシー (ブロックコントロールなど) を有効化します。必要に応じて、必要なアクションに適した重要度レベル (critical、error、warning、info など) を選択します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>セキュリティ状態レビューでは、モバイルアプリケーションの使用事例に応じてこれらのポリシーを強く推奨します。これらの制御は、基盤となるデバイスの健全性やネットワークの整合性に関係なく、アプリケーションのセキュリティを維持するのに役立ちます。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.mobile_security&amp;language=ja&amp;type=5">認証サーバーの証明書の固定の設定</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.mobile_security_mam_setup_ui.htm&amp;language=ja&amp;type=5">モバイルアプリケーションセキュリティポリシーの有効化と設定</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_third_party_apps_and_managed_app_security_controls">
+<h1 class="slds-text-heading_large">サードパーティアプリケーションと管理アプリケーションセキュリティコントロールの確認</h1>
+    
+    <p>サードパーティアプリケーションと管理アプリケーションセキュリティコントロールについて説明します。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="shr-3.html#shr_external_client_apps">外部クライアントアプリケーションの確認</a></strong><br>外部クライアントアプリケーションについて説明します。</li><li class="slds-p-bottom_small"><strong><a href="shr-2.html#shr_connected_apps">接続アプリケーションの確認</a></strong><br>接続アプリケーションについて説明します。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_track_object_field_history">
+<h1 class="slds-text-heading_large">追跡オブジェクトの項目履歴の確認</h1>
+    
+    <p>オブジェクト項目履歴の追跡について説明します。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="shr-3.html#shr_field_history_tracking">項目履歴管理</a></strong><br>オブジェクトの追跡項目へのすべての変更を記録し、コンプライアンスとフォレンジック調査のために古い値/新しい値、ユーザー、タイムスタンプを取得する Salesforce ネイティブ監査機能。</li><li class="slds-p-bottom_small"><strong><a href="shr-3.html#shr_field_history_tracking_retention">項目履歴管理保持コントロール</a></strong><br>外部アーカイブまたは項目監査履歴のアップグレードにより、項目履歴管理の標準保持期間を 18 か月間延長し、コンプライアンス要件の重要なデータ変更の長期的な監査可能性をサポートします。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_track_troubleshoot_and_audit_your_company_s_user_activity_add_on">
+<h1 class="slds-text-heading_large">会社のユーザー活動の追跡、トラブルシューティング、監査の確認 (アドオン)</h1>
+    
+    <p>会社のユーザー活動を追跡、トラブルシューティング、監査する方法について説明します。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="shr-2.html#shr_event_monitoring_settings">イベント監視設定の確認</a></strong><br>イベント監視設定について説明します。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_use_any_api_restriction">
+<h1 class="slds-text-heading_large">任意の API クライアントの使用 - 制限コントロール</h1>
+    
+    <p>API アクセスを管理者が承認した接続アプリケーションのみに制限し、ユーザーが未承認または従来の API クライアントを使用できないようにします。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>任意の API クライアントの使用 - 制限</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>API アクセスを管理者が承認した接続アプリケーションのみに制限し、ユーザーが未承認または従来の API クライアントを使用できないようにします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">説明</h2><p>すべてのプロファイルおよび権限セットのグローバル<code>Use Any API Client</code>システム権限を無効にし、定義済みの OAuth フローを介してすべてのプログラムによるやりとりを強制します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><p>[すべてのプロファイルで任意の API クライアントを使用] を選択解除します。セキュリティチームによって審査および承認された特定の接続アプリケーションにユーザーを割り当てることで、詳細なアクセス権に置き換えます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">セキュリティへの影響</h2><p>信頼できないサードパーティアプリケーションや、企業の監視をバイパスする CLI スクリプトでユーザーがログイン情報を使用する可能性がある重大なセキュリティホールを解決します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスへの影響</h2><p>特定のアプリケーションが API 制限を消費してデータにアクセスしている状況を把握し、リソースの管理と監査を改善して、より厳格なセキュリティポリシーで全体的なセキュリティ体制を強化できます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>認証されていないユーザーやログイン情報を盗んだ潜在的な攻撃者は、API 互換のツールを使用して、サードパーティアプリケーションが意図するセキュリティラッパーを迂回してデータをスクレイピングできます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>データの持ち出し: 不正なデータエクスポートによるログイン情報の不正使用: 漏洩したパスワードが、信頼できるクライアントを模倣するカスタムスクリプトを介して使用されます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>高 (7.0 ～ 8.9)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>これまで広範な API アクセスに依存してきた管理者やアクセスプロファイルが上位のユーザーが多い会社にとって、リスクは高くなります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>また、プロファイルでは [レポートのエクスポート] または [すべてのデータの編集] が有効になっています。これは、[Use Any API Client (任意の API クライアントを使用)] によってこれらの権限へのプログラムによる高速アクセスが可能になるためです。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">低リスク</h2><p>アクセスは、接続アプリケーションの OAuth 範囲を介して厳密に仲介されます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>これを無効にすると、外部サードパーティアプリケーションとして登録されていない既存のスクリプトや従来のインテグレーションが破損する可能性があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>Security Health Review は権限メタデータをスキャンし、Salesforce 組織で [任意の API を使用] クライアント設定が有効になっているプロファイルを特定します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">影響を受けるユーザー</h2><p>Salesforce から直接接続アプリケーションにアクセスする内部従業員、管理者、開発者、ワークフォースユーザー。</p></div>
+    
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_user_access_policies">
+<h1 class="slds-text-heading_large">ユーザーアクセスポリシー制御</h1>
+    
+    <p>Salesforce ユーザーアクセスポリシーは、事前定義された条件に基づいてユーザーの権限とライセンスを自動または手動で管理できるセキュリティおよび管理コントロールです。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>ユーザーアクセスポリシー</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><p> ユーザーアクセスポリシーを使用したアクセス権の手動付与または取り消し:</p><ul>
+                <li>[設定] &gt; [ユーザー管理設定] &gt; [ユーザーアクセスポリシーの有効化] および [ユーザーアクセスポリシーの拡張インターフェース] の有効化 </li>
+
+                <li>[設定] &gt; [ユーザーアクセスポリシー] &gt; [新規ユーザーアクセスポリシー] &gt; [編集条件] &gt; [アクションの定義] </li>
+
+            </ul>
+<p> ユーザーアクセスポリシーを使用したアクセス権の自動付与または取り消し:</p><ul>
+                <li>[設定] &gt; [ユーザー管理設定] &gt; [ユーザーアクセスポリシーの有効化] および [ユーザーアクセスポリシーの拡張インターフェース] の有効化 </li>
+
+                <li>[設定] &gt; [ユーザーアクセスポリシー] &gt; [新規ユーザーアクセスポリシー] &gt; [編集条件] &gt; [アクションを定義] &gt; [ポリシーを自動化]</li>
+
+            </ul>
+</div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>Salesforce ユーザーアクセスポリシーは、ユーザーロール、プロファイル、カスタム項目値などの定義済みの条件に基づいて、ユーザーの権限とライセンスを自動または手動で管理できるセキュリティおよび管理コントロールです。</p><p>これらのポリシーを定義することで、管理者は権限セット、パッケージライセンス、公開グループメンバーシップなどのアクセスメカニズムの付与と取り消しを合理化し、会社全体で一貫した効率的なアクセス制御を実現できます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>ユーザーアクセスポリシーを効果的かつ安全に設定しないと、機密権限が大規模に自動オーバープロビジョニングされ、検索条件が誤って管理され、未承認ユーザーに広範なデータアクセスが許可される可能性があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>内部脅威アクターや変更されたユーザー属性を持つ従業員は、誤って設定されたユーザーアクセスポリシーをトリガーし、高度な管理権限や機密データセットへのアクセス権を自動的に付与する可能性があります。安全な検証とそれに対応する取り消しロジックがないと、これは検出されずに残り、ユーザー (またはアカウントを侵害した攻撃者) が広範なシステムアクセスを無期限に悪用できます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>重大 (9.0 ～ 10.0)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>ユーザー数、ユーザーアクセス範囲。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>Salesforce ユーザーアクセスポリシーを誤って設定するリスクは、ポリシー条件として使用されるユーザーレコード項目のデータガバナンスが不適切で、項目レベルセキュリティが不足しているために大幅に増大します。これらの項目が厳密に管理されていない場合、不正な変更によって、意図せずに上位レベルの権限が自動的に付与される可能性があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Low or No Risk When (低リスクまたは無リスクの場合)</h2><p>Salesforce ユーザーアクセスポリシーを誤って設定するリスクを最小限に抑えるために、権限の自動付与をトリガーするユーザーレコード属性 (ロールや部署など) に厳格な項目レベルセキュリティと入力規則を実装する必要があります。</p><p>さらに、これらのトリガー項目で項目履歴管理を有効にし、定期的なユーザーアクセスレビューを実行して、権限の不正または偶発的なエスカレーションが明確な監査履歴によって迅速に検出され、修正されるようにします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>顧客はユーザーエクスペリエンスとユーザー種別を考慮する必要があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨される修復</h2><p>必要に応じて、ユーザーアクセスポリシーを使用して、自動アクションと手動アクションを組み合わせてアクセスを許可または取り消します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>N/A - 現在、セキュリティ状態レビューツールでは検査されません。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.perm_active_user_access_policy.htm&amp;language=ja&amp;type=5">ユーザーアクセスポリシーを使用したアクセス権の自動付与または取り消し</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.perm_manual_user_access_policies.htm&amp;language=ja&amp;type=5">ユーザーアクセスポリシーを使用したアクセス権の手動による付与または取り消し</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_user_provisioning_for_connected_apps_enable_user_provisioning">
+<h1 class="slds-text-heading_large">接続アプリケーションのユーザープロビジョニング: ユーザープロビジョニング制御の有効化</h1>
+    
+    <p>このセキュリティ設定により、Salesforce と外部アプリケーション間のユーザー ID 情報の交換が自動化されます。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>接続アプリケーション: 接続アプリケーションのユーザープロビジョニング: ユーザープロビジョニングの有効化</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><p>ユーザープロビジョニングを有効にします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>このセキュリティ設定により、Salesforce と外部アプリケーション間のユーザー ID 情報の交換が自動化され、Salesforce ユーザーレコードに基づいてプログラムでアカウントを作成、更新、無効化できます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>接続アプリケーションの中央ユーザープロビジョニングの欠如は、手動のオフボーディングギャップが原因で、終了ユーザーが有効なログイン情報と外部サービスプロバイダーへのアクセス権を保持する重大なリスクにつながります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>Salesforce アカウントが無効化された元従業員は、ダウンストリームアカウントがプログラムで取り消されていないため、引き続きローカルログイン情報を使用して機密の統合クラウドストレージプラットフォームにログインします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>高 (7.0 ～ 8.9)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>アプリケーションエコシステム全体でユーザー状況を同期しないと、従業員以外のユーザーによる不正なデータアクセスが発生し、ログイン情報の取り消しに関するデータプライバシー規制への組織のコンプライアンスが複雑になります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>接続アプリケーションでシングルサインオンがサポートされていない場合や、孤立したアカウントを識別するための ID 調整プロセスが組織にない場合、リスクが非常に高くなります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">低リスク</h2><p>組織が、すべての統合エンドポイントにジャストインタイムプロビジョニングとグローバルセッション終了を適用する統合 ID プロバイダーを使用している場合。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>自動プロビジョニングは、管理オーバーヘッドを削減するための大規模なエンタープライズリリースの安全な標準です。一方、ユーザー数が制限される小規模なツールでは、手動アカウント管理が適している場合があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨される修復</h2><p>接続アプリケーションの [ユーザープロビジョニング] セクションに移動し、ユーザープロビジョニングウィザードを実行して、対象外部アプリケーションのマッピングとフローの方向を設定します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>セキュリティ状態レビューでは、オフボーディングプロセスの整合性を確保し、外部企業リソースへの不正アクセスが保持されないようにするために、自動ユーザープロビジョニングを強く推奨する標準として特定します。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.connected_app_user_provisioning.htm&amp;language=ja&amp;type=5">接続アプリケーションのユーザープロビジョニング</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_user_sharing_and_visibility">
+<h1 class="slds-text-heading_large">ユーザー共有と表示制御</h1>
+    
+    <p>最小権限の原則を適用するには、ユーザーオブジェクトの組織の共有設定を「非公開」に設定し、[参照項目のレコード名を表示する権限が必要] 設定を有効にします。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>ユーザーの共有と表示</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><p>デフォルトの外部アクセス権は、より制限が厳しく、デフォルトの内部アクセス権と同じである必要があります。</p><p>[設定] &gt; [共有設定] &gt; [組織の共有設定] [編集] &gt; [ユーザーレコードのデフォルトの内部および外部アクセス権] を選択します。</p><p>参照項目にレコード名を表示する権限が必要:</p><p>[設定] &gt; [共有設定] &gt; [組織の共有設定の編集] &gt; [参照項目にレコード名を表示する権限が必要]。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>最小権限の原則を適用するには、ユーザーオブジェクトの組織の共有設定を「非公開」に設定し、[参照項目のレコード名を表示する権限が必要] 設定を有効にします。</p><p>この制御により、ユーザーが明示的な共有アクセス権または「すべての参照レコード名の参照」権限を持っている場合にのみ、他のユーザーの詳細を表示したり、参照項目にレコード名を表示したりできるようになり、プラットフォーム全体での不正なデータ漏洩を防止できます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>レコードおよびオブジェクトへの不正アクセスのリスクが高まります。制限された組織の共有設定と参照レコード名権限を適用しないと、ユーザーは参照が許可されていない機密レコード名と内部ユーザーの詳細を参照でき、不正なデータ検出や会社情報の収集が発生する可能性があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>悪意のあるユーザーは、広範な組織の共有設定を使用して、アクセス権を持たない重要な取引先や内部エキスパートを特定し、参照項目の表示を利用して機密プロジェクト名とその関連関係者を特定します。</p><p>レコード名とユーザープロファイルを使用してこの内部インテリジェンスを収集することで、会社の非公開業務の戦略的ロードマップをエクスポートできます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>重大 (9.0 ～ 10.0)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>リスクの重要度は、ユーザーの種別、母集団の規模、オブジェクト数、オブジェクト内のデータによって異なります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>
+            組織の共有設定 (OWD) やルックアップの表示が緩いだけでなく、次のようないくつかの設定ミスにより、内部データの収集や不正アクセスのリスクが大幅に増幅される可能性があります。 </p><ul><li>「すべて表示」および「すべて変更」権限が過剰 </li>
+<li>「すべてのユーザーの参照」権限 </li>
+<li>過度に広範なロール階層 </li>
+<li>Experience Cloud ゲストアクセスの設定ミス </li>
+<li>ガバナンスが不十分な広範な権限セット</li>
+</ul>
+</div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Low or No Risk When (低リスクまたは無リスクの場合)</h2><p>
+            この制御は、次のいずれか 1 つ以上が実装されている場合は、低リスクとみなすことができます。 </p><ul><li>制限ルール: 共有ルールを超える検索条件の設定。OWD または共有ルールで通常は許可されている場合でも、特定のレコードがユーザーに表示されないようにするルールを作成します。</li>
+<li>項目レベルセキュリティ (FLS): ユーザーがルックアップでレコード名を表示できたとしても、FLS を使用して機密データ項目 (SSN、給与、非公開メモなど) を非表示にし、レコードが事実上空のシェルになるようにします。</li>
+<li>Real-Time Transaction Security(Salesforce Shield): ユーザーが 1 つのセッションで特定の数(500 件以上など)を超えるレコードを取得しようとした場合に、API を使用してレポートをエクスポートしたりクエリを実行したりできないようにポリシーを設定します。</li>
+<li>ログイン IP アドレスの制限と MFA: 既知の企業 IP アドレス (VPN) へのログインを制限し、すべてのユーザーに多要素認証 (MFA) を適用します。これにより、ユーザーが未管理個人デバイスからシステムにアクセスできなくなります。</li>
+</ul>
+</div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>ユーザーは、ユーザーレコードアクセスのビジネス上の正当性を評価する必要があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨される修復</h2><p>定期的なレビューで共有設定を制限および管理し、レコード適用を参照する権限を要求します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>Security Health Reviewでは、外部ユーザーの組織全体の共有が評価され、システム管理者が確認できるように非公開に設定されていないユーザーを特定するのに役立ちます。また、ゼロ信頼と最小権限の原則に従って、参照項目のレコード名が権限を要求して制限されていることを確認します。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.security_sharing_owd_users.htm&amp;language=ja&amp;type=5">ユーザーレコードの組織の共有設定</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.security_sharing_require_permission_lookup.htm&amp;language=ja&amp;type=5">参照項目でレコード名を表示する権限の必須化</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_verify_the_ownership_of_email_sending_domains_by_dkim_keys">
+<h1 class="slds-text-heading_large">DKIM 鍵制御によるメール送信ドメインの所有権の確認</h1>
+    
+    <p>Salesforce 組織が、送信メールの送信に使用されるドメインの正当な所有者であることを確認します。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>メールセキュリティ - 到達可能性 ([DKIM 鍵でメール送信ドメインの所有権を確認] を選択します)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>暗号化DKIM鍵にそれらのドメインをバインドして、Salesforce組織が送信メールの送信に使用されるドメインの正当な所有者であることを確認します。これにより、リモート メール サーバはメッセージが会社から発信されたことをTrustできます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">説明</h2><p>この設定を有効にすると、Salesforce では各送信メールドメインに有効な DKIM キーが設定されている必要があります。Salesforce によってドメインごとに鍵が生成され、対応する DNS レコードが DNS ゾーンに公開されて所有権を証明し、メールサーバーを受信することで署名検証を有効にします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><p>[設定] &gt; [メール管理] &gt; [配信可能性] または [メールセキュリティ] で [DKIM キーでメール送信ドメインの所有権を確認] を選択し、各送信ドメインの DKIM キーを設定して DNS レコードを公開します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">セキュリティへの影響</h2><p>メッセージが承認された Salesforce のバックアップドメインから送信されたことを暗号で証明することで、送信メールの信憑性を高め、攻撃者がこれらのドメインをスプーフィングしたり、正当なメールが疑わしいとマークされたりする可能性を減らします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスへの影響</h2><p>メールの到達可能性と送信者の評価を高め、セキュリティ意識の高い受信者やコンプライアンス重視の受信者がメッセージを信頼できない受信者として処理する可能性を減らし、Brand Trustと規制コンプライアンスのメッセージングをサポートします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>組織の未検証のメール送信ドメインの所有権により、攻撃者はより簡単にドメインを偽装でき、受信者は Salesforce が送信した本物のメッセージとなりすましのメッセージを区別できなくなります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>攻撃者は、ドメインから送信されたように見えるフィッシングメールやなりすましメールを作成し、受信者をだましてログイン情報を開示したり、不正な取引を開始したり、信頼できないメッセージを正当な Salesforce 通知であるかのように処理したりできます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>高 (7.0 ～ 8.9)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>影響は、顧客が使用するドメインやブランドに敏感なドメイン(<code>@company.com</code>や<code>@support.company.com</code>など)を使用して、大量のメールや影響の大きいトランザクション メールまたはマーケティング メールを送信する場合にさらに大きくなります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>送信メールに複数のドメインが使用されている、外部関係者がメールベースのワークフローに大きく依存している、または組織がデータプライバシーやフィッシング対策の厳格な規制の対象になっている。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">低リスク</h2><p>メール量が少ない、ほとんどの送信メールが内部メールであるか、厳密に制御された個別のメールゲートウェイを介してすでに転送されている、または送信ドメインが外部で使用されていない一般的な内部専用アドレスである。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>DNS およびメール管理者チームと協力して鍵の循環と DNS レコードのメンテナンスを管理し、有効化する前にすべての有効な送信ドメインがカバーされていることを確認します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>強くお勧めします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">影響を受けるユーザー</h2><p>システム管理者、メールマーケティングチームとコミュニケーションチーム、セキュリティチームとコンプライアンスチーム、Salesforce ベースの送信ドメインからメールを受信する外部受信者。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=release-notes.rn_sales_productivity_org_verification.htm&amp;language=ja&amp;release=242&amp;type=5">メール検証用の Salesforce ドメインの所有権の確認</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_view_event_log_data_in_analytics_apps">
+<h1 class="slds-text-heading_large">Analytics アプリケーションコントロールでのイベントログデータの表示</h1>
+    
+    <p>ELF(イベント ログ ファイル)とリアルタイムのイベント データをSalesforce Analytics(CRM Analytics/Einstein Analytics)内で直接照会および視覚化できるようにします。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>イベント監視設定 ([分析アプリケーションでイベントログデータを表示] を有効化)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>ELF(イベント ログ ファイル)とリアルタイムのイベント データをSalesforce Analytics(CRM Analytics/Einstein Analytics)内で直接照会および視覚化し、外部エクスポートなしでセキュリティ監視用のネイティブ ダッシュボードを提供します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">説明</h2><p>有効にすると、許可されたユーザーは Big Object に保存されているイベントデータ (ログインイベント、レポートエクスポート、API コール) からレンズ、ダッシュボード、データセットを作成できます。保持に応じて最大 1 ～ 24 か月の異常検知と履歴分析のためのリアルタイムストリーミングイベントをサポートします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><p>[設定] &gt; [イベント監視設定] で [分析アプリケーションでイベントログデータを参照] を有効にし、セキュリティアナリストに「Analytics でイベントログファイルを参照」権限を割り当てて、Shield Platform イベントログファイルと統合することで完全にカバーします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">セキュリティへの影響</h2><p>Salesforce から離れることなく、ユーザー行動、ログインパターン、データアクセスを一元的に可視化し、ネイティブ BI ツールを使用して脅威の検出とコンプライアンスレポートを積極的に作成できます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスへの影響</h2><p>ポイント &amp; クリック分析を使用してセキュリティ調査を迅速化し、SIEM インテグレーションコストを削減し、SQL/イベントログに関する深い専門知識を持たないアナリストでも組織の健全性を監視できます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>セキュリティ監視用のイベントログデータの分析を無効にすると、重要なユーザー活動データが未加工ファイルにサイロ化され、リアルタイムの分析や視覚化ができなくなります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>誤って設定または無効化されたイベント監視では、ユーザーアクティビティの取得に失敗し、異常なデータエクスポート、権限のエスカレーション、ブルートフォースログイン試行などの疑わしい動作やセキュリティインシデントの検出が妨げられます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>高 (7.0 ～ 8.9)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>価値はユーザー数とデータの機密性に応じてスケールします。長期保存のためのストレージコストは監視のニーズとのバランスを取る必要があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>大規模なユーザーベース、外部共有が有効、API インテグレーションが頻繁、継続的なユーザー活動の監視が必要な規制対象の業種。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">低リスク</h2><p>少人数の内部チーム、最小限の外部アクセス、ネイティブのログイン履歴と堅牢な MFA 適用で補完。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>CRM Analytics ライセンスと Event Monitoring アドオンが必要です。本番ダッシュボードの前にサンプルデータセットを使用してテストします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>強くお勧めします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">影響を受けるユーザー</h2><p>SecOps アナリスト、コンプライアンス担当者、セキュリティダッシュボードを作成する Salesforce システム管理者、ユーザー活動レポートを必要とする監査人。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.real_time_em_elo_analytics.htm&amp;language=ja&amp;type=5">Analytics アプリケーションでのイベントログデータの表示</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_waf_define_custom_firewall_rules_based_on_asn_or_ip">
+<h1 class="slds-text-heading_large">WAF: ASN または IP 制御に基づくカスタムファイアウォールルールの定義</h1>
+    
+    <p>この制御により、Salesforce システム管理者は Salesforce コンテンツ配信ネットワーク (CDN) 内に特定のセキュリティ検索条件を作成し、発信元の IP アドレスまたは自律システム番号に基づいて Web トラフィックをブロックまたは許可できます。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>ASN または IP に基づくカスタムファイアウォールルールの定義</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><p>Salesforce CDN 設定で、ASN または IP に基づいてカスタムファイアウォールルールを定義します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>この制御により、システム管理者は Salesforce CDN 内に特定のセキュリティ検索条件を作成し、発信元の IP アドレスまたは自律システム番号に基づいて Web トラフィックをブロックまたは許可できます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>カスタムファイアウォールルールがない場合、サイトは既知の悪意のあるネットワーク範囲やリスクの高い地理的地域からのトラフィックを制限できないため、アプリケーションを標的型プローブや大規模な自動攻撃に対して開いたままにします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>特定のインターネットサービスプロバイダーまたは地理的地域から発信された調整済みボットネットは、ユーザーアカウントを危険にさらすためにログインエンドポイントに対してブルートフォース攻撃を実行します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>高 (7.0 ～ 8.9)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>ネットワークエッジでトラフィックをフィルタリングしないと、地域のサイバー脅威にさらされる可能性が高くなり、アプリケーションサーバーは不必要な悪意のある要求を処理しなければならなくなるため、正当なユーザーのパフォーマンスが低下する可能性があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>組織は、特定のグローバルネットワークブロックから発信された国家主体またはプロフェッショナルなハッキンググループによって頻繁に標的にされる、有名な業界で活動しています。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">低リスク</h2><p>サイトが、地域での悪用のパターンを特定できない世界中の利用者を対象としており、Web アプリケーションファイアウォールのデフォルトの管理ルールセットですでに保護されている場合。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>カスタムルールを定義するには、正規のパートナーネットワーク範囲と従業員オフィス IP の正確なインベントリを作成して、承認されたユーザーが誤ってポータルにアクセスできないようにする必要があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨される修復</h2><p>エクスペリエンスワークスペース内の Salesforce CDN 設定に移動し、検証済みの悪意のある自律システム番号または疑わしい IP 範囲からのトラフィックをブロックするカスタムファイアウォール式を設定します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>セキュリティ状態レビューでは、カスタムファイアウォールルールが階層防御戦略の重要なコンポーネントとして識別され、ネットワークレベルの脅威がアプリケーションレイヤーに到達する前に分離および無効化するために必要な詳細な制御が提供されます。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.community_builder_cdn_custom_firewall_rules.htm&amp;language=ja&amp;type=5">Salesforce CDN のファイアウォールルールのカスタム式</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_waf_firewall_managed_ruleset">
+<h1 class="slds-text-heading_large">WAF ファイアウォールによるルールセット管理</h1>
+    
+    <p>この制御により、Salesforce コンテンツ配信ネットワーク (CDN) 内の事前設定されたセキュリティルールレイヤーが有効化され、受信 Web トラフィックがサイトに到達する前に一般的な悪意のあるパターンがブロックされます。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>WAF ファイアウォール管理ルールセット</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><p>Salesforce CDN 設定で、[WAF ファイアウォール管理ルールセット] を有効にします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>この制御により、Salesforce コンテンツ配信ネットワーク (CDN) 内の事前設定されたセキュリティルールレイヤーが有効化され、受信 Web トラフィックがサイトに到達する前に一般的な悪意のあるパターンがブロックされます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>有効な WAF がない場合、Experience Cloud サイトは、Web コードの脆弱性を悪用してデータを盗んだり、サービスを妨害したりする SQL インジェクションやクロスサイトスクリプティングなどの自動攻撃に直接さらされます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>攻撃者は自動化されたボットネットを使用して分散型サービス拒否 (DDoS) 攻撃や「クレデンシャルスタッフィング」キャンペーンを開始し、ポータルを圧倒して大量の不正アクセスを行う可能性があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>重大 (9.0 ～ 10.0)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>エッジでブロックされた可能性のある悪意のあるトラフィックを Salesforce Platform で処理する必要があるため、WAF がない場合、ダウンタイムの増加、データ侵害の可能性、リソース消費の増加につながります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>公開ポータルは、グローバルなハッキンググループや自動化された脆弱性スキャナーの主な標的になるため、顧客の機密データや金融取引を処理します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">低リスク</h2><p>サイトは単なる情報であり、認証されたログインがない場合、または Salesforce に到達する前にサードパーティのエンタープライズクラスのエッジセキュリティプロバイダーを使用してトラフィックを絞り込む場合です。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>管理ルールセットを実装するには、正当なユーザーがトラフィックを脅威と誤って認識するセキュリティ署名によってブロックされていないことを確認する監視が必要な場合があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨される修復</h2><p>[エクスペリエンスワークスペース] &gt; [管理] &gt; [メール] に移動して [外部サービス] を選択し、[CDN 設定] 内で WAF 管理ルールセットを有効にします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>Security Health Review (セキュリティ状態レビュー) では、WAF 管理ルールセットがネットワークの入り口で機能する境界防御レイヤーとして識別されるため、このレイヤーを使用して、変化するさまざまな Web ベースの脅威や自動攻撃に対するプロアクティブな防御を提供する必要があります。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.community_builder_cdn_edit_settings.htm&amp;language=ja&amp;type=5">Salesforce CDN の設定の編集</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_web_app_saml_policy_strengthening_single_logout_signature_verification_and_encrypting_response">
+<h1 class="slds-text-heading_large">Web アプリケーション: SAML ポリシーの強化、シングルログアウト、署名検証、応答の暗号化</h1>
+    
+    <p>このセキュリティポリシースイートは、ログアウト時に SAML ベースのセッションをグローバルに終了して、すべての受信認証要求が暗号化によって認証されるようにします。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>外部クライアントアプリケーション: Web アプリケーション (SAML 設定の有効化): SAML ポリシーの強化</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><p>
+            SAML を有効にしたら、必要なポリシーを設定します。 </p><ul><li>シングルログアウトを有効化 - 選択</li>
+<li>要求署名の検証 - 選択 </li>
+<li>要求署名の検証 - 選択</li>
+<li>SAML 応答を暗号化 - 選択</li>
+</ul>
+</div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>このセキュリティポリシースイートは、ログアウト時に SAML ベースのセッションをグローバルに終了し、すべての受信認証要求が暗号化されて本物かどうかが確認され、ユーザー ID データが転送中に暗号化されます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>これらのポリシーがないと、ユーザーはログアウトしてもアプリケーションが有効なままになるセッション破棄や、攻撃者が ID データを偽造して不正アクセスする SAML アサーションラッピングやインジェクション攻撃に対して脆弱になります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>攻撃者は、機密性の高いユーザー属性を含むプレーンテキスト SAML アサーションを傍受するか、以前に取得された認証要求を再生してログイン要件をスキップします。これは、要求の署名や応答の暗号化がシステムによって適用されないためです。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>高 (7.0 ～ 8.9)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>これらの制御を実装しないと、認証ハンドシェイク中に個人識別情報 (PII) が漏洩し、放棄されたセッションや乗っ取られたセッションによってサービスプロバイダーへの不正アクセスが継続的に行われる可能性があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>サービスプロバイダーが規制対象データ (HIPAA や PCI 準拠のレコードなど) を処理する場合、またはセッションハイジャックがより蔓延しているパブリックネットワークや未管理ネットワークからユーザーが頻繁にアプリケーションにアクセスする場合。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">低リスク</h2><p>SAML インテグレーションが、すべてのトラフィックがすでに相互 TLS で暗号化され、デバイスへの物理的なアクセスが厳密に制御されている、独立した内部ネットワークに厳密に制限されている場合。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>これらの機能を有効にするには、復号化用の非公開鍵を保存する機能やグローバルログアウトシグナルを処理する技術的なロジックなど、高度な SAML 2.0 機能をサービスプロバイダーがサポートしている必要があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨される修復</h2><p>外部クライアントアプリケーションの SAML 2.0 設定に移動し、シングルログアウトの有効化、要求署名の検証、SAML 応答の暗号化を行うチェックボックスをオンにします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>Security Health Reviewでは、署名検証とアサーション暗号化の組み合わせが統合IDの必須標準として識別され、さまざまなTrust境界でユーザー データの整合性と機密性が維持されます。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.configure_external_client_app_saml.htm&amp;language=ja&amp;type=5">外部クライアントアプリケーションの SAML 2.0 設定およびポリシーの設定</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_web_app_settings_after_enabling_saml_configure_the_required_policies">
+<h1 class="slds-text-heading_large">Web アプリケーション設定: SAML を有効にした後、必要なポリシーコントロールを設定する</h1>
+    
+    <p>このセキュリティ設定では、ID プロバイダーと Web アプリケーション間のセキュリティアサーションマークアップ言語の交換を保護するために必要な暗号署名アルゴリズム、アサーション入力規則、およびサービスプロバイダーエンドポイントを定義します。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>接続アプリケーション: Web アプリケーション設定: SAML を有効にしたら、必要なポリシーを設定します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><p>SAML を有効にしたら、必要なポリシーを設定します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>このセキュリティ設定では、ID プロバイダーと Web アプリケーション間のセキュリティアサーションマークアップ言語の交換を保護するために必要な暗号署名アルゴリズム、アサーション入力規則、およびサービスプロバイダーエンドポイントを定義します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>Web アプリケーションの SAML ポリシー設定が弱いと、アサーションインジェクションや、標準認証プロトコルをバイパスする XML ベースの攻撃によって ID スプーフィングのリスクが生じます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>攻撃者は、暗号化されていないアサーションを傍受して XML 署名ラッピング攻撃を実行するか、偽造 ID 要求を挿入して、高権限ユーザーセッションへの不正アクセスを取得します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>高 (7.0 ～ 8.9)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>厳格な SAML ポリシーを適用しないと、管理アカウントの乗っ取りや永続的なセッションハイジャックが促進され、相互接続されたエコシステム内のすべての統合データの整合性が低下する可能性があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>会社が古い SHA-1 ハッシュアルゴリズムを使用している場合、または転送中に SAML アサーション全体の暗号化を義務付けていない場合。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">低リスク</h2><p>リプレイ攻撃を防ぐために、会社がすべてのデジタル署名に SHA-256 を適用し、認証要求ごとに一意の短命の nonce を使用している場合。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>強化された SAML ポリシーを実装することで、ワークフォースのシームレスなシングルサインオンが保証されると同時に、サービスプロバイダーは高度な暗号化標準と特定の属性の対応付けをサポートする必要があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨される修復</h2><p>[接続アプリケーションの Web アプリケーション設定] に移動して SAML を有効にし、必要なセキュリティ証明書をアップロードするときにエンティティ ID、ACS URL、件名種別を設定します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>セキュリティ状態レビューでは、統合 ID フローを操作から保護し、すべての外部サービスアクセス要求の信頼性を確保するために、堅牢な SAML アサーションポリシーを使用することを強く推奨する標準として特定します。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.connected_app_create_saml_sso.htm&amp;language=ja&amp;type=5">SAML 2.0 を使用した接続アプリケーションとしてサービスプロバイダーを統合</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_web_app_settings_encrypt_saml_response_select">
+<h1 class="slds-text-heading_large">Web アプリケーション設定: Encrypt SAML Response - Select Control (SAML 応答を暗号化 - 制御を選択)</h1>
+    
+    <p>このセキュリティ設定は、送信前にサービスプロバイダーから提供された公開鍵を使用して、ユーザー ID と認証属性を含む SAML アサーション全体を暗号化して難読化します。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>接続アプリケーション: Web アプリケーション設定: [SAML を暗号化] 応答 - [選択]</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><p>Encrypt SAML response (SAML 応答を暗号化) - 選択します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>このセキュリティ設定は、送信前にサービスプロバイダーから提供された公開鍵を使用して、ユーザー ID と認証属性を含む SAML アサーション全体を暗号化して難読化します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>Web 接続アプリケーションの暗号化されていない SAML 応答は、プレーンテキスト認証トラフィックを傍受できるネットワークレベルの盗聴者に機密 ID 属性と認証要求が公開される可能性があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>安全でないネットワークセグメントに対して中間者攻撃を実行している攻撃者は、プレーンテキスト SAML アサーションを取得して、セッションハイジャックや偵察のためにユーザー ID、グループメンバーシップ、その他の個人識別情報を抽出します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>高 (7.0 ～ 8.9)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>応答を暗号化しないと、ユーザーメタデータの不正収集が促進され、統合エコシステム全体でログイン情報の盗難やダウンストリームアカウントの悪用に対する会社の脆弱性が高まります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>SAML アサーションに従業員 ID や社会保障番号などの機密カスタム属性が含まれ、パブリックネットワークインフラストラクチャまたは信頼できないネットワークインフラストラクチャを介して送信される場合、リスクが非常に高くなります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">低リスク</h2><p>組織がすでにエンドツーエンドのトランスポート層セキュリティを義務付けており、検証済みの特定の IP 範囲に制限された存続期間の短いアサーションを使用している場合。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>アサーションの暗号化を実装するには、サービスプロバイダーが受信ペイロードを復号化するための有効な非公開鍵を保持する必要があります。これにより、インテグレーションライフサイクルに証明書管理のレイヤーが追加されます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨される修復</h2><p>[接続アプリケーションの Web アプリケーション設定] に移動し、[SAML 応答を暗号化] オプションを選択して、サービスプロバイダーから提供された暗号化証明書をアップロードします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>Security Health Review では、ID アサーションの機密性を維持し、認証ハンドシェイク中の機密ユーザーメタデータの漏洩を防ぐために、SAML 応答の暗号化を強く推奨する標準として特定します。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.connected_app_create_saml_sso.htm&amp;language=ja&amp;type=5">SAML 2.0 を使用した接続アプリケーションとしてサービスプロバイダーを統合</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_web_app_settings_signing_algorithm_for_saml_messages_select_sha256">
+<h1 class="slds-text-heading_large">Web アプリケーション設定: SAML メッセージの署名アルゴリズム - SHA256 制御の選択</h1>
+    
+    <p>このセキュリティ設定では、SAML アサーションのデジタル署名を生成するために Secure Hash Algorithm 256 ビットバリエーションを使用することを指定します。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>接続アプリケーション: Web アプリケーション設定: SAML メッセージの署名アルゴリズム - SHA256 を選択</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><p>SAML メッセージの署名アルゴリズム - [SHA256] を選択します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>このセキュリティ設定では、SAML アサーションのデジタル署名を生成するために Secure Hash Algorithm 256 ビットバリエーションを使用するように指定し、ID 交換の整合性と信頼性を確保します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>SAML メッセージに弱い署名アルゴリズムを使用しないか使用すると、証明書偽造の脆弱性が発生し、プロバイダーとアプリケーション間で確立された ID Trust がバイパスされます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>攻撃者は、SHA-1 などの従来のアルゴリズムの既知の衝突の脆弱性を利用して、有効なデジタル署名を偽造し、未承認の管理要求を認証フローに挿入できるようにします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>高 (7.0 ～ 8.9)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>最新のハッシュ標準を使用しないと、アサーション操作と ID スプーフィングが成功し、統合アクセス管理システムが完全に侵害される可能性があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>サービスプロバイダーが署名の有効期限を適用しない場合、または署名に使用される非公開鍵がハードウェアベースの保護なしでソフトウェアベースのリポジトリに保存されている場合。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">低リスク</h2><p>組織がすでに存続期間の短い SAML アサーションの使用を義務付け、統合ログイン試行ごとに多要素認証を適用している場合。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>SHA-256 に移行すると、最新の業界セキュリティ標準への準拠が保証されますが、受信側サービスプロバイダーが 256 ビット暗号ハッシュを処理できることを確認する必要があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨される修復</h2><p>設定を保存する前に、[接続アプリケーションの Web アプリケーション設定] に移動し、[署名アルゴリズム] 項目を更新して [SHA256] を選択します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>Security Health Review では、SHA-256 署名の適用が、暗号攻撃を防止し、すべての ID アサーションが不正な変更に対して耐性を保持できるようにするために強く推奨される標準であることが示されています。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.connected_app_create_saml_sso.htm&amp;language=ja&amp;type=5">SAML 2.0 を使用した接続アプリケーションとしてサービスプロバイダーを統合</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="shr_web_app_settings_verify_request_signatures_select">
+<h1 class="slds-text-heading_large">Web アプリケーション設定: 要求署名の検証 - 制御の選択</h1>
+    
+    <p>このセキュリティ設定により、プラットフォームは、受信したすべての SAML または OAuth 要求のデジタル署名を信頼済み公開証明書に対して検証し、送信者が本物であることを確認する必要があります。</p>
+
+
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">コントロール名</h2><p>接続アプリケーション: Web アプリケーション設定: 要求署名の検証 - 選択</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨設定</h2><p>Web アプリケーション設定: 要求署名の検証 - 選択します。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">制御の概要</h2><p>このセキュリティ設定により、プラットフォームは、受信したすべての SAML または OAuth 要求のデジタル署名を信頼済み公開証明書に対して検証し、送信者が本物であることを確認する必要があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">設定されていない場合のセキュリティリスク</h2><p>接続 Web アプリケーションのアプリケーション要求署名を検証しないと、傍受または変更された未検証の要求によってデータが改ざんされ、不正なシステム変更が行われるリスクがあります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">脅威のシナリオ</h2><p>攻撃者は、暗号化されていない認証要求を傍受し、要求が Salesforce サービスプロバイダーエンドポイントに到達する前にユーザー識別子または権限要求を変更してアクセス権を昇格させます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推定 CVSS スコア範囲</h2><p>高 (7.0 ～ 8.9)。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">リスクの影響に関する考慮事項</h2><p>署名検証を適用しないと、不正な管理アクションの実行や、操作されたインテグレーションパラメーターによる機密レコードの持ち出しが促進されます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">より高いリスク</h2><p>接続アプリケーションが価値の高い金融取引を処理する場合、または組織が認証メタデータの送信に安全でない HTTP チャネルの使用を許可する場合。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">低リスク</h2><p>組織が認証機関を使用して有効期間の短い署名鍵を発行し、すべての API レベルの通信に相互トランスポート層セキュリティを適用している場合。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">ビジネスと統合に関する考慮事項</h2><p>署名検証を実装すると、すべての受信要求を拒否できなくなりますが、すべての送信ペイロードに署名するために必要な計算オーバーヘッドを外部サービスプロバイダーに要求する必要があります。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">推奨される修復</h2><p>[接続アプリケーションの Web アプリケーション設定] に移動し、正しい検証証明書が有効になっていることを確認しながら [要求署名を検証] チェックボックスをオンにします。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Security Health Review Guidance (セキュリティ状態レビューガイダンス)</h2><p>セキュリティ状態レビューでは、要求署名の検証が、統合 ID 環境内の要求リプレイ攻撃やメッセージ改ざん攻撃から保護するために強く推奨される標準として識別されます。</p></div>
+    
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.connected_app_create_saml_sso.htm&amp;language=ja&amp;type=5">SAML 2.0 を使用した接続アプリケーションとしてサービスプロバイダーを統合</a></li></ul></div>
+</div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="shr-4.html">&larr; セキュリティ状態レビュー (SHR)（4/5）</a><a href="overview_misc.html">概要・その他 &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.security_secure_your_org.htm&type=5&language=ja">help.salesforce.com — 組織を保護する（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>

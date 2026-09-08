@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>インシデント管理・スウォーミング（3/3） | Service Cloud ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（33）</h2>
+    <ol>
+      <li><a href="#incident_mgmt_send_a_broadcast_slack_message">ブロードキャスト Slack メッセージの送信</a></li>
+      <li><a href="#incident_mgmt_set_up_entitlement_process">インシデントのエンタイトルメントプロセスの設定</a></li>
+      <li><a href="#incident_mgmt_setup">カスタマーサービスインシデント管理の設定</a></li>
+      <li><a href="#incident_mgmt_setup_broadcast_alerts">ブロードキャストアラートの設定</a></li>
+      <li><a href="#incident_mgmt_setup_broadcast_banners">ブロードキャストサイトバナーの設定</a></li>
+      <li><a href="#incident_mgmt_setup_broadcast_comms">ブロードキャスト通信の設定</a></li>
+      <li><a href="#incident_mgmt_setup_broadcast_emails">ブロードキャストメールの設定</a></li>
+      <li><a href="#incident_mgmt_setup_broadcast_slack">ブロードキャスト Slack メッセージの設定</a></li>
+      <li><a href="#incident_mgmt_setup_broadcast_template_slack">カスタムブロードキャスト Slack メッセージテンプレートの作成</a></li>
+      <li><a href="#incident_mgmt_setup_flows">カスタマーサービスインシデント管理フローの設定</a></li>
+      <li><a href="#incident_mgmt_sla_admin_setup">システム管理者による設定</a></li>
+      <li><a href="#incident_mgmt_sla_agents">サポート担当者のインシデント追跡</a></li>
+      <li><a href="#incident_mgmt_swarm">インシデント、問題、変更要求のスウォーミング</a></li>
+      <li><a href="#incident_mgmt_track_incident">インシデントの追跡</a></li>
+      <li><a href="#incident_mgmt_update_slack_message">ブロードキャスト Slack メッセージの更新</a></li>
+      <li><a href="#incident_mgmt_use_slas">マイルストーンとエンタイトルメントを使用したインシデントの追跡</a></li>
+      <li><a href="#incident_mgmt_what_is_this">カスタマーサービスインシデント管理とは?</a></li>
+      <li><a href="#prep_omni_for_swarming">スウォーミング用のエキスパートファインダーの設定</a></li>
+      <li><a href="#quick_actions_swarming">クイックアクションを使用したスウォーミング</a></li>
+      <li><a href="#reopen_a_swarm">Lightning Experience でのスウォーミングの再オープン</a></li>
+      <li><a href="#service_swarm_change_slack_channel_name">スウォームレコードの Slack チャンネル名の変更</a></li>
+      <li><a href="#service_swarm_manage">スウォーミングの管理</a></li>
+      <li><a href="#service_swarm_slack_collab_tool">スウォーミングのためのコラボレーションツールの設定</a></li>
+      <li><a href="#service_swarm_take_action_slack">Slack でのアクションの実行</a></li>
+      <li><a href="#service_swarming_intro">スウォーミングによるコラボレーションの実現</a></li>
+      <li><a href="#service_swarming_limitations">スウォーミングの制限および考慮事項</a></li>
+      <li><a href="#set_up_flows_swarming">スウォーミングフローの設定</a></li>
+      <li><a href="#set_up_perms_swarming">スウォーミングユーザー権限の設定</a></li>
+      <li><a href="#set_up_swarming">スウォーミングの設定</a></li>
+      <li><a href="#swarming_in_lex">Lightning Experience でのスウォーミング</a></li>
+      <li><a href="#swarming_in_lex_intro">Lightning Experience でのスウォーミングの使用</a></li>
+      <li><a href="#swarming_in_slack">Slack でのスウォーム</a></li>
+      <li><a href="#turn_on_swarming">スウォーミングの有効化</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>インシデント管理・スウォーミング（3/3）</h1>
+      <div class="meta">Salesforce Service Cloud ヘルプ · 33 記事 · 生成 2026-08-13</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="incident-2.html">&larr; インシデント管理・スウォーミング（2/3）</a><a href="case_mgmt-1.html">ケース管理・エスカレーション・自動化（1/3） &rarr;</a></div>
+<section class="article" id="incident_mgmt_send_a_broadcast_slack_message">
+<h1 class="slds-text-heading_large">ブロードキャスト Slack メッセージの送信</h1>
+  <p>インシデントが発生したときに、ブロードキャスト Slack メッセージで関係者とリーダーチームに最新情報を提供します。ブロードキャスト Slack メッセージは、関連付けられた Slack チャンネルへのアクセス権を持つすべてのユーザーに表示されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table><ul>
+        <li>カスタマーサービスインシデント管理が有効になっている必要があります。</li>
+
+        <li>ブロードキャスト Slack メッセージが有効である必要があります。</li>
+
+        <li>ブロードキャストトピックを Slack チャンネルに割り当てる必要があります。</li>
+
+      </ul>
+</div>
+    <ol><li>
+        <span>[インシデント] 関連リストに移動し、[ブロードキャスト通信] 関連リストを見つけます。</span>
+      </li><li>
+        <span><strong class="uicontrol">[新規ブロードキャスト Slack メッセージ]</strong> をクリックします。</span>
+      </li><li>
+        <span>関連性の高いブロードキャストトピックとテンプレートを選択して、<strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>メッセージを送信する前に、メッセージを送信するチャンネルのリストを確認します。ブロードキャストメッセージを別のチャンネルに送信するには、別のブロードキャストトピックを選択します。</span>
+      </li><li>
+        <span>トピックが適切であれば、メッセージプレビューを確認して <strong class="uicontrol">[送信]</strong> をクリックします。
+     </span>
+        <div>送信する内容が適切であることを確認できるように、メッセージをテストチャンネルに送信するためのブロードキャストトピックがシステム管理者によって用意されている場合があります。テストブロードキャストトピックと Slack チャンネルを使用することで、共有しても安全なコンテンツであることを確認できます。</div>
+      </li><li>
+        <span>コンテンツが適切であることを確認して、[<strong class="uicontrol">このまま送信</strong>] をクリックします。<div style="text-align:left;"><img alt="ブロードキャスト Slack メッセージのプレビュー画面" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_broadcast_slack_preview.png"></div></span>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="ユーザーが Slack でインシデントの更新を共有できるようにするには、Service for Slack アプリケーションを設定し、ブロードキャスト Slack メッセージを有効にして、ブロードキャストトピックを作成し、Slack チャンネルに割り当てます。" href="#incident_mgmt_setup_broadcast_slack">ブロードキャスト Slack メッセージの設定</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_set_up_entitlement_process">
+<h1 class="slds-text-heading_large">インシデントのエンタイトルメントプロセスの設定</h1>
+  <p>インシデントのエンタイトルメントを有効にして、サポート担当者が顧客に適切なサービスレベルを提供できるようにします。エンタイトルメントプロセスを設定して、サポート担当者がインシデントを解決するために実行する必要のあるすべてのステップ (マイルストーン) を含むカスタマイズされたタイムラインを作成します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d45029e54" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d45029e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">エンタイトルメントを有効化する</td>
+
+              <td headers="d45029e54" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d45029e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">エンタイトルメントを参照する</td>
+
+              <td headers="d45029e54" style="vertical-align:top;" class="slds-cell-wrap">エンタイトルメントに対する「参照」</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d45029e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">エンタイトルメントを変更する</td>
+
+              <td headers="d45029e54" style="vertical-align:top;" class="slds-cell-wrap">エンタイトルメントに対する「編集」</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d45029e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">エンタイトルメントプロセスを作成および更新する</td>
+
+              <td headers="d45029e54" style="vertical-align:top;" class="slds-cell-wrap">「エンタイトルメントの管理」</td>
+
+            </tr>
+          </tbody></table><p>インシデントのエンタイトルメントとマイルストーンを使用する前に、エンタイトルメントを有効にしてマイルストーンを作成します。手順については、「<a target="_blank" href="entitlement_sla-1.html#entitlements_parent_admin">エンタイトルメントとマイル</a>ストンの設定と管理」を参照してください。</p></div>
+    <ol><li>
+        <span>[設定] の [クイック検索] ボックスに<kbd>「エンタイトルメント」</kbd>と入力し、<strong class="uicontrol">[エンタイトルメントプロセス]</strong> を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[新規エンタイトルメントプロセス]</strong> をクリックします。</span>
+      </li><li>
+        <span>エンタイトルメントプロセス種別として [<strong class="uicontrol">インシデント]</strong> を選択し、[<strong class="uicontrol">次へ</strong>] をクリックします。<div style="text-align:left;"><img alt="[エンタイトルメントプロセス] ページ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_entitlement_process.png"></div></span>
+      </li><li>
+        <span>プロセスの名前を入力します。</span>
+      </li><li>
+        <span>エンタイトルメントプロセスを <strong class="uicontrol">[有効]</strong> に設定します。</span>
+      </li><li>
+        <span>必要に応じて、インシデントでプロセスを開始および終了する条件を設定します。</span>
+      </li><li>
+        <span>変更内容を保存します。</span>
+      </li><li>
+        <span>[マイルストーン] で、<strong class="uicontrol">[新規]</strong> をクリックします。</span>
+      </li><li>
+        <span>マイルストーンを選択します。エンタイトルメントプロセスの定期的なマイルストーンまたは非定期的なマイルストーンを選択できます。</span>
+      </li><li>
+        <span>タイムトリガーの分数を入力します。</span>
+      </li><li>
+        <span>マイルストーンを処理する順序を指定します。</span>
+      </li><li>
+        <span>変更内容を保存します。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_setup">
+<h1 class="slds-text-heading_large">カスタマーサービスインシデント管理の設定</h1>
+  <p>カスタマーサービスインシデント管理を有効にして、ユーザーにアクセス権を付与する方法を説明します。カスタマーサービスインシデント管理は、Winter '22 リリース以降に作成されたすべての組織で自動的に有効になります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> Salesforce Go!ガイド付き設定環境の検索、より多くのコンテンツの探索、関連機能の発見、機能の使用状況の監視を行います。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.setup_salesforce_go.htm&amp;language=ja&amp;type=5">Discover and Set Up Features</a> With Salesforce Go」を参照してください。</div></div></div>
+
+  
+<ol><li class="slds-p-bottom_small"><strong><a href="incident-2.html#incident_mgmt_enable_incident_management">カスタマーサービスインシデント管理の有効化</a></strong><br>いくつかのステップを行うことでカスタマーサービスインシデント管理を有効にして、サービスチームがサービスの中断を追跡して診断し、再発を防止できるようにします。これらをすべて Salesforce 内で実行できます。</li><li class="slds-p-bottom_small"><strong><a href="incident-1.html#incident_mgmt_assign_access">ユーザーへのカスタマーサービスインシデント管理に対するアクセス権の付与</a></strong><br>ユーザーにカスタマーサービスインシデント管理機能へのアクセス権を付与するには、ユーザープロファイルにインシデント、問題、および変更要求へのアクセス権を割り当てます。</li><li class="slds-p-bottom_small"><strong><a href="incident-1.html#incident_mgmt_automate">カスタマーサービスインシデント管理を使用した自動化</a></strong><br>カスタマーサービスインシデント管理用のオートメーションツールを使用して問題をシームレスに解決します。</li><li class="slds-p-bottom_small"><strong><a href="incident-2.html#incident_mgmt_integrations">カスタマーサービスインシデント管理のインテグレーションの設定</a></strong><br>カスタマーサービスインシデント管理をパートナーシステムと統合し、潜在的な問題を特定して、致命的な問題になる前に問題に積極的に対応します。</li><li class="slds-p-bottom_small"><strong><a href="incident-1.html#incident_mgmt_add_related_to_cases">インシデントおよびケースページレイアウトへの関連項目の追加</a></strong><br>ケースレコードからケースに関連したインシデント、問題、変更要求を確認するには、ケースページレイアウトに関連リストを追加します。また、Winter '24 より前にカスタマーサービスインシデント管理が有効化されている組織では、[商品] 項目を追加して、[インシデント] ページレイアウトに関連商品が表示されるようにします。</li><li class="slds-p-bottom_small"><strong><a href="incident-2.html#incident_mgmt_reporting">カスタマーサービスインシデント管理のレポート</a></strong><br>[カスタマーサービスインシデント管理ダッシュボード] 管理パッケージを使用してチームがインシデントを解決する方法を確認します。作成されたインシデント、問題、変更要求の数と、完了したそれらの数を追跡します。また、月次の有効ユーザー数を使用してユーザーの採用を測定します。</li></ol>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_setup_broadcast_alerts">
+<h1 class="slds-text-heading_large">ブロードキャストアラートの設定</h1>
+  <p>インシデントが発生したときにユーザーがアプリケーション内アラートを送信できるようにするには、ブロードキャストアラートを有効にして、ブロードキャストトピックを作成し、グループに割り当てます。次に、カスタム Lightning コンソールアプリケーションを使用している場合は、インシデントアラートウィジェットをコンソールに追加します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table>
+  
+<ol><li class="slds-p-bottom_small"><strong><a href="incident-2.html#incident_mgmt_enable_alerts">ブロードキャストアラートの有効化</a></strong><br>ブロードキャストアラートを有効にすると、インシデントが発生したときにインシデントマネージャーが中断を伴うアプリケーション内通知を送信できます。</li><li class="slds-p-bottom_small"><strong><a href="incident-1.html#incident_mgmt_add_incident_alert">インシデントアラートユーティリティの Lightning コンソールアプリケーションへの追加</a></strong><br>インシデントが発生したときにユーザーがブロードキャストアラートを受信できるようにするには、Lightning コンソールアプリケーションにインシデントアラートユーティリティ項目を追加します。このステップは、カスタム Lightning アプリケーションを使用するユーザーにのみ必要で、Lightning サービスコンソールユーザーで自動的に有効になります。</li><li class="slds-p-bottom_small"><strong><a href="incident-1.html#incident_mgmt_alerts_customize_all_incidents">インシデントアラートの [すべて] タブのカスタマイズ</a></strong><br>インシデントアラートユーティリティの [すべて] タブからカスタムインシデントリストビューを表示します。デフォルトでは、標準のすべてのインシデント (デフォルト) リストビューが表示されます。</li><li class="slds-p-bottom_small"><strong><a href="incident-1.html#incident_mgmt_create_bt_alert">ブロードキャストアラートのブロードキャストトピックの作成</a></strong><br>インシデントマネージャーがブロードキャストアラートを作成できるようにするには、まずブロードキャストトピックを 1 つ以上作成します。インシデントが発生すると、インシデントマネージャーはブロードキャストトピックに基づいてブロードキャストアラートをグループに送信できます。</li><li class="slds-p-bottom_small"><strong><a href="incident-1.html#incident_mgmt_assign_topic_to_group">グループへのブロードキャストトピックの割り当て</a></strong><br>事前に決められた Salesforce ユーザーセットにブロードキャストアラートを送信するには、ブロードキャストトピックを 1 つ以上のグループに割り当てます。インシデントが発生すると、インシデントマネージャーはブロードキャストトピックに基づいてブロードキャストアラートを Salesforce のグループに送信できます。</li></ol>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_setup_broadcast_banners">
+<h1 class="slds-text-heading_large">ブロードキャストサイトバナーの設定</h1>
+  <p>インシデントが発生したときにユーザーが Aura および LWR サイトにブロードキャストサイトバナーを追加できるようにするには、ブロードキャストサイトバナーを有効化し、ブロードキャストトピックを作成してネットワークサイトに割り当てます。次にエクスペリエンスビルダーでサイトにサイトバナーコンポーネントをサイト追加します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table>
+  
+<ol><li class="slds-p-bottom_small"><strong><a href="incident-2.html#incident_mgmt_enable_site_banners">ブロードキャストサイトバナーの有効化</a></strong><br>ブロードキャストサイトバナーを有効にして、ユーザーが重要な情報を表示するバナーを Aura および LWR サイトに追加できるようにします。</li><li class="slds-p-bottom_small"><strong><a href="incident-1.html#incident_mgmt_create_broadcast_topic">ブロードキャストサイトバナーのブロードキャストトピックの作成</a></strong><br>ユーザーがブロードキャストサイトバナーを作成できるようにするには、まずブロードキャストトピックを 1 つ以上作成します。インシデントが発生すると、ユーザーはブロードキャストトピックに基づいてブロードキャストサイトバナーを Experience Cloud サイトに追加できます。</li><li class="slds-p-bottom_small"><strong><a href="incident-1.html#incident_mgmt_assign_topic_to_network">ネットワークサイトへのブロードキャストトピックの割り当て</a></strong><br>ユーザーが Aura および LWR サイトにブロードキャストサイトバナーを追加できるようにするには、ブロードキャストトピックを 1 つ以上のネットワークサイトに追加します。ブロードキャストトピックをネットワークサイトに割り当てると、ブロードキャストトピックと Experience Cloud サイト間のリンクが作成されます。インシデントが発生すると、ユーザーはブロードキャストトピックに基づいてブロードキャストサイトバナーを Experience Cloud サイトに追加できます。</li><li class="slds-p-bottom_small"><strong><a href="incident-1.html#incident_mgmt_add_site_banner_component">サイトバナーコンポーネントのサイトへの追加</a></strong><br>ユーザーが Aura および LWR サイトにバナーを追加できるようにするには、エクスペリエンスビルダーでサイトバナーコンポーネントをサイトに追加します。バナーのデザインをカスタマイズすることもできます。</li></ol>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_setup_broadcast_comms">
+<h1 class="slds-text-heading_large">ブロードキャスト通信の設定</h1>
+  <p>インシデント中にチームが大規模に顧客と最新情報を共有できるように、ブロードキャスト通信を設定します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table>
+  
+<ol><li class="slds-p-bottom_small"><strong><a href="#incident_mgmt_setup_broadcast_banners">ブロードキャストサイトバナーの設定</a></strong><br>インシデントが発生したときにユーザーが Aura および LWR サイトにブロードキャストサイトバナーを追加できるようにするには、ブロードキャストサイトバナーを有効化し、ブロードキャストトピックを作成してネットワークサイトに割り当てます。次にエクスペリエンスビルダーでサイトにサイトバナーコンポーネントをサイト追加します。</li><li class="slds-p-bottom_small"><strong><a href="#incident_mgmt_setup_broadcast_emails">ブロードキャストメールの設定</a></strong><br>インシデントが発生したときにユーザーがブロードキャストメールを送信できるようにするには、ブロードキャストメールを有効化し、取引先責任者リストビューを作成/管理するか、ユーザーがインシデントに関連するケースまたは商品の取引先責任者にブロードキャストメールを送信できるようにします。</li><li class="slds-p-bottom_small"><strong><a href="#incident_mgmt_setup_broadcast_alerts">ブロードキャストアラートの設定</a></strong><br>インシデントが発生したときにユーザーがアプリケーション内アラートを送信できるようにするには、ブロードキャストアラートを有効にして、ブロードキャストトピックを作成し、グループに割り当てます。次に、カスタム Lightning コンソールアプリケーションを使用している場合は、インシデントアラートウィジェットをコンソールに追加します。</li><li class="slds-p-bottom_small"><strong><a href="#incident_mgmt_setup_broadcast_slack">ブロードキャスト Slack メッセージの設定</a></strong><br>ユーザーが Slack でインシデントの更新を共有できるようにするには、Service for Slack アプリケーションを設定し、ブロードキャスト Slack メッセージを有効にして、ブロードキャストトピックを作成し、Slack チャンネルに割り当てます。</li><li class="slds-p-bottom_small"><strong><a href="incident-1.html#incident_mgmt_assign_broadcast_comms_access">ユーザーへのブロードキャスト通信に対するアクセス権の付与</a></strong><br>ユーザーがさまざまなブロードキャスト種別を作成できるようにするには、ブロードキャスト通信オブジェクト権限へのアクセス権をユーザーに付与します。</li><li class="slds-p-bottom_small"><strong><a href="incident-1.html#incident_mgmt_add_broadcasts_to_incident">インシデントレコードへのブロードキャスト通信の追加</a></strong><br>インシデントの発生時にユーザーがブロードキャスト (ブロードキャストメールやサイトバナーなど) を作成できるようにするには、[ブロードキャスト通信] 関連リストをインシデントページレイアウトに追加します。</li><li class="slds-p-bottom_small"><strong><a href="incident-1.html#incident_mgmt_comms_limitations">ブロードキャスト通信に関する考慮事項</a></strong><br>さまざまなブロードキャスト種別を使用するときに、以下の考慮事項に留意してください。</li></ol>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_setup_broadcast_emails">
+<h1 class="slds-text-heading_large">ブロードキャストメールの設定</h1>
+  <p>インシデントが発生したときにユーザーがブロードキャストメールを送信できるようにするには、ブロードキャストメールを有効化し、取引先責任者リストビューを作成/管理するか、ユーザーがインシデントに関連するケースまたは商品の取引先責任者にブロードキャストメールを送信できるようにします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table>
+  
+<ol><li class="slds-p-bottom_small"><strong><a href="incident-2.html#incident_mgmt_enable_emails">ブロードキャストメールの有効化</a></strong><br>ブロードキャストメールを有効にして、ユーザーが重要な情報を影響を受ける顧客に送信できるようにします。</li></ol>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_setup_broadcast_slack">
+<h1 class="slds-text-heading_large">ブロードキャスト Slack メッセージの設定</h1>
+  <p>ユーザーが Slack でインシデントの更新を共有できるようにするには、Service for Slack アプリケーションを設定し、ブロードキャスト Slack メッセージを有効にして、ブロードキャストトピックを作成し、Slack チャンネルに割り当てます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table>
+  
+<ol><li class="slds-p-bottom_small"><strong><a href="incident-2.html#incident_mgmt_enable_slack">ブロードキャスト Slack メッセージの有効化</a></strong><br>ブロードキャストアラートを有効にすると、インシデントが発生したときにインシデントマネージャーが中断を伴うアプリケーション内通知を送信できます。</li><li class="slds-p-bottom_small"><strong><a href="incident-1.html#incident_mgmt_create_bt_slack">ブロードキャスト Slack メッセージのブロードキャストトピックの作成</a></strong><br>インシデントチームがブロードキャスト Slack メッセージを送信できるようにするには、まずブロードキャストトピックを 1 つ以上作成します。インシデントが発生すると、ユーザーはブロードキャストトピックに基づいてブロードキャスト Slack メッセージを Slack チャンネルに送信できます。</li><li class="slds-p-bottom_small"><strong><a href="incident-1.html#incident_mgmt_assign_topic_to_channel">Slack チャンネルへのブロードキャストトピックの割り当て</a></strong><br>ユーザーが Slack でインシデントの更新を共有できるようにするには、ブロードキャストトピックを 1 つ以上の Slack チャンネルに割り当てます。インシデントが発生すると、インシデントチームはブロードキャストトピックに基づいてブロードキャスト Slack メッセージを Slack チャンネルに送信できます。</li><li class="slds-p-bottom_small"><strong><a href="#incident_mgmt_setup_broadcast_template_slack">カスタムブロードキャスト Slack メッセージテンプレートの作成</a></strong><br>ビジネスニーズに合わせてカスタマイズされたブロードキャスト Slack メッセージを送信するには、カスタムブロードキャスト Slack メッセージテンプレートを作成します。デフォルトでは、テンプレートは [Slack のインシデントの最新情報] (デフォルト) に設定されています。</li></ol>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_setup_broadcast_template_slack">
+<h1 class="slds-text-heading_large">カスタムブロードキャスト Slack メッセージテンプレートの作成</h1>
+  <p>ビジネスニーズに合わせてカスタマイズされたブロードキャスト Slack メッセージを送信するには、カスタムブロードキャスト Slack メッセージテンプレートを作成します。デフォルトでは、テンプレートは [Slack のインシデントの最新情報] (デフォルト) に設定されています。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table><p>ブロードキャスト Slack メッセージテンプレートを作成する前に、<a target="_blank" href="https://help.salesforce.com/s/articleView?id=slack.set_up_slack.htm&amp;language=ja&amp;type=5">Service for Slack アプリケーション</a>の設定を完了し、ブロードキャスト Slack メッセージを有効にします。</p></div>
+    <ol><li>
+        <span>[設定] の [クイック検索] ボックスに<kbd>「カスタマーサービスインシデント管理」</kbd>と入力し、<strong class="uicontrol">[カスタマーサービスインシデント管理]</strong> をクリックします。</span>
+      </li><li>
+        <span>[ブロードキャスト Slack メッセージを設定] で [カスタムテンプレートを作成 (省略可能)] を見つけ、<strong class="uicontrol">[テンプレートを作成]</strong> を選択します。</span>
+      </li><li>
+        <span>[カスタム通知種別] で、<strong class="uicontrol">[新規]</strong> を選択します。</span>
+      </li><li>
+        <span>通知種別として <strong class="uicontrol">[Slack]</strong> を選択します。</span>
+      </li><li>
+        <span>カスタム通知名と API 参照名を入力します。この名前は、ユーザーがブロードキャスト Slack メッセージを作成するときにテンプレート名として表示されます。</span>
+      </li><li>
+        <span>オブジェクトを [インシデント] に設定します。</span>
+      </li><li>
+        <span>必要に応じて説明を入力し、<strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>配信アプリケーションを <strong class="uicontrol">[Service Cloud for Slack]</strong> に設定し、<strong class="uicontrol">[次へ]</strong> を選択します。</span>
+      </li><li>
+        <span>タイトルと本文のメッセージを入力します。このテキストは、ブロードキャスト Slack メッセージが作成されたときに Slack チャンネルでユーザーに送信されます。レコードの項目に基づいてブロードキャスト Slack メッセージテンプレートを動的に更新するには、差し込み項目を使用します。「Slack 通知<div style="text-align:left;"><img alt="[Slack 通知を作成] ウィンドウ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_slack_notification_template.png"></div>の<a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.notif_builder_merge_fields.htm&amp;language=ja&amp;type=5">差し込み項目</a>」を参照してください。</span>
+      </li><li>
+        <span>必要に応じて、アクションボタンを追加します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[完了]</strong> をクリックします。</span>
+      </li></ol>
+
+    <div><p>ユーザーはインシデントからブロードキャスト Slack メッセージを作成するときに、カスタムテンプレートを選択できるようになりました。</p><div style="text-align:left;">
+        <img alt="[ブロードキャスト Slack メッセージを送信] ウィンドウで選択されたテンプレート" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/incident_mgmt_template_selected.png">
+      </div></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_setup_flows">
+<h1 class="slds-text-heading_large">カスタマーサービスインシデント管理フローの設定</h1>
+  <p>[ケース所有者をインシデント所有者に変更] や [変更要求および関連問題をクローズする] などのカスタマーサービスインシデント管理のサンプルフローを使用するには、設定を完了してください。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table><p>カスタマーサービスインシデント管理フローを使用するには、最初にカスタマーサービスインシデント管理を有効にします。</p></div>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> カスタマーサービスインシデント管理フローは、[アクション &amp; おすすめ] 以外のコンポーネントでも機能します。<a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.flow_distribute_internal.htm&amp;language=ja&amp;type=5">もうひとこと...</a></div></div></div>
+</div>
+    <ol><li>
+        <span>カスタマーサービスインシデント管理のサンプルフローを [アクション &amp; おすすめ] コンポーネントに追加するには、最初にフローをコピーします。</span>
+        <ol>
+          <li>
+            <span>[設定] で、[クイック検索] ボックスに<kbd>「フロー」</kbd>と入力して、<strong class="uicontrol">[フロー]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[ケース所有者をインシデント所有者に変更]</strong> または <strong class="uicontrol">[変更要求および関連問題をクローズする]</strong> を選択し、<strong class="uicontrol">[別名で保存]</strong> をクリックします。</span>
+          </li>
+
+          <li>
+            <span>フローの表示ラベルと API 参照名を入力します。変更内容を保存します。</span>
+          </li>
+
+          <li>
+            <span>フローを有効化します。</span>
+          </li>
+
+          <li>
+            <span>もう 1 つのカスタマーサービスインシデント管理フローでステップ a ～ d を繰り返します。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>フローを<a target="_blank" href="https://help.salesforce.com/s/articleView?id=service.console_lex_guided_action_deployment.htm&amp;language=ja&amp;type=5">リリースに</a>追加して、オブジェクトとして <strong class="uicontrol">[変更要求]</strong> または <strong class="uicontrol">[インシデント]</strong> を選択します。</span>
+        <div>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> [ケース所有者をインシデント所有者に変更] はインシデントでのみ機能します。[変更要求および関連問題をクローズする] は変更要求でのみ機能します。</div></div></div>
+
+        </div>
+      </li><li>
+        <span>[アクション &amp; おすすめ] コンポーネントからフローをユーザーに表示するには、<a target="_blank" href="https://help.salesforce.com/s/articleView?id=service.console_lex_guided_action_use_deployment.htm&amp;language=ja&amp;type=5">リリースをコンポーネントに追加します</a>。[アクション &amp; おすすめ] コンポーネントはカスタマーサービスインシデント管理ページレイアウトに自動的に追加されます。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_sla_admin_setup">
+<h1 class="slds-text-heading_large">システム管理者による設定</h1>
+  <p>インシデント管理チームのエンタイトルメントとマイルストーンを設定します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table>
+  
+<ol><li class="slds-p-bottom_small"><strong><a href="#incident_mgmt_set_up_entitlement_process">インシデントのエンタイトルメントプロセスの設定</a></strong><br>インシデントのエンタイトルメントを有効にして、サポート担当者が顧客に適切なサービスレベルを提供できるようにします。エンタイトルメントプロセスを設定して、サポート担当者がインシデントを解決するために実行する必要のあるすべてのステップ (マイルストーン) を含むカスタマイズされたタイムラインを作成します。</li><li class="slds-p-bottom_small"><strong><a href="incident-1.html#incident_mgmt_add_entitlements_page_layout">ページレイアウトへのエンタイトルメントの追加</a></strong><br>エンタイトルメント項目をインシデントページレイアウトに追加します。</li><li class="slds-p-bottom_small"><strong><a href="incident-1.html#incident_mgmt_add_milestones">インシデントページレイアウトへのマイルストーンコンポーネントの追加</a></strong><br>インシデントの時間ベースのステップ (最初の対応やインシデント解決時間など) を表示します。</li></ol>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_sla_agents">
+<h1 class="slds-text-heading_large">サポート担当者のインシデント追跡</h1>
+  <p>マイルストーンとエンタイトルメントを使用して、インシデント中に顧客に最新情報を提供します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="incident-1.html#incident_mgmt_create_entitlement">インシデントのエンタイトルメントの作成</a></strong><br>エンタイトルメントを作成してエンタイトルメントプロセスにリンクし、インシデントを適切に時間どおりに解決します。</li><li class="slds-p-bottom_small"><strong><a href="incident-2.html#incident_mgmt_manage_slas">エンタイトルメントとマイルストーンを使用したインシデント SLA の管理</a></strong><br>インシデントが発生したときのサポートサービスレベル契約を把握します。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_swarm">
+<h1 class="slds-text-heading_large">インシデント、問題、変更要求のスウォーミング</h1>
+  <p>表示停止インシデントをすばやく解決するには、Slack でスウォームを開始して専門分野エキスパートとコラボレーションします。サポート担当者はインシデントでスウォーミングを行い、チームに最新情報を提供し、最新情報を共有できます。DevOps チームは問題でスウォーミングを行い、根本原因を見つけるのに最適なチームを編成できます。サポート担当者と DevOps チームは、ソリューションに合わせて変更要求でスウォーミングできます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table><p>Slack でスウォーミングするには、Salesforce システム管理者が最初に Service for Slack アプリケーションの設定を完了する必要があります。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Service Cloud は Agentforce Service になりました。Salesforce アプリケーションおよびドキュメントで Service Cloud を参照することがあります。</div></div></div>
+</div>
+    <ol><li>
+        <span><a target="_blank" href="#set_up_swarming">Service for Slack アプリケーション</a>を取得します。</span>
+      </li><li>
+        <span><a target="_blank" href="#swarming_in_lex">Salesforce のレコード</a>または <a target="_blank" href="https://help.salesforce.com/s/articleView?id=slack.slack_channel_swarming.htm&amp;language=ja&amp;type=5">Slack のチャネルから</a>スウォーミングを開始します。</span>
+      </li><li>
+        <span>Salesforce で<a target="_blank" href="incident-1.html#add_members_swarm">メンバーをスウォームに追加</a>します。新しいメンバーがスウォーミング用に作成された Slack チャンネルに追加されると、ユーザーはスウォームメンバーとして Salesforce にも追加されます。</span>
+      </li><li>
+        <span>コラボレーションが完了したら、<a target="_blank" href="incident-1.html#finish_swarming">スウォームを終了</a>します。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_track_incident">
+<h1 class="slds-text-heading_large">インシデントの追跡</h1>
+  <p>広範な問題が発生した場合は、オムニチャネルおよびカスタマーサービスレベル契約のインシデントルーティングを使用して問題を把握します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="incident-2.html#incident_mgmt_route_incidents">オムニチャネルを使用した適切なチームへのインシデントの転送</a></strong><br>インシデントが発生したら、オムニチャネルのキューベースまたはスキルベースのルーティングを使用して、インシデントを適切なチームに転送します。</li><li class="slds-p-bottom_small"><strong><a href="#incident_mgmt_use_slas">マイルストーンとエンタイトルメントを使用したインシデントの追跡</a></strong><br>マイルストーンとエンタイトルメントを使用してインシデントを把握します。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_update_slack_message">
+<h1 class="slds-text-heading_large">ブロードキャスト Slack メッセージの更新</h1>
+  <p>新しいブロードキャスト Slack メッセージを送信せずに関係者に最新情報を通知するには、ブロードキャスト Slack メッセージのインシデント項目を更新して、最新の変更を反映します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table><ul>
+        <li>カスタマーサービスインシデント管理が有効になっている必要があります。</li>
+
+        <li>ブロードキャスト Slack メッセージが有効である必要があります。</li>
+
+        <li>ブロードキャストトピックを Slack チャンネルに割り当てる必要があります。</li>
+
+      </ul>
+</div>
+    <div><p>削除されていないブロードキャスト Slack メッセージや、以前に送信、更新、削除に失敗していないブロードキャスト Slack メッセージのみを更新できます。</p></div>
+    <ol><li>
+        <span>[インシデント] 関連リストに移動し、[ブロードキャスト通信] 関連リストを見つけます。</span>
+      </li><li>
+        <span>更新するブロードキャスト Slack メッセージを見つけます。ブロードキャスト通信のドロップダウンから、<strong class="uicontrol">[ブロードキャスト Slack メッセージを更新]</strong> を選択します。</span>
+      </li><li>
+        <span>更新されたメッセージを確認して、<strong class="uicontrol">[次へ]</strong> をクリックし、<strong class="uicontrol">[完了]</strong> をクリックします。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_use_slas">
+<h1 class="slds-text-heading_large">マイルストーンとエンタイトルメントを使用したインシデントの追跡</h1>
+  <p>マイルストーンとエンタイトルメントを使用してインシデントを把握します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#incident_mgmt_sla_admin_setup">システム管理者による設定</a></strong><br>インシデント管理チームのエンタイトルメントとマイルストーンを設定します。</li><li class="slds-p-bottom_small"><strong><a href="#incident_mgmt_sla_agents">サポート担当者のインシデント追跡</a></strong><br>マイルストーンとエンタイトルメントを使用して、インシデント中に顧客に最新情報を提供します。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="incident_mgmt_what_is_this">
+<h1 class="slds-text-heading_large">カスタマーサービスインシデント管理とは?</h1>
+  <p>現在のデジタル環境では、サービスの中断は避けられません。Web の停止が発生したり、コードの変更やデータの破損によりサーバーがダウンしたり、悪天候によって停電や配信の遅延が発生したりします。このようなサービスインシデントがビジネスで発生した場合、原因を分析し、サービス業務を効率化して、ダウンタイムを最小限に抑える必要があります。Agentforce Service(旧称Service Cloud)のカスタマーサービスインシデント管理を使用して、この手順を実行できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+            </tr>
+          </tbody></table>
+    <p>カスタマーサービスインシデント管理は、チームが大規模な中断を追跡し、適切なエキスパートに ToDo を委任して、ビジネスが顧客の期待に応えられるようにするサービスソリューションです。組み込みの項目、ページレイアウト、ベストプラクティスと共にカスタマーサービスインシデント管理を使用することで、サービスチームは中断に対応し、顧客に最新情報を提供できます。さらに、リリース管理機能を使用すると、チームは変更を実装し、問題の再発を防止できます。</p>
+    <p>中断に対する会社の対応によって、ブランドが構築されることも、傷つくこともあります。迅速に解決することは素晴らしいことですが、サービス中断中のカスタマーエクスペリエンスのコミュニケーション方法や管理方法も同様に重要です。中断をポジティブな体験に変換することで、顧客ロイヤルティを強化できます。カスタマーサービスインシデント管理により、次のことができます。</p>
+    <ul>
+      <li>インシデントをプロアクティブに特定して対処する。</li>
+
+      <li>サポート担当者と対応チームがインシデントを追跡および管理するための一元化された場所を提供します。</li>
+
+      <li> インシデント、顧客、ケースのデータを容易に見つけることができる統合されたコンソールを利用する。</li>
+
+      <li>サービスレベル契約 (SLA) に準拠する。</li>
+
+    </ul>
+
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="incident-2.html#incident_mgmt_objects">カスタマーサービスインシデント管理のオブジェクトと項目</a></strong><br>カスタマーサービスインシデント管理を使用すると、サービスチームは、可視性の向上と中断への迅速な対応のために必要なツールとワークフローを取得できます。手順は次のとおりです。</li><li class="slds-p-bottom_small"><strong><a href="incident-1.html#incident_mgmt_case_vs_incident">ケースとインシデント</a></strong><br>ケースとインシデントが、サービスチームがさまざまな規模の顧客の問題を解決するのにどのように役立つかを説明します。</li><li class="slds-p-bottom_small"><strong><a href="incident-2.html#incident_mgmt_example">インシデントライフサイクルの例: インシデントチームの一日</a></strong><br>Take-Out のインシデントマネージャーは、メール、チャット、メッセージング、電話など、複数のチャネルで、新しいマーケティング割引コードのエラーに関する顧客ケースが急増していることに気が付きます。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="prep_omni_for_swarming">
+<h1 class="slds-text-heading_large">スウォーミング用のエキスパートファインダーの設定</h1>
+  <p>スウォーミングのカギを握る部分であり、オムニチャネルとスキルベースのルーティングを利用するエキスパートファインダーを設定します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table>
+    <p>オムニチャネルは、Lightningコンソールで対応可能なサポート担当者に作業要求を転送します。また、スキルベースのルーティングにより、コンタクトセンターは作業に最適なサポート担当者に作業を転送できます。</p>
+    <div>
+      <img alt="オムニチャネルルーティングのインフォグラフィック" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/omni_swarming.png" style="width:400px;">
+    </div>
+    <p>スウォーミングでは、これらのツールが連携して、コラボレーション要求が問題を解決するのに最適なエキスパートに転送されるようにします。</p>
+    <div style="text-align:left;">
+      <img alt="エキスパートファインダーを設定する手順を示すグラフィック。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/swarming_omni_steps.png">
+    </div>
+    <p> スウォーミングを最大限に活用するには、次のライセンスを使用してオムニチャネルとスキルベースのルーティングを設定します。</p>
+    <ul>
+      <li>チャットの有効化</li>
+
+      <li>サービスデスク</li>
+
+      <li>Service Cloud ユーザー機能ライセンス</li>
+
+      <li>フローユーザー機能ライセンス</li>
+
+    </ul>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="support_general-3.html#service_presence_intro">オムニチャネルの設定</a></li><li><a target="_blank" href="omnichannel-1.html#omnichannel_attribute_based_routing">スキルベースのルーティングルールを使用した転送</a></li></ul></div>
+<div id="service_resources_swarming" lang="ja-jp" aria-labelledby="ariaid-title2" class="nested1"><a name="service_resources_swarming"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">スウォーミングのスキルとサービスリソースの設定</h2>
+  <p>サービスリソースには、個々のサポート担当者が反映されます。スウォーミングを使用できるさまざまな種別のサポート担当者を表すサービスリソースを作成します。たとえば、あるリソースは Python と Perl のスキルを持つサポート担当者を表し、別のリソースはスペイン語を話せる商品エキスパートを表すことができます。サービスリソースを設定するときは、スキルまたは要件オブジェクトでサービスリソースについて [スキルレベル] が有効であることを確認してください。</p>
+
+    <ol>
+      <li>オムニチャネルが<a target="_blank" href="omnichannel-2.html#omnichannel_enable">有効になっ</a>ていることを確認します。</li>
+
+      <li>スキルベースのルーティングを有効にして、スウォームを適切なエキスパートに転送します。</li>
+
+      <li>サービスコンソールアプリケーションに<a target="_blank" href="omnichannel-1.html#omnichannel_add_utility_to_console">オムニチャネルユーティリティを追加</a>します。</li>
+
+      <li>スウォーミングサポート担当者用の<a target="_blank" href="omnichannel-3.html#omnichannel_skills_based_routing_create_service_resources">サービスリソースを作成</a>します。<div style="text-align:left;"><img alt="新規サービスリソース" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/swarm_service_resource.png"></div></li>
+
+      <li>Python やフランス語など、エージェントを<a target="_blank" href="omnichannel-3.html#omnichannel_skills_based_routing_create_skills">スウォーミングするスキル</a>を作成します。</li>
+
+      <li>スウォーミングサービスリソースから、<a target="_blank" href="omnichannel-3.html#omnichannel_skills_based_routing_assign_skills">関連するスキル</a>を割り当てます。<div style="text-align:left;"><img alt="サービスリソースレコードの [サービスリソーススキル] 関連リスト" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/swarm_python_service_resource_skill.png"></div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> [サービスリソース] に [スキル] 関連リストが表示されない場合は、ページレイアウトに [スキル] 関連リストを追加します。</div></div></div>
+</li>
+
+    </ol>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="omnichannel-3.html#omnichannel_skills_based_routing_create_service_resources">エージェントのサービスリソースの作成</a></li></ul></div>
+</div>
+<div id="presence_config_swarming" lang="ja-jp" aria-labelledby="ariaid-title3" class="nested1"><a name="presence_config_swarming"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">スウォーミング用のプレゼンス設定の定義</h2>
+  <p>エキスパートに業務量が割り当てられている場合のみスウォーミングをエキスパートに転送するには、スウォーミング固有のプレゼンス設定を定義します。プレゼンス設定によって、サポート担当者の業務量と、顧客のサポート中にサポート担当者がアクセスできるオムニチャネルの動作が決まります。サポート担当者用のデフォルトのプレゼンス設定を作成するときは、[エージェントが要求を拒否できるようにする] が選択されていることを確認します。</p>
+
+    <ol>
+      <li><a target="_blank" href="support_general-3.html#service_presence_create_presence_configurations">スウォーミングのプレゼンス設定を作成して、スウォーミングユーザーに割り当てます。</a></li>
+
+      <li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=service.service_presence_configuration_settings.htm&amp;language=ja&amp;type=5">プレゼンス設定の業務量ルールと設定を定義します。</a></li>
+
+    </ol>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="support_general-3.html#service_presence_create_presence_configurations">プレゼンス設定の作成</a></li></ul></div>
+</div>
+<div id="service_channel_swarming" lang="ja-jp" aria-labelledby="ariaid-title4" class="nested1"><a name="service_channel_swarming"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">スウォーミングサービスチャネルの作成</h2>
+  <p>スウォーミングサービスチャネルを作成して、スウォーム要求レコードを適切なサポート担当者に転送します。</p>
+
+    
+    <ol><li>
+        <span>[設定] から、[クイック検索] ボックスに<kbd>「オムニチャネル」</kbd>と入力し、<strong class="uicontrol">[オムニチャネル設定]</strong> を選択します。</span>
+      </li><li>
+        <span>サポートできるエキスパートにのみスウォーム要求を転送するには、<a target="_blank" href="omnichannel-3.html#omnichannel_status_based_capacity">状況ベースの業務量モデル</a>を有効にします。</span>
+      </li><li>
+        <span>[設定] から、[クイック検索] ボックスに<kbd>「サービスチャネル」</kbd>と入力し、<strong class="uicontrol">[新規]</strong> を選択します。</span>
+      </li><li>
+        <span>スウォーミングチャネルの名前を入力します (例: <kbd>「Swarming」</kbd> (スウォーミング))。</span>
+      </li><li>
+        <span>Salesforce オブジェクトとして、<strong class="uicontrol">[スウォームメンバー]</strong> を選択します。</span>
+      </li><li>
+        <span>業務量モデルとして、<strong class="uicontrol">[状況ベース]</strong> を選択します。</span>
+      </li><li>
+        <span>状況項目として、<strong class="uicontrol">[状況]</strong> を選択します。</span>
+      </li><li>
+        <span>[「処理中」の値] を <strong class="uicontrol">[新規]</strong> および <strong class="uicontrol">[進行中]</strong> に設定します。</span>
+      </li><li>
+        <span>[再開した作業項目での<strong class="uicontrol">エージェント業務量</strong>を確認] と [<strong class="uicontrol">再割り当て</strong>した作業項目でのエージェント業務量を確認] を選択して、変更を保存します。<a name="service_channel_swarming__image_u25_jfk_2tb"></a><div><img alt="サービスチャネル設定ページ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/service_channels.png" id="service_channel_swarming__image_u25_jfk_2tb" style="width:600px;"></div></span>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="support_general-3.html#service_presence_create_service_channel">サービスチャネルの作成</a></li></ul></div>
+</div>
+<div id="status_perm_set_swarming" lang="ja-jp" aria-labelledby="ariaid-title5" class="nested1"><a name="status_perm_set_swarming"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">スウォーミングのプレゼンス状況と権限セットの設定</h2>
+  <p>プレゼンス状況を使用して、ユーザーがオンラインでスウォーム要求を受け入れ可能か、退席中あるいはオフラインかを示します。スウォーミングを使用すると、サポート担当者はプレゼンス状況を使用して、エキスパートファインダーから送信されるスキルベースのスウォーム要求を拡張できます。権限セットを使用して、プロファイルを永続的に変更することなくサポート担当者の機能アクセス権を拡張できます。</p>
+
+    <p> サポート担当者は、スウォーミングに 2 つのプレゼンス状況が必要です。</p>
+    <ul>
+      <li>
+        <strong class="uicontrol">利用可</strong>
+        <p>スウォーム要求、対応可能ケースなど、使用可能なチャネルが複数ある場合、この状況は特定のチャネルに固有になる可能性があります。または、すべてのチャネルに使用可能など、複数のチャネルをグループ化した 1 つの状況になる可能性もあります。</p>
+      </li>
+
+      <li>
+        <strong class="uicontrol">取り込み中</strong>
+        <p>この状況は、他の状況を指定しない限り常にすべての使用可能なチャネルに適用されます。</p>
+      </li>
+
+    </ul>
+
+    <ol>
+      <li>[スウォーミング可能] プレゼンス状況を作成し、チャネルを [スウォームチャネル] に設定します。<div style="text-align:left;"><img alt="スウォーミングのプレゼンス状況とスウォーミングチャネル" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/swarm_presence_status.png"></div></li>
+
+      <li>「Unavailable for Swarming」(スウォーミング不可) の [取り込み中] プレゼンス状況を作成します。</li>
+
+      <li>[スウォーミング]、[Slack サービスユーザー]、またはカスタム権限セットにプレゼンス状況を追加します。</li>
+
+      <li>変更を保存します。</li>
+
+    </ol>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="support_general-3.html#service_presence_create_presence_status">プレゼンス状況の作成</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.perm_sets_create.htm&amp;language=ja&amp;type=5">権限セットの作成</a></li></ul></div>
+</div>
+<div id="trigger_flow_swarming" lang="ja-jp" aria-labelledby="ariaid-title6" class="nested1"><a name="trigger_flow_swarming"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">エキスパートファインダーを使用したスウォーミング用のトリガーフローの設定</h2>
+  <p>オムニチャネルのスキルベースのルーティング機能を備えたエキスパートファインダーを使用してメンバーをスウォームに追加するには、[設定] で [サポート担当者ワークフロートリガー] フローを設定します。</p>
+
+    <ol><li>
+        <span>[設定] から、[クイック検索] ボックスに<kbd>「プロセスの自動化設定」</kbd>と入力し、<strong class="uicontrol">[プロセスの自動化設定]</strong> を選択します。</span>
+      </li><li>
+        <span>デフォルトのワークフローユーザーを選択して、作業を保存します。このユーザー名は、ルールをトリガーしたユーザーが有効でないときに表示されます。<a name="trigger_flow_swarming__image_p31_nhk_2tb"></a><div><img alt="[プロセスの自動化設定] ページ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/trigger_flow.png" id="trigger_flow_swarming__image_p31_nhk_2tb" style="width:600px;"></div></span>
+      </li><li>
+        <span>変更内容を保存します。</span>
+      </li><li>
+        <span>(省略可能) トリガーフローをカスタマイズするには、コピーを作成して有効化します。</span>
+        <ol>
+          <li>
+            <span>[設定] で、[クイック検索] ボックスに<kbd>「フロー」</kbd>と入力して、<strong class="uicontrol">[フロー]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>フローのリストから <strong class="uicontrol">[Agent Workflow Trigger (エージェントワークフロートリガー)]</strong> を選択して、<strong class="uicontrol">[別名で保存]</strong> をクリックしてコピーを作成します。</span>
+          </li>
+
+          <li>
+            <span>新しいフローの名前を入力して、作業を保存します。</span>
+          </li>
+
+          <li>
+            <span>有効化するには、Flow Builder でコピーしたトリガーフローを開き、<strong class="uicontrol">[有効化]</strong> を選択します。</span>
+          </li>
+
+        </ol>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.workflow_defaultuser.htm&amp;language=ja&amp;type=5">デフォルトのワークフローユーザーの指定</a></li></ul></div>
+</div>
+</div>
+
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="quick_actions_swarming">
+<h1 class="slds-text-heading_large">クイックアクションを使用したスウォーミング</h1>
+  <p>クイックアクションを使用したスウォーミングでは、タブやウィンドウではなく、フィードコンポーネントのパブリッシャーでフローが実行されます。サポート担当がクイック アクションを使用してフローを実行すると、フローの実行中に外部 Lightning ページ コンポーネントを表示できるため、レコードに関する詳細情報を表示してアクセスできます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> クイックアクションは、スウォーミングアクションでページレイアウトのスペースを取りすぎないようにする場合に最適です。</div></div></div>
+</div>
+    <ol><li>
+        <span>コンソールに追加するフローごとに、[スウォーミングを開始] や [メンバーをスウォームに追加] など、アクション種別が [フロー] のクイックアクションを作成します。<a name="quick_actions_swarming__image_cjm_ghk_2tb"></a><div><img alt="動的アクションを使用したスウォーミング" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/dynamic_actions.png" id="quick_actions_swarming__image_cjm_ghk_2tb" style="width:800px;"></div></span>
+      </li><li>
+        <span>アクションを作成したオブジェクトの管理設定で、<strong class="uicontrol">[ページレイアウト]</strong> をクリックします。</span>
+      </li><li>
+        <span>フローアクションを [モバイルおよび Lightning のアクション] セクションから、ページレイアウトの [Salesforce モバイルおよび Lightning Experience アクション] セクションにドラッグします。<div style="text-align:left;"><img alt="ページレイアウトで強調表示された [スウォーミングを開始] フロー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/swarm_quick_action_page_layout.png"></div></span>
+      </li><li>
+        <span>変更内容を保存します。</span>
+      </li></ol>
+
+    <div><p>サポート担当者は、レコードのフィードからスウォーミングフローを起動できるようになりました。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.layouts_in_lex.htm&amp;language=ja&amp;type=5">Lightning Experience でのページレイアウト要素の表示方法</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.actions_overview.htm&amp;language=ja&amp;type=5">クイックアクション</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="reopen_a_swarm">
+<h1 class="slds-text-heading_large">Lightning Experience でのスウォーミングの再オープン</h1>
+  <p>Lightning Experience から完了したスウォームを再オープンし、会話をシームレスに再開します。スウォームを再オープンすると、状況がクローズ済みからオープンに変更されます。また、スウォームの再オープンを決定した方法に基づいて、同じスウォームメンバーまたは業務量がまだ残っているメンバーのみでスウォームを開くことができます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table></div>
+    <ol><li>
+        <span>Salesforce のレコードから、[<strong class="uicontrol">スウォームを再</strong>オープン] を選択します。<a name="reopen_a_swarm__image_zfz_wjl_2tb"></a><div style="text-align:left;"><img alt="LEX でのスウォームフローの再オープン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/lex_reopen.png" id="reopen_a_swarm__image_zfz_wjl_2tb" style="width:600px;"></div></span>
+      </li><li>
+        <span>スウォームを再オープンする方法を選択し、<strong class="uicontrol">[次へ</strong>] をクリックします。<a name="reopen_a_swarm__image_hcd_zjl_2tb"></a><div style="text-align:left;"><img alt="再オープンされたスウォームの確認" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/lex_reopen_2.png" id="reopen_a_swarm__image_hcd_zjl_2tb" style="width:600px;"></div></span>
+      </li><li>
+        <span>スウォームが再オープンされたことを確認し、<strong class="uicontrol">[完了]</strong> を選択します。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="service_swarm_change_slack_channel_name">
+<h1 class="slds-text-heading_large">スウォームレコードの Slack チャンネル名の変更</h1>
+  <p>Salesforce でスウォームレコードが作成されると、スウォームレコードの名前が [コラボレーションルーム] 項目に表示されます。Slack チャンネル名に機密情報が含まれている場合は、Slack で名前を変更するか、[コラボレーションルーム] 項目を更新することを検討してください。[コラボレーションルーム] 項目を特定のユーザーに非表示にすることもできます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Summer '23 リリースより前に作成されたスウォームレコードには、[コラボレーションルーム] 項目の [コラボレーションルーム ID] が表示されます。</div></div></div>
+</div>
+    <ol><li>
+        <span>Salesforce でスウォームレコードを開きます。</span>
+      </li><li>
+        <span><strong class="uicontrol">[コラボレーションルーム]</strong> を選択します。</span>
+      </li><li>
+        <span>[ルーム名] で、[<strong class="uicontrol">編集]</strong> を選択します。<div style="text-align:left;"><img alt="Slack チャンネルの [ルーム名] 項目が強調表示されている" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/swarm_slack_channel_room_name.png"></div></span>
+      </li><li>
+        <span>機密情報を含まない新しい名前を入力します。</span>
+      </li><li>
+        <span>変更内容を保存します。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="service_swarm_manage">
+<h1 class="slds-text-heading_large">スウォーミングの管理</h1>
+  <p>ユーザーが顧客の問題についてスウォーミングを行うときに、スウォーミングダッシュボードとレポートを使用してエンゲージメントを測定し、設定を管理して、スウォーミングの制限を把握します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#service_swarming_limitations">スウォーミングの制限および考慮事項</a></strong><br>スウォーミングを使用する前に、その制限事項を理解しておきましょう。</li><li class="slds-p-bottom_small"><strong><a href="incident-1.html#create_swarm_report">スウォームレポートの作成</a></strong><br>スウォームレポートを作成するには、標準の Service Cloud Swarming Reports and Dashboards AppExchange パッケージを使用するか、次の 3 つのレポートタイプのいずれかを作成します。このパッケージでは、レポートタイプが事前設定され、いくつかのスウォーミングレポートが提供され、完全なスウォーミングダッシュボードが含まれます。</li><li class="slds-p-bottom_small"><strong><a href="#service_swarm_change_slack_channel_name">スウォームレコードの Slack チャンネル名の変更</a></strong><br>Salesforce でスウォームレコードが作成されると、スウォームレコードの名前が [コラボレーションルーム] 項目に表示されます。Slack チャンネル名に機密情報が含まれている場合は、Slack で名前を変更するか、[コラボレーションルーム] 項目を更新することを検討してください。[コラボレーションルーム] 項目を特定のユーザーに非表示にすることもできます。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="service_swarm_slack_collab_tool">
+<h1 class="slds-text-heading_large">スウォーミングのためのコラボレーションツールの設定</h1>
+  <p>顧客の問題についてスウォーミングを行うには、Slack などのコラボレーションツールを Salesforce に接続します。スウォームレコードのフィードをコラボレーションに使用する場合、コラボレーションツールは必要なく、スウォームオブジェクトのフィード追跡を有効にするだけで済みます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table></div>
+    <ol><li>
+        <span>[設定] で、[クイック検索] ボックスに<kbd>「スウォーミング」</kbd>と入力して、<strong class="uicontrol">[スウォーミング]</strong> を選択します。</span>
+      </li><li>
+        <span>[省略可能: コラボレーションツールを使用したスウォーミング] で、<strong class="uicontrol">[Slack 設定に移動]</strong> をクリックして Service Cloud for Slack アプリケーションの設定を完了します。ユーザーが Slack でスウォーミングを開始する前に、システム管理者が設定を完了する必要があります。</span>
+      </li><li>
+        <span>アプリケーションの設定が完了したら、スウォーミング設定ページに戻り、コラボレーションツールとして [<strong class="uicontrol">Slack]</strong> を選択します。</span>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=slack.set_up_slack.htm&amp;language=ja&amp;type=5">Slack の設定</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=slack.service_swarm_slack_set_up_slack_conversations.htm&amp;language=ja&amp;type=5">Salesforce ヘルプ: Slack 会話コンポーネントの設定</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="service_swarm_take_action_slack">
+<h1 class="slds-text-heading_large">Slack でのアクションの実行</h1>
+  <p>スウォーミングを最大限に活用するには、Service Cloud for Slack アプリケーションと簡単に使用できるスラッシュコマンドを使用して Salesforce レコードを作成および検索します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table><p>Service Cloud for Slack アプリケーションから使用できる Salesforce アクションについては、<a target="_blank" href="https://help.salesforce.com/s/articleView?id=slack.slack_service_salesforce_actions.htm&amp;language=ja&amp;type=5">「Slack での Salesforce アクション」</a>を参照してください。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="service_swarming_intro">
+<h1 class="slds-text-heading_large">スウォーミングによるコラボレーションの実現</h1>
+  <p>スウォーミングにより、サポート担当者は、他のエキスパートを巻き込んで、階層を邪魔することなくコラボレーション、参加、所有権をシームレスに記録するためのツールを利用できます。ビジネスでスウォーミングを最大限に活用するには、チームが何でコラボレーションしたいのか (Salesforce、Slack、またはその両方) を調べます。</p>
+
+    <p>
+      <span style="vertical-align:text-bottom;display:inline-block;"><img alt="スウォーミングバナー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/main-banner-lm-swarming.png" style="margin-bottom:0;"></span>
+    </p>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:100%"></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">
+              <em> <strong>コラボレーションの専門知識をお客様に迅速に提供</strong> </em>
+            </td>
+
+          </tr>
+        </tbody></table>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><p>
+              <a name="service_swarming_intro__image_ugk_2qy_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="開始" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/resources-global/_corporate/images/learning_maps/lm_start.png" id="service_swarming_intro__image_ugk_2qy_scc" style="margin-bottom:0;"></span>
+              </p><p>
+                <strong>準備を整える</strong>
+              </p><p>
+                <a name="service_swarming_intro__image_b1z_mry_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="Trailhead" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_trailhead.png" id="service_swarming_intro__image_b1z_mry_scc" style="margin-bottom:0;"></span> <em>Trailhead:</em> <a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/trails/service-cloud-for-slack">Service Cloud for Slack</a>
+              </p><p>360 ブログ: <a target="_blank" href="https://www.salesforce.com/blog/what-is-case-swarming/">What Is Service Swarming? (サービススウォーミングとは?)</a></p><p>360 ブログ: <a target="_blank" href="https://www.salesforce.com/blog/collaborative-customer-service/">How Collaborative Customer Service Improves Customer Experience and Accelerates Agent Productivity (コラボレーションカスタマーサービスでカスタマーエクスペリエンスを改善し、エージェントの生産性を向上させる方法)</a></p><p>サービスイノベーション協会: <a target="_blank" href="https://library.serviceinnovation.org/Intelligent_Swarming">Intelligent Swarming (インテリジェントなスウォーミング)</a></p><p style="margin-bottom:0;">
+                スウォーミングに関する<a name="service_swarming_intro__image_n1t_qry_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="service_swarming_intro__image_n1t_qry_scc" style="margin-bottom:0;"></span>の<a title="スウォーミングを使用する前に、その制限事項を理解しておきましょう。" href="#service_swarming_limitations">制限と考慮事項</a>
+              </p></td>
+
+            <td style="vertical-align:top;" class="slds-cell-wrap"><p>
+              <a name="service_swarming_intro__image_ct5_fqy_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="構築" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/resources-global/_corporate/images/learning_maps/lm_build_1.png" id="service_swarming_intro__image_ct5_fqy_scc" style="margin-bottom:0;"></span>
+              </p><p>
+                <strong>Lightning Experience でのスウォーミングについて</strong>
+              </p><p style="margin-bottom:0;">
+                <a name="service_swarming_intro__image_xdl_rry_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="service_swarming_intro__image_xdl_rry_scc" style="margin-bottom:0;"></span> <a title="スウォーミングとのコラボレーションは、サポート担当者が問題解決の支援を得るためにスウォーム要求を送信すると開始されます。Salesforce のレコードからスウォームを開始し、スウォームレコードのフィードからエキスパートとコラボレーションします。" href="#swarming_in_lex">Swarm in Lightning Experience</a>
+              </p></td>
+
+            <td style="vertical-align:top;" class="slds-cell-wrap"><p>
+              <a name="service_swarming_intro__image_vhm_sqy_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="終了" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/resources-global/_corporate/images/learning_maps/lm_learn_end_1.png" id="service_swarming_intro__image_vhm_sqy_scc" style="margin-bottom:0;"></span>
+              </p><p>
+                <strong>Slack でのスウォーミングについて</strong>
+              </p><p style="margin-bottom:0;">
+                <a name="service_swarming_intro__image_vmp_rry_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="service_swarming_intro__image_vmp_rry_scc" style="margin-bottom:0;"></span> Slack での<a target="_blank" href="https://help.salesforce.com/s/articleView?id=slack.slack_apps_service_swarm_in_slack.htm&amp;language=ja&amp;type=5">スウォームの開始</a>
+              </p></td>
+
+          </tr>
+        </tbody></table>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:100%"></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">
+              <em> <strong>Lightning Experience でのサポート担当者による問題の迅速な解</strong> </em>決
+            </td>
+
+          </tr>
+        </tbody></table>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><p>
+              <a name="service_swarming_intro__image_as5_nqy_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="開始" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/resources-global/_corporate/images/learning_maps/lm_start.png" id="service_swarming_intro__image_as5_nqy_scc" style="margin-bottom:0;"></span>
+              </p><p>
+                <strong>スウォーミングの設定</strong>
+              </p><p>
+                <a name="service_swarming_intro__image_uyv_rry_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="service_swarming_intro__image_uyv_rry_scc" style="margin-bottom:0;"></span> <a title="顧客の問題についてのスウォーミングを開始して、顧客の解決時間を短縮するには、スウォーミングを有効にします。" href="#turn_on_swarming">Turn On Swarming</a>
+              </p><p>
+                <a name="service_swarming_intro__image_lpz_rry_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="service_swarming_intro__image_lpz_rry_scc" style="margin-bottom:0;"></span> <a title="設定後、サポート担当者は事前設定されたスウォーミングフローテンプレートを使用して、Salesforce のレコードからすばやくスウォームを開始してメンバーを追加し、スウォームをクローズできます。" href="#set_up_flows_swarming">Configure Swarming Flows</a> (スウォーミングフローの設定)
+              </p><p style="margin-bottom:0;">
+                <a name="service_swarming_intro__image_rlb_sry_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="service_swarming_intro__image_rlb_sry_scc" style="margin-bottom:0;"></span> <a title="サポート担当者のスウォーミング環境を最適化し、スウォーミングページレイアウト、タブ、および関連リストを使用してスウォーミングを前面中央に配置します。" href="incident-1.html#console_objects_swarming">サービスコンソールのスウォーミング</a>の設定
+              </p></td>
+
+            <td style="vertical-align:top;" class="slds-cell-wrap"><p>
+              <a name="service_swarming_intro__image_rbd_4qy_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="構築" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/resources-global/_corporate/images/learning_maps/lm_build_1.png" id="service_swarming_intro__image_rbd_4qy_scc" style="margin-bottom:0;"></span>
+              </p><p>
+                <strong>適切なユーザーへのスウォーミングの転送</strong>
+              </p><p style="margin-bottom:0;">
+                <a name="service_swarming_intro__image_ezd_sry_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="service_swarming_intro__image_ezd_sry_scc" style="margin-bottom:0;"></span> <a title="スウォーミングのカギを握る部分であり、オムニチャネルとスキルベースのルーティングを利用するエキスパートファインダーを設定します。" href="#prep_omni_for_swarming">Set Up Expert Finder for Swarming</a> (スウォーミング用のエキスパートファインダーの設定)
+              </p></td>
+
+            <td style="vertical-align:top;" class="slds-cell-wrap"><p>
+              <a name="service_swarming_intro__image_pks_4qy_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="統合" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/resources-global/_corporate/images/learning_maps/lm_integrate_1.png" id="service_swarming_intro__image_pks_4qy_scc" style="margin-bottom:0;"></span>
+              </p><p>
+                <strong>Lightning Experience からのアクションの実行</strong>
+              </p><p>
+                <a name="service_swarming_intro__image_z5h_sry_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="service_swarming_intro__image_z5h_sry_scc" style="margin-bottom:0;"></span> <a title="スウォーミングとのコラボレーションは、サポート担当者が問題解決の支援を得るためにスウォーム要求を送信すると開始されます。Salesforce のレコードからスウォームを開始し、スウォームレコードのフィードからエキスパートとコラボレーションします。" href="#swarming_in_lex">Swarm in Lightning Experience</a>
+              </p><p>
+                <a title="顧客の問題を解決するときに異なるスキルを持つ他のユーザーから支援が必要な場合、進行中のスウォームにメンバーを追加できます。エキスパートファインダーを使用して、スキル、対応可能状況、業務量の観点から最適なユーザーを検索します。またはユーザーを直接名前で追加します。エキスパートファインダーを使用している場合、オムニチャネルは、対応可能で指定されたスキルを持つ最適なユーザーに招待を転送し、ケースとスウォームのスウォームメンバーレコードを作成します。スウォームメンバーを名前で追加したり、エキスパートファインダーでスキル別に検索したり、スウォームメンバーの追加をスキップして後で追加したりできます。" href="incident-1.html#add_members_swarm">Lightning Experience でのスウォームへのメンバーの追加の<span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="service_swarming_intro__image_onj_sry_scc" style="margin-bottom:0;"></span></a>
+              </p><p>
+                <a title="Lightning Experience からスウォームを完了としてマークします。スウォーミングを完了すると、終了日時が設定され、状況とすべての関連するスウォームメンバーが [完了] に変更されます。また、サポート担当者がより多くの作業を受け入れることができるように、サポート担当者のオムニチャネルプレゼンス設定の領域も解放されます。また、スウォームに関与しているメンバーがレポートに表示されます。" href="incident-1.html#finish_swarming">Lightning Experience でのスウォームの終了の<span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="service_swarming_intro__image_dhl_sry_scc" style="margin-bottom:0;"></span></a>
+              </p><p style="margin-bottom:0;">
+                <a name="service_swarming_intro__image_ccn_sry_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="service_swarming_intro__image_ccn_sry_scc" style="margin-bottom:0;"></span> Lightning Experience でのスウォームの<a title="Lightning Experience から完了したスウォームを再オープンし、会話をシームレスに再開します。スウォームを再オープンすると、状況がクローズ済みからオープンに変更されます。また、スウォームの再オープンを決定した方法に基づいて、同じスウォームメンバーまたは業務量がまだ残っているメンバーのみでスウォームを開くことができます。" href="#reopen_a_swarm">再開</a>
+              </p></td>
+
+          </tr>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><p>
+              <a name="service_swarming_intro__image_v45_qqy_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ユーザー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/resources-global/_corporate/images/learning_maps/lm_user_2.png" id="service_swarming_intro__image_v45_qqy_scc" style="margin-bottom:0;"></span>
+              </p><p>
+                <strong>Lightning Experience へのコラボレーションの導入 (省略可能)</strong>
+              </p><p>
+                <a name="service_swarming_intro__image_ohs_sry_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="service_swarming_intro__image_ohs_sry_scc" style="margin-bottom:0;"></span> スウォーミング用のコラボレーションツール<a title="顧客の問題についてスウォーミングを行うには、Slack などのコラボレーションツールを Salesforce に接続します。スウォームレコードのフィードをコラボレーションに使用する場合、コラボレーションツールは必要なく、スウォームオブジェクトのフィード追跡を有効にするだけで済みます。" href="#service_swarm_slack_collab_tool">の設定</a>
+              </p><p>
+                <a name="service_swarming_intro__image_cyt_sry_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="service_swarming_intro__image_cyt_sry_scc" style="margin-bottom:0;"></span> <a target="_blank" href="https://help.salesforce.com/s/articleView?id=slack.set_up_slack.htm&amp;language=ja&amp;type=5">Set Up Slack</a>
+              </p><p>
+                <a name="service_swarming_intro__image_jrv_sry_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="service_swarming_intro__image_jrv_sry_scc" style="margin-bottom:0;"></span> Slack 会話<a target="_blank" href="https://help.salesforce.com/s/articleView?id=slack.service_swarm_slack_set_up_slack_conversations.htm&amp;language=ja&amp;type=5">コンポーネントの設定</a>
+              </p><p style="margin-bottom:0;">
+                Slack 会話コンポーネントの<a name="service_swarming_intro__image_n13_try_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="service_swarming_intro__image_n13_try_scc" style="margin-bottom:0;"></span>の<a target="_blank" href="https://help.salesforce.com/s/articleView?id=slack.swarm_slack_conversations_limitations.htm&amp;language=ja&amp;type=5">考慮事項</a>
+              </p></td>
+
+            <td style="vertical-align:top;" class="slds-cell-wrap"><p>
+              <a name="service_swarming_intro__image_fds_rqy_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="終了" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/resources-global/_corporate/images/learning_maps/lm_learn_end_1.png" id="service_swarming_intro__image_fds_rqy_scc" style="margin-bottom:0;"></span>
+              </p><p>
+                <strong>スウォーミングインサイトによるコラボレーションの促進</strong>
+              </p><p style="margin-bottom:0;">
+                <a name="service_swarming_intro__image_zlm_try_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="service_swarming_intro__image_zlm_try_scc" style="margin-bottom:0;"></span> <a title="スウォームレポートを作成するには、標準の Service Cloud Swarming Reports and Dashboards AppExchange パッケージを使用するか、次の 3 つのレポートタイプのいずれかを作成します。このパッケージでは、レポートタイプが事前設定され、いくつかのスウォーミングレポートが提供され、完全なスウォーミングダッシュボードが含まれます。" href="incident-1.html#create_swarm_report">スウォームレポートの作成</a>
+              </p></td>
+
+            <td style="vertical-align:top;" class="slds-cell-wrap">&nbsp;</td>
+
+          </tr>
+        </tbody></table>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:100%"></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">
+              <em> <strong>Slack での合理化されたコラボレーションによる効率化</strong> </em>
+            </td>
+
+          </tr>
+        </tbody></table>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><p>
+              <a name="service_swarming_intro__image_ygc_1ry_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="開始" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/resources-global/_corporate/images/learning_maps/lm_start.png" id="service_swarming_intro__image_ygc_1ry_scc" style="margin-bottom:0;"></span>
+              </p><p>
+                <strong>スウォーミングの設定</strong>
+              </p><p>
+                <a name="service_swarming_intro__image_cpx_nry_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="Trailhead" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_trailhead.png" id="service_swarming_intro__image_cpx_nry_scc" style="margin-bottom:0;"></span> <em>Trailhead:</em> <a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/trails/service-cloud-for-slack">Service Cloud for Slack</a>
+              </p><p>360 ブログ: <a target="_blank" href="https://www.salesforce.com/blog/what-is-case-swarming/">What Is Service Swarming? (サービススウォーミングとは?)</a></p><p>360 ブログ: <a target="_blank" href="https://www.salesforce.com/blog/collaborative-customer-service/">How Collaborative Customer Service Improves Customer Experience and Accelerates Agent Productivity (コラボレーションカスタマーサービスでカスタマーエクスペリエンスを改善し、エージェントの生産性を向上させる方法)</a></p><p>サービスイノベーション協会: <a target="_blank" href="https://library.serviceinnovation.org/Intelligent_Swarming">Intelligent Swarming (インテリジェントなスウォーミング)</a></p><p>
+                <a name="service_swarming_intro__image_kjn_pry_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="動画" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_video.png" id="service_swarming_intro__image_kjn_pry_scc" style="margin-bottom:0;"></span><em>ビデオ:</em> <a target="_blank" href="https://salesforce.vidyard.com/watch/Zv4osFTZFGzvweZZiHQXts?" class="doc_video_link"><span class="doc_video_title">Service: Core Service: Swarming</span> (サービス: コアサービス: スウォーミング) </a>
+              </p><p style="margin-bottom:0;">
+                <a title="スウォーミングを使用する前に、その制限事項を理解しておきましょう。" href="#service_swarming_limitations">スウォーミングの制限および考慮事項</a>
+              </p></td>
+
+            <td style="vertical-align:top;" class="slds-cell-wrap"><p>
+              <a name="service_swarming_intro__image_ovq_1ry_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="構築" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/resources-global/_corporate/images/learning_maps/lm_build_1.png" id="service_swarming_intro__image_ovq_1ry_scc" style="margin-bottom:0;"></span>
+              </p><p>
+                <strong>スウォーミングのための Slack の設定</strong>
+              </p><p style="margin-bottom:0;">
+                <a name="service_swarming_intro__image_qcc_5ry_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="service_swarming_intro__image_qcc_5ry_scc" style="margin-bottom:0;"></span> <a title="スウォーミングとのコラボレーションは、サポート担当者が問題解決の支援を得るためにスウォーム要求を送信すると開始されます。Salesforce のレコードからスウォームを開始し、スウォームレコードのフィードからエキスパートとコラボレーションします。" href="#swarming_in_lex">Swarm in Lightning Experience</a>
+              </p></td>
+
+            <td style="vertical-align:top;" class="slds-cell-wrap"><p>
+              <a name="service_swarming_intro__image_cn1_bry_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="終了" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/resources-global/_corporate/images/learning_maps/lm_learn_end_1.png" id="service_swarming_intro__image_cn1_bry_scc" style="margin-bottom:0;"></span>
+              </p><p>
+                <strong>Slack でのアクションの実行</strong>
+              </p><p style="margin-bottom:0;">
+                <a name="service_swarming_intro__image_uhf_5ry_scc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="ヘルプドキュメント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/incident_management/bi_edd_landing_help.png" id="service_swarming_intro__image_uhf_5ry_scc" style="margin-bottom:0;"></span> Slack での<a target="_blank" href="https://help.salesforce.com/s/articleView?id=slack.slack_apps_service_swarm_in_slack.htm&amp;language=ja&amp;type=5">スウォームの開始</a>
+              </p></td>
+
+          </tr>
+        </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#set_up_swarming">スウォーミングの設定</a></strong><br>段階的なサポートを排除して、数ステップでスウォーミングを開始できます。Salesforce レコードでスウォームコラボレーションを保持するか、Slack でスウォームするのかを選択できます。</li><li class="slds-p-bottom_small"><strong><a href="#swarming_in_lex_intro">Lightning Experience でのスウォーミングの使用</a></strong><br>Salesforce レコードからスウォームを開始したり、スウォームにエキスパートを追加したり、コラボレーションする場所を選択したりします。</li><li class="slds-p-bottom_small"><strong><a href="#service_swarm_manage">スウォーミングの管理</a></strong><br>ユーザーが顧客の問題についてスウォーミングを行うときに、スウォーミングダッシュボードとレポートを使用してエンゲージメントを測定し、設定を管理して、スウォーミングの制限を把握します。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="service_swarming_limitations">
+<h1 class="slds-text-heading_large">スウォーミングの制限および考慮事項</h1>
+  <p>スウォーミングを使用する前に、その制限事項を理解しておきましょう。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">
+        一般的なスウォーミングの制限
+      </h2><ul>
+        <li>[スウォーミングを開始] のワークスペースセレクターには、ユーザーがアクセス権を持っていなかったとしても組織に接続されたワークスペースが表示されます。</li>
+
+        <li>Essentials Edition では、スウォーミングはサポートされていません。</li>
+
+        <li>ユーザーがコピーしたフローには、一部の最新のスウォーミング機能と Service Cloud for Slack 機能が含まれていない場合があります。最新の機能と更新を取得するには、元のフローを使用します。</li>
+
+        <li>スウォームレコードをキューが所有することはできません。</li>
+
+        <li>Slack からスウォームを開始する場合、[スウォームの説明] 項目には最大 625 文字まで入力できます。ただし、Slack チャンネルに投稿すると、255 文字のみが表示されます。項目の完全な 625 文字は、引き続き Salesforce のスウォームレコードに記録されます。</li>
+
+        <li>Salesforce でフローからスウォームを開始する場合、スウォームの説明の制限は 255 です。</li>
+
+        <li>Salesforce でスウォームレコードを手動で作成する場合、スウォームの説明の制限は 32,000 文字です。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">
+        Slack を使用したスウォーミング
+      </h2><ul>
+        <li>ユーザーが Slack でスウォームに参加できるようにするには、スウォームメンバーが次の条件を満たしていることを確認します。<ul><li>スウォームメンバーは Service Cloud ユーザーである必要があります。</li>
+<li>スウォームメンバーは Salesforce アカウントを Service Cloud for Slack アプリケーションに接続している必要があります。</li>
+<li>スウォームメンバーは、スウォーム要求者と同じ Slack ワークスペースに属している必要があります。</li>
+<li>エキスパートファインダーを使用してスウォームメンバーを追加するには、Salesforce 組織でサポート担当者作業トリガーフローをコピーして有効化し、オムニチャネルを有効にする必要があります。</li>
+</ul>
+</li>
+
+        <li>Summer '23 リリースより前に Service Cloud for Slack アプリケーションをインストールした場合、チャネルのワークスペース外のユーザー向けに Slack チャネルに参加するための招待メールを送信するには、Service Cloud for Slack アプリケーションを再インストールする必要があります。<ul><li>Slack で、Service Cloud for Slack アプリケーションから [概要] タブに移動します。<strong class="uicontrol">[設定]</strong> をクリックします。アプリケーションの Slack アプリケーションディレクトリページで、<strong class="uicontrol">[App を削除]</strong> をクリックします。次に、アプリケーションを Slack ワークスペースに再度追加します。</li>
+</ul>
+</li>
+
+        <li>既存のチャネルでスウォーミングを開始すると、Slack ワークスペースのすべてのユーザーがチャネルセレクターから公開チャネルにアクセスできます。</li>
+
+        <li>Slack ユーザーグループをメンションしてそのメンバーをスウォームチャネルに追加できますが、スウォームを終了するときはユーザーグループをスウォームメンバーとして追加できません。</li>
+
+        <li>既存のチャネルでスウォームを開始した場合、チャネルセレクターで自分がチャネルのメンバーである最初の 1,000 件の公開チャネルと非公開チャネルからしか選択できません。</li>
+
+        <li>「Slack 会話コンポーネントの<a target="_blank" href="https://help.salesforce.com/s/articleView?id=slack.swarm_slack_conversations_limitations.htm&amp;language=ja&amp;type=5">考慮事項</a>」を参照してください。</li>
+
+        <li>Slack のナレッジ記事のドラフトでは、最大 2,500 文字のメッセージがサポートされます (英語の場合)。他の言語では文字数制限が異なる場合があります。Slack メッセージは文字制限で切り捨てられます。</li>
+
+        <li>Slack のレコードで <strong class="uicontrol">[Salesforce で表示]</strong> を選択すると、Slack から Salesforce のレコードに移動します。</li>
+
+        <li>Slack で検索および編集できるのは、Salesforce の取引先、取引先責任者、ケース、およびカスタマーサービスインシデント管理のレコードのみです。</li>
+
+        <li>Slack から作成できるのは、Salesforce ケース、ナレッジ記事のドラフト、およびカスタマーサービスインシデント管理のレコードのみです。</li>
+
+        <li>Slack では、3 文字から 100 文字までを検索できます。</li>
+
+        <li>Slack でナレッジ記事のドラフトを作成する場合は、リッチテキスト、画像、動画、添付ファイル、絵文字はサポートされません。</li>
+
+        <li>Slack からナレッジ記事のドラフトを作成するときに、Slack メッセージと Slack メタデータを同じナレッジ項目に対応付けることはできません。</li>
+
+        <li>Salesforce でナレッジ作成権限を持つユーザーのみが Slack からナレッジ記事を作成できます。</li>
+
+        <li>複数のスウォームがある Slack チャンネルでは、/service-swarm-close スラッシュコマンドを使用しても、スウォームメンバーのリストを表示できません。スウォームのメンバーを表示するには、スウォームの <strong class="uicontrol">[スウォーミングを完了]</strong> ボタンをクリックします。</li>
+
+      </ul>
+</div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="set_up_flows_swarming">
+<h1 class="slds-text-heading_large">スウォーミングフローの設定</h1>
+  <p>設定後、サポート担当者は事前設定されたスウォーミングフローテンプレートを使用して、Salesforce のレコードからすばやくスウォームを開始してメンバーを追加し、スウォームをクローズできます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table>
+    <p>次のようなフローを使用できます。</p>
+    <ul>
+      <li>スウォーミングを開始</li>
+
+      <li>メンバーをスウォームに追加</li>
+
+      <li>スウォーミングを完了</li>
+
+      <li>スウォームを再オープン</li>
+
+      <li>関連ケースを使用してスウォームをクローズ (自動起動)</li>
+
+      <li>関連インシデントを使用してスウォームをクローズ (自動起動)</li>
+
+      <li>サポート担当者作業トリガー (自動起動)</li>
+
+    </ul>
+
+    <p>これらのフローは、アクション &amp; おすすめ、動的アクション、またはクイックアクションを使用して UI で有効にできます。これらのツールのいずれかまたはすべてを使用して、フローを起動できます。</p>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:25%"><col style="width:25%"><col style="width:25%"><col style="width:25%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d44606e89" style="vertical-align:top;" class="slds-cell-wrap" scope="col">アクション種別</th>
+            <th id="d44606e92" style="vertical-align:top;" class="slds-cell-wrap" scope="col">アクション &amp; おすすめ</th>
+            <th id="d44606e95" style="vertical-align:top;" class="slds-cell-wrap" scope="col">クイックアクション</th>
+            <th id="d44606e98" style="vertical-align:top;" class="slds-cell-wrap" scope="col">動的アクション</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d44606e89" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクション種別">利点</td>
+
+            <td headers="d44606e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクション &amp; おすすめ"><ul>
+                <li>ユーザーに馴染みのあるコンポーネントをレコードページにあらかじめ設定できる</li>
+
+                <li>フローがレコードのネストされたサブタブで実行される</li>
+
+                <li>完了したフローにチェックマークが表示される</li>
+
+                <li>すべてのスウォーミングインタラクション (スウォーミングリストビューやフローなど) を 1 つのタブで保持する場合に最適</li>
+
+              </ul>
+</td>
+
+            <td headers="d44606e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="クイックアクション"><ul>
+                <li>ユーザーはレコードページに留まるため、レコードのコンテキストが維持される</li>
+
+                <li>フローが新しいタブまたはウィンドウではなく [フィード] タブで実行される</li>
+
+              </ul>
+</td>
+
+            <td headers="d44606e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="動的アクション"><ul>
+                <li>特定のルールを満たしている場合にのみユーザーにフローを表示する</li>
+
+                <li>フローが新しいタブまたはウィンドウではなく [フィード] タブで実行される</li>
+
+              </ul>
+</td>
+
+          </tr>
+        </tbody></table>
+    <p>自動起動フローを使用するには、フローをコピーして有効化します。自動起動フローはユーザーに表示されず、レコードが保存された後にフロー条件に一致すると実行されます。</p>
+    <p>スウォーミングフローを最初から作成し、呼び出し可能なアクションを使用して作成したフローから Slack を操作することもできます。あるいは、事前設定されたテンプレートのいずれかをコピーして、ビジネスニーズに合わせて調整します。</p>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> 標準のフローに追加された新機能は、コピーされたフローには表示されず、システム管理者が作成したバージョンに手動で追加する必要があります。</div></div></div>
+
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="incident-1.html#actions_and_recs_swarming">アクション &amp; おすすめを使用したスウォーム</a></strong><br>アクション &amp; おすすめコンポーネントを使用すると、ユーザーはコンソールで有効になっているフローに簡単にアクセスできます。このコンポーネントのフローは、レコードのネストされたサブタブで起動されます。レコードを切り替えて、他のタブで使用する情報を表示できます。</li><li class="slds-p-bottom_small"><strong><a href="#quick_actions_swarming">クイックアクションを使用したスウォーミング</a></strong><br>クイックアクションを使用したスウォーミングでは、タブやウィンドウではなく、フィードコンポーネントのパブリッシャーでフローが実行されます。サポート担当がクイック アクションを使用してフローを実行すると、フローの実行中に外部 Lightning ページ コンポーネントを表示できるため、レコードに関する詳細情報を表示してアクセスできます。</li><li class="slds-p-bottom_small"><strong><a href="incident-1.html#dynamic_actions_swarming">動的アクションを使用したスウォーム</a></strong><br>動的アクションを使用して、サポート担当者のエクスペリエンスを合理化し、エラーの防止に役立つルールでスウォーミングフローを表示します。ルールを追加し、レコード条件に基づいて [編集] ドロップダウンに適切な ToDo のみが表示されるようにします。たとえば、ルールを設定して、ケースの状況が [クローズ] に設定されている場合にのみ [スウォーミングを完了] が表示されるようにします。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="set_up_perms_swarming">
+<h1 class="slds-text-heading_large">スウォーミングユーザー権限の設定</h1>
+  <p>Lightning Experience でレコードをスウォーミングするために必要な権限をユーザーに付与します。Slack でのスウォーミングへのアクセス権を含む「Slack Service ユーザー」権限セットを割り当てるか、必要な権限を含む権限セットを作成します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table><p>カスタム権限セットを作成する場合、または既存の権限セットを使用する場合は、割り当てられたユーザーに「フローユーザー」ライセンスと「Service Cloud ユーザー」ライセンスがあることを確認してください。Slack でスウォーミングするためのユーザー権限を設定するには、「Set Up Service Cloud for Slack User Permissions (Service Cloud for Slack ユーザー権限の設定)」を参照してください。</p></div>
+    <ol><li>
+        <span>スウォームメンバーおよびスウォームオブジェクトへのアクセス権をプロファイルレベルで付与します。</span>
+        <ol>
+          <li>
+            <span>[設定] の [クイック検索] ボックスに<kbd>「プロファイル」</kbd>と入力し、<strong class="uicontrol">[プロファイル]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>スウォーミングオブジェクトへのアクセス権を付与するユーザープロファイルを選択します。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[編集]</strong> をクリックします。</span>
+          </li>
+
+          <li>
+            <span>[標準オブジェクト権限] で、ユーザープロファイルに割り当てるスウォームとスウォームメンバーオブジェクトのアクセスレベルを有効にします。「参照」、「作成」、「編集」、および「削除」権限を付与できます。</span>
+            <div>
+              <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> ユーザーがケースに関連するスウォームレコードおよびスウォームメンバーレコードを表示するには、参照アクセス権が必要です。スウォームまたはスウォームメンバーを作成するすべてのユーザーに作成、参照、および編集権限が必要です。</div></div></div>
+
+            </div>
+          </li>
+
+          <li>
+            <span>必要に応じて、他のユーザープロファイルに対して繰り返します。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>「Slack Service ユーザー」権限セットまたは作成した権限セットをユーザーに割り当てます。。</span>
+        <ol>
+          <li>
+            <span>[設定] から、[クイック検索] ボックスに「<kbd>権限セット</kbd>」と入力し、<strong class="uicontrol">[権限セット]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[Slack Service ユーザー]</strong> 権限セットまたは作成した権限セットを選択します。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[割り当ての管理]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[割り当てを追加]</strong> をクリックして、Service Cloud for Slack アプリケーションを使用するユーザープロファイルに権限セットを割り当てます。</span>
+            <div>
+              <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> プロファイルでユーザーを簡単に並び替えるには、[新規ビューの作成] を選択し、検索条件を [プロファイル] [次の文字列と一致する] [&lt;スウォーミングユーザープロファイル&gt;] に設定します。</div></div></div>
+
+            </div>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[割り当て]</strong> をクリックします。</span>
+          </li>
+
+        </ol>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="set_up_swarming">
+<h1 class="slds-text-heading_large">スウォーミングの設定</h1>
+  <p>段階的なサポートを排除して、数ステップでスウォーミングを開始できます。Salesforce レコードでスウォームコラボレーションを保持するか、Slack でスウォームするのかを選択できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> Salesforce Go!ガイド付き設定環境の検索、より多くのコンテンツの探索、関連機能の発見、機能の使用状況の監視を行います。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.setup_salesforce_go.htm&amp;language=ja&amp;type=5">Discover and Set Up Features</a> With Salesforce Go」を参照してください。</div></div></div>
+
+  
+<ol><li class="slds-p-bottom_small"><strong><a href="#turn_on_swarming">スウォーミングの有効化</a></strong><br>顧客の問題についてのスウォーミングを開始して、顧客の解決時間を短縮するには、スウォーミングを有効にします。</li><li class="slds-p-bottom_small"><strong><a href="#set_up_perms_swarming">スウォーミングユーザー権限の設定</a></strong><br>Lightning Experience でレコードをスウォーミングするために必要な権限をユーザーに付与します。Slack でのスウォーミングへのアクセス権を含む「Slack Service ユーザー」権限セットを割り当てるか、必要な権限を含む権限セットを作成します。</li><li class="slds-p-bottom_small"><strong><a href="incident-1.html#console_objects_swarming">スウォーミング用のサービスコンソールの設定</a></strong><br>サポート担当者のスウォーミング環境を最適化し、スウォーミングページレイアウト、タブ、および関連リストを使用してスウォーミングを前面中央に配置します。</li><li class="slds-p-bottom_small"><strong><a href="#set_up_flows_swarming">スウォーミングフローの設定</a></strong><br>設定後、サポート担当者は事前設定されたスウォーミングフローテンプレートを使用して、Salesforce のレコードからすばやくスウォームを開始してメンバーを追加し、スウォームをクローズできます。</li><li class="slds-p-bottom_small"><strong><a href="#prep_omni_for_swarming">スウォーミング用のエキスパートファインダーの設定</a></strong><br>スウォーミングのカギを握る部分であり、オムニチャネルとスキルベースのルーティングを利用するエキスパートファインダーを設定します。</li><li class="slds-p-bottom_small"><strong><a href="#service_swarm_slack_collab_tool">スウォーミングのためのコラボレーションツールの設定</a></strong><br>顧客の問題についてスウォーミングを行うには、Slack などのコラボレーションツールを Salesforce に接続します。スウォームレコードのフィードをコラボレーションに使用する場合、コラボレーションツールは必要なく、スウォームオブジェクトのフィード追跡を有効にするだけで済みます。</li></ol>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="swarming_in_lex">
+<h1 class="slds-text-heading_large">Lightning Experience でのスウォーミング</h1>
+  <p>スウォーミングとのコラボレーションは、サポート担当者が問題解決の支援を得るためにスウォーム要求を送信すると開始されます。Salesforce のレコードからスウォームを開始し、スウォームレコードのフィードからエキスパートとコラボレーションします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table></div>
+    <ol><li>
+        <span><strong class="uicontrol">[スウォーミングを開始]</strong> フローアクションを選択します。クイックアクション、動的アクション、または [アクション &amp; おすすめ] パネルのいずれかになります。</span>
+      </li><li>
+        <span>メンバーをスウォームに追加する方法を選択します。特定のチームメンバーを追加するには、対応するオプションを選択し、その名前を入力します。<a name="swarming_in_lex__image_kvm_ljk_2tb"></a><div><img alt="[スウォーミングを開始] モーダルのスキルの追加" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/swarm_begin_swarm_modal.png" id="swarming_in_lex__image_kvm_ljk_2tb" style="width:400px;"></div></span>
+        <div> エキスパートファインダーではスキルベースのルーティングを使用して適切なスキルを持ち、作業を遂行できるだけの対応可能状況と業務量を備えたメンバーを見つけます。</div>
+      </li><li>
+        <span><strong class="uicontrol">[別のスウォームメンバーを追加]</strong> チェックボックスをオンにして、スウォームに追加する各メンバーの詳細を入力します。次に、<strong class="uicontrol">[次へ]</strong> をクリックしてスウォームレコードを作成します。</span>
+      </li><li>
+        <span>「I need help with a Java and Perl issue」 (Java と Perl の問題について支援を求めています) のように問題の詳細を入力し、<strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>Chatter フィードでエキスパートと会話を開始します。<div style="text-align:left;"><img alt="スウォームレコードで強調表示されている Chatter フィード" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/swarm_lightning_chatter.png"></div></span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="swarming_in_lex_intro">
+<h1 class="slds-text-heading_large">Lightning Experience でのスウォーミングの使用</h1>
+  <p>Salesforce レコードからスウォームを開始したり、スウォームにエキスパートを追加したり、コラボレーションする場所を選択したりします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#swarming_in_lex">Lightning Experience でのスウォーミング</a></strong><br>スウォーミングとのコラボレーションは、サポート担当者が問題解決の支援を得るためにスウォーム要求を送信すると開始されます。Salesforce のレコードからスウォームを開始し、スウォームレコードのフィードからエキスパートとコラボレーションします。</li><li class="slds-p-bottom_small"><strong><a href="#swarming_in_slack">Slack でのスウォーム</a></strong><br>Service Cloud for Slack アプリケーションで、顧客の問題についてスウォームします。スウォームは、Salesforce のレコードまたは Slack チャネルから開始できます。</li><li class="slds-p-bottom_small"><strong><a href="incident-1.html#add_members_swarm">Lightning Experience でのスウォームへのメンバーの追加</a></strong><br>顧客の問題を解決するときに異なるスキルを持つ他のユーザーから支援が必要な場合、進行中のスウォームにメンバーを追加できます。エキスパートファインダーを使用して、スキル、対応可能状況、業務量の観点から最適なユーザーを検索します。またはユーザーを直接名前で追加します。エキスパートファインダーを使用している場合、オムニチャネルは、対応可能で指定されたスキルを持つ最適なユーザーに招待を転送し、ケースとスウォームのスウォームメンバーレコードを作成します。スウォームメンバーを名前で追加したり、エキスパートファインダーでスキル別に検索したり、スウォームメンバーの追加をスキップして後で追加したりできます。</li><li class="slds-p-bottom_small"><strong><a href="incident-1.html#finish_swarming">Lightning Experience でのスウォームのクローズ</a></strong><br>Lightning Experience からスウォームを完了としてマークします。スウォーミングを完了すると、終了日時が設定され、状況とすべての関連するスウォームメンバーが [完了] に変更されます。また、サポート担当者がより多くの作業を受け入れることができるように、サポート担当者のオムニチャネルプレゼンス設定の領域も解放されます。また、スウォームに関与しているメンバーがレポートに表示されます。</li><li class="slds-p-bottom_small"><strong><a href="#reopen_a_swarm">Lightning Experience でのスウォーミングの再オープン</a></strong><br>Lightning Experience から完了したスウォームを再オープンし、会話をシームレスに再開します。スウォームを再オープンすると、状況がクローズ済みからオープンに変更されます。また、スウォームの再オープンを決定した方法に基づいて、同じスウォームメンバーまたは業務量がまだ残っているメンバーのみでスウォームを開くことができます。</li><li class="slds-p-bottom_small"><strong><a href="#service_swarm_take_action_slack">Slack でのアクションの実行</a></strong><br>スウォーミングを最大限に活用するには、Service Cloud for Slack アプリケーションと簡単に使用できるスラッシュコマンドを使用して Salesforce レコードを作成および検索します。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="swarming_in_slack">
+<h1 class="slds-text-heading_large">Slack でのスウォーム</h1>
+  <p>Service Cloud for Slack アプリケーションで、顧客の問題についてスウォームします。スウォームは、Salesforce のレコードまたは Slack チャネルから開始できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table><p>Service Cloud for Slack アプリケーションで顧客の問題についてスウォームするには、<a target="_blank" href="https://help.salesforce.com/s/articleView?id=slack.slack_apps_service_swarm_in_slack.htm&amp;language=ja&amp;type=5">「Slack でのスウォームの開始」</a>を参照してください。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="turn_on_swarming">
+<h1 class="slds-text-heading_large">スウォーミングの有効化</h1>
+  <p>顧客の問題についてのスウォーミングを開始して、顧客の解決時間を短縮するには、スウォーミングを有効にします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><a target="_blank" href="support_general-1.html#service_editions_reference">サポートされているエディションを表示する</a>。</td>
+
+          </tr>
+        </tbody></table></div>
+    <ol><li>
+        <span>[設定] で、[クイック検索] ボックスに「<kbd>スウォーミング」</kbd>と入力して、[<strong class="uicontrol">スウォーミング]</strong> を選択します。 <div style="text-align:left;"><img alt="[スウォーミングを有効化] が強調表示されたスウォーミング設定ページ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-service-support-262-0-0-production-jajp/910067ed-d2c5-4b6b-84e0-649d98d3ccf8/support/images/swarming/swarming_setup_enable.png"></div></span>
+      </li><li>
+        <span>切り替えスイッチを選択して<strong class="uicontrol">スウォーミングを有効化</strong>します。</span>
+      </li></ol>
+
+    <div><p>次に、スウォーミングオブジェクトへのアクセス権をユーザーに付与し、サービスコンソールを設定し、標準のフローを設定して、コラボレーションツールを選択します。</p></div>
+  
+</div></div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="incident-2.html">&larr; インシデント管理・スウォーミング（2/3）</a><a href="case_mgmt-1.html">ケース管理・エスカレーション・自動化（1/3） &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=service.service_cloud.htm&type=5&language=ja">help.salesforce.com — Salesforce Service Cloud（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>

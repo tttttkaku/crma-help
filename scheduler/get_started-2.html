@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>はじめに・セットアップ・有効化（2/2） | Salesforce Scheduler ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（23）</h2>
+    <ol>
+      <li><a href="#ls_enable_schedule_appnt_using_engage_channels_setting">[エンゲージメントチャネルを使用して予定をスケジュール] 設定の有効化</a></li>
+      <li><a href="#ls_enable_service_resource_filtering">サービスリソースの絞り込みの有効化</a></li>
+      <li><a href="#ls_enable_translation_custom_fields">カスタム項目データの翻訳の有効化</a></li>
+      <li><a href="#ls_enable_translation_workbench">トランスレーションワークベンチを有効にする</a></li>
+      <li><a href="#ls_enable_users_to_create_and_manage_appointments">Salesforce Scheduler でのユーザーによる予定の作成および管理の許可</a></li>
+      <li><a href="#ls_event_mgmt_overview">Salesforce または外部カレンダーでの行動としての予定の表示</a></li>
+      <li><a href="#ls_get_started_with_salesforce_scheduler">Salesforce Scheduler の使用開始</a></li>
+      <li><a href="#ls_inbound_overview">認証済み外部ユーザーのスケジュールの設定</a></li>
+      <li><a href="#ls_overview">Salesforce Scheduler での予定の管理</a></li>
+      <li><a href="#ls_overview_operating_hours_for_STM_for_WTGs">作業種別グループ別のサービスリソースの対応可能状況の判断</a></li>
+      <li><a href="#ls_prereqs_capacity_based_scheduling">業務量ベースのスケジュールを有効にするための前提条件</a></li>
+      <li><a href="#ls_prereqs_drop_in_appointments">[ドロップイン予定] を使用するための前提条件</a></li>
+      <li><a href="#ls_prereqs_for_using_engagement_channels">エンゲージメントチャネル種別を使用するための前提条件</a></li>
+      <li><a href="#ls_prereqs_multiple_attendee_event">複数のサービスリソースイベント設定を有効にするための前提条件</a></li>
+      <li><a href="#ls_prereqs_multiple_topics_for_shifts">[シフトの複数のトピック] 設定を有効化するための前提条件</a></li>
+      <li><a href="#ls_prereqs_operating_hours_for_resources_working_on_appointment_topics">予定のトピックで作業するリソースの営業時間の設定の前提条件</a></li>
+      <li><a href="#ls_read_calendars_overview">カレンダーの確認によるサービスリソースの対応可能状況の判断</a></li>
+      <li><a href="#ls_read_external_events_overview">外部システムの確認によるサービスリソースの対応可能状況の判断</a></li>
+      <li><a href="#ls_scheduling_policies_overview">Salesforce Scheduler で適切なサービスリソースを見つけるためのルールの定義</a></li>
+      <li><a href="#ls_set_up_picklists_intro">州選択リストと国選択リストの設定</a></li>
+      <li><a href="#ls_setup_assistant">Salesforce Scheduler 設定アシスタントの調査 (省略可能)</a></li>
+      <li><a href="#ls_setup_qr_codes_for_lobby">レコードページへのロビー管理 QR コードコンポーネントの追加</a></li>
+      <li><a href="#ls_troubleshoot_issues_with_setup_and_appointment_scheduling">Salesforce Scheduler のトラブルシューティングツール</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>はじめに・セットアップ・有効化（2/2）</h1>
+      <div class="meta">Salesforce Scheduler ヘルプ · 23 記事 · 生成 2026-08-14</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="get_started-1.html">&larr; はじめに・セットアップ・有効化（1/2）</a><a href="resources-1.html">サービスリソース・スキル・シフト・稼働可能時間（1/2） &rarr;</a></div>
+<section class="article" id="ls_enable_schedule_appnt_using_engage_channels_setting">
+<h1 class="slds-text-heading_large">[エンゲージメントチャネルを使用して予定をスケジュール] 設定の有効化</h1>
+  <p>1 つ以上のチャネルをシフトに追加するには、[エンゲージメントチャネルを使用して予定をスケジュール] を有効化します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><p>エンゲージメントチャネルを使用して予定をスケジュールする前に、<a title="Salesforce Scheduler では、シフトエンゲージメントチャネル連結オブジェクトを使用してエンゲージメントチャネル種別をシフトに関連付け、エンゲージメントチャネル作業種別連結オブジェクトを使用してエンゲージメントチャネル種別を作業種別に関連付けます。[エンゲージメントチャネルを使用して予定をスケジュール] 設定を有効にする前に、次の前提条件を完了してください。" href="#ls_prereqs_for_using_engagement_channels">前提条件</a>を完了してください。</p><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience。</td>
+
+          </tr>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition および <strong>Unlimited</strong> Edition</td>
+
+          </tr>
+        </tbody></table></div>
+    <ol><li>
+        <span>[設定] から、[クイック検索] ボックスに<kbd>「Salesforce Scheduler の設定」</kbd>と入力し、<strong class="uicontrol">[Salesforce Scheduler の設定]</strong> を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[エンゲージメントチャネルを使用して予定をスケジュール]</strong> を有効化します。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="ls_enable_service_resource_filtering">
+<h1 class="slds-text-heading_large">サービスリソースの絞り込みの有効化</h1>
+  <p>予定フローにサービスリソースの検索条件を適用して、予定をより迅速に、最も適したサービスリソースでスケジュールできるようにします。関連するフローページで [リソース ID 別に絞り込み] 属性を使用して、サービスリソース ID のカンマ区切りリストを指定します。Salesforce Scheduler は、予定のサービスリソースまたはサービステリトリースロットを取得するときに、指定されたリソースのリストのみを検索します。サービスリソース選択ページでは、サービスリソースはカンマ区切りのリストで指定した順序で表示されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience。</td>
+
+          </tr>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition および <strong>Unlimited</strong> Edition</td>
+
+          </tr>
+        </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d40006e65" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d40006e65" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Flow Builder でフローを開く、編集または作成する</td>
+
+              <td headers="d40006e65" style="vertical-align:top;" class="slds-cell-wrap">「フローの管理」</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d40006e65" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">フローを実行する</td>
+
+              <td headers="d40006e65" style="vertical-align:top;" class="slds-cell-wrap">「フローの実行」</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>[リソース ID 別に絞り込み] 属性は、送信フローの [サービスリソースを選択] ページで使用できます。また、受信フローとゲストフローの [サービスリソースとサービス予定時間を選択] ページでも使用できます。</p></div>
+    <ol><li>
+        <span>[設定] で、[クイック検索] ボックスに<kbd>「フロー」</kbd>と入力して、<strong class="uicontrol">[フロー]</strong> を選択します。</span>
+      </li><li>
+        <span>フローを作成するか、サービスリソースの絞り込みを有効にする既存のフローを編集します。</span>
+        <div>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-scheduler-262-0-0-production-jajp/7046ca23-fde1-41de-b142-e62072ab4694/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> フローを編集するには、事前に無効化しておく必要があります。</div></div></div>
+
+        </div>
+      </li><li>
+        <span>Flow Builder で、[サービスリソースを選択] または [サービスリソースとサービス予定時間を選択] フロー画面コンポーネントを使用してフロー画面を編集します。</span>
+      </li><li>
+        <span>フロー画面コンポーネントを選択します。</span>
+      </li><li>
+        <span>[リソース ID 別に絞り込み] 属性に、サービスリソース ID のカンマ区切りリストを入力します。</span>
+        <div>影響を受けるページには、指定したサービスリソースのリストと選択したサービステリトリーおよび作業種別グループに含まれているサービスリソースのみが表示されます。</div>
+      </li><li>
+        <span>変更を保存して、フローを有効化します。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="ls_enable_translation_custom_fields">
+<h1 class="slds-text-heading_large">カスタム項目データの翻訳の有効化</h1>
+  <p>ユーザーが作業種別グループオブジェクト、サービステリトリーオブジェクト、サービスリソースオブジェクトのカスタム項目データの翻訳を可能にします。テキスト型、テキストエリア型、ロングテキストエリア型、テキストエリア (リッチ) 型、および URL 型のカスタム項目のデータ翻訳を有効にできます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience。</td>
+
+          </tr>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition および <strong>Unlimited</strong> Edition</td>
+
+          </tr>
+        </tbody></table><p>カスタム項目のデータ翻訳を有効にする前に、必ずデータ翻訳を有効にしてください。</p></div>
+    <ol><li>
+        <span>[設定] から [クイック検索] ボックスに<kbd>「データ翻訳設定」</kbd>と入力し、<strong class="uicontrol">[データ翻訳設定]</strong> を選択します。</span>
+      </li><li>
+        <span>カスタム項目のデータ翻訳を有効にするには、オブジェクトを選択します。</span>
+        <div> データ翻訳をサポートするオブジェクトのみが表示されます。</div>
+      </li><li>
+        <span>翻訳を有効にするカスタム項目を選択します。</span>
+      </li><li>
+        <span>変更内容を保存します。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="ls_enable_translation_workbench">
+<h1 class="slds-text-heading_large">トランスレーションワークベンチを有効にする</h1>
+  <p>トランスレーションワークベンチを使用して、翻訳に使用する言語を指定したり、翻訳者を割り当てたり、翻訳を管理したりします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience。</td>
+
+          </tr>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition および <strong>Unlimited</strong> Edition</td>
+
+          </tr>
+        </tbody></table></div>
+    <ol><li>
+        <span>[設定] から [クイック検索] ボックスに<kbd>「翻訳言語設定」</kbd>と入力し、<strong class="uicontrol">[翻訳言語設定]</strong> を選択します。</span>
+      </li><li>
+        <span>トランスレーションワークベンチを有効にします。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="ls_enable_users_to_create_and_manage_appointments">
+<h1 class="slds-text-heading_large">Salesforce Scheduler でのユーザーによる予定の作成および管理の許可</h1>
+  <p>ユーザーおよび顧客が Salesforce Lightning サービスコンソール、Experience Cloud サイト、および会社の Web サイトを使用して予定を予約できるようにします。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="flow_components.html#ls_provide_flow_access_to_profiles">Salesforce Scheduler フローへのアクセスの管理</a></strong><br>フローアクセスを使用して、Salesforce Schedulerフロープロセス種別で、ユーザーレコード、プロファイル、または権限セットに基づいてフローを編集および実行できるユーザーを制限します。より詳細なセキュリティを個々のフローに適用するには、フローのデフォルトの動作を上書きします。そして、ユーザープロファイルまたは権限セットに基づいてフローへのアクセス権を付与します。</li><li class="slds-p-bottom_small"><strong><a href="appointments-1.html#ls_create_salesforce_scheduler_email_prompt_template">Salesforce Schedulerのメールプロンプトテンプレートの作成</a></strong><br>エンドユーザーが予定招待メールを手動で作成する時間を節約します。Salesforce Scheduler Email プロンプトテンプレートを作成して、Salesforce オブジェクトの最新データを使用して、Large Language Model(LLM; 大規模言語モデル)にパーソナライズされた予定招待を生成するように指示します。</li><li class="slds-p-bottom_small"><strong><a href="appointments-1.html#ls_appointment_statuses_and_status_categories_in_salesforce_scheduler">Salesforce Scheduler での予定の状況と状況のカテゴリ</a></strong><br>サービス予定の状況を使用すると、ユーザーは予定のライフサイクル全体で予定の状況を追跡できます。それぞれの予定状況は、標準のサービス予定状況のカテゴリのいずれかに対応付けられています。状況のカテゴリを使用すると、カスタム状況を作成して使用でき、一貫した作業分類で追跡とレポートを行うことができます。カスタム予定状況は作成できますが、状況のカテゴリを作成することはできません。</li><li class="slds-p-bottom_small"><strong><a href="customize-3.html#ls_set_up_video_appnts_with_chime">Amazon Chime を使用したビデオ予定の設定</a></strong><br>     <span>Salesforce Scheduler に Amazon Chime が統合され、ビデオ通話が可能になりました。この機能は Bring Your Own Application (BYOA) モデルで動作し、使用するには Amazon Chime アカウントが必要です。Salesforce Scheduler では、ビデオ通話設定を有効にして設定すると、すべてのビデオ予定に Amazon Chime が使用されます。また、Salesforce Scheduler には仮想の予定のメール予定テンプレートが用意されているため、これを利用して未認証のユーザーに今後のビデオ予定の通知を送信することもできます。 </span>   </li><li class="slds-p-bottom_small"><strong><a href="customize-2.html#ls_distribute_outbound_flows">発信スケジュールの設定</a></strong><br>Salesforce Scheduler に用意されている標準フローテンプレートにより、内部ユーザー (従業員) は顧客との予定をすばやくスケジュールできます。ユーザーは予定の適切な人、トピック、場所、および日時を容易に検索して選択できます。用意されている標準フローテンプレートを使用することも、これらのテンプレートに基づいてフローを作成してビジネスニーズに合わせてカスタマイズすることもできます。</li><li class="slds-p-bottom_small"><strong><a href="appointments-2.html#ls_work_with_appointments">Salesforce Scheduler での送信予定の作成と管理</a></strong><br>Salesforce Scheduler を使用して、顧客と割り当て済みリソース (1 人または複数) の予定をスケジュールします。予定を変更することで、別の日時に再スケジュールしたり、サービスリソースを追加したりできます。顧客の都合が悪くなった場合は予定をキャンセルします。予定をスケジュールした後に、サービスリソースを削除したり、作業種別の所要時間を変更したり、予定を変更して割り当て済みのサービスリソースを削除したりすると、予期しない動作が発生する可能性があります。</li><li class="slds-p-bottom_small"><strong><a href="appointments-2.html#ls_set_up_inbound_scheduling">受信スケジュールの設定</a></strong><br>認証済み外部ユーザー (顧客およびパートナー) と認証されていないユーザー (プロスペクト) は、提供されている標準の受信フローテンプレートを設定することにより、従業員の予定をすばやくスケジュールできます。</li><li class="slds-p-bottom_small"><strong><a href="appointments-2.html#ls_work_with_inbound_appointments">Salesforce Scheduler での受信予定の作成と管理</a></strong><br>顧客、パートナー、見込み客は Salesforce Scheduler を使用してサービスリソースとの予定をスケジュールできます。また、予定を変更して再スケジュールしたり、サービスリソースを追加したり、予定をキャンセルしたりすることもできます。予定をスケジュールした後に、サービスリソースを削除したり、作業種別の所要時間を変更したり、予定を変更して割り当て済みのサービスリソースを削除したりすると、予期しない動作が発生する可能性があります。</li><li class="slds-p-bottom_small"><strong><a href="appointments-2.html#ls_set_up_group_service_appointments">グループサービス予定の設定</a></strong><br>グループサービス予定を使用して、大規模な顧客グループの予定を作成し、サービス予定への登録やサービス予定からの登録解除を柔軟に行うことができます。たとえば、複数のユーザーを作成して再開ワークショップに登録できるようにします。また、リードレコードと認証済みユーザーを予定に直接登録するか、グループ予定登録 URL をメールで未認証ユーザーと共有します。</li><li class="slds-p-bottom_small"><strong><a href="appointments-2.html#ls_manage_appointments_for_guest_users">Salesforce Scheduler でのゲストサービス予定管理</a></strong><br>ゲストユーザーは、予定を変更して再スケジュールしたり、サービスリソースを変更したり、予定をキャンセルしたりできます。スケジュール済み予定をゲストユーザーに通知するには、使用可能なメールテンプレートを使用してメール通知を設定します。メールテンプレートには、ゲストユーザーサービス予定を変更およびキャンセルするフローを呼び出すリンクが含まれます。ゲストユーザーが予定をキャンセルすると、確認メールテンプレートには別の予定を作成するためのリンクが含まれます。</li><li class="slds-p-bottom_small"><strong><a href="resources-2.html#ls_share_srvc_resource_availability_using_invitation_url">招待 URL を使用したサービスリソースの対応可能状況の共有</a></strong><br>サービスリソースまたはそのアシスタントは、予定の予約でリソースを使用できる期間を共有できます。予定条件を定義し、招待 URL を作成して予定条件をユーザーと共有できます。ユーザーは招待 URL に移動して予定を予約できます。この URL によりユーザーは、サービスリソースが対応可能になる開始週に移動します。</li><li class="slds-p-bottom_small"><strong><a href="agentforce.html#ls_lobby_management">ロビー管理</a></strong><br>     ロビー管理を<span>使用して、スケジュール済み予定の有無に関係なく、支店ロケーションへの訪問を希望する顧客を管理します。ロビー管理を使用すると、グリーターはスケジュール済みサービス予定とドロップイン予定を管理できます。また、予定の予想待機時間を表示することもできます。</span>   </li><li class="slds-p-bottom_small"><strong><a href="customize-2.html#ls_how_ss_tracks_appt_after_lead_conversion">Salesforce Scheduler による予定の追跡方法</a></strong><br>リードの取引が開始されるか、取引先がマージされるときに、Salesforce Scheduler では関連付けられたサービス予定の [親レコード] 項目を更新します。Salesforce Scheduler では、関連付けられた Salesforce カレンダーの行動の [関連先] 項目も更新します。</li><li class="slds-p-bottom_small"><strong><a href="customize-2.html#ls_embed_flows_into_flows">他のフローへの Salesforce Scheduler フローの埋め込み</a></strong><br>Salesforce Scheduler フロー種別である別のフロー内から Salesforce Scheduler フローをコールできます。たとえば、ユーザーに予定を作成するのか、変更するのかを尋ねる Salesforce Scheduler フローを作成して取引先ページに追加することができます。このフローはさらに関連フローを起動します。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="ls_event_mgmt_overview">
+<h1 class="slds-text-heading_large">Salesforce または外部カレンダーでの行動としての予定の表示</h1>
+  <p>
+    <span id="publish_appts_as_events_description"><a name="publish_appts_as_events_description"></a>[行動管理] 設定を有効にすると、Salesforce Scheduler でサービスリソースの予定が Salesforce カレンダーに行動として書き込まれます。行動を Salesforce カレンダーから外部カレンダーに書き込むには、Einstein 活動キャプチャなどのカレンダー同期機能を使用します。カレンダー同期ツールを利用できない場合は、[予定をプラットフォームイベントとして公開] 設定を有効化して、Salesforce Scheduler で予定が作成、変更、削除されたときにプラットフォームイベントをトリガーします。そして、新しい AppointmentSchedulingEvent プラットフォームイベントに登録し、API を使用して外部カレンダーにプラットフォームイベントを外部カレンダーに書き込みます。</span>
+  </p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience。</td>
+
+          </tr>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition および <strong>Unlimited</strong> Edition</td>
+
+          </tr>
+        </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="appointments-1.html#ls_considerations_to_write_appointments_to_salesforce_calendar">予定を Salesforce カレンダーに書き込む際の考慮事項</a></strong><br>[行動管理] 設定を有効に設定して Salesforce Scheduler の予定を Salesforce カレンダーに書き込めるようにする場合は、次の点に留意してください。</li><li class="slds-p-bottom_small"><strong><a href="get_started-1.html#ls_enable_event_mgmt">Salesforce Scheduler の予定を Salesforce カレンダーに書き込む</a></strong><br>     <span>[行動管理] 設定を使用して、Salesforce カレンダーに予定を書き込みます。サービスリソースでは、スケジュールされた予定が Salesforce カレンダーで行動として表示されます。[行動] ページレイアウトに [サービス予定] 項目を追加すると、行動の詳細ページに対応する Salesforce Scheduler のサービス予定へのリンクが表示されます。サービス人員は、このリンクを使用して Salesforce カレンダーの行動からサービス予定を直接開くことができます。サービス予定ページの [割り当て済み人員] 関連リストにも、Salesforce カレンダーの行動に戻るためのリンクが表示されます。</span>   </li><li class="slds-p-bottom_small"><strong><a href="customize-2.html#ls_ext_cal_update">Salesforce Scheduler の予定を外部カレンダーに書き込む</a></strong><br>[予定をプラットフォームイベントとして公開] 設定を有効にして、AppointmentSchedulingEvent プラットフォームイベントを登録し、API を使用して予定を外部カレンダーに書き込みます。</li><li class="slds-p-bottom_small"><strong><a href="appointments-1.html#ls_connect_calendars">外部カレンダーとの Salesforce カレンダーの接続</a></strong><br>Einstein 活動キャプチャアプリケーションを使用して、Salesforce カレンダーを Microsoft® Outlook® や Google Calendar™ などの外部カレンダーに接続します。Einstein 活動キャプチャを使用している場合、設定した同期方向に基づいてどのカレンダーから行動を編集する必要があるかをユーザーに指示します。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://unofficialsf.com/salesforce-scheduler-with-einstein-activity-capture/">非公式 SF: Einstein 活動キャプチャを使用する Salesforce Scheduler</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="ls_get_started_with_salesforce_scheduler">
+<h1 class="slds-text-heading_large">Salesforce Scheduler の使用開始</h1>
+  <p>Salesforce Scheduler の機能、使用できるユーザー、機能を使用するために必要なライセンス、および機能の内容について説明します。主要な用語、ロール、データモデル、利用可能なリソースについても説明します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience。</td>
+
+          </tr>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition および <strong>Unlimited</strong> Edition</td>
+
+          </tr>
+        </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="appointments-1.html#ls_capabilities_of_salesforce_scheduler">Salesforce Scheduler の機能</a></strong><br>Salesforce Scheduler には、予定のスケジュールに関わるデータを管理するツールが用意されています。予定のスケジュールを標準の Salesforce ワークフロー (リード &amp; 紹介、ケース、商談、取引先など) に埋め込むこともできます。Salesforce Scheduler では、ユーザーが Salesforce Lightning コンソール、Experience Cloud サイト、および Web サイトを使用して予定を予約することもできます。</li><li class="slds-p-bottom_small"><strong><a href="appointments-2.html#ls_licenses_for_salesforce_scheduler">Salesforce Scheduler のライセンス</a></strong><br>顧客の予定を予約したり、顧客の予定を受け入れたり、アセットをスケジュールしたりするには、それぞれ別のライセンスが必要です。</li><li class="slds-p-bottom_small"><strong><a href="appointments-2.html#ls_whats_included_in_salesforce_scheduler">Salesforce Scheduler に含まれているもの</a></strong><br>Salesforce Scheduler には、予定のスケジュールに必要なオブジェクトと、Salesforce Scheduler を簡単に設定できるアプリケーションが用意されています。予定の予約環境を提供する事前設定済みのカスタマイズ可能なフローとルールが提供されます。また、予定の予約環境を作成するビジネス API も提供されます。</li><li class="slds-p-bottom_small"><strong><a href="appointments-2.html#ls_key_terms_in_salesforce_scheduler">Salesforce Scheduler における主要な用語</a></strong><br>主要な用語 (サービスリソース、サービステリトリー、作業種別グループ、作業種別、スキルなど) とその説明のリスト。</li><li class="slds-p-bottom_small"><strong><a href="appointments-2.html#ls_key_roles_in_salesforce_scheduler">Salesforce Scheduler における主要なロール</a></strong><br>システム管理者、サービスリソース、サービステリトリーマネージャー、顧客ケア担当者など、Salesforce Scheduler におけるロールと、各ロールで実行できる内容について説明します。</li><li class="slds-p-bottom_small"><strong><a href="customize-2.html#ls_data_model_diagram">データモデルの概要</a></strong><br>予定および予定に参加するようにスケジュールできる従業員を表す、Salesforce Scheduler データモデル内のオブジェクトとリレーションについて説明します。</li><li class="slds-p-bottom_small"><strong><a href="resources-2.html#ls_salesforce_scheduler_resources">Salesforce Scheduler リソース</a></strong><br>Salesforce Scheduler の操作に役立つリソース (動画、Trailhead、開発者ガイド、実装ガイドなど) のリスト。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="ls_inbound_overview">
+<h1 class="slds-text-heading_large">認証済み外部ユーザーのスケジュールの設定</h1>
+  <p>Salesforce Scheduler を使用すると、認証済み外部ユーザー (顧客およびパートナー) は標準フローテンプレートを使用して、従業員との予定をすばやくスケジュールできます。ユーザーは予定の適切な人、トピック、場所、および日時を容易に検索して選択できます。用意されている標準フローテンプレートを使用することも、これらのテンプレートに基づいてフローを作成してビジネス要件に合わせてカスタマイズすることもできます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience。</td>
+
+          </tr>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition および <strong>Unlimited</strong> Edition</td>
+
+          </tr>
+        </tbody></table>
+    <p>Salesforce Scheduler には、認証済み外部ユーザー向けに次の標準フローテンプレートが用意されています。</p>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d21606e72" style="vertical-align:top;" class="slds-cell-wrap" scope="col">フロー</th>
+            <th id="d21606e75" style="vertical-align:top;" class="slds-cell-wrap" scope="col">目的</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d21606e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="フロー">受信 新規予定</td>
+
+            <td headers="d21606e75" style="vertical-align:top;" class="slds-cell-wrap" data-label="目的"><p>認証済み外部ユーザーは、手順に従って 1 人以上の従業員またはコントラクターが含まれる予定をスケジュールできます。</p><p style="margin-bottom:0;">このフローを変更し、コミュニティユーザーが発信フローとして使用できるようにできます。詳細は、<a title="受信フローを発信フローとして提供するには、[コミュニティユーザーが使用可能な発信フロー] 属性を使用します。発信フローを有効にすると、コントラクターであるサービスリソースは、取引先、商談、またはリードのサービス予定を作成および管理できます。コントラクターは、アシスタントに代理で予定を予約するように依頼することもできます。" href="customize-3.html#ls_modify_inbound_as_outbound">「受信フローを発信フローとして使用」</a>を参照してください。変更されたフローを使用すると、独立系ウェルスアドバイザーや自動車販売店担当者などのパートナーユーザーは予定を簡単に予約できます。</p></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d21606e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="フロー">受信 予定を変更</td>
+
+            <td headers="d21606e75" style="vertical-align:top;" class="slds-cell-wrap" data-label="目的"><p>認証済み外部ユーザーは、手順に従ってスケジュール済みの予定を変更できます。</p><p style="margin-bottom:0;">パートナーユーザー (コントラクター) は、このフローを使用して Experience Cloud で予定を変更することもできます。</p></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d21606e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="フロー">受信 予定をキャンセル</td>
+
+            <td headers="d21606e75" style="vertical-align:top;" class="slds-cell-wrap" data-label="目的">認証済み外部ユーザーは、手順に従ってスケジュール済みの予定をキャンセルできます。</td>
+
+          </tr>
+        </tbody></table>
+    <p>認証済み外部ユーザーに受信予定フローへのアクセス権を付与するには、受信予定フローを Experience Cloud サイトに追加します。</p>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="customize-1.html#ls_comm_user_permissions">認証済みユーザーへの必要なユーザー権限およびオブジェクト権限の付与</a></strong><br>認証済みユーザーが予定をスケジュールするには、特定のユーザー権限およびオブジェクト権限が必要です。これらの権限はユーザープロファイルまたは権限セットを使用してユーザーに付与できます。</li><li class="slds-p-bottom_small"><strong><a href="customize-1.html#ls_comm_user_sharing_settings">予定をスケジュールする認証済み外部ユーザーの共有設定の更新</a></strong><br>組織の共有設定を使用して、Salesforce Scheduler レコードのベースラインの外部アクセス権を設定します。</li><li class="slds-p-bottom_small"><strong><a href="customize-3.html#ls_inbound_modify_additional_config">[受信 予定を変更] フローの追加の設定</a></strong><br>組織で [行動管理] 設定が有効になっている場合、[受信 予定を変更] フローを機能させるために追加の手順を実行する必要があります。</li><li class="slds-p-bottom_small"><strong><a href="customize-3.html#ls_publish_inbound_flow">Experience Cloud サイトへの受信フローの追加</a></strong><br>1 つ以上の受信フローをサイトに追加すると、認証されたサイトユーザーは予定をスケジュール、変更、キャンセルできます。</li><li class="slds-p-bottom_small"><strong><a href="customize-3.html#ls_modify_inbound_as_outbound">受信フローを発信フローとして使用</a></strong><br>受信フローを発信フローとして提供するには、[コミュニティユーザーが使用可能な発信フロー] 属性を使用します。発信フローを有効にすると、コントラクターであるサービスリソースは、取引先、商談、またはリードのサービス予定を作成および管理できます。コントラクターは、アシスタントに代理で予定を予約するように依頼することもできます。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Salesforce Scheduler のフローは、標準フローテンプレートとしてインストールされます。ビジネスニーズに合わせて任意のフローをカスタマイズできます。" href="customize-2.html#ls_customize_flows">標準フローテンプレートのカスタマイズ</a></li><li><a title="ユーザーや顧客は、Salesforce Scheduler 標準フローテンプレートの手順に従って予定をスケジュール、変更、キャンセルできます。" href="customize-3.html#ls_provided_flows">Salesforce Scheduler 標準フローテンプレート</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="ls_overview">
+<h1 class="slds-text-heading_large">Salesforce Scheduler での予定の管理</h1>
+  <p>Salesforce Scheduler (旧称 Lightning Scheduler) では、Salesforce での予定のスケジュールを簡略化するために必要なツールが提供されます。適切な担当者が割り当てられた顧客の予定 (対面、電話、またはビデオ) を適切な場所と時間にスケジュールすることで、パーソナライズした環境を作成します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience。</td>
+
+          </tr>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition および <strong>Unlimited</strong> Edition</td>
+
+          </tr>
+        </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="customize-2.html#ls_help_learning_map">Salesforce Scheduler の設定と予定の予約</a></strong><br>Salesforce Scheduler (旧称 Lightning Scheduler) では、Salesforce での予定のスケジュールを簡略化するためのツールが提供されます。適切な担当者が割り当てられた顧客の予定 (対面、電話、または動画) を適切な場所と時間にスケジュールすることで、パーソナライズした環境を作成します。予定の配分やサービスリソースの絞り込みなどの高度な機能を使用して、リソーススケジュールを最適化します。Salesforce Lightning サービスコンソール、Experience Cloud サイト、および会社の Web サイトで、予定を予約できるようにします。</li><li class="slds-p-bottom_small"><strong><a href="#ls_get_started_with_salesforce_scheduler">Salesforce Scheduler の使用開始</a></strong><br>Salesforce Scheduler の機能、使用できるユーザー、機能を使用するために必要なライセンス、および機能の内容について説明します。主要な用語、ロール、データモデル、利用可能なリソースについても説明します。</li><li class="slds-p-bottom_small"><strong><a href="resources-2.html#ls_implementation_resources_for_salesforce_scheduler">Salesforce Scheduler の実装のリソース</a></strong><br>実装を計画するには、ガイドラインを確認してください。Salesforce Scheduler の実装に役立つリソースにアクセスできます。</li><li class="slds-p-bottom_small"><strong><a href="customize-3.html#ls_set_up">Salesforce Scheduler でのビジネス情報の管理</a></strong><br>サービスロケーション、リソース、スキル、トピック、予定テンプレートなど、ビジネスや関係者に関連する情報を管理します。会社の用語を使用するには、タブ名や項目名を変更します。</li><li class="slds-p-bottom_small"><strong><a href="resources-2.html#ls_manage_availability_and_exceptions">Salesforce Scheduler での対応可能状況と例外の管理</a></strong><br>サービスリソースの対応可能状況、サービステリトリーと作業種別の業務時間、および取引先の訪問時間を指定します。休日、不在、手動で作成したカレンダー行動などの例外を管理します。対応可能な時間枠を決定するために Salesforce Scheduler Engine で使用する必要があるルールを指定するには、スケジュールポリシーと Scheduler 設定を定義します。予定配分、マルチリソーススケジュール、および同時スケジュールを処理する機能を設定します。</li><li class="slds-p-bottom_small"><strong><a href="#ls_scheduling_policies_overview">Salesforce Scheduler で適切なサービスリソースを見つけるためのルールの定義</a></strong><br>スケジュールポリシーを使用してルールを適用し、ユーザーが予定に最適なサービスリソースを見つけられるようにします。スケジュールポリシーにより、ポリシールールで定義する条件を予定が満たしていることが確認されます。たとえば、サービスリソースを検索するときに、サービスリソースのスキルおよびサービステリトリーメンバーシップを考慮します。Salesforce Scheduler のデフォルトの予定スケジュールポリシーを変更することも、カスタムスケジュールポリシーを作成してフローに関連付けるか API コールで使用することもできます。</li><li class="slds-p-bottom_small"><strong><a href="customize-2.html#ls_how_are_time_slots_determined">Salesforce Scheduler による対応可能な時間枠の決定</a></strong><br>ユーザーがサービス予定をスケジュールすると、Salesforce Scheduler では項目値、スケジュール済み予定、不在、Scheduler の設定、スケジュールポリシーなどの複数の要素を使用して対応可能な時間枠が決定されます。</li><li class="slds-p-bottom_small"><strong><a href="appointments-1.html#ls_customize_appointment_booking_experience">Salesforce Scheduler での予定の予約のカスタマイズ</a></strong><br>Salesforce Scheduler の標準フローテンプレート、フロー画面、フロー画面コンポーネントをカスタマイズして、ユーザー、顧客、見込み客に合わせて調整された予定の予約環境を提供します。</li><li class="slds-p-bottom_small"><strong><a href="customize-1.html#ls_configure_email_notification_with_ics">ICS ファイルを使用した予定メール通知の設定</a></strong><br>     <span>今後の予定について、Internet Calendar Scheduling (ICS) ファイルと共にメール通知を内部および外部のユーザーに送信します。ICS ファイルには、日付、時刻、期間などの予定情報が含まれます。通知を受信者グループにメールで送信するか、各受信者に個別に送信するようにレコードトリガーフローを設定できます。 </span>   </li><li class="slds-p-bottom_small"><strong><a href="#ls_enable_users_to_create_and_manage_appointments">Salesforce Scheduler でのユーザーによる予定の作成および管理の許可</a></strong><br>ユーザーおよび顧客が Salesforce Lightning サービスコンソール、Experience Cloud サイト、および会社の Web サイトを使用して予定を予約できるようにします。</li><li class="slds-p-bottom_small"><strong><a href="#ls_event_mgmt_overview">Salesforce または外部カレンダーでの行動としての予定の表示</a></strong><br>     <span>[行動管理] 設定を有効にすると、Salesforce Scheduler でサービスリソースの予定が Salesforce カレンダーに行動として書き込まれます。行動を Salesforce カレンダーから外部カレンダーに書き込むには、Einstein 活動キャプチャなどのカレンダー同期機能を使用します。カレンダー同期ツールを利用できない場合は、[予定をプラットフォームイベントとして公開] 設定を有効化して、Salesforce Scheduler で予定が作成、変更、削除されたときにプラットフォームイベントをトリガーします。そして、新しい AppointmentSchedulingEvent プラットフォームイベントに登録し、API を使用して外部カレンダーにプラットフォームイベントを外部カレンダーに書き込みます。</span>   </li><li class="slds-p-bottom_small"><strong><a href="appointments-2.html#ls_troubleshoot_appointment_scheduling_issues">予定のスケジュールに関する問題のトラブルシューティング</a></strong><br>ユーザーに予定を管理するために必要な項目レベル権限があるかどうかを確認してください。ユーザーが予定を管理しているときに発生する可能性がある、フロー画面のレコードの対応可能状況に関連した問題を見つけて、修正してください。</li><li class="slds-p-bottom_small"><strong><a href="customize-1.html#ls_complementary_products">Salesforce 製品およびプラットフォーム機能を使用して Salesforce Scheduler を拡張する</a></strong><br>他の Salesforce 製品 (メール、アンケート、メモ、カレンダーインテグレーション、分析など) を使用して、Salesforce Scheduler の機能を拡張します。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="ls_overview_operating_hours_for_STM_for_WTGs">
+<h1 class="slds-text-heading_large">作業種別グループ別のサービスリソースの対応可能状況の判断</h1>
+  <p>
+    
+    <span id="OH_for_STMs_by_WTGs_description"><a name="OH_for_STMs_by_WTGs_description"></a>Salesforce Scheduler では、サービステリトリー、サービステリトリーメンバー、作業種別、取引先の業務時間の交差部分を使用し、スケジュールポリシーとスケジューラーの設定に基づいて、サービスリソースの対応可能状況を判断します。また、作業種別グループを使用して対応可能状況を判断できるようにもするには、[Salesforce Scheduler の設定] で [作業種別グループのサービステリトリーメンバーの業務時間] 設定を有効にします。そして、サービステリトリーメンバーレコードに、サービステリトリーメンバーの業務時間の作業種別グループを入力します。Summer '21 リリース以降に作成された組織では、この設定がデフォルトで有効になっています。</span>
+  </p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience。</td>
+
+          </tr>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition および <strong>Unlimited</strong> Edition</td>
+
+          </tr>
+        </tbody></table>
+    <p>この設定を使用して、サービスリソースが特定の予定のトピックで作業できる時間を指定できます。たとえば、ある支店のバンカーが午前 10 時から午後 12 時までは Investment Banking と Retail Banking、午後 1 時から午後 3 時までは Account Opening を担当するように設定できます。</p>
+    <p>この設定を使用して、サービスリソースがサービステリトリーから作業できるトピックのサブセットを定義することもできます。たとえば、医師が 2 つのロケーションにある Apollo Clinic で診察を行うとします。この医師が、サンフランシスコで平日の午前 10 時から午後 12 時まで呼吸器科の患者を診察し、さらに免疫学とアレルギー薬の専門家でもあるためオークランドのクリニックで平日の午後 2 時から午後 4 時まで診察を行うように設定できます。</p>
+    <div><p>この設定を有効化したら、次のようにサービステリトリーメンバーの業務時間を設定します。</p><ul><li>サービスリソースが特定の業務時間で一部の作業種別グループに対応できるようにするには、業務時間を入力してから作業種別グループを選択します。</li>
+<li>サービスリソースがすべての作業種別グループに対応できるようにするには、業務時間を入力して、作業種別グループは選択しないでください。</li>
+<li>特定の日にサービスリソースを対応不能とするには、その日の業務時間を入力しないでください。</li>
+</ul>
+</div>
+    <p>サービステリトリーメンバーの業務時間を作成しないと、そのリソースがすべての作業種別グループに対応可能であると見なされます。</p>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#ls_prereqs_operating_hours_for_resources_working_on_appointment_topics">予定のトピックで作業するリソースの営業時間の設定の前提条件</a></strong><br>[作業種別グループのサービステリトリーメンバーの営業時間] 設定を有効にするには、組織は特定の前提を満たす必要があります。</li><li class="slds-p-bottom_small"><strong><a href="get_started-1.html#ls_enable_operating_hours_for_stm_for_wtgs">[作業種別グループのサービステリトリーメンバーの業務時間] の有効化</a></strong><br>予定のトピックで作業するリソースの時間を設定するには、[作業種別グループのサービステリトリーメンバーの業務時間] 設定を有効にします。</li><li class="slds-p-bottom_small"><strong><a href="resources-1.html#ls_examples_restrict_availability_based_on_work_type_groups">作業種別グループ別のサービスリソースの対応可能状況の判断の例</a></strong><br>[作業種別グループのサービステリトリーメンバーの業務時間] 設定を使用すると時間枠の値がどのように入力されるかについて説明します。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="ls_prereqs_capacity_based_scheduling">
+<h1 class="slds-text-heading_large">業務量ベースのスケジュールを有効にするための前提条件</h1>
+  <p>業務量ベースのスケジュールを使用する前に、次の前提条件を実行します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience。</td>
+
+          </tr>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition および <strong>Unlimited</strong> Edition</td>
+
+          </tr>
+        </tbody></table>
+    <a name="ls_prereqs_capacity_based_scheduling__ul_av1_jvs_xcc"></a><ul id="ls_prereqs_capacity_based_scheduling__ul_av1_jvs_xcc">
+      <li>[サポートされるすべてのトピック] 項目が有効になっているシフト作業トピックレコードがないことを確認します。「業務量ベースのスケジュールのシフト作業トピック<a title="シフト作業トピックを更新して、業務量ベースのスケジュールに向けて組織を準備します。" href="resources-2.html#ls_update_shift_work_topics_for_capacity_based_scheduling">の更新</a>」のスクリプトを使用して、レコードを更新できます。</li>
+
+      <li>業務量ベースのスケジュールを使用するには、シフトを使用します。<a title="シフトにより、サービスリソースは頻繁に変更される勤務時間を設定および更新できます。サービスリソースは、同じサービステリトリーに異なる勤務時間のシフトを設定したり、サービステリトリーの業務時間を超えるシフトを設定したり、複数のサービステリトリーのシフトを設定したりできます。" href="resources-2.html#ls_manage_shifts">「Salesforce Scheduler でのシフトの管理」</a>を参照してください。</li>
+
+      <li>[シフトの複数のトピック] を有効にします。</li>
+
+    </ul>
+
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="resources-2.html#ls_update_shift_work_topics_for_capacity_based_scheduling">業務量ベースのスケジュールのシフト作業トピックの更新</a></strong><br>シフト作業トピックを更新して、業務量ベースのスケジュールに向けて組織を準備します。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="resources-2.html#ls_multiple_topics_for_shifts">シフトの複数のトピック</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="ls_prereqs_drop_in_appointments">
+<h1 class="slds-text-heading_large">[ドロップイン予定] を使用するための前提条件</h1>
+  <p>[ドロップイン予定] 設定を有効化する場合は、次の前提条件を満たしていることを確認してください。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience。</td>
+
+          </tr>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition および <strong>Unlimited</strong> Edition</td>
+
+          </tr>
+        </tbody></table>
+    <div><ul>
+        <li>Summer '23 より前に作成したインスタンスの場合:<ul><li>サービス予定オブジェクトの [チェックイン済み] 状況を作成し、[チェックイン済み] 状況を [チェックイン済み] 状況カテゴリに対応付けます。<p>[チェックイン済み] 状況を作成するときに、表示ラベルを<kbd>「Checked In」</kbd> (チェックイン済み) と入力します。</p></li>
+<li>タブ設定を変更して、[待機リスト] タブおよび [待機リスト管理] タブを追加します。これらのタブは、待機リストを作成および管理するユーザーに関連付けられているプロファイルで追加します。</li>
+</ul>
+</li>
+
+        <li>予約なしの予定の待機リストに関連付ける作業種別に、[ドロップイン] オプションを設定した予定カテゴリを追加します。</li>
+
+        <li>顧客を待機リストにチェックインするには、[ドロップイン] オプションのみが選択されている予定カテゴリも作成する必要があります。</li>
+
+        <li>ユーザーがサービス予定にアクセスして管理できるようにするため、サービス予定を管理するユーザーのプロファイルに、予定カテゴリオブジェクトへの参照アクセス権を付与します。</li>
+
+        <li>簡易ビュー<ul>
+            <li>簡易ビューを有効にするには、まず [<strong class="uicontrol">スキルおよびスキルレベル</strong>の照合] を有効にします。</li>
+
+            <li>簡易ビューを有効または無効にするには、まず組織の待機リストにチェックインしている有効な待機リスト参加者を削除します。スケジュールされたダウンタイム中または営業時間外にこの設定を有効にすることをお勧めします。</li>
+
+          </ul>
+</li>
+
+      </ul>
+</div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="カスタム予定状況を作成して予定カテゴリに対応付けます。同じ状況のカテゴリで複数の予定の状況を作成できますが、複数の状況のカテゴリを同じ予定の状況に対応付けることはできません。" href="appointments-1.html#ls_create_an_appointment_status">予定の状況の作成</a></li><li><a title="作業種別は作業種別グループ (予定のトピック) とサービステリトリー (支店の場所) に含まれるテンプレートであり、これにより、予定のスケジュール作業を効率的かつ容易に標準化できます。デフォルトの予定所要時間、予定の前後のバッファ時間、予定の対応可能期間など、各種パラメーターを設定できます。" href="misc_combined.html#ls_create_work_types">Salesforce Scheduler での作業種別の作成</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.users_tab_visibility.htm&amp;language=ja&amp;type=5">権限セットとプロファイルでのタブ設定の表示と編集</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="ls_prereqs_for_using_engagement_channels">
+<h1 class="slds-text-heading_large">エンゲージメントチャネル種別を使用するための前提条件</h1>
+  <p>
+  Salesforce Scheduler では、シフトエンゲージメントチャネル連結オブジェクトを使用してエンゲージメントチャネル種別をシフトに関連付け、エンゲージメントチャネル作業種別連結オブジェクトを使用してエンゲージメントチャネル種別を作業種別に関連付けます。[エンゲージメントチャネルを使用して予定をスケジュール] 設定を有効にする前に、次の前提条件を完了してください。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience。</td>
+
+          </tr>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition および <strong>Unlimited</strong> Edition</td>
+
+          </tr>
+        </tbody></table>
+    <div><ul>
+        <li>エンゲージメントチャネル種別を使用する場合は、常にシフトを有効にしてください。</li>
+
+        <li>Salesforce Scheduler のエンゲージメントチャネル種別レコードを作成するには、[有効] 項目と [利用状況の種別] 項目を [エンゲージメントチャネル種別] ページに追加します。これらの項目の追加方法についての詳細は、<a title="Salesforce Scheduler のエンゲージメントチャネル種別を作成するには、[有効] 項目と [利用状況の種別] 項目を [エンゲージメントチャネル種別] ページに追加します。" href="customize-2.html#ls_engagement_channel_page_layout">「Salesforce Scheduler のエンゲージメントチャネル種別ページレイアウトの更新」</a>を参照してください。</li>
+
+        <li>エンゲージメントチャネル種別レコードを作成し、レコードをシフトレコードと作業種別レコードに関連付けます。</li>
+
+        <li>サービス予定オブジェクトと予定招待オブジェクトのページレイアウトの [一般情報] セクションで [エンゲージメントチャネル種別] 項目を追加します。</li>
+
+        <li>対応する連結オブジェクトを追加して、エンゲージメントチャネル種別オブジェクト、シフトオブジェクト、作業種別オブジェクトの関連リストを設定します。<ul><li>[エンゲージメントチャネル種別] で、シフトエンゲージメントチャネルオブジェクトとエンゲージメントチャネル作業種別連結オブジェクトを追加します。</li>
+<li>[作業種別] で、エンゲージメントチャネル作業種別連結オブジェクトを追加します。</li>
+<li>[シフト] で、シフトエンゲージメントチャネル連結オブジェクトを追加します。<p>関連リストの設定方法については、<a title="Salesforce Scheduler オブジェクトの関連リストを設定して、Salesforce Scheduler ユーザーがオブジェクトレコードに関連する詳細に簡単にアクセスできるようにします。たとえば、サービステリトリーを作成したら、[サービステリトリーメンバー] 関連リストからサービステリトリーにサービスリソースを割り当てられるようになります。また、[サービステリトリー作業種別] 関連リストからサービステリトリーに作業種別を割り当てることができます。" href="customize-1.html#ls_admin_config_related_lists">「Salesforce Scheduler オブジェクトページレイアウトの関連リストの設定」</a>を参照してください。</p></li>
+</ul>
+</li>
+
+        <li>[エンゲージメントチャネルを使用して予定をスケジュール] 設定を有効にした後、該当するシフトのシフトエンゲージメントチャネルレコードとエンゲージメントチャネル作業種別レコードを作成します。</li>
+
+      </ul>
+</div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="customize-2.html#ls_engagement_channel_page_layout">Salesforce Scheduler のエンゲージメントチャネル種別ページレイアウトの更新</a></strong><br>Salesforce Scheduler のエンゲージメントチャネル種別を作成するには、[有効] 項目と [利用状況の種別] 項目を [エンゲージメントチャネル種別] ページに追加します。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="対応可能な時間枠を決定するときに、サービステリトリーメンバーの業務時間の代わりにシフトを使用するには、スケジュールポリシーでシフト固有のルールを有効にします。" href="resources-2.html#ls_use_shifts_to_determine_time_slots">スケジュールポリシーでのシフトルールの定義</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.customize_layoutcreate.htm&amp;language=ja&amp;type=5">標準オブジェクトのページレイアウトの編集</a></li><li><a title="ユーザーの [サービス予定をレビュー] 画面レイアウトを変更するには、ユーザーのプロファイルに割り当てられた [サービス予定] レイアウトを変更します。" href="appointments-2.html#ls_modify_the_review_service_appointment_screen">[サービス予定をレビュー] 画面の変更</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="ls_prereqs_multiple_attendee_event">
+<h1 class="slds-text-heading_large">複数のサービスリソースイベント設定を有効にするための前提条件</h1>
+  <p>本番組織で [複数のサービスリソース行動] 設定を有効にする前に、Sandbox で設定を有効にして、その機能をテストします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience。</td>
+
+          </tr>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition および <strong>Unlimited</strong> Edition</td>
+
+          </tr>
+        </tbody></table>
+    <div><p>サービス予定ロジックに関連付けられた行動に関連するカスタマイズを必ず検証します。次に、いくつか例を示します。</p><ul><li>レコードを更新するイベントに対するトリガー</li>
+<li>行動を参照および更新する割り当て済みサービスリソースまたはサービス予定に対するトリガー</li>
+<li>行動データを使用する外部インテグレーション</li>
+</ul>
+</div>
+    <div><p>複数の被招集者を含む行動を作成するための Apex コードのサンプルを次に示します。Sandbox でこのコードを使用して、これらの行動のカスタマイズ内容が [複数のサービスリソース行動] 機能で機能するかどうかを確認します。</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-java">Event multiEvent = new Event();
+
+multiEvent.ownerId = '005xx000001Sv6FAAS';//Event organizer
+multiEvent.StartDateTime = Datetime.now();
+multiEvent.EndDateTime = Datetime.now().addHours(1);
+multiEvent.DurationInMinutes = 60;
+multiEvent.Subject='Event with multiple attendees from Apex';
+
+insert multiEvent;
+
+//Create attendees
+EventRelation firstAttendee = new EventRelation();
+firstAttendee.eventId = multiEvent.Id;
+firstAttendee.RelationId = '005xx000001SwuzAAC';//additional attendee
+
+insert firstAttendee;
+
+EventRelation secondAttendee = new EventRelation();
+secondAttendee.eventId = multiEvent.Id;
+secondAttendee.RelationId = '005xx000001SvHGAA0';//additional attendee
+
+insert secondAttendee;
+</code></pre></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="ls_prereqs_multiple_topics_for_shifts">
+<h1 class="slds-text-heading_large">[シフトの複数のトピック] 設定を有効化するための前提条件</h1>
+  <p>[シフトの複数のトピック] 機能では、シフト作業トピック連結オブジェクトを使用して、シフトでサポートされるトピックを管理します。Salesforce Scheduler フローと API でもこの連結オブジェクトを使用します。[シフトの複数のトピック] 設定を有効にする前に、サポートされるトピックに関連する情報をシフトレコードからシフト作業トピックレコードに移行し、既存の作業種別と作業種別データをクリアしておきます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience。</td>
+
+          </tr>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition および <strong>Unlimited</strong> Edition</td>
+
+          </tr>
+        </tbody></table></div>
+    <ol><li>
+        <span>開発者コンソールを使用して既存のデータを移行します。</span>
+        <div>
+          <ul>
+            <li>[Salesforce Scheduler for Health Cloud] オプションが無効になっている場合に作業種別グループとシフトの関連付けを移行するための Apex コードの例を次に示します。<pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-java">Integer countOfShifts = [SELECT COUNT() FROM Shift];
+
+//If shift records are more than 50,000
+for(Integer i=0; i&gt;=0; i=countOfShifts-50000) {
+    List&lt;ShiftWorkTopic&gt; shiftWorkTopics = new List&lt;ShiftWorkTopic&gt;();
+    for(Shift shiftRecord : [Select Id, WorkTypeGroupId From Shift Where Id NOT IN (SELECT ShiftId FROM ShiftWorkTopic) LIMIT 50000]){
+        ShiftWorkTopic swtRecord = new ShiftWorkTopic();
+        swtRecord.ShiftId = shiftRecord.Id;
+        if(shiftRecord.WorkTypeGroupId == null){
+            swtRecord.AreAllTopicsSupported  = true;
+        } else {
+            swtRecord.WorkTypeGroupId = shiftRecord.WorkTypeGroupId;
+        }
+        shiftWorkTopics.add(swtRecord);
+    }
+    insert shiftWorkTopics;
+}</code></pre></li>
+
+            <li>[Salesforce Scheduler for Health Cloud] オプションが有効になっている場合に作業種別とシフトの関連付けを移行するための Apex コードの例を次に示します。<pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-java">Integer countOfShifts = [SELECT COUNT() FROM Shift];
+
+//If shift records are more than 50,000
+for(Integer i=0; i&gt;=0; i=countOfShifts-50000) {
+    List&lt;ShiftWorkTopic&gt; shiftWorkTopics = new List&lt;ShiftWorkTopic&gt;();
+    for(Shift shiftRecord : [Select Id, WorkTypeId From Shift Where Id NOT IN (SELECT ShiftId FROM ShiftWorkTopic) LIMIT 50000]){
+        ShiftWorkTopic swtRecord = new ShiftWorkTopic();
+        swtRecord.ShiftId = shiftRecord.Id;
+        if(shiftRecord.WorkTypeId == null){
+            swtRecord.AreAllTopicsSupported  = true;
+        } else {
+            swtRecord.WorkTypeId = shiftRecord.WorkTypeId;
+        }
+        shiftWorkTopics.add(swtRecord);
+    }
+    insert shiftWorkTopics;
+}</code></pre></li>
+
+          </ul>
+
+        </div>
+      </li><li>
+        <span>次のコードを使用して、既存の作業種別と作業種別データをクリアします。</span>
+        <div>
+          <pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-java">Integer countOfShifts = [SELECT COUNT() FROM Shift];
+
+//If shift records are more than 50,000
+for(Integer i=0; i&gt;=0; i=countOfShifts-50000) {
+    List&lt;Shift&gt; shiftRecords = new List&lt;Shift&gt;();
+    for(Shift shiftRecord : [Select Id, WorkTypeId, WorkTypeGroupId From Shift Where WorkTypeId != null OR WorkTypeGroupId != null LIMIT 50000]){
+        Shift shift = new Shift();
+        shift.Id = shiftRecord.Id;
+        shift.WorkTypeId = null;
+        shift.WorkTypeGroupId = null;
+        shiftRecords.add(shift);
+    }
+    update shiftRecords;
+}
+</code></pre>
+        </div>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="ls_prereqs_operating_hours_for_resources_working_on_appointment_topics">
+<h1 class="slds-text-heading_large">予定のトピックで作業するリソースの営業時間の設定の前提条件</h1>
+  <p>[作業種別グループのサービステリトリーメンバーの営業時間] 設定を有効にするには、組織は特定の前提を満たす必要があります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience。</td>
+
+          </tr>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition および <strong>Unlimited</strong> Edition</td>
+
+          </tr>
+        </tbody></table>
+    <p>この機能で使用する新しい予定のトピック時間枠連結オブジェクトは、すべての開発で使用されるようになっています。Salesforce Scheduler フローでもこの連結オブジェクトを使用します。</p>
+    <div><p>次の前提条件は既存の組織にのみ適用されます。すべての新規組織でこの機能はデフォルトで有効になっています。</p><ul><li>開発者コンソールを使用して既存のデータを移行します。作業種別グループと時間枠の関連付けを移行する Apex コードの例を次に示します。<pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-java">
+public class AppointmentTopicTimeSlotDataLoader {
+    public static void retrieveAndInsertRecords(){  
+        List&lt;AppointmentTopicTimeSlot&gt; appointmentTopicTimeSlotList = new List&lt;AppointmentTopicTimeSlot&gt;();
+        List&lt;TimeSlot&gt; timeSlots = [SELECT Id, WorkTypeGroupId FROM TimeSlot WHERE WorkTypeGroupId!=null];
+        system.debug('Total No. of TimeSlot Records having WorkTypeGroup: '+ timeSlots.size());
+        for(TimeSlot TS : timeSlots){
+            AppointmentTopicTimeSlot ATTS = new AppointmentTopicTimeSlot(TimeSlotId = TS.Id,
+                                                                         WorkTypeGroupId = TS.WorkTypeGroupId);
+            appointmentTopicTimeSlotList.add(ATTS);
+        }
+        insertRecords(appointmentTopicTimeSlotList);
+    }
+    
+    private static void insertRecords(List&lt;AppointmentTopicTimeSlot&gt; appointmentTopicTimeSlotList){
+        Database.SaveResult[] saveResults = Database.insert(appointmentTopicTimeSlotList, false);
+        Integer attsInserted = 0;
+        for (Database.SaveResult sr : saveResults) {
+            if (sr.isSuccess()) {
+                attsInserted = attsInserted+1;
+                system.debug('Record successfully inserted. AppointmentTopicTimeSlot ID: ' + sr.getId());
+            }
+            else {               
+                for(Database.Error err : sr.getErrors()) {
+                    System.debug('The following error has occurred.');                    
+                    System.debug(err.getStatusCode() + ': ' + err.getMessage());
+                    System.debug('AppointmentTopicTimeSlot fields that affected this error: ' + err.getFields());
+                }
+            }
+        }
+        system.debug('Total No. of AppointmentTopicTimeSlot records successfully inserted: '+ attsInserted);
+    }
+}
+</code></pre></li>
+<li>作業種別グループですべての時間枠を削除します。</li>
+<li>トリガーまたは検証を含むすべてのカスタマイズをバックアップします。</li>
+<li>ユーザーが予定をスケジュールできるようにするには、新しい予定のトピックの時間枠オブジェクトに対する参照以上の権限を付与する必要があります。コミュニティライセンスを持つユーザーも参照以上の権限が必要です。</li>
+<li>ユーザーにサービス予定オブジェクトの [匿名予約] 項目に対する「編集」アクセス権を付与します。<ol><li>[設定] から<strong class="uicontrol">オブジェクトマネージャー</strong>を開きます。</li>
+<li>[クイック検索] ボックスに<kbd>「サービス予定」</kbd>と入力し、<strong class="uicontrol">[サービス予定]</strong> を選択します。</li>
+<li><strong class="uicontrol">[項目とリレーション]</strong> をクリックし、<strong class="uicontrol">[匿名予約]</strong> を選択します。</li>
+<li><strong class="uicontrol">[Set Field-Level Security (項目レベルセキュリティの設定)]</strong> をクリックします。</li>
+<li>予定をスケジュールするすべてのユーザープロファイルで <strong class="uicontrol">[参照可能]</strong> を選択します。</li>
+<li>変更内容を保存します。</li>
+</ol></li>
+</ul>
+</div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="ls_read_calendars_overview">
+<h1 class="slds-text-heading_large">カレンダーの確認によるサービスリソースの対応可能状況の判断</h1>
+  <p>Salesforce Scheduler では、予定のスケジュール処理中に Salesforce カレンダーの行動、さらには外部システムを確認して、サービスリソースが対応可能かどうかを判断できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience。</td>
+
+          </tr>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition および <strong>Unlimited</strong> Edition</td>
+
+          </tr>
+        </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="appointments-2.html#ls_read_salesforce_calendar">Salesforce カレンダーの確認によるリソースの対応可能状況の判断</a></strong><br>Salesforce Scheduler で手動で作成したカレンダーの行動とのスケジュールの競合を回避するには、[Salesforce カレンダーでリソースの対応可能状況を確認] スケジュールポリシールールを有効にします。</li><li class="slds-p-bottom_small"><strong><a href="#ls_read_external_events_overview">外部システムの確認によるサービスリソースの対応可能状況の判断</a></strong><br>提供されている LxScheduler.ServiceResourceScheduleHandler Apex インターフェースを使用して、外部システム (外部カレンダーの行動など) を確認する Apex クラスを作成し、サービスリソースがすでに予約されている時間枠を検索します。次に、[外部システムでリソースの対応可能状況を確認] スケジュールポリシールールを使用して、この Apex クラスを Salesforce Scheduler フローまたは API コールに関連付けます。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="ls_read_external_events_overview">
+<h1 class="slds-text-heading_large">外部システムの確認によるサービスリソースの対応可能状況の判断</h1>
+  <p>提供されている LxScheduler.ServiceResourceScheduleHandler Apex インターフェースを使用して、外部システム (外部カレンダーの行動など) を確認する Apex クラスを作成し、サービスリソースがすでに予約されている時間枠を検索します。次に、[外部システムでリソースの対応可能状況を確認] スケジュールポリシールールを使用して、この Apex クラスを Salesforce Scheduler フローまたは API コールに関連付けます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience。</td>
+
+          </tr>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition および <strong>Unlimited</strong> Edition</td>
+
+          </tr>
+        </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="appointments-2.html#ls_read_external_calendar">外部カレンダーの確認によるリソースの対応可能状況の判断</a></strong><br>Salesforce Scheduler フローを実行するか、API コールを実行すると、Apex インターフェースで Apex クラスへの同期コールが実行されます。Apex インターフェースでは、要求されたサービスリソースの詳細と、外部カレンダーでリソースが対応可能かどうかを確認するために Salesforce Scheduler で必要となるタイムラインが渡されます。Apex クラスは、外部カレンダーの行動をチェックし、リソースが対応できない時間枠を返します。Salesforce Scheduler では、予定をスケジュールする際に、対応できない時間枠が除外されます。</li><li class="slds-p-bottom_small"><strong><a href="payments.html#ls_ext_cal_integration_troubleshooting">Apex インターフェースの実装の制限およびエラーコード</a></strong><br>サービスリソースの対応可能状況を決定する場合、カスタム Apex クラスを使用して外部カレンダー行動を確認する際に制限が適用されます。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="ls_scheduling_policies_overview">
+<h1 class="slds-text-heading_large">Salesforce Scheduler で適切なサービスリソースを見つけるためのルールの定義</h1>
+  <p>スケジュールポリシーを使用してルールを適用し、ユーザーが予定に最適なサービスリソースを見つけられるようにします。スケジュールポリシーにより、ポリシールールで定義する条件を予定が満たしていることが確認されます。たとえば、サービスリソースを検索するときに、サービスリソースのスキルおよびサービステリトリーメンバーシップを考慮します。Salesforce Scheduler のデフォルトの予定スケジュールポリシーを変更することも、カスタムスケジュールポリシーを作成してフローに関連付けるか API コールで使用することもできます。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="appointments-2.html#ls_scheduling_policies">Salesforce Scheduler のスケジュールポリシールール</a></strong><br>Salesforce Scheduler で使用できるスケジュールポリシールールについて説明します。</li><li class="slds-p-bottom_small"><strong><a href="appointments-2.html#ls_scheduling_policies_in_flows">適用するスケジュールポリシールールの選択</a></strong><br>フローまたは API コールでカスタムスケジュールポリシーを作成して使用しない場合、デフォルトの予定スケジュールポリシーが使用されます。デフォルトの予定スケジュールポリシーを編集することで、予定のスケジュール時に適用するルールを選択できます。</li><li class="slds-p-bottom_small"><strong><a href="appointments-1.html#ls_custom_scheduling_policies">Salesforce Scheduler でのカスタムスケジュールポリシーの作成と使用</a></strong><br>Salesforce Scheduler フローまたは API コールで 1 つ以上のカスタムスケジュールポリシーを使用できます。たとえば、予定開始時間間隔の異なる 2 つのスケジュールポリシーを作成できます。次に、予定のスケジュール時にユーザーが選択する作業種別に応じてどちらか一方のスケジュールポリシーを呼び出すようにフローをカスタマイズします。</li><li class="slds-p-bottom_small"><strong><a href="resources-1.html#ls_add_service_resource_preferences_to_accounts">Salesforce Scheduler の取引先へのサービスリソース希望設定の追加</a></strong><br>     <span>必須のサービスリソースの割り当てを促進し、除外されたサービスリソースがサービス予定に割り当てられないようにするには、取引先でサービスリソースを必須または除外済みとして指定します。</span>   </li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="ls_set_up_picklists_intro">
+<h1 class="slds-text-heading_large">州選択リストと国選択リストの設定</h1>
+  <p>州選択リストと国選択リストを設定することで、都道府県および国のデータをテキスト項目に入力する代わりに、事前定義の標準化されたリストから選択できるようになります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience。</td>
+
+          </tr>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition および <strong>Unlimited</strong> Edition</td>
+
+          </tr>
+        </tbody></table>
+    <p>州選択リストと国選択リストを使用することでデータの一貫性を保証できます。また、このデータをレポートで使用しやすくなります。詳細は<a target="_blank" href="https://resources.docs.salesforce.com/230/latest/en-us/sfdc/pdf/state_country_picklists_impl_guide.pdf">「州選択リストと国選択リストの実装」</a>を参照してください。</p>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-scheduler-262-0-0-production-jajp/7046ca23-fde1-41de-b142-e62072ab4694/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 
+      <ul>
+        <li>サービステリトリーと予定を設定した後で州選択リストと国選択リストを実装した場合は、実装前に作成してあるすべてのサービステリトリーで都道府県と国を更新する必要があります。</li>
+
+        <li>実装前に作成してあるすべてのサービステリトリーで都道府県と国を更新することにより、フローテンプレートへの変更を保存するときのロケーション関連エラーを防止できます。</li>
+
+        <li>既存の予定を編集した場合は、保存する前に都道府県と国を更新してください。保存前に都道府県と国を更新しないと、予期しない動作が発生する場合があります。</li>
+
+      </ul>
+
+    </div></div></div>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="ls_setup_assistant">
+<h1 class="slds-text-heading_large">Salesforce Scheduler 設定アシスタントの調査 (省略可能)</h1>
+  <p>Salesforce Scheduler 設定アプリケーションには、Salesforce Scheduler 設定アシスタントツールが含まれており、権限セットの割り当て、予定リソースの作成、リードと紹介、ケース、商談、取引先への予定スケジュールの埋め込みなどの主要な設定作業を行うために使用できます。これらの作業は、Salesforce Scheduler 設定アプリケーションの [設定] タブや [オブジェクト] タブからも行うことができます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience。</td>
+
+          </tr>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition および <strong>Unlimited</strong> Edition</td>
+
+          </tr>
+        </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d59833e65" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d59833e65" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">アプリケーションを参照する</td>
+
+              <td headers="d59833e65" style="vertical-align:top;" class="slds-cell-wrap">「設定・定義の参照」</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d59833e65" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">アプリケーションを管理する</td>
+
+              <td headers="d59833e65" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-error"><img alt="警告" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-scheduler-262-0-0-production-jajp/7046ca23-fde1-41de-b142-e62072ab4694/images/icon_warning.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">警告</span> Salesforce Scheduler 設定アシスタントは Salesforce モバイルアプリケーションではサポートされていません。モバイルアプリケーションでアシスタントを使用しようとすると、例外が発生します。</div></div></div>
+<div><p>[Salesforce Scheduler 設定アシスタント] タブが [Salesforce Scheduler 設定] アプリケーションナビゲーションバーに表示されない場合、手動でタブをナビゲーションバーに追加します。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-scheduler-262-0-0-production-jajp/7046ca23-fde1-41de-b142-e62072ab4694/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> <ul><li>[Salesforce Scheduler 設定アシスタント] タブは、本番組織でのみ有効にします。それ以外の組織では、設定アシスタントは正常に動作しません。</li>
+<li>Salesforce Scheduler 設定アシスタントは、管理者ユーザーにお勧めです。管理者以外のユーザー向けに [Salesforce Scheduler 設定アシスタント] タブを有効にする前に、Salesforce Scheduler オブジェクトの作成と編集に必要なオブジェクトアクセス権をユーザーに付与します。また、管理者以外のユーザーが権限を設定できないことを理解していることも確認します。</li>
+</ul>
+</div></div></div>
+</div></div>
+    <ol><li>
+        <span>[設定] の [クイック検索] ボックスに<kbd>「アプリケーションマネージャー」</kbd>と入力し、<strong class="uicontrol">[アプリケーションマネージャー]</strong> を選択します。</span>
+      </li><li>
+        <span>Lightning Experience アプリケーションマネージャーの設定ページで、Salesforce Scheduler 設定アプリケーションを編集します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[ナビゲーション項目]</strong> を選択します。</span>
+      </li><li>
+        <span>Salesforce Scheduler 設定アシスタントを [選択済みの項目] に移動して、<strong class="uicontrol">[保存]</strong> をクリックします。</span>
+      </li><li>
+        <span>アプリケーションランチャーから、Salesforce Scheduler 設定アプリケーションを見つけて開きます。</span>
+      </li><li>
+        <span>[Salesforce Scheduler 設定アシスタント] タブをクリックします。</span>
+        <div>[Salesforce Scheduler 設定アシスタント] タブが表示されない場合は、プロファイルで有効にしてください。</div>
+        <ol>
+          <li>
+            <span>[設定] の [クイック検索] ボックスに<kbd>「プロファイル」</kbd>と入力し、<strong class="uicontrol">[プロファイル]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>更新するプロファイルをクリックします。</span>
+          </li>
+
+          <li>
+            <span>Salesforce Scheduler 設定アシスタントの [タブの設定] で、<strong class="uicontrol">[デフォルトで表示]</strong> を選択し、変更内容を保存します。</span>
+          </li>
+
+        </ol>
+      </li></ol>
+
+    <div><p>[Salesforce Scheduler 設定アシスタント] タブの内容は次のようになっています。<span style="vertical-align:text-bottom;display:inline-block;"><img alt="コールアウトのある Salesforce Scheduler 設定アシスタント。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-scheduler-262-0-0-production-jajp/7046ca23-fde1-41de-b142-e62072ab4694/scheduler/images/ls_232_setup_assistant_steps.png" style="margin-bottom:0;"></span></p><ul><li>組み込まれている予定のサンプルを表示するには <strong class="uicontrol">[サンプル予定を表示]</strong> (1) をクリックします。</li>
+<li>設定項目の下にあるリンク (2) をクリックして、そのトピックのヘルプを確認します。</li>
+<li>設定項目の横にあるボタン (3) をクリックし、そのステップを実行します。</li>
+</ul>
+<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-scheduler-262-0-0-production-jajp/7046ca23-fde1-41de-b142-e62072ab4694/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> Salesforce Scheduler 設定アシスタントツールを使用すると、リソースをすばやく作成できますが、ツールで設定を行えない場合もあります。たとえば、[業務時間の設定] をクリックすると、業務時間を作成できます。ただし、作成した業務時間を作業種別、サービステリトリー、またはサービステリトリーメンバーに割り当てるには、その作業種別、サービステリトリー、またはサービステリトリーメンバーのレコードページにある [業務時間] 項目を使用する必要があります。</div></div></div>
+</div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="サービスロケーション、リソース、スキル、トピック、予定テンプレートなど、ビジネスや関係者に関連する情報を管理します。会社の用語を使用するには、タブ名や項目名を変更します。" href="customize-3.html#ls_set_up">Salesforce Scheduler でのビジネス情報の管理</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="ls_setup_qr_codes_for_lobby">
+<h1 class="slds-text-heading_large">レコードページへのロビー管理 QR コードコンポーネントの追加 </h1>
+  <p>QR コードコンポーネントは、サービステリトリーレコードページと待機リストレコードページに追加できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience。</td>
+
+          </tr>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition および <strong>Unlimited</strong> Edition</td>
+
+          </tr>
+        </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d44575e68" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d44575e68" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Lobby Management ダッシュボードにアクセスする</td>
+
+              <td headers="d44575e68" style="vertical-align:top;" class="slds-cell-wrap">Greeter Product Service ライセンス</td>
+
+            </tr>
+          </tbody></table></div>
+    
+    
+    <ol><li>
+        <span>[設定] から、[クイック検索] ボックスに<kbd>「ユーザーインターフェース」</kbd>と入力し、<strong class="uicontrol">[Lightning アプリケーションビルダー]</strong> を選択します。</span>
+      </li><li>
+        <span>[アクション] で、[サービステリトリー] ページまたは [待機リストレコード] ページの横にある [<strong class="uicontrol">編集] を</strong>クリックします。</span>
+      </li><li>
+        <span>Lighting アプリケーションビルダーの [コンポーネント] セクションで、[QR コード] コンポーネントをレコードページにドラッグします。</span>
+      </li><li>
+        <span>右側の属性パネルの [対象 URL 項目] で、待機リストの [<strong class="uicontrol">リンク]</strong> とサービステリトリーの [<strong class="uicontrol">セルフチェックイン URL</strong>] を選択します。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="ls_troubleshoot_issues_with_setup_and_appointment_scheduling">
+<h1 class="slds-text-heading_large">Salesforce Scheduler のトラブルシューティングツール</h1>
+  <p>Salesforce Scheduler では、スケジュールポリシーやその他の設定および権限を使用して、予定のスケジュールのレコードと時間枠が表示されます。Salesforce Scheduler トラブルシューティングツールでは、データが正確に設定され、ユーザーに関連する権限があり、オブジェクトレコードが適切に共有されているかどうかが検証されます。標準のシステム管理者プロファイルを持つユーザーは、いつでも (設定前や設定後) にトラブルシューティングツールを実行して、組織、サービスリソース、および Experience Cloud ユーザーの設定に関連する問題を特定し、修正できます。</p>
+
+    <p>Salesforce Scheduler トラブルシューティングツールでは、Summer '22 までにリリースされた機能がサポートされます。</p>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#ls_identify_missing_system_object_and_FLS_perms">欠落している権限の特定</a></strong><br>選択したスケジュールポリシーに基づいてユーザーに権限が欠落していないかどうかを確認します。Salesforce Scheduler トラブルシューティングツールでは、予定のスケジュールに最低限必要な権限が満たされているかどうかのみがチェックされます。また、ユーザーにレコードへのアクセス権限が欠落していないかどうかを確認することもできます。</li><li class="slds-p-bottom_small"><strong><a href="customize-3.html#ls_troubleshoot_unavailable_time_slots">欠落している時間枠の特定</a></strong><br>特定の時間枠が見つからない予定をスケジュールするときは、その理由 (サービスリソースがすでに予約されている、必須スキルがないなど) を確認できます。</li><li class="slds-p-bottom_small"><strong><a href="customize-2.html#ls_identify_validation_issues_with_records">レコードの検証の問題の特定</a></strong><br>レコードまたはレコードリレーションに検証の問題があるかどうかを確認します。1 つのレコードを検証するには、1 つのオブジェクトと対応するレコードが必要です。レコードリレーションを検証するには、プライマリレコード ID と複数の関連レコード ID を追加して指定します。</li></ul>
+</div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="get_started-1.html">&larr; はじめに・セットアップ・有効化（1/2）</a><a href="resources-1.html">サービスリソース・スキル・シフト・稼働可能時間（1/2） &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=platform.ls_assign_ls_setup_app.htm&type=5&language=ja">help.salesforce.com — Salesforce Scheduler（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>

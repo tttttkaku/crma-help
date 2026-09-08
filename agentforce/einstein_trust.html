@@ -1,0 +1,1600 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Einstein Trust Layer / セキュリティ | Agentforce / AI ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（20）</h2>
+    <ol>
+      <li><a href="#copilot_trust">Trust and Agentforce</a></li>
+      <li><a href="#generative_ai_audit_data_mask">マスクされたデータの確認</a></li>
+      <li><a href="#generative_ai_audit_feedback_usage_types">監査とフィードバックの請求に関する考慮事項</a></li>
+      <li><a href="#generative_ai_audit_toxicity">有害性スコアの確認</a></li>
+      <li><a href="#generative_ai_audit_trail">監査履歴</a></li>
+      <li><a href="#generative_ai_plan_trust">AI プロジェクトのリスク評価の実施</a></li>
+      <li><a href="#generative_ai_trust_arch">Einstein Trust Layer: Design for Trust</a></li>
+      <li><a href="#generative_ai_trust_arch2">Einstein Trust Layer: 応答ジャーニー</a></li>
+      <li><a href="#generative_ai_trust_citations">Build Trust in AI Responses with Citations (引用を使用した AI 応答への信頼の構築)</a></li>
+      <li><a href="#generative_ai_trust_configure_citation_mode_custom_action">カスタムアクションの引用モードの設定</a></li>
+      <li><a href="#generative_ai_trust_configure_toxicity_detection">プロンプトの有害性検出の有効化 (ベータ)</a></li>
+      <li><a href="#generative_ai_trust_content_safety_and_security">コンテンツの安全性とセキュリティ</a></li>
+      <li><a href="#generative_ai_trust_data_mask_considerations">LLM データマスキングに関する考慮事項と制限事項</a></li>
+      <li><a href="#generative_ai_trust_lang_region">Einstein Trust Layer リージョンおよび言語のサポート</a></li>
+      <li><a href="#generative_ai_trust_layer">Einstein Trust Layer</a></li>
+      <li><a href="#generative_ai_trust_limits">Einstein Trust Layer の制限</a></li>
+      <li><a href="#generative_ai_trust_overview">Einstein 生成 AI &amp; 信頼</a></li>
+      <li><a href="#generative_ai_trust_setup">Einstein Trust Layer の設定</a></li>
+      <li><a href="#generative_ai_trust_show_citations_for_answer_questions_with_knowledge_action">Knowledge 標準アクションを使用した質問への回答の使用時にソースを表示</a></li>
+      <li><a href="#generative_ai_trust_toxicity_detection">有害検出</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>Einstein Trust Layer / セキュリティ</h1>
+      <div class="meta">Salesforce AI / Agentforce ヘルプ · 20 記事 · 生成 2026-08-13</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="prompt_builder-3.html">&larr; プロンプトビルダー（3/3）</a><a href="einstein_copilot-1.html">Einstein Copilot（1/5） &rarr;</a></div>
+<section class="article" id="copilot_trust">
+<h1 class="slds-text-heading_large">Trust and Agentforce</h1>
+  <p>Salesforce では、エージェントは生成 AI 技術に関連するリスクを軽減するように設計されているため、安全な AI エージェントを簡単に作成できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition。<a title="特定のクラウドと一般的な使用事例のエージェント種別とデフォルトテンプレートについて説明します。" href="agentforce_general-3.html#agent_setup_explore_types">必要なアドオンライセンスはエージェント種別によって異なります。</a></td>
+
+            </tr>
+          </tbody></table>
+    <p>AgentforceプラットフォームはEinstein Trust Layerと統合されており、機能にはAIガードレールが含まれています。エージェントは標準の Salesforce アクセス制御も尊重します。</p>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Einstein Trust Layer</h2><p>Agentforceは、Salesforceにネイティブに組み込まれた安全なAIアーキテクチャであるEinstein Trust Layerと統合されています。</p><p>エンタープライズ セキュリティ標準向けに設計されたTrust Layerにより、顧客データを損なうことなく生成AIのメリットを享受できます。また、信頼できるデータを使用して生成 AI 応答を改善することもできます。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col><col></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d66754e92" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Einstein Trust Layer サービス</th>
+              <th id="d66754e95" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d66754e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="Einstein Trust Layer サービス">Zero Data Retention Policy (ゼロデータ保持ポリシー)</td>
+
+              <td headers="d66754e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Einstein Trust Layerではゼロ データ保持ポリシーが使用されるため、サード パーティLLMによるモデルのトレーニングにデータが保存または使用されることはありません。エージェントを含む他の機能を顧客が使用すると、データストレージが作成される可能性があります。詳細は、Salesforce のアカウントエグゼクティブにお問い合わせください。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d66754e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="Einstein Trust Layer サービス">安全なデータ取得を使用した動的グラウンディング</td>
+
+              <td headers="d66754e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">信頼できる会社のデータ、Knowledgeベース、または設定したその他のソースからの関連情報を使用して質問に回答します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d66754e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="Einstein Trust Layer サービス">プロンプトの防御 (システムポリシーとプロンプトの挿入検出)</td>
+
+              <td headers="d66754e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">システムポリシーは、幻覚を制限し、LLM が意図しない出力や有害な出力を行う可能性を減らすのに役立ちます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d66754e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="Einstein Trust Layer サービス">有害検出</td>
+
+              <td headers="d66754e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">潜在的な有害な LLM 応答が検出され、フラグが付けられます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d66754e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="Einstein Trust Layer サービス">監査とフィードバック</td>
+
+              <td headers="d66754e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">プロンプト、応答、Trustシグナルが記録されて<span>Data 360</span>に保存されるため、各ユーザー操作の結果を把握できます。フィードバックは、手順やプロンプトテンプレートの改善などに使用できます。</td>
+
+            </tr>
+          </tbody></table><p>Einstein Trust Layer を介したデータ マスキングは、エージェントのパフォーマンスと精度を高めるために無効になっています。エージェントがアクセスするすべてのデータ (個人識別情報 (PII) を含む) は、厳格なゼロデータ保持ポリシーの一環として、転送中に保護され、外部の LLM プロバイダーによってトレーニング目的で保存または使用されることはありません。「<a title="Einstein Trust Layer では、大規模言語モデル（LLM）のパターンベースおよび項目ベースのデータ マスキングはエージェントで無効になっています。" href="agentforce_general-4.html#agent_trust_data_masking">Agentforce のデータマスキング</a>の制限」を参照してください。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">AI ガードレール</h2><p>Agentforceプラットフォームには、AIの幻覚を最小限に抑えるための倫理的なガードレールと、プロンプト インジェクションなどの脅威や悪意のある攻撃を防止するためのセキュリティ ガードレールが含まれています。</p><p>より詳細な制御を行うには、エージェントサブエージェントの指示を使用して境界を作成し、コンテキストを設定して、エージェントの動作を定義します。標準エージェントサブエージェントの手順を変更するか、カスタムサブエージェントを最初から作成できます。<a title="指示の遵守は、エージェントが応答を生成するときにサブエージェントの指示をどの程度適切に解釈しているかを評価するエージェントガードレールです。" href="agentforce_general-1.html#agent_guardrails_instruction_adherence">指示の遵守</a>を使用して、エージェントがサブエージェントの指示をどの程度適切に解釈し、従っているかを確認します。</p><p>さまざまなエージェント種別に、エージェントの動作を定義する独自の設定とガードレールを設定できます。たとえば、Agentforce サービスエージェントテンプレートでは、サブエージェントの指示を使用して、エージェントからサービス担当者に会話をエスカレーションするタイミングを決定します。SDR エージェント種別には、エージェントがリードの作業を開始できる条件とエージェントメールを送信できる方法とタイミングに関する、システム管理者が定義したエンゲージメントルールがあります。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">権限とアクセス権</h2><p>AI エージェントは、ライセンス、権限、項目レベルセキュリティ、共有設定などの標準の Salesforce アクセス制御を尊重するため、エージェントは常に安全に動作します。</p><ul>
+        <li>エージェント タイプ：デフォルトの Agentforce エージェントは、システム管理者および「Agentforce Default」権限セットを持つユーザが使用できます。一部のエージェント種別は、特定のクラウドまたはライセンスで動作するように構築されているため、別のライセンスが必要です。</li>
+
+        <li>標準エージェントサブエージェント: 多くの標準サブエージェントは、デフォルトの Agentforce エージェントにアクセスする権限を持つすべてのユーザーが使用できます。</li>
+
+        <li>標準エージェントアクション: 多くの標準アクションは、デフォルトの Agentforce エージェントにアクセスする権限を持つすべてのユーザーが使用できます。一部の標準アクションは、特定のクラウドまたは製品と連携するように構築されているため、別のライセンスまたは権限が必要です。</li>
+
+        <li>カスタムエージェントアクション: カスタムアクションへのアクセスは、アクションが参照する Apex クラス、フロー、またはプロンプトテンプレートによって異なります。たとえば、カスタムアクションがフローを使用して作成されている場合、カスタムアクションはフローで設定された権限、項目レベルセキュリティ、および共有設定に従います。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">信頼済み URL</h2><p>Agentforce は、ビジネスの信頼済み URL 許可リストを適用します。これにより、エージェントが悪意のあるリンクを呼び出したり生成したりすることが防止され、機密データのセキュリティが維持されます。</p><p>エージェントが未承認の URL を応答に含めようとすると、未承認の URL は「URL_Redacted」に置き換えられます。また、エージェントが未承認の URL をコールまたは生成しようとすると、プランキャンバスにエラーメッセージが表示されるため、ブロックされた URL を許可リストに追加するか、エージェントの設定から削除するかを評価できます。</p><p>エージェントに<a title="引用は、AI が生成した回答を回答に関連するグラウンディングソースにリンクします。引用を使用して、大規模言語モデル (LLM) が応答の生成に使用した情報を確認し、ソースデータの有効性を確認します。引用は、生成された回答の潜在的な不正確さや幻覚を特定するのに役立ち、AI ツールの使用に対する信頼性を高めます。" href="#generative_ai_trust_citations">引用</a>が設定されている場合、ドメインが信頼済み URL に含まれていなくても、エージェント応答の生成に使用されるソース URL がエージェントの会話に表示されます。</p><p>エージェントで URL を使用するには、信頼済み URL <a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.security_trusted_urls_manage.htm&amp;language=ja&amp;type=5">に追加</a>します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">エージェントコンプライアンス</h2><p>Agentforce は、Einstein プラットフォームおよび Agentforce SOC 2 および SOC 3 レポートに対象サービスとして含まれています。Agentforce は HIPAA の要件を満たしており、Salesforce <a target="_blank" href="https://www.salesforce.com/company/legal/business-associate-addendum-restrictions/">Business Associate Addendum の制限</a>の対象です。また、ISO 27001、27017、27018 の認定も取得しています。</p></div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="agentforce_general-4.html#agent_trust_data_masking">Agentforce のデータマスキングの制限事項</a></strong><br>Einstein Trust Layer では、大規模言語モデル（LLM）のパターンベースおよび項目ベースのデータ マスキングはエージェントで無効になっています。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="会社の秘密と顧客データを使用して生成 AI を信頼しながら、生成 AI の利点のバランスを取ることは、今日でも困難です。Einstein Trust Layerは、Salesforceプラットフォームに組み込まれた安全なAIアーキテクチャです。これは、生成 AI ソリューションの探索中に会社の安全を確保するために使用される契約、セキュリティテクノロジー、データ、プライバシーコントロールのセットです。" href="#generative_ai_trust_layer">Einstein Trust Layer</a></li><li><a title="サブエージェントは、エージェントが実行できる特定のジョブであり、エージェントの推論に不可欠な要素です。サブエージェントには、ジョブで使用できるツールであるアクションと、エージェントに意思決定方法を指示する指示が含まれます。エージェントに割り当てられたサブエージェントによって、エージェントが処理できる機能が定義されます。Salesforce には一般的な使用事例に対応する標準サブエージェントのライブラリが用意されており、ユーザーの特定のビジネスニーズに合わせてカスタムサブエージェントを作成できます。" href="einstein_copilot-5.html#copilot_topics">従来のビルダーのサブエージェント</a></li><li><a title="サブエージェントの指示は、エージェントの動作に関するガイドラインを設定し、エージェントが作業するために必要なコンテキストを提供します。サブエージェントの指示を記述するためのベストプラクティスを確認して、遅延を減らし、エージェントが正確かつ一貫性のある応答ができるようにします。" href="einstein_copilot-5.html#copilot_topics_instructions">従来のビルダーでのサブエージェント手順のベストプラクティス</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="generative_ai_audit_data_mask">
+<h1 class="slds-text-heading_large">マスクされたデータの確認</h1>
+  <p>Einstein Trust Layer の [設定] でデータのマスキング先を設定したら、機密データがマスキングされていることを確認し、経時的な監視も行う必要があります。 </p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Sales、Einstein for Platform、Einstein for Service、Einstein 1 Service、または Einstein GPT Service アドオンが付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition。アドオンを購入するには、Salesforce アカウントエグゼクティブにお問い合わせください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d34325e62" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d34325e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロンプトビルダーでプロンプトテンプレートを作成および管理する</td>
+
+              <td headers="d34325e62" style="vertical-align:top;" class="slds-cell-wrap">「プロンプトテンプレートマネージャー」権限セット</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d34325e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">レポートやダッシュボードを表示およびアクセスする</td>
+
+              <td headers="d34325e62" style="vertical-align:top;" class="slds-cell-wrap">「Data Cloud ユーザー」</td>
+
+            </tr>
+          </tbody></table><p>どのデータがマスクされているかを確認するには、2 つの方法があります。</p><a name="generative_ai_audit_data_mask__ul_otq_qwg_pdc" href="https://help.salesforce.com/s?language=ja"></a><ul id="generative_ai_audit_data_mask__ul_otq_qwg_pdc">
+        <li>プロンプトビルダーを使用して、実行時にマスクされるデータを確認できます。「<a title="プロンプトビルダーは、プロンプトのライフサイクルの各フェーズ (作成からテスト、有効化まで) をガイド付きビジュアルレイアウトで説明します。" href="prompt_builder-2.html#prompt_builder_get_to_know">Get to Know プロンプトビルダー</a>」を参照してください。</li>
+
+        <li>データのマスキング活動を監視するには、標準 Data 360 レポートを作成して、クレジットカードや電話番号などの機密データが LLM プロンプトで適切にマスキングされていることを確認します。次の手順は、Data 360 レポートを作成する手順を示しています。</li>
+
+      </ul>
+<p> Data 360でデータを表示するには、事前に<a title="Einstein 生成 AI 監査およびフィードバックデータを収集するには、Einstein 設定で有効にします。" href="generative_misc-2.html#generative_ai_feedback_enable">Einstein生成AIデータ収集</a>を有効にする必要があります。</p></div>
+    <ol><li>
+        <span>Data Cloud の [レポート] タブで、<strong class="uicontrol">[レポート]</strong> をクリックします。</span>
+      </li><li>
+        <span>Data Cloud レポートカテゴリで、<strong class="uicontrol">GenAIGatewayRequest</strong> レポートを選択します。このレポートでは、生成 AI 要求データモデルオブジェクト (DMO) が使用されます。</span>
+      </li><li>
+        <span>[<strong class="uicontrol">Start Report</strong> (レポートを開始)] をクリックします。</span>
+      </li><li>
+        <span>レポートに列を追加します。</span>
+        <div>
+          <div><p>追加する列のリストを次に示します。</p><ul><li>タイムスタンプ</li>
+<li>モデル</li>
+<li># promptTokens</li>
+<li>応答画面</li>
+<li>MaskedPrompt</li>
+</ul>
+</div>
+        </div>
+      </li><li>
+        <span>レポートを実行します。レポートには、データと対応するマスクされたテキストを含むすべてのプロンプトが表示されます。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="generative_ai_audit_feedback_usage_types">
+<h1 class="slds-text-heading_large">監査とフィードバックの請求に関する考慮事項</h1>
+  <p>生成 AI 監査およびフィードバックデータは Data 360 に保存されます。特定の Data 360 機能を使用すると、クレジット消費に影響する可能性があります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Sales、Einstein for Platform、Einstein for Service、Einstein 1 Service、または Einstein GPT Service アドオンが付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition。アドオンを購入するには、Salesforce アカウントエグゼクティブにお問い合わせください。</td>
+
+            </tr>
+          </tbody></table>
+    <p>監査とフィードバックでは、取り込み、保存、処理に Data 360 クレジットが使用されます。</p>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> 
+    <p>この機能では、有効な契約全体で有効な商品のほぼリアルタイムの消費データを提供する無料のアカウント管理ツールであるDigital Walletにアクセスできます。Digital Walletにアクセスし、組織の使用状況の追跡を開始します。詳細は、「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.wallet_about.htm&amp;language=ja&amp;type=5">About Digital Wallet</a>」を参照してください。</p>
+   </div></div></div>
+
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:13.586956521739133%"><col style="width:13.586956521739133%"><col style="width:44.29347826086957%"><col style="width:28.53260869565218%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d50605e77" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Digital Wallet Card (デジタルウォレットカード)</th>
+            <th id="d50605e80" style="vertical-align:top;" class="slds-cell-wrap" scope="col">利用状況の種別</th>
+            <th id="d50605e83" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+            <th id="d50605e86" style="vertical-align:top;" class="slds-cell-wrap" scope="col">NOtes</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d50605e77" style="vertical-align:top;" class="slds-cell-wrap" data-label="Digital Wallet Card (デジタルウォレットカード)"><span>データサービス</span></td>
+
+            <td headers="d50605e80" style="vertical-align:top;" class="slds-cell-wrap" data-label="利用状況の種別">一括処理データパイプライン (外部データパイプライン)</td>
+
+            <td headers="d50605e83" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">使用量は、内部データパイプラインを介して取り込まれる構造化データを除き、すべてのコネクタで Data 360 データストリームによって処理されるバッチデータの行数に基づいて計算されます。</td>
+
+            <td headers="d50605e86" style="vertical-align:top;" class="slds-cell-wrap" data-label="NOtes"><p>監査データとフィードバックデータは Data 360 データストリームに取り込まれ、使用量は取り込まれたデータ量に基づきます。</p><p>平均して、大規模言語モデル (LLM) と往復するたびに 24 件のレコードが Data 360 に取り込まれます。
+                </p><p style="margin-bottom:0;">取り込まれるデータ量は、3 つの利用状況の種別のうちクレジット消費の主な要因です。</p></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d50605e77" style="vertical-align:top;" class="slds-cell-wrap" data-label="Digital Wallet Card (デジタルウォレットカード)"><span>データサービス</span></td>
+
+            <td headers="d50605e80" style="vertical-align:top;" class="slds-cell-wrap" data-label="利用状況の種別">データクエリ</td>
+
+            <td headers="d50605e83" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>使用量は、処理されたレコードの数に基づいて計算されます。</p><p style="margin-bottom:0;">処理されるレコード数は、クエリの構造のほか、クエリ対象オブジェクトのレコード総数などの他の関連要素によって異なります。</p></td>
+
+            <td headers="d50605e86" style="vertical-align:top;" class="slds-cell-wrap" data-label="NOtes">データクエリは、Data 360 のレポートとダッシュボードの作成に使用されます。使用量は、処理されたレコードに基づいて計算されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d50605e77" style="vertical-align:top;" class="slds-cell-wrap" data-label="Digital Wallet Card (デジタルウォレットカード)"><span>データサービス</span></td>
+
+            <td headers="d50605e80" style="vertical-align:top;" class="slds-cell-wrap" data-label="利用状況の種別">ストリーミング計算済みインサイト</td>
+
+            <td headers="d50605e83" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">使用量は、処理されたレコードの数に基づいて計算されます。</td>
+
+            <td headers="d50605e86" style="vertical-align:top;" class="slds-cell-wrap" data-label="NOtes">計算済みインサイト (CI) はプロンプトビルダーの利用状況とフィードバック評価指標 (ベータ) に使用されます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d50605e77" style="vertical-align:top;" class="slds-cell-wrap" data-label="Digital Wallet Card (デジタルウォレットカード)"><span>データストレージ</span></td>
+
+            <td headers="d50605e80" style="vertical-align:top;" class="slds-cell-wrap" data-label="利用状況の種別">割り当てを超えるストレージ</td>
+
+            <td headers="d50605e83" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">使用量は、割り当てられた量を超えて使用されたストレージ量に基づいて計算されます。</td>
+
+            <td headers="d50605e86" style="vertical-align:top;" class="slds-cell-wrap" data-label="NOtes">使用量は、割り当てられた量を超えて消費されたストレージの量に基づいて計算されます。</td>
+
+          </tr>
+        </tbody></table>
+    <p>Data 360 クレジット数を推定するには、「<a target="_blank" href="https://www.salesforce.com/products/platform/customer-data-cloud/services/">Multipliers in Data 360</a>」を参照してください。</p>
+    <p>Data 360 使用量の請求方法についての詳細は、契約書を参照するか、アカウントエグゼクティブにお問い合わせください。</p>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=data.c360_a_data_usage_types.htm&amp;language=ja&amp;type=5">Data 360 Billable Usage Types (請求可能なデータ使用量種別)</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="generative_ai_audit_toxicity">
+<h1 class="slds-text-heading_large">有害性スコアの確認</h1>
+  
+  <p>標準 Data 360 レポートを作成して、大規模言語モデル (LLM) で生成された回答の毒性スコアを確認します。また、事前作成済みダッシュボードとレポートを使用して、有害性のトレンドを確認することもできます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Sales、Einstein for Platform、Einstein for Service、Einstein 1 Service、または Einstein GPT Service アドオンが付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition。アドオンを購入するには、Salesforce アカウントエグゼクティブにお問い合わせください。</td>
+
+            </tr>
+          </tbody></table><p>Einstein Generative AI Audit and Feedback Data Reportsパッケージがインストールされている必要があります。</p></div>
+    <ol><li>
+        <span>Data Cloud の [レポート] タブで、[<strong class="uicontrol">レポート]</strong>、[<strong class="uicontrol">新規レポート]</strong> の順にクリックします。</span>
+      </li><li>
+        <span>Data Cloud レポートカテゴリで、<strong class="uicontrol">[GenAIGatewayResponse with GenAIContentCategory]</strong> レポートを選択します。</span>
+      </li><li>
+        <span>[<strong class="uicontrol">Start Report</strong> (レポートを開始)] をクリックします。</span>
+      </li><li>
+        <span>レポートに列を追加します。追加する列のリストを次に示します。</span>
+        <div>
+          <ul>
+            <li>タイムスタンプ</li>
+
+            <li>ResponseText</li>
+
+            <li>DetectorType</li>
+
+            <li>カテゴリ</li>
+
+            <li>値</li>
+
+          </ul>
+
+        </div>
+      </li><li>
+        <span><strong class="uicontrol">[検索条件</strong>] パネルを選択します。フィールドで <strong class="uicontrol">［Detector Type］</strong> を選択し、演算子で <strong class="uicontrol">［Equals］</strong> を選択し、値で <strong class="uicontrol">［toxicity］</strong> を選択します。</span>
+      </li><li>
+        <span>レポートを実行します。</span>
+      </li></ol>
+
+    <div><p>レポートには、各回答とその有害性スコアが表示されます。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span>  <strong class="uicontrol">isToxicityDetected</strong> フィールドが true の場合、コンテンツに有害な表現が含まれていることの確度が高くなります。ただし、<strong class="uicontrol">isToxicityDetected</strong> フィールドが false の場合は、必ずしも有害性がないという意味ではなく、モデルによってコンテンツの有害性が検出されなかったという意味です。モデルは 0 ～ 1 のスコアを提供するようにトレーニングされます。<ul><li>安全カテゴリのスコアの範囲は 0 ～ 1 で、1 が最も安全です。0.5 ～ 1 の安全スコアは安全とみなされます。</li>
+<li>他のすべてのカテゴリのスコアは、各カテゴリの有害性を示します。範囲は 0 ～ 1 で、1 が最も有害性が高くなります。0.5 以上の有害性スコアは、そのカテゴリで有害とみなされます。</li>
+</ul>
+</div></div></div>
+</div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="generative_ai_audit_trail">
+<h1 class="slds-text-heading_large">監査履歴</h1>
+  <p>Salesforce 組織での生成 AI の使用を追跡し、AI の使用がセキュリティ、プライバシー、規制、AI ガバナンスポリシーに準拠していることを確認します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Sales、Einstein for Platform、Einstein for Service、Einstein 1 Service、または Einstein GPT Service アドオンが付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition。アドオンを購入するには、Salesforce アカウントエグゼクティブにお問い合わせください。</td>
+
+            </tr>
+          </tbody></table>
+    <p>生成 AI 監査データ (監査履歴とも呼ばれる) には、データ マスキングや有害性スコアなどの Einstein Trust Layer 機能に関するデータが含まれます。</p>
+    <p>監査履歴とフィードバックデータはData 360に保存されます。 Data 360レポートを使用して、Einstein Trust Layerが機密データを外部のLLM(大規模言語モデル)に公開されないように保護する方法について説明します。Einstein Trust Layer は、LLM によって生成された応答の安全性と正確性も検証します。たとえば、組織でデータマスキングが有効になっている場合、生成 AI データには、外部 LLM に送信されたマスクされたプロンプトテキストが含まれます。同様に、LLM によって生成された応答と、ユーザーに提供された完全なマスクされていない応答も表示できます。</p>
+    <p>Data 360に保存されているデータにアクセスするには、<a title="Einstein 生成 AI 監査およびフィードバックデータを収集するには、Einstein 設定で有効にします。" href="generative_misc-2.html#generative_ai_feedback_enable">Einstein生成</a>AIデータ収集およびストレージを有効にして、レポート パッケージを<a title="Einstein生成AIデータの収集と保存を有効にしたら、Data 360から直接Einstein生成AI監査およびフィードバック レポートとダッシュボードにアクセスできます。Einstein 生成 AI およびフィードバックデータダッシュボードにアクセスできます。" href="generative_misc-2.html#generative_ai_feedback_install_report">インストール</a>する必要があります。</p>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="生成AI監査データ(監査履歴とも呼ばれる)を使用して、データのマスキングや有害性検出などのEinstein Trust Layer機能を追跡し、生成された応答の安全性と正確性を確保します。" href="generative_misc-2.html#generative_ai_feedback_about">生成 AI 監査およびフィードバックデータについて</a></li><li><a title="Einstein 生成 AI 監査およびフィードバックデータを収集するには、Einstein 設定で有効にします。" href="generative_misc-2.html#generative_ai_feedback_enable">Einstein 生成 AI 監査およびフィードバックの設定</a></li><li><a title="Einstein Trust Layer の [設定] でデータのマスキング先を設定したら、機密データがマスキングされていることを確認し、経時的な監視も行う必要があります。" href="#generative_ai_audit_data_mask">マスクされたデータの確認</a></li><li><a title="標準 Data 360 レポートを作成して、大規模言語モデル (LLM) で生成された回答の毒性スコアを確認します。また、事前作成済みダッシュボードとレポートを使用して、有害性のトレンドを確認することもできます。" href="#generative_ai_audit_toxicity">有害性スコアの確認</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="generative_ai_plan_trust">
+<h1 class="slds-text-heading_large">AI プロジェクトのリスク評価の実施</h1>
+  
+  <p>AI ソリューションでデータを使用するリスクを特定し、顧客データの安全を確保するためのガードレールを設定します。</p>
+
+    <div><p>プロンプトで顧客データを使用すると、モデルからの応答が向上します。ただし、プロンプトにビジネスデータを含めると、会社がリスクにさらされることになります。データを慎重に扱っていない場合、データ漏洩、規制の問題、評判の低下が発生する可能性があります。</p><p>AI プロジェクトで必要なデータを特定したら、その顧客データとビジネスデータのセキュリティを維持するように設計されたリスク軽減戦略を確立できます。</p></div>
+    <ol><li>
+        <span>プロジェクト関係者と協力して、プロジェクトデータを使用してこれらの各リスク種別の悪影響の可能性を特定します。Trailhead の [<a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/modules/ai-data-project-planning/plan-your-trust-strategy">Plan Your Trust Strategy</a>] 単元を使用して、主要な関係者と共有するためのリスク プロファイルと軽減戦略を作成できます。</span>
+      </li><li>
+        <span>プロジェクトが法的および倫理的なリスクを軽減するのに役立つガードレールを特定します。これらのガードレールの多くは、<a title="会社の秘密と顧客データを使用して生成 AI を信頼しながら、生成 AI の利点のバランスを取ることは、今日でも困難です。Einstein Trust Layerは、Salesforceプラットフォームに組み込まれた安全なAIアーキテクチャです。これは、生成 AI ソリューションの探索中に会社の安全を確保するために使用される契約、セキュリティテクノロジー、データ、プライバシーコントロールのセットです。" href="#generative_ai_trust_layer">Einstein Trust Layer</a> でカバーされます。AI ガードレールには次のものが含まれます。</span>
+        <a name="generative_ai_plan_trust__substeps_vl1_qvb_4cc" href="https://help.salesforce.com/s?language=ja"></a><ol id="generative_ai_plan_trust__substeps_vl1_qvb_4cc">
+          <li>
+            <span>セキュリティガードレール: 安全なデータ取得とは、エンドユーザーがアクセスできるデータのみがプロンプトで使用されることを意味します。データマスキングでは、機密データがプレースホルダーデータに置き換えられるため、モデルにマスクされたデータが表示されることはありません。データ保持ポリシーがゼロの場合、応答の生成後にデータがモデルに保存されません。</span>
+          </li>
+
+          <li>
+            <span>テクニカルガードレール: プロンプト防御は、プロンプトインジェクション攻撃や脱獄からデータを保護します。</span>
+          </li>
+
+          <li>
+            <span>倫理的なガードレール: 有害性とバイアスの検出により、プロンプトと応答で有害な言語が特定されます。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>潜在的なリスク領域と、リスクを軽減するためにシステムで使用される特定のガードレールのリストを作成します。</span>
+      </li><li>
+        <span>最も重要なリスクに最初に取り組むように、リスク軽減戦略に優先順位を付けます。</span>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/modules/ai-data-project-planning">Trailhead: AI + データ: プロジェクト計画</a></li><li><a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/modules/ai-strategy">Trailhead: AI戦略</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="generative_ai_trust_arch">
+<h1 class="slds-text-heading_large">Einstein Trust Layer: Design for Trust</h1>
+  <p>Einstein Trust Layerは、データ プライバシーを保護し、AIの精度を高め、Salesforceエコシステム全体でAIの責任ある使用を促進するために設計された機能、プロセス、ポリシーのコレクションです。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Sales、Einstein for Platform、Einstein for Service、Einstein 1 Service、または Einstein GPT Service アドオンが付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition。アドオンを購入するには、Salesforce アカウントエグゼクティブにお問い合わせください。</td>
+
+            </tr>
+          </tbody></table>
+    <p>Einstein Trust Layerのしくみを理解するために、Trust Layerを介したデータ フローを確認し、ジャーニーの各部分を詳しく見ていきましょう。</p>
+    <ul>
+      <li>プロンプト形式のデータは、CRMアプリケーションからEinstein Trust Layerを経由して、プロンプト ジャーニーと呼ばれる大規模言語モデル(LLM)に転送されます。</li>
+
+      <li>LLM はプロンプトを使用して応答を生成します。これを応答生成と呼びます。</li>
+
+      <li>生成された応答は、Einstein Trust Layerを通過してCRMアプリケーションに戻り、応答ジャーニーと呼ばれます。</li>
+
+    </ul>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Einstein Trust Layer機能は、生成AIおよびAgentforce機能にのみ適用されます。</div></div></div>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">しくみ</h2><div>
+        <img alt="Einstein Trust Layer フローチャート。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/trust_layer_full.png">
+      </div></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">プロンプトジャーニー</h2><p>LLM から応答を生成するには、応答にプロンプトを指定する必要があります。プロンプトは任意の CRM アプリケーションから取得できます。プロンプトビルダーでプロンプトを作成し、Apex またはフローから呼び出すことができます。</p><div>
+        <img alt="プロンプトジャーニーのみが強調表示されている Einstein Trust Layer フローチャート" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/trust_layer_before.png">
+      </div></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">安全なデータ取得とグラウンディング</h2><p>Trust Layer の最初のステップは、安全なデータの取得です。LLM がより関連性の高いパーソナライズされた応答を生成するには、CRM データから追加のコンテキストが必要です。プロンプトにコンテキストを追加するこのプロセスをグラウンディングと呼びます。プロンプトは、CRM データとの差し込み項目を使用してグラウンディングできます。CRM データには、レコード項目、フロー、Apex、Data 360 DMO、関連リストなどがあります。</p><p>安全なデータ取得とは、実行ユーザーがアクセスできるデータのみでプロンプトをグラウンディングすることです。</p><p>データ取得プロセスでは、Salesforce の既存のアクセス制御と権限が適用されます。 
+          </p><ul>
+        <li>プロンプトをグラウンディングするためのデータ取得は、プロンプトを実行するユーザーの権限に基づきます。
+        </li>
+
+        <li>プロンプトをグラウンディングするためのデータ取得では、CRM インスタンスからデータをグラウンディングするときに、ユーザー権限と項目レベルセキュリティに関するすべての標準の Salesforce ロールベースの制御が保持されます。
+        </li>
+
+      </ul>
+<p>グラウンディングは実行時に行われ、ユーザーのアクセス権によって異なるため、グラウンディングは動的です。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">LLM のデータマスキング</h2><p>Einstein Trust Layer ポリシーには、機密データが検出されてマスキングされるデータ マスキングが含まれます。機密データは、次の 2 つの方法で識別されます。</p><ul>
+        <li>パターンベース: パターンとコンテキストを使用して、プロンプトテキスト内の機密データを識別します。具体的には、正規表現 (正規表現) パターンとコンテキストワードを使用します。また、人名や会社名など、パターンが定義されていないデータを識別するためにトレーニングされた機械学習モデルも使用します。</li>
+
+        <li>項目ベース: Shield Platform Encryptionまたはデータ分類を使用して分類された項目のメタデータを使用して、機密項目を識別します。これにより、組織のデータに適用済みの分類が LLM データマスキングに拡張されます。</li>
+
+      </ul>
+<p>識別されたデータはプレースホルダーテキストでマスキングされ、外部モデルに公開されないようにします。Einstein Trust Layer は、元のエンティティとそれぞれのプレースホルダー間のリレーションを一時的に保存します。このリレーションは、生成された応答のデータをマスク解除するために後で使用されます。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> LLM のデータマスキングはエージェントで無効になっています。「<a title="Einstein Trust Layer では、大規模言語モデル（LLM）のパターンベースおよび項目ベースのデータ マスキングはエージェントで無効になっています。" href="agentforce_general-4.html#agent_trust_data_masking">データマスキングとエージェント</a>」を参照してください。<a target="_blank" href="https://help.salesforce.com/s/articleView?id=service.reply_recs_generative_ai_service_replies.htm&amp;type=5&amp;language=ja">Einstein Service Replies</a> などの組み込みの生成 AI 機能では、<a target="_blank" href="https://help.salesforce.com/s/articleView?id=service.cc_generative_ai_work_summaries.htm&amp;type=5&amp;language=ja">Einstein 作業概要</a>データ マスキングが使用可能で、Einstein Trust Layer 設定で設定できます。</div></div></div>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">プロンプトの防御</h2><p>LLM が意図しないものや有害なものを生成する可能性を減らすために、プロンプトビルダーとプロンプトテンプレート Connect API ではシステムポリシーを使用します。システム ポリシーは、ユーザとの Trust を構築するための特定の動作に関する LLM への指示のセットです。たとえば、LLM にコンテンツに対処したり、情報のない回答を生成したりしないように指示できます。システムポリシーは、脱獄攻撃やプロンプトインジェクション攻撃から防御する 1 つの方法です。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">応答の生成</h2><div>
+        <img alt="生成部分が強調表示されている Einstein Trust Layer フローチャート" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/trust_layer_gateway_llm.png">
+      </div><p>プロンプトが完全にハイドレートされて保護されると、LLM ゲートウェイを介して送信できるようになります。ゲートウェイは、さまざまなモデルプロバイダーとのやりとりを管理し、複数の LLM と通信するための統合された安全な方法を表します。ゲートウェイとモデルプロバイダーは TLS 暗号化を使用して、転送中のデータが保護されるようにします。</p><p>Salesforce によって作成または調整されたモデルは、Salesforce Trust 境界でホストされます。OpenAIなどのサード パーティ プロバイダーによって作成および管理される外部モデルは、共有Trust境界内にあります。作成および管理するモデルは、インフラストラクチャでホストされます。</p><p>OpenAI や Azure OpenAI などの外部パートナーモデルプロバイダーとゼロデータ保持ポリシーを実施しています。このポリシーでは、Salesforce から LLM に送信されたデータは保持されず、応答が Salesforce に返送された後に削除されます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Einstein Trust Layer: 対応ジャーニー</h2><p>生成された応答が大規模言語モデルから返されると、Einstein Trust Layer によって特定のポリシーとプロセスが適用され、応答が安全で役立つことが保証されます。「<a title="生成された応答が大規模言語モデルから返されると、Einstein Trust Layer によって特定のポリシーとプロセスが適用され、応答が安全で役立つことが保証されます。" href="#generative_ai_trust_arch2">Einstein Trust Layer: Response Journey」</a>を参照してください。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="生成された応答が大規模言語モデルから返されると、Einstein Trust Layer によって特定のポリシーとプロセスが適用され、応答が安全で役立つことが保証されます。" href="#generative_ai_trust_arch2">Einstein Trust Layer: 応答ジャーニー</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="generative_ai_trust_arch2">
+<h1 class="slds-text-heading_large">Einstein Trust Layer: 応答ジャーニー</h1>
+  <p>生成された応答が大規模言語モデルから返されると、Einstein Trust Layer によって特定のポリシーとプロセスが適用され、応答が安全で役立つことが保証されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Sales、Einstein for Platform、Einstein for Service、Einstein 1 Service、または Einstein GPT Service アドオンが付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition。アドオンを購入するには、Salesforce アカウントエグゼクティブにお問い合わせください。</td>
+
+            </tr>
+          </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">対応ジャーニー</h2><div>
+        <img alt="フェール生成部分が強調表示されている Einstein Trust Layer フローチャート" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/trust_layer_after.png">
+      </div></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">毒性検出</h2><p>回答の毒性検出: 生成された回答が毒性についてスキャンされます。検出プロセスには、有害または不適切なコンテンツを含む応答の確度を反映する毒性信頼性スコアが含まれます。毒性スコアとカテゴリは Data 360 に保存されます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">データのマスク解除</h2><p>プロンプトジャーニー中にデータをマスキングするために作成したプレースホルダーが実際のデータに置き換えられました。元のエンティティとそれぞれのプレースホルダー間のリレーションは、応答を戻すために使用されます。これにより、応答が返信されたときに便利で有意義なものになります。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> LLM のデータマスキングはエージェントで無効になっています。「<a title="Einstein Trust Layer では、大規模言語モデル（LLM）のパターンベースおよび項目ベースのデータ マスキングはエージェントで無効になっています。" href="agentforce_general-4.html#agent_trust_data_masking">データマスキングとエージェント</a>」を参照してください。<a target="_blank" href="https://help.salesforce.com/s/articleView?id=service.reply_recs_generative_ai_service_replies.htm&amp;language=ja&amp;type=5">Einstein Service Replies</a> などの組み込みの生成 AI 機能では、<a target="_blank" href="https://help.salesforce.com/s/articleView?id=service.cc_generative_ai_work_summaries.htm&amp;language=ja&amp;type=5">Einstein 作業概要</a>データ マスキングが使用可能で、Einstein Trust Layer 設定で設定できます。</div></div></div>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">引用</h2><p>関連する場合は、応答に引用を含めることができます。引用では、AI で生成された応答を、応答の生成に使用された元のソースにリンクします。引用を使用して、応答を生成してソースデータの有効性を検証するために大規模言語モデル (LLM) で使用された情報を確認します。引用は、生成された応答に不正確な内容や事実に基づかない情報が含まれる可能性を明らかにするのに役立ち、AI ツールの使用に対する信頼性を高めます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">フィードバックと監査</h2><p>Salesforce で回答が提示されたら、回答を承諾、変更、または却下できます。明示的なフィードバックを提供することもできます。回答に対する明示的なフィードバックは、監査およびフィードバックデータ (監査履歴) の一部として取得され、Data 360 に保存されます。AI 機能によっては、回答に対する暗黙的なアクションも Data 360 に取得されて保存される可能性があります。</p><p>監査履歴には、元のプロンプト、マスクされたプロンプト、有害性検出中に記録されたスコア、LLM からの元の出力、マスク解除された出力も含まれます。</p><p>監査およびフィードバックデータは Data 360 のインスタンスに保存されます。データを Data 360 のインスタンスに保存する期間は自分で制御できます。また、監査およびフィードバックデータは、コンプライアンスの目的で 30 日間 Salesforce によって保存されます。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Einstein Trust Layerは、データ プライバシーを保護し、AIの精度を高め、Salesforceエコシステム全体でAIの責任ある使用を促進するために設計された機能、プロセス、ポリシーのコレクションです。" href="#generative_ai_trust_arch">Einstein Trust Layer: Design for Trust</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="generative_ai_trust_citations">
+<h1 class="slds-text-heading_large">Build Trust in AI Responses with Citations (引用を使用した AI 応答への信頼の構築)</h1>
+  <p>引用は、AI が生成した回答を回答に関連するグラウンディングソースにリンクします。引用を使用して、大規模言語モデル (LLM) が応答の生成に使用した情報を確認し、ソースデータの有効性を確認します。引用は、生成された回答の潜在的な不正確さや幻覚を特定するのに役立ち、AI ツールの使用に対する信頼性を高めます。
+  </p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Sales、Einstein for Platform、Einstein for Service、Einstein 1 Service、または Einstein GPT Service アドオンが付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition。アドオンを購入するには、Salesforce アカウントエグゼクティブにお問い合わせください。</td>
+
+            </tr>
+          </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">引用について</h2><p>引用はいくつかの理由で役立ちます。</p><ul>
+      <li>検証可能性: ユーザーは、エージェントから提供された情報の正確性と発生源を確認できます。</li>
+
+      <li>Trust: ソースを提供することで、回答がデータベースであり信頼できるものであることを示します。</li>
+
+      <li>より深いインサイト: ユーザーは、より詳細な情報を得るためにソース素材を探索できます。</li>
+
+    </ul>
+<p>エージェントコンテキストでは、引用とは、応答の生成やアクションの実行に使用される情報源をシステムが参照する方法を指します。サポートされるソースには、Knowledge 記事、PDF ファイルのデータ、外部 Web ページの情報などがあります。</p><p>ソース URL は、エージェント ビルダー、<a target="_blank" href="https://developer.salesforce.com/docs/ai/agentforce/guide/agent-api.html">エージェント API</a>、Lightning Experience、Android および iOS 用の Salesforce モバイル アプリケーション、拡張チャット、Bring Your Own チャネルで表示できます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">プラットフォーム管理引用と命令ベースの引用</h2><p>引用は 2 つの方法で実装できます。</p><ul>
+      <li><strong>プラットフォーム管理引用</strong>: 専用のプラットフォームサービスで、プラットフォーム管理引用が標準で提供されます。このサービスでは、引用の形式設定、表示、リンクを行い、構造化された一貫したユーザーエクスペリエンスを実現します。</li>
+
+      <li><strong>命令ベースの引用</strong>: プロンプトテンプレートまたはサブエージェントで引用を生成するカスタム命令を指定します。</li>
+
+    </ul>
+<p>プラットフォームで管理される引用はアクションレベルで使用でき、次のアクションでサポートされます。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> プラットフォームで管理される見積は、2025 年 5 月 26 日以降に作成された新規エージェントのみが使用できます。</div></div></div>
+<ul>
+      <li>Agentforce データ ライブラリを介した Knowledge アクションを使用した質問への回答:プラットフォームベースの引用を有効にするには、「<a title="[Answer Questions with Knowledge (ナレッジを使用して質問に回答)] 標準アクションでは現在、応答の最後にソース URL を表示するプロンプトベースの引用がサポートされています。生成された応答に含めるには、エージェントのソースを表示するオプションを有効にする必要があります。" href="#generative_ai_trust_show_citations_for_answer_questions_with_knowledge_action">Show Sources for</a> Answer Questions with Knowledge Standard Action」を参照してください。</li>
+
+      <li>プロンプトテンプレートを使用して作成されたカスタムアクション: プロンプトテンプレートに基づくカスタムアクションのサービス管理による引用を有効にするには、「カスタムアクションの引用<a title="引用モードでは、プロンプトテンプレートを使用して作成されたカスタムアクションで、生成された応答にソース URL を表示するように設定できます。" href="#generative_ai_trust_configure_citation_mode_custom_action">の設定</a>」を参照してください。カスタムアクションの引用を含めるには、プロンプトテンプレートに少なくとも 1 つの <a title="Data 360 の取得増強生成 (RAG) により、LLM で生成された応答の品質、精度、関連性が向上します。Einstein Search でレトリーバーを使用してプロンプトテンプレートを強化します。非構造化テキストソースから LLM プロンプトに関連するナレッジを追加します。記事、メール、チャットのトランスクリプト、およびその他のソースからナレッジを取得します。" href="prompt_builder-2.html#prompt_builder_ground_rag">Einstein Search 取得</a>機能が含まれている必要があります。<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 現在、プロンプトテンプレートに基づくカスタムアクションではインライン引用を使用できません。</div></div></div>
+</li>
+
+      <li><a target="_blank" href="https://developer.salesforce.com/docs/ai/agentforce/guide/citations.html">Apex ベースの</a>エージェントアクションを使用した引用。</li>
+
+    </ul>
+<p>プラットフォームで管理される引用と命令ベースの引用のどちらを選択するかについては、次の点を考慮してください。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col><col><col></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d22969e160" style="vertical-align:top;" class="slds-cell-wrap" scope="col">考慮事項</th>
+            <th id="d22969e163" style="vertical-align:top;" class="slds-cell-wrap" scope="col">プラットフォーム管理</th>
+            <th id="d22969e166" style="vertical-align:top;" class="slds-cell-wrap" scope="col">指示ベース</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d22969e160" style="vertical-align:top;" class="slds-cell-wrap" data-label="考慮事項">引用処理</td>
+
+            <td headers="d22969e163" style="vertical-align:top;" class="slds-cell-wrap" data-label="プラットフォーム管理"><p>専用サービスで引用を構造化して処理します。</p><p style="margin-bottom:0;">組み込み機能の利点を活用できます。 </p></td>
+
+            <td headers="d22969e166" style="vertical-align:top;" class="slds-cell-wrap" data-label="指示ベース"><p>引用の形式と表示方法を柔軟に設定できます。</p><p style="margin-bottom:0;">引用を生成する手順とロジックを手動で追加する必要があります。</p></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d22969e160" style="vertical-align:top;" class="slds-cell-wrap" data-label="考慮事項">プロンプトの影響</td>
+
+            <td headers="d22969e163" style="vertical-align:top;" class="slds-cell-wrap" data-label="プラットフォーム管理">プロンプト内に特定の引用指示を追加したり、プロンプトを微調整したりする必要性を減らします。プロンプトのコンテキスト/単語数を最小限に抑えるのに役立ちます。</td>
+
+            <td headers="d22969e166" style="vertical-align:top;" class="slds-cell-wrap" data-label="指示ベース"><p>特定の引用指示を要求することで、プロンプトのコンテキスト/単語数を消費できます。</p><p style="margin-bottom:0;">引用を一貫して生成するために、追加の微調整が必要になる場合があります。</p></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d22969e160" style="vertical-align:top;" class="slds-cell-wrap" data-label="考慮事項">表示オプション</td>
+
+            <td headers="d22969e163" style="vertical-align:top;" class="slds-cell-wrap" data-label="プラットフォーム管理"><p>回答の最後に個別の [ソース] セクションに表示されます。インライン引用は番号付きリンクです。</p><p>現在、プロンプトテンプレートに基づくカスタムアクションではインライン引用を使用できません。</p><p style="margin-bottom:0;">引用に画像が含まれている場合、画像へのクリック可能なリンクとして表示されます。</p></td>
+
+            <td headers="d22969e166" style="vertical-align:top;" class="slds-cell-wrap" data-label="指示ベース">書式設定と表示は、プロンプト命令の一部として定義され、カスタマイズできます。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d22969e160" style="vertical-align:top;" class="slds-cell-wrap" data-label="考慮事項">大規模言語モデル (LLM)</td>
+
+            <td headers="d22969e163" style="vertical-align:top;" class="slds-cell-wrap" data-label="プラットフォーム管理">Salesforce が管理する微調整された言語モデルを活用します。</td>
+
+            <td headers="d22969e166" style="vertical-align:top;" class="slds-cell-wrap" data-label="指示ベース">選択した LLM に固有であり、LLM によって異なります。</td>
+
+          </tr>
+        </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">プラットフォーム引用の例</h2><p>プラットフォーム引用の表示例を次に示します。</p><p>
+      <span style="vertical-align:text-bottom;display:inline-block;"><img alt="スクリーンショットには、回答の最後にある [ソースとの会話] セクションが表示されています。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/citations_platform_display.png" style="margin-bottom:0;"></span>
+      </p><p>引用に関連する追加の詳細とメタデータは、監査履歴データの一部として Data 360 DMO に保存されます。『 <a title="適切なDMO(データ モデル オブジェクト)を使用して、Einstein生成AIの監査データとフィードバック データを理解および分析します。Einstein生成AI監査およびフィードバック データは、Data 360のデータ レイク オブジェクト(DLO)にストリーミングされ、データ モデル オブジェクト(DMO)にマッピングされます。" href="generative_misc-2.html#generative_ai_feedback_data_model">Data Model for Generative</a> AI Audit and Feedback 』の「Einstein Generative AI Gateway Object Record Citation Reference DMO」を参照してください。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=data.c360_a_ai_citations_retriever.htm&amp;language=ja&amp;type=5">Salesforce ヘルプ: Retrievers での引用</a></li><li><a title="引用は、AI が生成した回答を回答に関連するグラウンディングソースにリンクします。引用を使用して、大規模言語モデル (LLM) が応答の生成に使用した情報を確認し、ソースデータの有効性を確認します。引用は、生成された回答の潜在的な不正確さや幻覚を特定するのに役立ち、AI ツールの使用に対する信頼性を高めます。" href="#generative_ai_trust_citations">Build Trust in AI Responses with Citations (引用を使用した AI 応答への信頼の構築)</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="generative_ai_trust_configure_citation_mode_custom_action">
+<h1 class="slds-text-heading_large">カスタムアクションの引用モードの設定</h1>
+ 
+ <p>引用モードでは、プロンプトテンプレートを使用して作成されたカスタムアクションで、生成された応答にソース URL を表示するように設定できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+  <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition。<a title="特定のクラウドと一般的な使用事例のエージェント種別とデフォルトテンプレートについて説明します。" href="agentforce_general-3.html#agent_setup_explore_types">必要なアドオンライセンスはエージェント種別によって異なります。</a></td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d79432e79" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d79432e79" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">アクションの引用モードを設定する</td>
+
+       <td headers="d79432e79" style="vertical-align:top;" class="slds-cell-wrap">「AI エージェントの管理」および自分のエージェント種別の必須権限 </td>
+
+      </tr>
+      <tr class="">
+       <td headers="d79432e79" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">&nbsp;</td>
+
+       <td headers="d79432e79" style="vertical-align:top;" class="slds-cell-wrap">または</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d79432e79" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">&nbsp;</td>
+
+       <td headers="d79432e79" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+      </tr>
+     </tbody></table><p>アクションは、少なくとも 1 つの <a title="Data 360 の取得増強生成 (RAG) により、LLM で生成された応答の品質、精度、関連性が向上します。Einstein Search でレトリーバーを使用してプロンプトテンプレートを強化します。非構造化テキストソースから LLM プロンプトに関連するナレッジを追加します。記事、メール、チャットのトランスクリプト、およびその他のソースからナレッジを取得します。" href="prompt_builder-2.html#prompt_builder_ground_rag">Einstein Search 取得</a>機能を含むプロンプト テンプレートに基づいている必要があります。</p><p>応答で引用を表示するには、エージェントを<a target="_blank" href="einstein_copilot-5.html#copilot_setup_activate_deactivate">有効化</a>する必要があります。</p></div>
+  <ol><li>
+    <span>[設定] から、[クイック検索] ボックスに「<kbd>エージェント」</kbd>と入力し、[<strong class="uicontrol">Agentforce アセット]</strong> を選択します</span>
+   </li><li>
+    <span>［<strong class="uicontrol">Actions］</strong> タブで、設定するカスタム アクションをクリックして開きます。</span>
+   </li><li>
+    <span>引用モードで、[<strong class="uicontrol">入力が必要</strong>] オプションをオンにして引用を有効にします。有効にすると、入力パラメーターでソースのリストが収集されます。この入力パラメータは、カスタムアクションがプロンプトテンプレートに基づいている場合にのみ使用できます。<span style="vertical-align:text-bottom;display:inline-block;"><img alt="Web フォームに引用モードの設定が表示されます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/citation_custom_action_config.png" style="width:600px;margin-bottom:0;"></span></span>
+    <div>カスタム アクションで、要求元ユーザーがアクセスできるKnowledge記事のみが使用されていることを確認します。</div>
+    <div>現在、プロンプトテンプレートに基づくカスタムアクションではインライン引用を使用できません。</div>
+   </li></ol>
+
+ 
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="引用は、AI が生成した回答を回答に関連するグラウンディングソースにリンクします。引用を使用して、大規模言語モデル (LLM) が応答の生成に使用した情報を確認し、ソースデータの有効性を確認します。引用は、生成された回答の潜在的な不正確さや幻覚を特定するのに役立ち、AI ツールの使用に対する信頼性を高めます。" href="#generative_ai_trust_citations">Build Trust in AI Responses with Citations (引用を使用した AI 応答への信頼の構築)</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="generative_ai_trust_configure_toxicity_detection">
+<h1 class="slds-text-heading_large">プロンプトの有害性検出の有効化 (ベータ)</h1>
+  <p>プロンプトで有害検出を有効にして、有害な文言が含まれるプロンプトを監視し、それに応じて変更できるようにします。これらの設定は Salesforce 組織に適用されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Sales、Einstein for Platform、Einstein for Service、Einstein 1 Service、または Einstein GPT Service アドオンが付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition。アドオンを購入するには、Salesforce アカウントエグゼクティブにお問い合わせください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d62173e62" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d62173e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロンプトで有害検出を有効にする</td>
+
+              <td headers="d62173e62" style="vertical-align:top;" class="slds-cell-wrap">「設定の参照」 </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d62173e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">&nbsp;</td>
+
+              <td headers="d62173e62" style="vertical-align:top;" class="slds-cell-wrap">および</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d62173e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">&nbsp;</td>
+
+              <td headers="d62173e62" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+            </tr>
+          </tbody></table><p> Einstein 生成 AI が有効になっている必要があります。</p></div>
+    <div><p>応答の有害検出はデフォルトで有効になっており、無効にすることはできません。プロンプトで有害検出を有効にすることで、応答の有害性につながる可能性のある問題のある文言が含まれるプロンプトを監視できます。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> プロンプトの有害検出はベータです。</div></div></div>
+</div>
+    <ol><li>
+        <span>[設定] の [クイック検索] 項目に<kbd>「Einstein」</kbd>と入力し、<strong class="uicontrol">[Einstein Trust Layer]</strong> を選択します。</span>
+        <div>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> <strong class="uicontrol">[Einstein 生成 AI 設定]</strong> が見つからない場合は、使用する生成 AI 機能の前提条件を組織が満たしていることを確認してください。詳細は、Salesforce アカウントエグゼクティブ (AE) にお問い合わせください。</div></div></div>
+
+        </div>
+      </li><li>
+        <span><strong class="uicontrol">[安全とセキュリティ]</strong> をクリックします。</span>
+      </li><li>
+        <span>ベータサービス条件を確認します。プロンプトで有害検出を有効にします。</span>
+      </li><li>
+        <span><a title="Salesforce組織のEinstein生成AI監査およびフィードバック データからのインサイトをチームと共有します。事前作成済みのダッシュボードとレポートを使用して、クエリを実行し、Data 360 レポートを作成します。" href="generative_misc-2.html#generative_ai_feedback_analytics">Data Cloud のレポート</a>とダッシュボードを使用して、有害性スコアとトレンドを確認および分析します。</span>
+        <div>
+          <p>
+            <a name="generative_ai_trust_configure_toxicity_detection__image_rwk_zs1_qcc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="現在無効になっているプロンプトの有害検出を有効または無効にする切り替えスイッチ。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/trust_layer_toxicity_detection_setup.png" id="generative_ai_trust_configure_toxicity_detection__image_rwk_zs1_qcc" style="margin-bottom:0;"></span>
+          </p>
+        </div>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Einstein Trust Layer は機械学習 (ML) モデルを使用して、プロンプトと応答内の有害なコンテンツを識別し、フラグを設定します。" href="#generative_ai_trust_toxicity_detection">有害検出</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="generative_ai_trust_content_safety_and_security">
+<h1 class="slds-text-heading_large">コンテンツの安全性とセキュリティ</h1>
+  <p>Einstein Trust Layerには、AIアプリケーションの安全性とセキュリティを侵害しようとする潜在的な有害なコンテンツと悪意のある攻撃を検出するのに役立つ一連のポリシーが含まれています。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Sales、Einstein for Platform、Einstein for Service、Einstein 1 Service、または Einstein GPT Service アドオンが付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition。アドオンを購入するには、Salesforce アカウントエグゼクティブにお問い合わせください。</td>
+
+            </tr>
+          </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">有害なコンテンツ</h2><p>有害なコンテンツとは、個人やコミュニティに悪影響を及ぼす可能性がある情報を指します。生成 AI モデルのコンテキストでは、有害なコンテンツとは、メンタルヘルス、行動、または健康に悪影響を及ぼすプロンプトまたは応答のデータを指します。有害なコンテンツには、ヘイトや暴力などの有害なコンテンツや、不当または差別的なパターンのコンテンツが含まれる可能性があります。</p><p>大規模言語モデル (LLM) では、次のような理由で有害なコンテンツが誤って生成される可能性があります。</p><ul>
+        <li>プロンプトの影響: プロンプトの言語がモデルの出力に直接影響します。たとえば、プロンプトに攻撃的な語句や有害な語句が含まれている場合、モデルの応答に同様の語句が組み込まれる可能性があります。</li>
+
+        <li>トレーニングデータ: LLM は、バイアスのかかったコンテンツや有害なコンテンツが含まれる可能性がある大量のデータから学習します。トレーニングデータに有害な言語が含まれていると、モデルが意図せずに再現してしまう可能性があります。</li>
+
+        <li>コンテキストパターン: LLM はデータの統計パターンに基づいて応答を生成します。有害な言語が同様のコンテキストで頻繁に出現する場合、モデルがそれらのパターンを再現する可能性があります。</li>
+
+        <li>学習の微調整と移行: 特定のタスクの LLM を微調整すると、バイアスが発生する可能性があります。関連しないドメインからの転移学習もコンテンツの生成に影響する可能性があります。</li>
+
+      </ul>
+<p>Einstein Trust Layer は、機械学習モデルを使用して、生成 AI アプリケーションおよび機能に含まれる有害なコンテンツを識別します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">プロンプトの挿入</h2><p>プロンプトインジェクションは、LLM が意図しない動作をさせようとする試みです。ハッカーは、システムポリシーを上書きしたり、LLM を操作して意図しない動作をさせようとするプロンプトを作成できます。</p><p>Salesforce には、悪意のある攻撃によるリスクを軽減するのに役立つ迅速な防御メカニズムが用意されています。</p><p>プロンプトインジェクション検出をシステムポリシーと共に使用すると、プロンプト防御の詳細なアプローチが可能になります。プロンプト インジェクション防御は、すべてのユーザー プロンプトに一貫して適用され、Agentforceおよび組み込みAIアプリケーションのセキュリティを強化します。</p><ul>
+        <li>ハルシネーションを制限し、LLM が意図しない出力や有害な出力を行う可能性を減らすのに役立つ組み込みシステムポリシーがあります。</li>
+
+        <li>プロンプトの挿入検出は、LLM を操作して意図しない操作を試みる悪意のある攻撃を検出するのに役立ちます。</li>
+
+      </ul>
+</div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Einstein Trust Layer は機械学習 (ML) モデルを使用して、プロンプトと応答内の有害なコンテンツを識別し、フラグを設定します。" href="#generative_ai_trust_toxicity_detection">有害検出</a></li><li><a title="プロンプトの挿入 (「ジェイルブレイク 」とも呼ばれる) は、大規模言語モデル (LLM) の脆弱性です。プロンプトインジェクションは、LLM が意図しない動作をさせようとする試みです。ハッカーは、システムポリシーを上書きしたり、LLM を操作して意図しない動作をさせようとするプロンプトを作成できます。" href="prompt_builder-1.html#generative_ai_trust_prompt_injection_detection">プロンプトインジェクション検出 (ベータ)</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="generative_ai_trust_data_mask_considerations">
+<h1 class="slds-text-heading_large">LLM データマスキングに関する考慮事項と制限事項</h1>
+  <p>大規模言語モデル (LLM) データマスキングを設定する前に、次の考慮事項と制限事項を確認してください。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Sales、Einstein for Platform、Einstein for Service、Einstein 1 Service、または Einstein GPT Service アドオンが付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition。アドオンを購入するには、Salesforce アカウントエグゼクティブにお問い合わせください。</td>
+
+            </tr>
+          </tbody></table>
+    <div id="generative_ai_trust_data_mask_considerations__section_c3l_fwr_vcc"><a name="generative_ai_trust_data_mask_considerations__section_c3l_fwr_vcc" href="https://help.salesforce.com/s?language=ja"></a><h2 class="slds-text-heading_medium slds-p-top_small">制限事項</h2><a name="generative_ai_trust_data_mask_considerations__ul_j11_jwr_vcc" href="https://help.salesforce.com/s?language=ja"></a><ul id="generative_ai_trust_data_mask_considerations__ul_j11_jwr_vcc">
+        <li>LLM データマスキングは、すべての機能で常に使用できるわけではありません。詳細は、機能に関するドキュメントを参照してください。</li>
+
+        <li>LLM のデータマスキングはエージェントで無効になっています。「<a title="Einstein Trust Layer では、大規模言語モデル（LLM）のパターンベースおよび項目ベースのデータ マスキングはエージェントで無効になっています。" href="agentforce_general-4.html#agent_trust_data_masking">データマスキングとエージェント</a>」を参照してください。<a target="_blank" href="https://help.salesforce.com/s/articleView?id=service.reply_recs_generative_ai_service_replies.htm&amp;language=ja&amp;type=5">Einstein Service Replies</a> などの組み込みの生成 AI 機能では、<a target="_blank" href="https://help.salesforce.com/s/articleView?id=service.cc_generative_ai_work_summaries.htm&amp;language=ja&amp;type=5">Einstein 作業概要</a>データ マスキングが使用可能で、Einstein Trust Layer 設定で設定できます。</li>
+
+        <li>パターンベースのマスキング: 内部テストで検出モデルの有効性が確認されていますが、どのモデルも 100% の精度を保証することはできません。また、地域間および複数国の使用事例は、特定のデータパターンを検出する機能に影響する可能性があります。Trustを優先事項として、モデルの継続的な評価と調整に取り組んでいます。</li>
+
+        <li>項目ベースのマスキング: 項目ベースのマスキングは、プロンプトテンプレートを使用するプロンプトビルダーおよび AI 機能でサポートされています。項目ベースのマスキングは、レコード項目と関連リストを参照するプロンプトの差し込み項目でのみ使用できます。</li>
+
+      </ul>
+</div>
+    <div id="generative_ai_trust_data_mask_considerations__section_phq_1xr_vcc"><a name="generative_ai_trust_data_mask_considerations__section_phq_1xr_vcc" href="https://help.salesforce.com/s?language=ja"></a><h2 class="slds-text-heading_medium slds-p-top_small">考慮事項</h2><p>データマスキングは、LLM プロンプトのグラウンディングに影響する可能性があります。マスキング設定をテストして、高品質の LLM 応答を確認することをお勧めします。監査履歴を使用して、<a title="Einstein Trust Layer の [設定] でデータのマスキング先を設定したら、機密データがマスキングされていることを確認し、経時的な監視も行う必要があります。" href="#generative_ai_audit_data_mask">マスキング動作を確認</a>します。</p><p>パターンベースと項目ベースのマスキングを設定するときは、次の違いを考慮してください。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d73706e114" style="vertical-align:top;" class="slds-cell-wrap" scope="col">パターンベース</th>
+              <th id="d73706e117" style="vertical-align:top;" class="slds-cell-wrap" scope="col">項目ベース</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d73706e114" style="vertical-align:top;" class="slds-cell-wrap" data-label="パターンベース">パターン マッチング、コンテキスト、機械学習モデルに基づくEinstein Trust Layerによる自動検出。</td>
+
+              <td headers="d73706e117" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目ベース">検出は、ユーザーが設定した Salesforce 項目のデータ分類タグに基づきます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d73706e114" style="vertical-align:top;" class="slds-cell-wrap" data-label="パターンベース">プロンプトのすべてのテキスト (自由形式テキストなどの構造化されていない入力や、Salesforce 項目からのマージされた情報を含む) に適用されます。</td>
+
+              <td headers="d73706e117" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目ベース"><p>プロンプトテンプレートの差し込み項目にのみ適用されます。</p><p style="margin-bottom:0;">サポートされるデータソース: レコード項目と関連リスト。</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d73706e114" style="vertical-align:top;" class="slds-cell-wrap" data-label="パターンベース">データ型と言語の個別のリストのみがサポートされます。</td>
+
+              <td headers="d73706e117" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目ベース">Salesforce 組織の任意の項目を分類して、項目のマスキングに使用できます。</td>
+
+            </tr>
+          </tbody></table><p>データ マスキング設定をより包括的にするには、Salesforce 項目にデータ分類を適用し、関連する分類タイプの Einstein Trust Layer 設定でデータ マスキングを有効にします。パターンベースのマスキングを有効にすると、プロンプト内のテキスト全体が機密データとして評価されるため、保護が強化されます。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="generative_ai_trust_lang_region">
+<h1 class="slds-text-heading_large">Einstein Trust Layer リージョンおよび言語のサポート</h1>
+  <p>Einstein Trust Layerは、複数の地域や言語のPII(個人識別情報)などの機密データを検出し、マスキングします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Sales、Einstein for Platform、Einstein for Service、Einstein 1 Service、または Einstein GPT Service アドオンが付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition。アドオンを購入するには、Salesforce アカウントエグゼクティブにお問い合わせください。</td>
+
+            </tr>
+          </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">項目ベースのデータマスキング</h2><p>項目ベースのデータマスキングでは、すべての Salesforce 言語がサポートされます。詳細は、「<a title="Einstein Trust Layer は、プロンプトで機密情報を識別してマスキングしてから、Large Language Model(LLM; 大規模言語モデル)に送信します。Einstein Trust Layerは、データ マスキングを使用して、PII(個人識別情報)などの機密データが外部LLMに公開されないように保護します。" href="generative_misc-2.html#generative_ai_mask_data">Large Language Model Data Masking</a> and <a title="マスキングして機密データが大規模言語モデル (LLM) に公開されないようにするデータを選択します。これらの設定は Salesforce 組織に適用されます。" href="generative_misc-2.html#generative_ai_mask_select">Select What Data To Mask</a> (大規模言語モデルのデータマスキングとマスキング対象データの選択)」を参照してください。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">パターンベースのデータマスキング</h2><p>機密データは、次の 2 つの方法で識別されます。</p><a name="generative_ai_trust_lang_region__ul_mrp_cmr_vcc"></a><ul id="generative_ai_trust_lang_region__ul_mrp_cmr_vcc">
+        <li>モデルベースの検出: 機械学習モデルは、人や会社の名前など、特定のデータ型を識別するようにトレーニングされます。たとえば、モデルではテキストのブロックをスキャンして名前を検出し、個人または会社の名前として分類できます。</li>
+
+        <li>正規表現およびコンテキストベースの検出: 検出は、テキストが正規表現 (正規表現) パターンにどの程度正確に一致するか、パターンの一意性、および関連するコンテキスト単語とパターンの距離によって決まります。</li>
+
+      </ul>
+<p>次のデータ型は、英語、フランス語、ドイツ語、イタリア語、日本語、スペイン語でサポートされています。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:29.275362318840582%"><col style="width:41.73913043478261%"><col style="width:28.985507246376812%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d90374e101" style="vertical-align:top;" class="slds-cell-wrap" scope="col">データ型</th>
+              <th id="d90374e104" style="vertical-align:top;" class="slds-cell-wrap" scope="col">パターン</th>
+              <th id="d90374e107" style="vertical-align:top;" class="slds-cell-wrap" scope="col">検出方法</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d90374e101" style="vertical-align:top;" class="slds-cell-wrap" data-label="データ型">会社名</td>
+
+              <td headers="d90374e104" style="vertical-align:top;" class="slds-cell-wrap" data-label="パターン">会社または組織の名前</td>
+
+              <td headers="d90374e107" style="vertical-align:top;" class="slds-cell-wrap" data-label="検出方法">モデルベース </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e101" style="vertical-align:top;" class="slds-cell-wrap" data-label="データ型">クレジットカード</td>
+
+              <td headers="d90374e104" style="vertical-align:top;" class="slds-cell-wrap" data-label="パターン">スペースの有無に関係なく 16 桁または 17 桁のクレジットカード番号。例: 4111 1111 1131 1121</td>
+
+              <td headers="d90374e107" style="vertical-align:top;" class="slds-cell-wrap" data-label="検出方法"> 正規表現パターン + 関連するコンテキスト単語</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e101" style="vertical-align:top;" class="slds-cell-wrap" data-label="データ型">メールアドレス</td>
+
+              <td headers="d90374e104" style="vertical-align:top;" class="slds-cell-wrap" data-label="パターン">メールアドレス。例: astro@salesforce.com </td>
+
+              <td headers="d90374e107" style="vertical-align:top;" class="slds-cell-wrap" data-label="検出方法"> 正規表現パターン + 関連するコンテキスト単語</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e101" style="vertical-align:top;" class="slds-cell-wrap" data-label="データ型">IBANコード</td>
+
+              <td headers="d90374e104" style="vertical-align:top;" class="slds-cell-wrap" data-label="パターン">2 文字の国コード、2 つの数字、および口座番号で始まる国際銀行口座番号 (IBAN)。例: GB29NWBK60161331926819</td>
+
+              <td headers="d90374e107" style="vertical-align:top;" class="slds-cell-wrap" data-label="検出方法"> 正規表現パターン + 関連するコンテキスト単語</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e101" style="vertical-align:top;" class="slds-cell-wrap" data-label="データ型">名前</td>
+
+              <td headers="d90374e104" style="vertical-align:top;" class="slds-cell-wrap" data-label="パターン">個人の名、ミドルネーム、姓、またはその組み合わせ。「Mrs」、「Ms.」、「Mrs.」などの役職も考慮されます。</td>
+
+              <td headers="d90374e107" style="vertical-align:top;" class="slds-cell-wrap" data-label="検出方法">モデルベース</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e101" style="vertical-align:top;" class="slds-cell-wrap" data-label="データ型">パスポート</td>
+
+              <td headers="d90374e104" style="vertical-align:top;" class="slds-cell-wrap" data-label="パターン"><p>パスポートに記載されている番号</p><ul>
+                  <li>English: US および UK パスポート番号形式がサポートされます。</li>
+
+                  <li>フランス語: France</li>
+
+                  <li>ドイツ語: Germany</li>
+
+                  <li>イタリア語: イタリア</li>
+
+                  <li>日本語: 日本</li>
+
+                  <li>スペイン語: Spain</li>
+
+                </ul>
+</td>
+
+              <td headers="d90374e107" style="vertical-align:top;" class="slds-cell-wrap" data-label="検出方法">正規表現パターン + 関連するコンテキスト単語</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e101" style="vertical-align:top;" class="slds-cell-wrap" data-label="データ型">電話番号</td>
+
+              <td headers="d90374e104" style="vertical-align:top;" class="slds-cell-wrap" data-label="パターン"><p>国コードありまたはなしの電話番号。電話形式は、特定の地域と言語でサポートされています。&nbsp;</p><ul>
+                  <li>英語 (米国): 市外局番 (1 または 001) の後に 10 桁の番号 </li>
+
+                  <li>英語 (英国): 市外局番 (44 または 044) の後に 10 または 11 桁の番号 </li>
+
+                  <li>フランス語 (フランス): 市外局番 (33 または 033) の後に 9 桁の番号 </li>
+
+                  <li>ドイツ語 (ドイツ): 市外局番 (49 または 049) の後に 6 桁または 8 桁の番号 </li>
+
+                  <li>イタリア語 (イタリア): 市外局番 (39 または 034) の後に 6 または 9 桁の番号</li>
+
+                  <li>日本: 市外局番 (080) の後に 10 桁または 11 桁の番号 </li>
+
+                  <li>スペイン語 (スペイン): 市外局番 (34 または 034) の後に 6 桁または 9 桁の番号 </li>
+
+                </ul>
+</td>
+
+              <td headers="d90374e107" style="vertical-align:top;" class="slds-cell-wrap" data-label="検出方法">正規表現パターン + 関連するコンテキスト単語</td>
+
+            </tr>
+          </tbody></table><p>次のデータ型は英語 (アメリカ) でのみサポートされています。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d90374e265" style="vertical-align:top;" class="slds-cell-wrap" scope="col">機密データ型</th>
+              <th id="d90374e268" style="vertical-align:top;" class="slds-cell-wrap" scope="col">パターン</th>
+              <th id="d90374e271" style="vertical-align:top;" class="slds-cell-wrap" scope="col">検出方法</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d90374e265" style="vertical-align:top;" class="slds-cell-wrap" data-label="機密データ型">アメリカ合衆国の運転免許証</td>
+
+              <td headers="d90374e268" style="vertical-align:top;" class="slds-cell-wrap" data-label="パターン">米国の運転免許証番号。都道府県ごとに形式が異なります。7 ~ 14 文字の英数字を使用できます。</td>
+
+              <td headers="d90374e271" style="vertical-align:top;" class="slds-cell-wrap" data-label="検出方法">正規表現パターン + 関連するコンテキスト単語</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e265" style="vertical-align:top;" class="slds-cell-wrap" data-label="機密データ型">米国個人納税者 ID 番号</td>
+
+              <td headers="d90374e268" style="vertical-align:top;" class="slds-cell-wrap" data-label="パターン">9 で始まる 9 桁の数字と 4 桁目の 7 または 8 が含まれる米国の個人納税者識別番号 (ITIN)。例:&nbsp; 9XX-8X-XXXX</td>
+
+              <td headers="d90374e271" style="vertical-align:top;" class="slds-cell-wrap" data-label="検出方法">正規表現パターン + 関連するコンテキスト単語</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e265" style="vertical-align:top;" class="slds-cell-wrap" data-label="機密データ型">米国社会保障番号</td>
+
+              <td headers="d90374e268" style="vertical-align:top;" class="slds-cell-wrap" data-label="パターン">スペースを含まない 9 桁、またはダッシュ、スペース、ピリオドで区切られた 9 桁の米国社会保障番号 (SSN)。例: 254941476、254-94-1476、または 254.94.1476</td>
+
+              <td headers="d90374e271" style="vertical-align:top;" class="slds-cell-wrap" data-label="検出方法">正規表現パターン + 関連するコンテキスト単語</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">毒性検出</h2><p>Einstein Trust Layerは、応答の有害性を検出し、機械学習モデルを使用してスコアを割り当てます。&nbsp;このスコアは、監査履歴の一部として Data 360 に保存されます。詳細は、「<a title="Einstein Trust Layer は機械学習 (ML) モデルを使用して、プロンプトと応答内の有害なコンテンツを識別し、フラグを設定します。" href="#generative_ai_trust_toxicity_detection">有害性検出</a>」を参照してください。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:25%"><col style="width:25%"><col style="width:25%"><col style="width:25%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d90374e349" style="vertical-align:top;" class="slds-cell-wrap" scope="col">言語</th>
+              <th id="d90374e352" style="vertical-align:top;" class="slds-cell-wrap" scope="col">地域/ロケール</th>
+              <th id="d90374e355" style="vertical-align:top;" class="slds-cell-wrap" scope="col">言語</th>
+              <th id="d90374e358" style="vertical-align:top;" class="slds-cell-wrap" scope="col">サポートされているかどうか</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d90374e349" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語">デンマーク語</td>
+
+              <td headers="d90374e352" style="vertical-align:top;" class="slds-cell-wrap" data-label="地域/ロケール">デンマーク</td>
+
+              <td headers="d90374e355" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語"><code>da_DK</code></td>
+
+              <td headers="d90374e358" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされているかどうか">はい*</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e349" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語">オランダ語</td>
+
+              <td headers="d90374e352" style="vertical-align:top;" class="slds-cell-wrap" data-label="地域/ロケール">ベルギー</td>
+
+              <td headers="d90374e355" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語"><code>nl_BE</code></td>
+
+              <td headers="d90374e358" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされているかどうか">はい*</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e349" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語">オランダ語</td>
+
+              <td headers="d90374e352" style="vertical-align:top;" class="slds-cell-wrap" data-label="地域/ロケール">オランダ</td>
+
+              <td headers="d90374e355" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語"><code>nl_NL</code></td>
+
+              <td headers="d90374e358" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされているかどうか">はい*</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e349" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語">英語</td>
+
+              <td headers="d90374e352" style="vertical-align:top;" class="slds-cell-wrap" data-label="地域/ロケール">オーストラリア</td>
+
+              <td headers="d90374e355" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語"><code>en_AU</code></td>
+
+              <td headers="d90374e358" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされているかどうか">はい*</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e349" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語">英語</td>
+
+              <td headers="d90374e352" style="vertical-align:top;" class="slds-cell-wrap" data-label="地域/ロケール">カナダ</td>
+
+              <td headers="d90374e355" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語"><code>en_CA</code></td>
+
+              <td headers="d90374e358" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされているかどうか">はい*</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e349" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語">英語</td>
+
+              <td headers="d90374e352" style="vertical-align:top;" class="slds-cell-wrap" data-label="地域/ロケール">インド</td>
+
+              <td headers="d90374e355" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語"><code>en_IN</code></td>
+
+              <td headers="d90374e358" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされているかどうか">はい*</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e349" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語">英語</td>
+
+              <td headers="d90374e352" style="vertical-align:top;" class="slds-cell-wrap" data-label="地域/ロケール">アイルランド</td>
+
+              <td headers="d90374e355" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語"><code>en_IE</code></td>
+
+              <td headers="d90374e358" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされているかどうか">はい*</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e349" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語">英語</td>
+
+              <td headers="d90374e352" style="vertical-align:top;" class="slds-cell-wrap" data-label="地域/ロケール">シンガポール</td>
+
+              <td headers="d90374e355" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語"><code>en_SG</code></td>
+
+              <td headers="d90374e358" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされているかどうか">はい*</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e349" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語">英語</td>
+
+              <td headers="d90374e352" style="vertical-align:top;" class="slds-cell-wrap" data-label="地域/ロケール">イギリス</td>
+
+              <td headers="d90374e355" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語"><code>en_GB</code></td>
+
+              <td headers="d90374e358" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされているかどうか">はい*</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e349" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語">英語</td>
+
+              <td headers="d90374e352" style="vertical-align:top;" class="slds-cell-wrap" data-label="地域/ロケール">United States</td>
+
+              <td headers="d90374e355" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語"><code>en_US</code></td>
+
+              <td headers="d90374e358" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされているかどうか">はい </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e349" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語">フランス語</td>
+
+              <td headers="d90374e352" style="vertical-align:top;" class="slds-cell-wrap" data-label="地域/ロケール">ベルギー</td>
+
+              <td headers="d90374e355" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語"><code>fr_BE</code></td>
+
+              <td headers="d90374e358" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされているかどうか">はい*</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e349" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語">フランス語</td>
+
+              <td headers="d90374e352" style="vertical-align:top;" class="slds-cell-wrap" data-label="地域/ロケール">カナダ</td>
+
+              <td headers="d90374e355" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語"><code>fr_CA</code></td>
+
+              <td headers="d90374e358" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされているかどうか">はい*</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e349" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語">フランス語</td>
+
+              <td headers="d90374e352" style="vertical-align:top;" class="slds-cell-wrap" data-label="地域/ロケール">フランス</td>
+
+              <td headers="d90374e355" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語"><code>fr_FR</code></td>
+
+              <td headers="d90374e358" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされているかどうか">はい</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e349" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語">フランス語</td>
+
+              <td headers="d90374e352" style="vertical-align:top;" class="slds-cell-wrap" data-label="地域/ロケール">スイス</td>
+
+              <td headers="d90374e355" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語"><code>fr_CH</code></td>
+
+              <td headers="d90374e358" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされているかどうか">はい*</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e349" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語">ドイツ語</td>
+
+              <td headers="d90374e352" style="vertical-align:top;" class="slds-cell-wrap" data-label="地域/ロケール">オーストリア</td>
+
+              <td headers="d90374e355" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語"><code>de_AT</code></td>
+
+              <td headers="d90374e358" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされているかどうか">はい*</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e349" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語">ドイツ語</td>
+
+              <td headers="d90374e352" style="vertical-align:top;" class="slds-cell-wrap" data-label="地域/ロケール">ドイツ</td>
+
+              <td headers="d90374e355" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語"><code>de_DE</code></td>
+
+              <td headers="d90374e358" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされているかどうか">はい </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e349" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語">ドイツ語</td>
+
+              <td headers="d90374e352" style="vertical-align:top;" class="slds-cell-wrap" data-label="地域/ロケール">スイス</td>
+
+              <td headers="d90374e355" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語"><code>de_CH</code></td>
+
+              <td headers="d90374e358" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされているかどうか">はい*</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e349" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語">イタリア語</td>
+
+              <td headers="d90374e352" style="vertical-align:top;" class="slds-cell-wrap" data-label="地域/ロケール">イタリア</td>
+
+              <td headers="d90374e355" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語"><code>it_IT</code></td>
+
+              <td headers="d90374e358" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされているかどうか">はい </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e349" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語">イタリア語</td>
+
+              <td headers="d90374e352" style="vertical-align:top;" class="slds-cell-wrap" data-label="地域/ロケール">スイス</td>
+
+              <td headers="d90374e355" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語"><code>it_CH</code></td>
+
+              <td headers="d90374e358" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされているかどうか">はい*</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e349" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語">日本語</td>
+
+              <td headers="d90374e352" style="vertical-align:top;" class="slds-cell-wrap" data-label="地域/ロケール">日本</td>
+
+              <td headers="d90374e355" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語"><code>ja_JP</code></td>
+
+              <td headers="d90374e358" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされているかどうか">はい </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e349" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語">韓国語</td>
+
+              <td headers="d90374e352" style="vertical-align:top;" class="slds-cell-wrap" data-label="地域/ロケール">韓国</td>
+
+              <td headers="d90374e355" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語"><code>ko_KR</code></td>
+
+              <td headers="d90374e358" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされているかどうか">はい*</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e349" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語">ノルウェー語</td>
+
+              <td headers="d90374e352" style="vertical-align:top;" class="slds-cell-wrap" data-label="地域/ロケール">ノルウェー</td>
+
+              <td headers="d90374e355" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語"><code>nb_NO</code> <code>nn_NO</code></td>
+
+              <td headers="d90374e358" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされているかどうか">はい*</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e349" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語">ポルトガル語</td>
+
+              <td headers="d90374e352" style="vertical-align:top;" class="slds-cell-wrap" data-label="地域/ロケール">ブラジル</td>
+
+              <td headers="d90374e355" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語"><code>pt_BR</code></td>
+
+              <td headers="d90374e358" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされているかどうか">はい*</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e349" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語">ポルトガル語</td>
+
+              <td headers="d90374e352" style="vertical-align:top;" class="slds-cell-wrap" data-label="地域/ロケール">ポルトガル</td>
+
+              <td headers="d90374e355" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語"><code>pt_PT</code></td>
+
+              <td headers="d90374e358" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされているかどうか">はい*</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e349" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語">スペイン語</td>
+
+              <td headers="d90374e352" style="vertical-align:top;" class="slds-cell-wrap" data-label="地域/ロケール">メキシコ</td>
+
+              <td headers="d90374e355" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語"><code>es_MX</code></td>
+
+              <td headers="d90374e358" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされているかどうか">はい*</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e349" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語">スペイン語</td>
+
+              <td headers="d90374e352" style="vertical-align:top;" class="slds-cell-wrap" data-label="地域/ロケール">スペイン</td>
+
+              <td headers="d90374e355" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語"><code>es_ES</code></td>
+
+              <td headers="d90374e358" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされているかどうか">はい </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e349" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語">スウェーデン語</td>
+
+              <td headers="d90374e352" style="vertical-align:top;" class="slds-cell-wrap" data-label="地域/ロケール">スウェーデン</td>
+
+              <td headers="d90374e355" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語"><code>sv_SE</code></td>
+
+              <td headers="d90374e358" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされているかどうか">はい*</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d90374e349" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語">タイ語</td>
+
+              <td headers="d90374e352" style="vertical-align:top;" class="slds-cell-wrap" data-label="地域/ロケール">タイ</td>
+
+              <td headers="d90374e355" style="vertical-align:top;" class="slds-cell-wrap" data-label="言語"><code>th_TH</code></td>
+
+              <td headers="d90374e358" style="vertical-align:top;" class="slds-cell-wrap" data-label="サポートされているかどうか">はい*</td>
+
+            </tr>
+          </tbody></table><p>はい* = 地域特有の表現があると、有害なコンテンツや不適切なコンテンツを効果的に特定することが困難になります。Einstein Trust Layerは、特に地域固有の言語パターンが含まれる場合、100%の精度でそのようなコンテンツを識別できるとは限りません。</p></div>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span>  検出モデルは内部&nbsp;テストで有効であることが示されていますが、どのモデルも 100% の精度を保証することはできないことに注意してください。さらに、地域間および多国籍の使用事例は、特定のデータパターンを検出する機能に影響する可能性があります。Trustを優先事項として、モデルの継続的な評価と調整に取り組んでいます。</div></div></div>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">プロンプトの挿入検出</h2><p>プロンプトインジェクション検出は、英語 (アメリカ) 言語のみでサポートされています。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">引用</h2><p>引用は、英語、フランス語、ドイツ語、イタリア語、ポルトガル語 (ブラジル)、スペイン語でサポートされています。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="generative_ai_trust_layer">
+<h1 class="slds-text-heading_large">Einstein Trust Layer</h1>
+  <p>会社の秘密と顧客データを使用して生成 AI を信頼しながら、生成 AI の利点のバランスを取ることは、今日でも困難です。Einstein Trust Layerは、Salesforceプラットフォームに組み込まれた安全なAIアーキテクチャです。これは、生成 AI ソリューションの探索中に会社の安全を確保するために使用される契約、セキュリティテクノロジー、データ、プライバシーコントロールのセットです。</p>
+
+    <div><p>Einstein Trust Layerのしくみの概要については、次の動画をご覧ください。<a target="_blank" href="https://salesforce.vidyard.com/watch/Kw7DfNqG7AGPAZcqrrn2T5">このリンク</a>をクリックして、別のタブでビデオを全画面モードで起動することもできます。</p><p>Einstein Trust Layer とその機能の詳細については、「<a title="Einstein Trust Layerは、データ プライバシーを保護し、AIの精度を高め、Salesforceエコシステム全体でAIの責任ある使用を促進するために設計された機能、プロセス、ポリシーのコレクションです。" href="#generative_ai_trust_arch">Einstein Trust Layer: Designed for Trust</a>」を参照してください。</p><p>
+      <iframe src="https://play.vidyard.com/Kw7DfNqG7AGPAZcqrrn2T5" class="doc_embedded_video" width="640" height="360"><!-- --></iframe>
+      </p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:14.285714285714285%"><col style="width:85.71428571428571%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">
+                <span style="vertical-align:text-bottom;display:inline-block;"><img alt="x アイコンのデータ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/trust_layer_zero_data_retention.png" style="width:100px;margin-bottom:0;"></span>
+              </td>
+
+              <td style="vertical-align:top;" class="slds-cell-wrap"><p>
+                <strong>ゼロデータ保持ポリシー </strong>
+                </p><p>データはサードパーティ LLM によって保持されません。OpenAI などのすべての外部モデルプロバイダーと提携して、ゼロデータ保持ポリシーを適用します。</p><ul>
+                  <li> サードパーティ LLM による LLM モデルのトレーニングや製品の改善にデータは使用されません。</li>
+
+                  <li>サードパーティ LLM によってデータは保持されません。</li>
+
+                  <li>サードパーティプロバイダーのユーザーは、LLM に送信されたデータを参照しません。</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">
+                <span style="vertical-align:text-bottom;display:inline-block;"><img alt="セキュリティバッジアイコン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/trust_layer_secure_data_retrieval.png" style="width:100px;margin-bottom:0;"></span>
+              </td>
+
+              <td style="vertical-align:top;" class="slds-cell-wrap"><p>
+                <strong> <a target="_blank" href="#generative_ai_trust_arch">安全なデータ取得を使用した動的グラウンディング </a> </strong>
+                </p><ul>
+                  <li> Salesforce レコードの関連情報がプロンプトとマージされ、コンテキストが提供されます。</li>
+
+                  <li>プロンプトを実行するユーザーの権限に基づいて、プロンプトをグラウンディングするための Salesforce データの安全なデータ取得を行います。</li>
+
+                  <li>安全なデータ取得では、CRM インスタンスまたは Data 360 からグラウンディングデータをマージするときに、ユーザー権限と項目レベルセキュリティに関するすべての標準 Salesforce ロールベースの制御が保持されます。</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">
+                <span style="vertical-align:text-bottom;display:inline-block;"><img alt="錠アイコン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/trust_layer_prompt_defense.png" style="width:100px;margin-bottom:0;"></span>
+              </td>
+
+              <td style="vertical-align:top;" class="slds-cell-wrap"><p>
+                <strong><a target="_blank" href="#generative_ai_trust_arch">プロンプトの防御</a></strong>
+                </p><ul>
+                  <li>システムポリシーは、幻覚を制限し、LLM が意図しない出力や有害な出力を行う可能性を減らすのに役立ちます。</li>
+
+                  <li>システムポリシーは、生成 AI の機能と使用事例によって異なります。</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">
+                <span style="vertical-align:text-bottom;display:inline-block;"><img alt="矢印が貫通する歯車" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/trust_layer_data_masking.png" style="width:100px;margin-bottom:0;"></span>
+              </td>
+
+              <td style="vertical-align:top;" class="slds-cell-wrap"><p>
+                <strong><a title="Einstein Trust Layer は、プロンプトで機密情報を識別してマスキングしてから、Large Language Model(LLM; 大規模言語モデル)に送信します。Einstein Trust Layerは、データ マスキングを使用して、PII(個人識別情報)などの機密データが外部LLMに公開されないように保護します。" href="generative_misc-2.html#generative_ai_mask_data">データマスキング</a></strong>
+                </p><ul>
+                  <li>プロンプトを LLM に送信する前に、機密データが検出され、マスクされます。</li>
+
+                  <li>データマスキングでは、複数の地域と言語がサポートされます。</li>
+
+                  <li>マスキングする必要がある項目とマスクしてはならない項目を選択できます。</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">
+                <span style="vertical-align:text-bottom;display:inline-block;"><img alt="警告アイコン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/trust_layer_toxicity.png" style="width:100px;margin-bottom:0;"></span>
+              </td>
+
+              <td style="vertical-align:top;" class="slds-cell-wrap"><p>
+                <strong><a title="標準 Data 360 レポートを作成して、大規模言語モデル (LLM) で生成された回答の毒性スコアを確認します。また、事前作成済みダッシュボードとレポートを使用して、有害性のトレンドを確認することもできます。" href="#generative_ai_audit_toxicity">毒性スコアリング</a></strong>
+                </p><ul>
+                  <li>Einstein Trust Layer は、有害性に関するコンテンツをスコアリングします。</li>
+
+                  <li>毒性スコアが記録され、監査履歴の一部として Data 360 に保存されます。</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">
+                <span style="vertical-align:text-bottom;display:inline-block;"><img alt="チェックマーク付きの歯車" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/trust_layer_auditing.png" style="width:100px;margin-bottom:0;"></span>
+              </td>
+
+              <td style="vertical-align:top;" class="slds-cell-wrap"><p>
+                <strong> <a title="Einstein生成AI監査およびフィードバック データをData 360に収集して保存し、フィードバック分析、プロンプトの調整、LLMチューニングを使用して生成AIアプリケーションを強化します。" href="generative_misc-2.html#generative_ai_feedback">監</a> </strong>査
+                </p><ul>
+                  <li>プロンプト、応答、Trustシグナルが記録され、Data 360に保存されます。</li>
+
+                  <li>フィードバックは、プロンプトテンプレートの改善に使用できます。</li>
+
+                  <li>分析用の事前作成済みレポートとダッシュボードを提供します。</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Einstein Trust Layerは、複数の地域や言語のPII(個人識別情報)などの機密データを検出し、マスキングします。" href="#generative_ai_trust_lang_region">Einstein Trust Layer リージョンおよび言語のサポート</a></li><li><a title="組織のプライバシーとセキュリティのポリシーおよび要件に合わせてEinstein Trust Layerを設定します。" href="#generative_ai_trust_setup">Einstein Trust Layer の設定</a></li><li><a title="Einstein Trust Layer は、プロンプトで機密情報を識別してマスキングしてから、Large Language Model(LLM; 大規模言語モデル)に送信します。Einstein Trust Layerは、データ マスキングを使用して、PII(個人識別情報)などの機密データが外部LLMに公開されないように保護します。" href="generative_misc-2.html#generative_ai_mask_data">大規模言語モデルのデータマスキング</a></li><li><a title="Salesforce 組織での生成 AI の使用を追跡し、AI の使用がセキュリティ、プライバシー、規制、AI ガバナンスポリシーに準拠していることを確認します。" href="#generative_ai_audit_trail">監査履歴</a></li><li><a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/modules/the-einstein-trust-layer">Trailhead: Einstein Trust Layer</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="generative_ai_trust_limits">
+<h1 class="slds-text-heading_large">Einstein Trust Layer の制限</h1>
+  <p>Einstein Trust Layer は Sandbox ステージング環境でサポートされますが、いくつかの制限があります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">Einstein生成AIはLightning Experienceで使用できます。Einstein 生成 AI の設定は Lightning Experience で使用できます。</td>
+
+          </tr>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、および <strong>Unlimited</strong> Edition (Einstein for Sales、Einstein for Platform、または Einstein for Service アドオン付属)</td>
+
+          </tr>
+        </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Sandbox 環境での Einstein Trust Layer のサポート</h2><p>Einstein Trust Layerは、データがサードパーティのLLM(Large Language Model)に公開されないように、Sandboxステージング環境に含まれています。安全なデータ取得、システム ポリシー、データ マスキング、有害性検出などのTrust Layer機能は、生成AI機能を安全にテストするのに役立ちます。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> データマスキングは、すべての機能で常に使用できるわけではありません。<p>LLM のデータマスキングはエージェントで無効になっています。「<a title="Einstein Trust Layer では、大規模言語モデル（LLM）のパターンベースおよび項目ベースのデータ マスキングはエージェントで無効になっています。" href="agentforce_general-4.html#agent_trust_data_masking">データマスキングとエージェント</a>」を参照してください。<a target="_blank" href="https://help.salesforce.com/s/articleView?id=service.reply_recs_generative_ai_service_replies.htm&amp;language=ja&amp;type=5">Einstein Service Replies</a> などの組み込みの生成 AI 機能では、<a target="_blank" href="https://help.salesforce.com/s/articleView?id=service.cc_generative_ai_work_summaries.htm&amp;language=ja&amp;type=5">Einstein 作業概要</a>データ マスキングが使用可能で、Einstein Trust Layer 設定で設定できます。</p></div></div></div>
+<p>次の Einstein Trust Layer 機能は、ステージング環境でのテストには使用できません。</p><ul>
+        <li>Data 360 のオブジェクトのグラウンディング。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Sandbox 環境での Einstein Trust Layer の設定</h2><p>Sandbox環境が本番環境と同期されていない場合、Einstein Trust Layerの設定が正しく適用されない可能性があります。同期の問題は、次のシナリオで発生する可能性があります。</p><ul>
+        <li>Einstein Trust Layer 設定を本番組織からコピーして新しい Sandbox 組織を作成するとき。</li>
+
+        <li>個々の PII エンティティのデータマスキングを有効または無効にする場合。</li>
+
+      </ul>
+<p>Sandbox 環境で Einstein Trust Layer 設定が正しく適用されるようにするには、本番環境の Einstein Trust Layer の [設定] ページで、データ マスキング設定をオフにして、約 1 分間待機してからオンに戻します。</p><p><span style="vertical-align:text-bottom;display:inline-block;"><img alt="データ マスキングの切り替えが強調表示されている Trust Layer 設定ページ。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/trust_layer_data_masking_toggle.png" style="width:600px;margin-bottom:0;"></span></p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="generative_ai_trust_overview">
+<h1 class="slds-text-heading_large">Einstein 生成 AI &amp; 信頼</h1>
+  <p>新しいテクノロジーでイノベーションを起こすときには、データの安全を確保することが重要です。Einstein生成AIはそのNo.1の価値としてTrustを保持し、データのセキュリティを確保すると同時に、正確で安全なエクスペリエンスの構築に努めています。</p>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Einstein生成AIとデータ</h2><p>Salesforce では、Trust が最大の価値です。データのセキュリティを確保するため、Salesforce は OpenAI などの大規模言語モデル (LLM) プロバイダーと契約しています。これらの契約により、組織は LLM プロバイダーが非公開データを保持することなく生成 AI 機能を使用できます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">信頼できる生成 AI</h2><p>SalesforceのEinstein生成AIソリューションは、信頼できる生成AIに関する5つの原則に基づいて設計、開発、提供されます。</p><ul>
+        <li>精度: 可能な限り、説明とソースを使用してモデル応答をバックアップします。ほとんどの使用事例でエンドユーザーと共有する前に、人間がモデルの応答を確認することをお勧めします。</li>
+
+        <li>安全性: 業界をリードする検出および緩和技術により、製品に使用されているモデルからのバイアス、毒性、有害な応答を検出して軽減します。</li>
+
+        <li>透明性: 当社のモデルと機能は、可能な限りデータの証明を尊重し、お客様のデータに基づきます。</li>
+
+        <li>エンパワーメント: デルの製品によって従業員の能力が向上し、作業の効率と目的が達成されると考えています。</li>
+
+        <li>Sustainability (持続可能性): 精度を優先し、カーボンフットプリントを削減する適切なサイズのモデルの構築に努めています。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">生成 AI 応答の確認</h2><p>生成 AI は、より創造的で生産的になり、よりスマートなビジネス上の意思決定を行うのに役立つツールです。この技術は人間の判断に代わるものではありません。LLM で生成された応答を顧客と共有する場合、最終的にその責任はユーザーにあります。テキストが人間によって生成されたものか、LLM によって生成されたものかに関係なく、顧客はテキストを組織のブランドに関連付けて、意思決定に使用します。そのため、LLM で生成された外部利用者向けの回答が正確で役立ち、会社の価値観、姿勢、口調と一致していることを確認することが重要です。</p><p>エンドユーザーが外部利用者向けに生成された回答を確認するときは、コンテンツの正確性と安全性に焦点を絞ります。</p><ul>
+        <li>正確性: 生成 AI は、事実や既存のソースに基づかない応答を「幻覚」で改ざんする可能性があります。回答を公開する前に、主要な詳細が正しいことを確認します。たとえば、カスタマー サービスの提案は既存の最新のKnowledge記事に基づいていますか。</li>
+
+        <li>バイアスと毒性: AI は人間が作成し、人間が作成したデータに基づいてトレーニングされるため、歴史的に疎外されてきたグループに対するバイアスが含まれることもあります。まれに、一部の応答に有害な表現が含まれることがあります。回答をチェックして、顧客に適切であることを確認します。</li>
+
+      </ul>
+<p>回答があなたの標準または会社のビジネスニーズを満たしていない場合は、使用する必要はありません。一部のソリューションでは、エンドユーザーが回答を直接編集できます。編集できない場合は、最初から別の回答を生成することをお勧めします。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://www.salesforceairesearch.com/trusted-ai">Salesforce Research:信頼できるAI</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="generative_ai_trust_setup">
+<h1 class="slds-text-heading_large">Einstein Trust Layer の設定</h1>
+  
+  <p>組織のプライバシーとセキュリティのポリシーおよび要件に合わせてEinstein Trust Layerを設定します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Sales、Einstein for Platform、Einstein for Service、Einstein 1 Service、または Einstein GPT Service アドオンが付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition。アドオンを購入するには、Salesforce アカウントエグゼクティブにお問い合わせください。</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Einstein Trust Layerを設定する前に、Einstein生成AIを有効にして、組織でData Cloudを設定する必要があります。Einstein Trust Layerが正しく機能し、データを保護するためには、Data Cloudが必要です。詳細は、Salesforce アカウントエグゼクティブ (AE) にお問い合わせください。</div></div></div>
+<p>これらの設定は Salesforce 組織に適用されます。</p></div>
+    <ol><li>
+        <span>[設定] から、[クイック検索] ボックスに「<kbd>Einstein</kbd>」と入力し、[<strong class="uicontrol">Einstein Trust Layer</strong>] を選択します。Trust Layer 設定ページには、LLM データ マスキング用とコンテンツの安全性およびセキュリティ用の 2 つのタブがあります。</span>
+      </li><li>
+        <span>データマスキング: データマスキングはデフォルトで有効になっています。&nbsp;[Data Masking]タブで、Einstein Trust Layer が機密データを検出してマスキングできるように、データ マスキングが無効になっている場合は有効にします。データ マスキングに使用できるさまざまなオプションを理解するには、ページの上部にあるコンテンツを確認します。個々のエンティティまたはカテゴリを有効または無効にできます。変更が有効になるまで最大で数分かかる場合があります。</span>
+        <div>LLM のデータマスキングはエージェントで無効になっています。「<a title="Einstein Trust Layer では、大規模言語モデル（LLM）のパターンベースおよび項目ベースのデータ マスキングはエージェントで無効になっています。" href="agentforce_general-4.html#agent_trust_data_masking">データマスキングとエージェント</a>」を参照してください。<a target="_blank" href="https://help.salesforce.com/s/articleView?id=service.reply_recs_generative_ai_service_replies.htm&amp;type=5&amp;language=ja">Einstein Service Replies</a> などの組み込みの生成 AI 機能では、<a target="_blank" href="https://help.salesforce.com/s/articleView?id=service.cc_generative_ai_work_summaries.htm&amp;type=5&amp;language=ja">Einstein 作業概要</a>データ マスキングが使用可能で、Einstein Trust Layer 設定で設定できます。</div>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Einstein生成AIを設定して、強力な生成AI機能にアクセスします。" href="generative_misc-1.html#generative_ai_enable">Einstein 生成 AI の設定</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="generative_ai_trust_show_citations_for_answer_questions_with_knowledge_action">
+<h1 class="slds-text-heading_large">Knowledge 標準アクションを使用した質問への回答の使用時にソースを表示</h1>
+ 
+ <p>[Answer Questions with Knowledge (ナレッジを使用して質問に回答)] 標準アクションでは現在、応答の最後にソース URL を表示するプロンプトベースの引用がサポートされています。生成された応答に含めるには、エージェントのソースを表示するオプションを有効にする必要があります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+  <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition。<a title="特定のクラウドと一般的な使用事例のエージェント種別とデフォルトテンプレートについて説明します。" href="agentforce_general-3.html#agent_setup_explore_types">必要なアドオンライセンスはエージェント種別によって異なります。</a></td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d28355e77" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d28355e77" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">アクションの引用モードを設定する</td>
+
+       <td headers="d28355e77" style="vertical-align:top;" class="slds-cell-wrap">「AI エージェントの管理」および自分のエージェント種別の必須権限 </td>
+
+      </tr>
+      <tr class="">
+       <td headers="d28355e77" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">&nbsp;</td>
+
+       <td headers="d28355e77" style="vertical-align:top;" class="slds-cell-wrap">または</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d28355e77" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">&nbsp;</td>
+
+       <td headers="d28355e77" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+      </tr>
+     </tbody></table><p>応答で引用を表示するには、エージェントを<a target="_blank" href="einstein_copilot-5.html#copilot_setup_activate_deactivate">有効化</a>する必要があります。</p></div>
+  <ol><li>
+    <span>[設定] から、[クイック検索] ボックスに「<kbd>エージェント」</kbd>と入力し、[<strong class="uicontrol">Agentforce Agents]</strong> を選択します。</span>
+   </li><li>
+    <span>Agentforce Builder でエージェントを起動し、サイドバーから [<strong class="uicontrol">データ] を</strong>選択します</span>
+   </li><li>
+    <span>[<strong class="uicontrol">ソースを表示</strong>] チェックボックスをオンにします。外部顧客とやりとりするエージェントに割り当てられるKnowledgeのデータライブラリの場合、Salesforce Knowledgeドメインの URL を入力する必要があります。特定のKnowledgeメイン URL を含めない場合、デフォルトで公開されている URL になります。<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.faq_domain_name_what.htm&amp;language=ja&amp;type=5">Knowledgeドメイン</a>についての詳細を確認してください。<span style="vertical-align:text-bottom;display:inline-block;"><img alt="[ソースを表示] チェックボックスが表示されたデータライブラリページが表示されます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/citations_knowledge_config.png" style="width:1000px;margin-bottom:0;"></span></span>
+   </li><li>
+    <span>作業内容を保存します。</span>
+   </li></ol>
+
+  <div><p>実行時に、回答の末尾に、回答の生成に使用された元のソースの番号付きクリック可能リストとして引用が表示されます。インライン番号は、リスト内のソース番号を参照します。引用に画像が含まれている場合、画像へのクリック可能なリンクが応答に含まれます。</p></div>
+ 
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="引用は、AI が生成した回答を回答に関連するグラウンディングソースにリンクします。引用を使用して、大規模言語モデル (LLM) が応答の生成に使用した情報を確認し、ソースデータの有効性を確認します。引用は、生成された回答の潜在的な不正確さや幻覚を特定するのに役立ち、AI ツールの使用に対する信頼性を高めます。" href="#generative_ai_trust_citations">Build Trust in AI Responses with Citations (引用を使用した AI 応答への信頼の構築)</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="generative_ai_trust_toxicity_detection">
+<h1 class="slds-text-heading_large">有害検出</h1>
+  <p>Einstein Trust Layer は機械学習 (ML) モデルを使用して、プロンプトと応答内の有害なコンテンツを識別し、フラグを設定します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Einstein for Sales、Einstein for Platform、Einstein for Service、Einstein 1 Service、または Einstein GPT Service アドオンが付属する <strong>Enterprise</strong> Edition、<strong>Performance Edition</strong>、および <strong>Unlimited</strong> Edition。アドオンを購入するには、Salesforce アカウントエグゼクティブにお問い合わせください。</td>
+
+            </tr>
+          </tbody></table>
+    <p>AI アプリケーションからの顧客向け出力は、会社のブランドと話し方を表します。AI によって有害なコンテンツが生成され、会社の評判が損なわれる可能性があります。応答の有害性もプロンプトによって影響を受ける可能性があるため、応答だけでなくプロンプトでも有害性を検出することが重要です。プロンプトの有害性は、公開チャットのやりとりやサードパーティの Web コンテンツなどの信頼できないソースから発生する可能性があります。</p>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 応答内の有害検出はデフォルトで有効になっており、変更できません。プロンプト内の有害検出 (ベータ) はデフォルトで無効になっていますが、Salesforce 組織で有効にできます。</div></div></div>
+
+    <p>プロンプトまたは応答で有害性が検出されると、実行時に Salesforce AI 機能に通知または警告が表示されます。たとえば、LLM から生成された応答で有害なコンテンツが検出された場合、Copilot またはプロンプトビルダーに有害警告が表示されます。</p>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 免責事項: 毒性警告は、一部の AI 機能では使用できません。</div></div></div>
+
+    <div>
+      <p><strong>プロンプトビルダーでの有害性警告</strong></p>
+      <img alt="警告メッセージが表示され、コンテンツが有害である可能性があることを示す画像" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/generative_ai/images/trust_layer_toxicity_warning_in_prompt_builder.png">
+    </div>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-ai-generative_ai-262-0-0-production-jajp/bf199aa6-de0e-4c39-9678-b85437765958/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> 有害検出モデルは内部テストで有効であることが示されていますが、どのモデルも 100% の精度を保証することはできないことに注意してください。さらに、地域間および多国籍の使用事例は、特定のデータパターンを検出する機能に影響する可能性があります。Salesforce は信頼を優先事項として、モデルの継続的な評価と調整に取り組んでいます。</div></div></div>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">有害性カテゴリ</h2><p>Einstein 有害性検出モデルでは、次のカテゴリが認識されます。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d83771e96" style="vertical-align:top;" class="slds-cell-wrap" scope="col">カテゴリ</th>
+              <th id="d83771e99" style="vertical-align:top;" class="slds-cell-wrap" scope="col">コンテンツのタイプ</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d83771e96" style="vertical-align:top;" class="slds-cell-wrap" data-label="カテゴリ">暴力</td>
+
+              <td headers="d83771e99" style="vertical-align:top;" class="slds-cell-wrap" data-label="コンテンツのタイプ">人、動物、財産に物理的危害を加えることを意図した行動を描写、参照、扇動するコンテンツ</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d83771e96" style="vertical-align:top;" class="slds-cell-wrap" data-label="カテゴリ">性的</td>
+
+              <td headers="d83771e99" style="vertical-align:top;" class="slds-cell-wrap" data-label="コンテンツのタイプ">合意の上および非合意の性的コンテンツ、違法および合法的な性的行為、性的に挑発的で相手の気を引こうとするコンテンツなど、性的な言語、画像、テーマを含む素材、行動、言語を描写、参照、または要求するコンテンツ</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d83771e96" style="vertical-align:top;" class="slds-cell-wrap" data-label="カテゴリ">冒涜</td>
+
+              <td headers="d83771e99" style="vertical-align:top;" class="slds-cell-wrap" data-label="コンテンツのタイプ">扇動的、攻撃的、卑猥、下品、不遜な言葉、仕草、暴言を含むコンテンツ</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d83771e96" style="vertical-align:top;" class="slds-cell-wrap" data-label="カテゴリ">憎悪</td>
+
+              <td headers="d83771e99" style="vertical-align:top;" class="slds-cell-wrap" data-label="コンテンツのタイプ">アイデンティティまたはその他の際立った個人的な特性に基づいて、個人またはグループに心理的な損害を与えることを意図した行動や言葉を描写、参照、扇動するコンテンツ</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d83771e96" style="vertical-align:top;" class="slds-cell-wrap" data-label="カテゴリ">物理</td>
+
+              <td headers="d83771e99" style="vertical-align:top;" class="slds-cell-wrap" data-label="コンテンツのタイプ">違法な物質、非処方薬、および摂取すると生理的または心理的な影響を影響を及ぼすその他の物質、または身体的な危害、自傷行為、死を意図する行為を描写、参照、奨励したり、使用、取得、配布を可能にしたりするコンテンツ </td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">有害性スコアリング</h2><p>有害コンテンツの各カテゴリは、テキスト内のそのような有害言語の可能性を示すために評価されます。さらに、Einstein Trust Layer では、検出されたすべてのカテゴリの組み合わせを反映する全体的な有害性スコアが示されます。</p><p>スコアの範囲は 0 ～ 1 で、1 が最も有害です。スコアは監査履歴に記録され、Data 360に保存されます。 Trust Layerの事前作成済みレポートとダッシュボードでは、機能と時間の有害性トレンドが視覚化されます。Data 360 でカスタムレポートを作成することもできます。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="プロンプトで有害検出を有効にして、有害な文言が含まれるプロンプトを監視し、それに応じて変更できるようにします。これらの設定は Salesforce 組織に適用されます。" href="#generative_ai_trust_configure_toxicity_detection">プロンプトの有害性検出の有効化 (ベータ)</a></li></ul></div>
+</div></div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="prompt_builder-3.html">&larr; プロンプトビルダー（3/3）</a><a href="einstein_copilot-1.html">Einstein Copilot（1/5） &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=ai.copilot_intro.htm&type=5&language=ja">help.salesforce.com — Salesforce AI / Agentforce（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>

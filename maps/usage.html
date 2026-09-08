@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>活用・ルート最適化・Esri 連携 | Salesforce Maps ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（17）</h2>
+    <ol>
+      <li><a href="#salesforce_maps_usage">フィールド営業担当者向け Salesforce Maps</a></li>
+      <li><a href="#salesforce_maps_usage_esri_living_atlas">世界中の公開されているコンテンツのプロット</a></li>
+      <li><a href="#salesforce_maps_usage_grow_business">Salesforce Maps データを使用した新規ビジネスの検索</a></li>
+      <li><a href="#salesforce_maps_usage_grow_business_business_data">企業に製品やサービスを売り込む</a></li>
+      <li><a href="#salesforce_maps_usage_grow_business_concepts_data_considerations">Salesforce Maps データの使用に関する検討事項</a></li>
+      <li><a href="#salesforce_maps_usage_grow_business_concepts_data_examples">Salesforce Maps データを使用してビジネスを拡大させる例</a></li>
+      <li><a href="#salesforce_maps_usage_grow_business_concepts_data_examples_business">ビジネスデータの例</a></li>
+      <li><a href="#salesforce_maps_usage_grow_business_concepts_data_examples_demographic">デモグラフィックデータの例</a></li>
+      <li><a href="#salesforce_maps_usage_grow_business_concepts_data_examples_property">プロパティデータの例</a></li>
+      <li><a href="#salesforce_maps_usage_grow_business_concepts_data_types">リーチを広げるデータの種類</a></li>
+      <li><a href="#salesforce_maps_usage_grow_business_concepts_preparation">Salesforce Maps のデータを利用するための要件</a></li>
+      <li><a href="#salesforce_maps_usage_grow_business_demographic_context">未開拓の市場や開拓が不十分な市場に進出する</a></li>
+      <li><a href="#salesforce_maps_usage_grow_business_lead_generation">地図上でリードを生成し、新規市場を特定する</a></li>
+      <li><a href="#salesforce_maps_usage_grow_business_property_data">プロパティの所有者に製品とサービスを売り込む機会を探す</a></li>
+      <li><a href="#salesforce_maps_usage_visits">短時間でより多くの顧客を訪問</a></li>
+      <li><a href="#salesforce_maps_usage_visits_marker_selection">注意が必要なレコードの視覚化とフォーカスの設定</a></li>
+      <li><a href="#salesforce_maps_usage_visits_mass_actions">複数のレコードで同時に訪問を計画してアクションを実行</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>活用・ルート最適化・Esri 連携</h1>
+      <div class="meta">Salesforce Maps ヘルプ · 17 記事 · 生成 2026-08-13</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="advanced-2.html">&larr; Salesforce Maps Advanced・テリトリープランニング（2/2）</a><a href="field_features.html">現場機能（近隣検索・自動割当・チェックイン・スケジュール） &rarr;</a></div>
+<section class="article" id="salesforce_maps_usage">
+<h1 class="slds-text-heading_large">フィールド営業担当者向け Salesforce Maps</h1>
+  <p>顧客との関係構築の時間を増やし、移動時間を減らします。Salesforce Maps は、売上高と顧客サービスの向上、対面およびバーチャル訪問のスケジュールとルートの最適化、新規ビジネスの発見を支援します。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_usage_visits">短時間でより多くの顧客を訪問</a></strong><br>最適化された取引先訪問を基にして顧客リレーションを構築し維持することで、売上を増加することができます。Salesforce Maps の凡例から直接特定の取引先に対して行動することで、営業の生産性を向上できます。近辺の商談を使用してスケジュールの隙間を埋めて、効率的なルートを作成できます。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_usage_grow_business">Salesforce Maps データを使用した新規ビジネスの検索</a></strong><br>リードを生み出し、未開拓の市場や開拓が不十分な市場を見つけて、経営陣の販売およびサービスの目標を達成し、さらに上を目指します。新しい場所に進出し、自社の製品やサービスから利益を得られる人を特定し、出先で空いているスケジュールを埋めます。Salesforce Maps には、販売やサービスの目標を達成するための競争上の強みとなるプロパティ、ビジネス、デモグラフィックデータが含まれています。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_usage_esri_living_atlas">世界中の公開されているコンテンツのプロット</a></strong><br>Esri™ ArcGIS Living Atlas of the World から使用可能なレイヤーを Salesforce Maps で直接プロットすることで、地理的な状況に関する深いインサイトを取得し、販売とサービスを改善するスケジュールを計画できます。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_usage_esri_living_atlas">
+<h1 class="slds-text-heading_large">世界中の公開されているコンテンツのプロット</h1>
+  <p>Esri™ ArcGIS Living Atlas of the World から使用可能なレイヤーを Salesforce Maps で直接プロットすることで、地理的な状況に関する深いインサイトを取得し、販売とサービスを改善するスケジュールを計画できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d7138e59" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d7138e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Salesforce Maps にアクセスする</td>
+
+              <td headers="d7138e59" style="vertical-align:top;" class="slds-cell-wrap">Salesforce Maps</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span><a target="_blank" href="https://livingatlas.arcgis.com/en/browse">ArcGIS Living Atlas of the World</a> でレイヤーのカタログを参照します。</span>
+      </li><li>
+        <span>プロットするレイヤーをクリックし、その URL をコピーします。たとえば、山火事データをプロットするには、[<strong class="uicontrol">USA Current Wildfires</strong>] を選択します。次に、その URL をコピーします。</span>
+        <div>
+          <div style="text-align:left;">
+            <img alt="USA Current Wildfiles レイヤーの URL の選択" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/salesforce_maps_esri_living_atlas_layer_url.png">
+          </div>
+        </div>
+      </li><li>
+        <span>Salesforce Maps で ArcGIS レイヤーを作成します。このオプションが表示されない場合は、Salesforce Maps 権限グループで ArcGIS を有効にするように Salesforce システム管理者に依頼してください。</span>
+      </li><li>
+        <span>レイヤーに名前を付け、ArcGIS レイヤーの URL を貼り付けます。</span>
+        <div>
+          <div style="text-align:left;">
+            <img alt="新しい ArcGIS レイヤー名と URL" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/salesforce_maps_esri_living_atlas_layer_new.png">
+          </div>
+        </div>
+      </li><li>
+        <span>変更を保存します。</span>
+      </li><li>
+        <span>作成したレイヤーをプロットします。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_usage_grow_business">
+<h1 class="slds-text-heading_large">Salesforce Maps データを使用した新規ビジネスの検索</h1>
+  <p>リードを生み出し、未開拓の市場や開拓が不十分な市場を見つけて、経営陣の販売およびサービスの目標を達成し、さらに上を目指します。新しい場所に進出し、自社の製品やサービスから利益を得られる人を特定し、出先で空いているスケジュールを埋めます。Salesforce Maps には、販売やサービスの目標を達成するための競争上の強みとなるプロパティ、ビジネス、デモグラフィックデータが含まれています。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_usage_grow_business_concepts_data_types">リーチを広げるデータの種類</a></strong><br>Salesforce Maps では、自社の製品やサービスから利益を得られる市場のインサイトを直接把握できます。ATTOM や DatabaseUSA.com などのプロバイダーが提供する、信頼性の高いプロパティ、ビジネス、デモグラフィックのデータを利用できます。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_usage_grow_business_concepts_data_examples">Salesforce Maps データを使用してビジネスを拡大させる例</a></strong><br>Salesforce Maps で利用できるプロパティ、ビジネス、デモグラフィックデータを使用して、リード、取引先、商談を生成します。実際の事例から着想を得て、それをご自身のビジネス要件に適合させます。より詳細な情報が必要な場合は、ArcGIS の天気予報情報など、他の使用可能なデータを重ね合わせます。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_usage_grow_business_concepts_preparation">Salesforce Maps のデータを利用するための要件</a></strong><br>Salesforce Maps とそのデータにアクセスし、目標を設定し、地図上のデータを解釈します。その後、そのデータからリードや取引先を生成し、マーケティングキャンペーンがご自身やチームの目標達成に役立つかどうかを判断します。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_usage_grow_business_concepts_data_considerations">Salesforce Maps データの使用に関する検討事項</a></strong><br>プロパティ、ビジネス、デモグラフィックデータの使用に関する目標を設定します。Salesforce Maps のデータは、ATTOM や DatabaseUSA.com などの多数の信頼できるデータプロバイダーから提供されています。</li><li class="slds-p-bottom_small"><strong><a href="setup.html#salesforce_maps_mobile_considerations">Maps Mobile Enhanced に関する考慮事項</a></strong><br>再設計された Salesforce Maps アプリケーションでは、デスクトップの機能を最大限に活用できます。応答性の高いモバイルファーストの設計により、営業担当は信頼できる機能と同じ機能にアクセスでき、外出先での速度と使いやすさが最適化されています。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_usage_grow_business_lead_generation">地図上でリードを生成し、新規市場を特定する</a></strong><br>プロパティの所有者や企業に製品とサービスを売り込みます。プロパティデータやビジネスデータを使用することで、手間のかかるデータ入力を省いて Salesforce でリードを生成します。Salesforce Maps で事業拡大や採用活動のデモグラフィック要件を満たす場所を特定します。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_usage_grow_business_business_data">
+<h1 class="slds-text-heading_large">企業に製品やサービスを売り込む</h1>
+  <p>既存の顧客の近くにある企業に製品やサービスを提供します。Salesforce Maps にプロットした、DatabaseUSA.com の信頼できる米国とカナダのビジネスデータを使用して、特定の業種や場所に焦点を当てます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d8368e59" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d8368e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Salesforce Maps にアクセスする</td>
+
+              <td headers="d8368e59" style="vertical-align:top;" class="slds-cell-wrap">Salesforce Maps</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span><span class="menucascade"><strong class="uicontrol">[レイヤー]</strong> | <strong class="uicontrol">[保存済み]</strong> | <strong class="uicontrol">[個人]</strong> | <strong class="uicontrol">[新規]</strong> | <strong class="uicontrol">[データレイヤー]</strong></span> の順にクリックします。</span>
+        <div>
+          <div>
+            <img alt="データレイヤーの作成オプション" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/salesforce_maps_usage_grow_business_data_layer.png">
+          </div>
+        </div>
+      </li><li>
+        <span>データレイヤーの名前と説明を入力します。データソースに <strong class="uicontrol">[Business Data (USA) (ビジネスデータ (米国))]</strong> を選択します。</span>
+        <div>
+          <div>
+            <img alt="ビジネスデータソースを使用してデータレイヤーを作成するオプション" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/salesforce_maps_usage_grow_business_business_1.png">
+          </div>
+        </div>
+      </li><li>
+        <span>フィルターを追加すると、特定のプロパティの特性や場所に焦点を当てることができます。次に、マーカーポップアップに表示する取引先責任者名、住所、ビジネスの特徴などの詳細を指定します。</span>
+        <div>
+          <div>
+            <img alt="特定の特性に焦点を当てるフィルター" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/salesforce_maps_usage_grow_business_business_2.png">
+          </div>
+        </div>
+      </li><li>
+        <span>作業内容を保存し、データレイヤーをプロットします。特に力を入れたいエリアにズームし、そのエリアのレイヤーを更新します。</span>
+        <div><div><img alt="フィルター条件を満たす企業" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/salesforce_maps_usage_grow_business_business_3.png"></div>個別の企業および企業のクラスターを表すマーカーが表示されます。任意のマーカーを選択すると、そのマーカーに表示されている企業の詳細を確認できます。</div>
+      </li><li>
+        <span>企業のリードを生成するには、マーカーをクリックして <strong class="uicontrol">[アクション]</strong> を選択し、<strong class="uicontrol">[Click2Create]</strong> をクリックします。Click2Create へのアクセス権がない場合は、Salesforce システム管理者にお問い合わせください。</span>
+        <div>
+          <div>
+            <img alt="マーカーに表示する企業のリードの作成オプション" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/salesforce_maps_usage_grow_business_business_4.png">
+          </div>
+        </div>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_usage_grow_business_concepts_data_considerations">
+<h1 class="slds-text-heading_large">Salesforce Maps データの使用に関する検討事項</h1>
+  <p>プロパティ、ビジネス、デモグラフィックデータの使用に関する目標を設定します。Salesforce Maps のデータは、ATTOM や DatabaseUSA.com などの多数の信頼できるデータプロバイダーから提供されています。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:21.45922746781116%"><col style="width:78.54077253218884%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d20201e57" style="vertical-align:top;" class="slds-cell-wrap" scope="col">状況</th>
+            <th id="d20201e60" style="vertical-align:top;" class="slds-cell-wrap" scope="col">注意事項</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d20201e57" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">Salesforce Maps ライセンスの購入を検討している</td>
+
+            <td headers="d20201e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="注意事項"><p>Salesforce Maps は Salesforce が提供するさまざまなサービスで利用でき、追加料金を支払うと使用できます。次に例を示します。</p><ul><li>セールス</li>
+<li>サービス</li>
+<li>リテールエグゼキューション (Salesforce Maps が含まれているもの)</li>
+<li>金融サービス、ヘルスケア、製造など、その他の業界固有のサービス</li>
+</ul>
+<p style="margin-bottom:0;">オプションについては、Salesforce のアカウントエグゼクティブにご相談ください。</p></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d20201e57" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">プロパティデータ、ビジネスデータを使用する</td>
+
+            <td headers="d20201e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="注意事項"><p>Salesforce にデータをインポートする場合</p><ul><li>データの中には、メールアドレスが含まれていないものがあります。連絡を取る必要があるプロパティ所有者や企業のものである可能性が高いユーザー名やドメイン名を調査できます。</li>
+<li>Salesforce Maps の Click2Create を使用し、リードを作成するか取引先を作成するかを選択します。</li>
+<li>Salesforce のデータを管理し、データの重複を防止できます。重複管理が有効になっているかどうかは、Salesforce システム管理者が確認できます。</li>
+</ul>
+</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d20201e57" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">データに関する問題をトラブルシューティングする</td>
+
+            <td headers="d20201e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="注意事項"><p>プロバイダーやソースによって、Salesforce Maps で利用できるプロパティ、ビジネス、デモグラフィックデータが異なる場合があります。不正確なデータを見つけた場合は以下のとおり対応します。</p><ul><li>Salesforce カスタマーサポートがデータの潜在的な問題を調査します。問題が Salesforce Maps に起因する場合は、Salesforce Maps 製品チームが解決に向けたスケジュールを設定します。</li>
+<li>Salesforce がデータプロバイダーと協力して不正確な情報を修正します。ただし、プロバイダーが不正確な情報を解決するかどうか、また解決する時期については、Salesforce は関与できません。</li>
+</ul>
+</td>
+
+          </tr>
+        </tbody></table>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_usage_grow_business_concepts_data_examples">
+<h1 class="slds-text-heading_large">Salesforce Maps データを使用してビジネスを拡大させる例</h1>
+  <p>Salesforce Maps で利用できるプロパティ、ビジネス、デモグラフィックデータを使用して、リード、取引先、商談を生成します。実際の事例から着想を得て、それをご自身のビジネス要件に適合させます。より詳細な情報が必要な場合は、ArcGIS の天気予報情報など、他の使用可能なデータを重ね合わせます。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_usage_grow_business_concepts_data_examples_property">プロパティデータの例</a></strong><br>Salesforce Maps のプロパティデータを使用して、特定の特性を持つプロパティの所有者に焦点を当てた新しいエリアに進出し、自社の製品やサービスに共感する顧客を見つけられます。潜在的なビジネス商談を見込み取引先として Salesforce に追加します。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_usage_grow_business_concepts_data_examples_business">ビジネスデータの例</a></strong><br>既存の顧客の近くにいる見込み顧客に焦点を当てます。Salesforce Maps のビジネスデータを使用して、特定の特徴を持つ企業を検索し、出先で空いているスケジュールを埋めます。見込み顧客を見込み取引先またはリードとして Salesforce に追加します。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_usage_grow_business_concepts_data_examples_demographic">デモグラフィックデータの例</a></strong><br>Salesforce Maps のデモグラフィックデータを使用して、未開拓の地域や開拓が不十分な地域にビジネスを拡大したり、主要な母集団での採用活動を多様化したりします。検索結果は密度として地図上に表示され、どこに労力を集中させればよいかを確認できます。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_usage_grow_business_concepts_data_examples_business">
+<h1 class="slds-text-heading_large">ビジネスデータの例</h1>
+  <p>既存の顧客の近くにいる見込み顧客に焦点を当てます。Salesforce Maps のビジネスデータを使用して、特定の特徴を持つ企業を検索し、出先で空いているスケジュールを埋めます。見込み顧客を見込み取引先またはリードとして Salesforce に追加します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table>
+    <p>Salesforce Maps で DatabaseUSA.com のビジネスデータと定義したフィルターを使用して、データレイヤーを作成します。法人取引先責任者との連絡に関する役立つ詳細情報をマーカーポップアップに入力することで、見込み調査活動をサポートします。たとえば、取引先責任者名、住所、その他の関連する詳細情報を入力します。</p>
+    <div style="text-align:left;">
+      <img alt="ビジネスデータとフィルターを使用して作成するデータレイヤー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/salesforce_maps_data_examples_business_1.png">
+    </div>
+    <p>データレイヤーを地図上にプロットすると、定義したフィルターに基づいて企業が表示されます。</p>
+    <div style="text-align:left;">
+      <img alt="地図上にプロットされたデータレイヤーにより、定義したフィルターに基づいて企業が表示される" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/salesforce_maps_data_examples_business_2.png">
+    </div>
+    <p>見込み顧客を特定したら、Salesforce にリードまたは見込み取引先を作成するか、その見込み顧客をスケジュールやルートに追加するかを選択します。</p>
+    <p>以下の例では、新しい販売やサービスの見込み顧客を特定するために、さまざまな企業が Salesforce Maps で利用できるビジネスデータをどのように利用しているかを説明しています。</p>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:25.641025641025646%"><col style="width:74.35897435897436%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d6284e88" style="vertical-align:top;" class="slds-cell-wrap" scope="col">例</th>
+            <th id="d6284e91" style="vertical-align:top;" class="slds-cell-wrap" scope="col">新規見込み顧客の特定を支援するビジネスデータ</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d6284e88" style="vertical-align:top;" class="slds-cell-wrap" data-label="例">既存顧客の最も近くにある企業への営業</td>
+
+            <td headers="d6284e91" style="vertical-align:top;" class="slds-cell-wrap" data-label="新規見込み顧客の特定を支援するビジネスデータ"><p>近隣の工業団地でビジネスを拡大したいと考えているプロパティ管理会社のリーダーが、注力したいと考えている企業の基準</p><ul><li>社名、NAICS コード、SIC コードに特定の語句が含まれている</li>
+<li>企業規模が従業員 10 名以上</li>
+</ul>
+</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d6284e88" style="vertical-align:top;" class="slds-cell-wrap" data-label="例">建物の大きさ、間取り、ビジネス種別で建物を識別する</td>
+
+            <td headers="d6284e91" style="vertical-align:top;" class="slds-cell-wrap" data-label="新規見込み顧客の特定を支援するビジネスデータ"><p>ある新興の空調設備工事会社が、企業向けに潜在的な製品とサービスの提供機会を特定する基準</p><ul><li>面積 5,000 平方メートル以上</li>
+<li>従業員数 20 名以上</li>
+<li>特定の NAICS コードを含むビジネス種別</li>
+</ul>
+</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d6284e88" style="vertical-align:top;" class="slds-cell-wrap" data-label="例">空いているスケジュールをルートに沿って埋める</td>
+
+            <td headers="d6284e91" style="vertical-align:top;" class="slds-cell-wrap" data-label="新規見込み顧客の特定を支援するビジネスデータ"><p>ある医療用品メーカーの営業担当者が、営業ルートを有効活用するために近隣の企業を識別する基準</p><ul><li>社名、NAICS コード、SIC コードに特定の語句が含まれている企業</li>
+<li>営業担当者がいる場所から半径 15 マイル以内に事業所がある企業</li>
+</ul>
+</td>
+
+          </tr>
+        </tbody></table>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_usage_grow_business_concepts_data_examples_demographic">
+<h1 class="slds-text-heading_large">デモグラフィックデータの例</h1>
+  <p>Salesforce Maps のデモグラフィックデータを使用して、未開拓の地域や開拓が不十分な地域にビジネスを拡大したり、主要な母集団での採用活動を多様化したりします。検索結果は密度として地図上に表示され、どこに労力を集中させればよいかを確認できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table>
+    <p>Salesforce Maps で、デモグラフィックコンテキスト (USA) データソースと、定義したフィルターを使用してデータレイヤーを作成します。</p>
+    <div style="text-align:left;">
+      <img alt="プロパティデータとフィルターを使用して作成するデータレイヤー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/salesforce_maps_data_examples_demographic_1.png">
+    </div>
+    <p>データレイヤーを地図上にプロットすると、指定した表示オプションに基づく収入がある世帯の密度が表示されます。</p>
+    <div style="text-align:left;">
+      <img alt="地図上にプロットされたデータレイヤーにより、特定の区分内の収入がある世帯の密度が表示される" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/salesforce_maps_data_examples_demographic_2.png">
+    </div>
+    <p>密度の高いエリアを特定したら、どこに注力するかを決めます。</p>
+    <p>以下の例では、ビジネスや採用の拡大に必要となる母集団や関心のある分野を特定するために、さまざまな機関や企業が Salesforce Maps で利用できるデモグラフィックデータをどのように利用しているかを説明しています。</p>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:25.641025641025646%"><col style="width:74.35897435897436%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d4589e88" style="vertical-align:top;" class="slds-cell-wrap" scope="col">例</th>
+            <th id="d4589e91" style="vertical-align:top;" class="slds-cell-wrap" scope="col">母集団と関心のある分野の特定に役立つデモグラフィックデータ</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d4589e88" style="vertical-align:top;" class="slds-cell-wrap" data-label="例">採用活動を多様化する</td>
+
+            <td headers="d4589e91" style="vertical-align:top;" class="slds-cell-wrap" data-label="母集団と関心のある分野の特定に役立つデモグラフィックデータ"><p>社会経済的に恵まれないエリアの出願者を増やしたいと考えている大学の大学役員会が重要視する要素</p><ul><li>世帯年収</li>
+<li>年齢層別の子供の数</li>
+<li>保護者の最終学歴の割合</li>
+</ul>
+</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d4589e88" style="vertical-align:top;" class="slds-cell-wrap" data-label="例">開拓が不十分な地域社会に製品・サービスを提供する</td>
+
+            <td headers="d4589e91" style="vertical-align:top;" class="slds-cell-wrap" data-label="母集団と関心のある分野の特定に役立つデモグラフィックデータ"><p>旗艦店から半径 80 マイル以内にある別の場所への進出を検討している、ある地方の農業用品の会社のリーダーが郵便番号の他に検討している基準</p><ul><li>世帯年収 70,000 ドル以下</li>
+<li>世帯規模</li>
+<li>農業および関連事業に従事する人</li>
+</ul>
+</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d4589e88" style="vertical-align:top;" class="slds-cell-wrap" data-label="例">特定の母集団を特定する</td>
+
+            <td headers="d4589e91" style="vertical-align:top;" class="slds-cell-wrap" data-label="母集団と関心のある分野の特定に役立つデモグラフィックデータ"><p>ある住宅介護事業者は、以下の密度が高い郡に施設を開設するために、場所を調査しています。</p><ul><li>75 ～ 84 歳の人</li>
+<li>年収が 72,000 ドル以上の世帯</li>
+</ul>
+</td>
+
+          </tr>
+        </tbody></table>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_usage_grow_business_concepts_data_examples_property">
+<h1 class="slds-text-heading_large">プロパティデータの例</h1>
+  <p>Salesforce Maps のプロパティデータを使用して、特定の特性を持つプロパティの所有者に焦点を当てた新しいエリアに進出し、自社の製品やサービスに共感する顧客を見つけられます。潜在的なビジネス商談を見込み取引先として Salesforce に追加します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table>
+    <p>Salesforce Maps で、ATTOM のプロパティデータと、定義したフィルターを使用してデータレイヤーを作成します。プロパティの所有者との連絡に関する役立つ情報をマーカーポップアップに入力することで、見込み調査活動をサポートします。たとえば、所有者名、住所、その他の関連する詳細情報を入力します。</p>
+    <div style="text-align:left;">
+      <img alt="プロパティデータとフィルターを使用して作成するデータレイヤー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/salesforce_maps_data_examples_property_1.png">
+    </div>
+    <p>データレイヤーを地図上にプロットすると、定義した検索条件に基づいてプロパティが表示されます。見込み客を特定したら、Salesforce で見込み客を作成するか、その見込み客をスケジュールとルートに追加するかを選択します。</p>
+    <div style="text-align:left;">
+      <img alt="地図上にプロットされたデータレイヤーにより、定義したフィルターに基づいたプロパティが表示される" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/salesforce_maps_data_examples_property_2.png">
+    </div>
+    <p>以下の例では、新しい販売やサービスの見込み顧客を特定するために、さまざまな企業が Salesforce Maps で利用できるプロパティデータをどのように利用しているかを説明しています。</p>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:25.641025641025646%"><col style="width:74.35897435897436%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d9385e85" style="vertical-align:top;" class="slds-cell-wrap" scope="col">例</th>
+            <th id="d9385e88" style="vertical-align:top;" class="slds-cell-wrap" scope="col">新規見込み顧客の特定を支援するプロパティデータ</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d9385e85" style="vertical-align:top;" class="slds-cell-wrap" data-label="例">新しいエリア・市場に進出する</td>
+
+            <td headers="d9385e88" style="vertical-align:top;" class="slds-cell-wrap" data-label="新規見込み顧客の特定を支援するプロパティデータ"><p>他地域への進出を検討しているある警報システム会社が、以下のような特性を持つ物件を探しています。</p><ul><li>ベッドルーム 3 室以上</li>
+<li>所有者の占有率</li>
+<li>所有者持分が 100,000 ドルを越える</li>
+</ul>
+</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d9385e85" style="vertical-align:top;" class="slds-cell-wrap" data-label="例">自社の製品・サービスを必要とする顧客を特定する</td>
+
+            <td headers="d9385e88" style="vertical-align:top;" class="slds-cell-wrap" data-label="新規見込み顧客の特定を支援するプロパティデータ"><p>ある造園会社は、所有物件の特性が以下の条件に合致する、近隣の見込み顧客を探しています。</p><ul><li>敷地面積が 10,000 平方メートルを越える</li>
+<li>特定の郵便番号の範囲内にある</li>
+<li>商業用または住宅用に分類される</li>
+</ul>
+</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d9385e85" style="vertical-align:top;" class="slds-cell-wrap" data-label="例">特定のプロパティの所有者に売り込む</td>
+
+            <td headers="d9385e88" style="vertical-align:top;" class="slds-cell-wrap" data-label="新規見込み顧客の特定を支援するプロパティデータ"><p>ある屋根修理業者は、最近雹が降った地域に屋根の修理サービスを提供しています。ArcGIS のデータレイヤーにより、地図上に被害のあった地域が表示されます。その中で、最も多くリードを獲得できる物件は、以下のような物件です。</p><ul><li>屋根材がウッドシェイク、セラミックタイル、アスファルトシングルで作られている</li>
+<li>所有者持分が 200,000 ドルを超える</li>
+<li>敷地面積が 1,000 平方メートル以上</li>
+</ul>
+</td>
+
+          </tr>
+        </tbody></table>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_usage_grow_business_concepts_data_types">
+<h1 class="slds-text-heading_large">リーチを広げるデータの種類</h1>
+  <p>Salesforce Maps では、自社の製品やサービスから利益を得られる市場のインサイトを直接把握できます。ATTOM や DatabaseUSA.com などのプロバイダーが提供する、信頼性の高いプロパティ、ビジネス、デモグラフィックのデータを利用できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table>
+    <p>信頼できるデータソースのデータを地図上にプロットすれば、販売やサービスの目標を達成し、さらに上を目指せる可能性が高まります。何にフォーカスするかを判断するために使用するデータを、プロパティ、ビジネス、デモグラフィックのデータから選択できます。</p>
+    <div style="text-align:left;">
+      <img alt="Salesforce Maps のプロパティ、ビジネス、デモグラフィックデータ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/salesforce_maps_data_types.png">
+    </div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:16.528925619834713%"><col style="width:83.47107438016529%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d10457e69" style="vertical-align:top;" class="slds-cell-wrap" scope="col">利用できるデータ</th>
+            <th id="d10457e72" style="vertical-align:top;" class="slds-cell-wrap" scope="col">データ内容の例</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d10457e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="利用できるデータ">プロパティ</td>
+
+            <td headers="d10457e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="データ内容の例"><ul>
+                <li>プロパティの所有者とその住所</li>
+
+                <li>部屋数</li>
+
+                <li>ローンポジションおよび残高</li>
+
+                <li>資材構成、空調システム、プロパティの特徴</li>
+
+                <li>固定資産税評価額</li>
+
+              </ul>
+</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d10457e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="利用できるデータ">ビジネス</td>
+
+            <td headers="d10457e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="データ内容の例"><ul>
+                <li>会社情報 (従業員数、取引先責任者名、電話番号、郵送先住所など)</li>
+
+                <li>推定事業費 (光熱費、賃貸料、司法サービス、オフィス用品など)</li>
+
+                <li>業種コード</li>
+
+                <li>年間売上高の総額と範囲</li>
+
+              </ul>
+</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d10457e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="利用できるデータ">デモグラフィック</td>
+
+            <td headers="d10457e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="データ内容の例"><ul>
+                <li>所得区分</li>
+
+                <li>年齢層</li>
+
+                <li>教育水準</li>
+
+              </ul>
+</td>
+
+          </tr>
+        </tbody></table>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Salesforce Maps で利用できる米国の公開ビジネスデータを最大限に活用することで、より多くのビジネスを獲得できます。データレイヤーをフィルタリングしてプロットすることで、それぞれのビジネスの取り組みに関連する営業やサービスの機会が見つかります。" href="reference.html#salesforce_maps_setup_reference_fields_data_layers_business">ビジネスデータ用項目 (米国)</a></li><li><a title="Salesforce Maps で利用できる米国のプロパティに関する公開データを使用して機会を見つけ出し、より多くのリードを創出します。データレイヤーをフィルタリングしてプロットすることで、自社の製品やサービスが有益となる顧客を発見できます。" href="reference.html#salesforce_maps_setup_reference_fields_data_layers_property">プロパティデータ用項目 (米国)</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_usage_grow_business_concepts_preparation">
+<h1 class="slds-text-heading_large">Salesforce Maps のデータを利用するための要件</h1>
+  <p>Salesforce Maps とそのデータにアクセスし、目標を設定し、地図上のデータを解釈します。その後、そのデータからリードや取引先を生成し、マーケティングキャンペーンがご自身やチームの目標達成に役立つかどうかを判断します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table>
+    <p>信頼できるデータソースのデータを地図上にプロットすれば、販売やサービスの目標を達成し、さらに上を目指せる可能性が高まります。何にフォーカスするかを判断するために使用するデータを、プロパティ、ビジネス、デモグラフィックのデータから選択できます。</p>
+    <div>
+      <img alt="Salesforce Maps のデータを利用するための要件" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/salesforce_maps_data_prep.png">
+    </div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:16.528925619834713%"><col style="width:83.47107438016529%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d9493e69" style="vertical-align:top;" class="slds-cell-wrap" scope="col">目的</th>
+            <th id="d9493e72" style="vertical-align:top;" class="slds-cell-wrap" scope="col">方法</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d9493e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="目的">ライセンスを取得する</td>
+
+            <td headers="d9493e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="方法"><p>Salesforce Maps のライセンスをお持ちでない場合は、Salesforce のアカウントエグゼクティブにご相談ください。担当のアカウントエグゼクティブが、以下を購入する必要があるかどうかを判断するサポートをします。</p><ul><li>Salesforce Maps (営業、サービス、または金融サービス、ヘルスケア、製造などの業種固有のサービスのアドオンとして)</li>
+<li>Salesforce Maps に標準搭載されている Consumer Goods でのリテールエグゼキューション</li>
+</ul>
+</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d9493e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="目的">目標を設定する</td>
+
+            <td headers="d9493e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="方法"><p>普段使用しているリードのソースを補完する、見込み顧客の健全なパイプラインを構築します。Salesforce Maps のデータを使用して、追跡するプロパティや企業のリードや取引先を作成できます。</p><p style="margin-bottom:0;">未開拓の市場や開拓が不十分な市場にビジネスを拡大するか、それらの市場から採用を考えている場合は、どのような特性を持つ母集団が自社の製品や求人に反応する可能性が高いかを判断します。たとえば、人口が多く、世帯の所得が特定の区分に集中している地域に焦点を当てます。</p></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d9493e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="目的">データをマッピングする</td>
+
+            <td headers="d9493e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="方法"><p>Salesforce Maps にプロットするデータレイヤーを作成します。追跡するプロパティや企業を表すデータを特定したら、Salesforce Maps の Click2Create を使用してリードを作成します。</p><p style="margin-bottom:0;">デモグラフィックデータを使用する場合は、事業の拡大や人材の効率的な採用ができる可能性が高いエリアを地図上に可視化します。</p></td>
+
+          </tr>
+        </tbody></table>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=sf.retail_concept_user_get_started.htm&amp;language=ja&amp;type=5">Salesforce ヘルプ: 手元で操作できるリテールエグゼキューション</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_usage_grow_business_demographic_context">
+<h1 class="slds-text-heading_large">未開拓の市場や開拓が不十分な市場に進出する</h1>
+  <p>ビジネスを拡大するために最適な市場を見極め、特定の人口統計に基づいて採用活動を多様化し、主要な母集団に販売とサービスの労力を集中させます。地図上のビジュアルインジケーターは、Salesforce Maps のデモグラフィックデータを使用して、新しいビジネスの機会や人材を集中的に探す場所を示します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d7951e59" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d7951e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Salesforce Maps にアクセスする</td>
+
+              <td headers="d7951e59" style="vertical-align:top;" class="slds-cell-wrap">Salesforce Maps</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span><span class="menucascade"><strong class="uicontrol">[レイヤー]</strong> | <strong class="uicontrol">[保存済み]</strong> | <strong class="uicontrol">[個人]</strong> | <strong class="uicontrol">[新規]</strong> | <strong class="uicontrol">[データレイヤー]</strong></span> の順にクリックします。</span>
+        <div>
+          <div>
+            <img alt="デモグラフィックコンテキストデータソースを使用してデータレイヤーを作成するオプション" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/salesforce_maps_usage_grow_business_data_layer.png">
+          </div>
+        </div>
+      </li><li>
+        <span>データレイヤーの名前と説明を入力します。データソースに <strong class="uicontrol">[Demographic Context (USA) (デモグラフィックコンテキスト (米国))]</strong> を選択し、近隣地域や郵便番号など、地図に表示する情報の詳細度を選択します。</span>
+        <div>
+          <div>
+            <img alt="デモグラフィックコンテキストデータソースを使用してデータレイヤーを作成するオプション" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/salesforce_maps_usage_grow_business_demographic_context_data_layer_2.png">
+          </div>
+        </div>
+      </li><li>
+        <span>フィルターを追加すると、都道府県など、特定のエリアに焦点を当てます。</span>
+        <div>
+          <div>
+            <img alt="特定のエリアに焦点を当てるフィルター" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/salesforce_maps_usage_grow_business_demographic_context_data_layer_3.png">
+          </div>
+        </div>
+      </li><li>
+        <span>他のエリアより大きな商機があるエリアを区別するためにスタイルを追加します。たとえば、所得が 50,000 ドルから 59,999 ドルの世帯が最も多い郵便番号に焦点を当てることができます。 どこに労力を集中させるかを示すには、範囲とそれに対応する色を設定します。この色は、選択した範囲の所得がある世帯の密度を示します。</span>
+        <div>
+          <div>
+            <img alt="エリアの商機を区別するスタイル" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/salesforce_maps_usage_grow_business_demographic_context_data_layer_4.png">
+          </div>
+        </div>
+      </li><li>
+        <span>作業内容を保存し、データレイヤーをプロットします。労力を集中させる部分にズームインします。</span>
+        <div>
+          <div>
+            <img alt="所得が 50,000 ～ 59,999 ドルである世帯を含むデータレイヤー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/salesforce_maps_usage_grow_business_demographic_context.png">
+          </div>
+        </div>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_usage_grow_business_lead_generation">
+<h1 class="slds-text-heading_large">地図上でリードを生成し、新規市場を特定する</h1>
+  <p>プロパティの所有者や企業に製品とサービスを売り込みます。プロパティデータやビジネスデータを使用することで、手間のかかるデータ入力を省いて Salesforce でリードを生成します。Salesforce Maps で事業拡大や採用活動のデモグラフィック要件を満たす場所を特定します。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_usage_grow_business_property_data">プロパティの所有者に製品とサービスを売り込む機会を探す</a></strong><br>ATTOM の信頼できるプロパティデータを使用して、自社の製品やサービスから利益を得られるプロパティを特定します。発行済みの許可証、ローンポジションとローン残高、プロパティの特徴や特性のインサイトを把握できます。Salesforce Maps のデータを使用して、地図上で特定の都市や地域に焦点を当てます。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_usage_grow_business_business_data">企業に製品やサービスを売り込む</a></strong><br>既存の顧客の近くにある企業に製品やサービスを提供します。Salesforce Maps にプロットした、DatabaseUSA.com の信頼できる米国とカナダのビジネスデータを使用して、特定の業種や場所に焦点を当てます。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_usage_grow_business_demographic_context">未開拓の市場や開拓が不十分な市場に進出する</a></strong><br>ビジネスを拡大するために最適な市場を見極め、特定の人口統計に基づいて採用活動を多様化し、主要な母集団に販売とサービスの労力を集中させます。地図上のビジュアルインジケーターは、Salesforce Maps のデモグラフィックデータを使用して、新しいビジネスの機会や人材を集中的に探す場所を示します。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_usage_grow_business_property_data">
+<h1 class="slds-text-heading_large">プロパティの所有者に製品とサービスを売り込む機会を探す</h1>
+  <p>ATTOM の信頼できるプロパティデータを使用して、自社の製品やサービスから利益を得られるプロパティを特定します。発行済みの許可証、ローンポジションとローン残高、プロパティの特徴や特性のインサイトを把握できます。Salesforce Maps のデータを使用して、地図上で特定の都市や地域に焦点を当てます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d10711e59" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d10711e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Salesforce Maps にアクセスする</td>
+
+              <td headers="d10711e59" style="vertical-align:top;" class="slds-cell-wrap">Salesforce Maps</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span><span class="menucascade"><strong class="uicontrol">[レイヤー]</strong> | <strong class="uicontrol">[保存済み]</strong> | <strong class="uicontrol">[個人]</strong> | <strong class="uicontrol">[新規]</strong> | <strong class="uicontrol">[データレイヤー]</strong></span> の順にクリックします。</span>
+        <div>
+          <div>
+            <img alt="データレイヤーの作成オプション" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/salesforce_maps_usage_grow_business_data_layer.png">
+          </div>
+        </div>
+      </li><li>
+        <span>データレイヤーの名前と説明を入力します。データソースに <strong class="uicontrol">[Property Data (USA) (プロパティデータ (米国))]</strong> を選択します。</span>
+        <div>
+          <div>
+            <img alt="プロパティデータソースを使用してデータレイヤーを作成するオプション" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/salesforce_maps_usage_grow_business_property_1.png">
+          </div>
+        </div>
+      </li><li>
+        <span>フィルターを追加すると、特定のプロパティの特性や場所に焦点を当てることができます。次に、マーカーポップアップに表示する名前、住所、プロパティの特徴などの詳細を指定します。</span>
+        <div>
+          <div>
+            <img alt="特定の特性やエリアに焦点を当てるフィルター" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/salesforce_maps_usage_grow_business_property_2.png">
+          </div>
+        </div>
+      </li><li>
+        <span>作業内容を保存し、データレイヤーをプロットします。特に力を入れたいエリアにズームし、そのエリアのレイヤーを更新します。</span>
+        <div><div><img alt="フィルターの条件を満たしたプロパティ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/salesforce_maps_usage_grow_business_property_4.png"></div>個別のプロパティおよびプロパティのクラスターを表すマーカーが表示されます。任意のマーカーを選択すると、そのマーカーに表示されているプロパティの詳細を確認できます。</div>
+      </li><li>
+        <span>プロパティのリードを作成するには、マーカーをクリックして <strong class="uicontrol">[アクション]</strong> を選択し、<strong class="uicontrol">[Click2Create]</strong> をクリックします。Click2Create へのアクセス権がない場合は、Salesforce システム管理者にお問い合わせください。</span>
+        <div>
+          <div>
+            <img alt="マーカーに表示するプロパティのリードを作成するオプション" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/salesforce_maps_usage_grow_business_property_5.png">
+          </div>
+        </div>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_usage_visits">
+<h1 class="slds-text-heading_large">短時間でより多くの顧客を訪問</h1>
+  <p>最適化された取引先訪問を基にして顧客リレーションを構築し維持することで、売上を増加することができます。Salesforce Maps の凡例から直接特定の取引先に対して行動することで、営業の生産性を向上できます。近辺の商談を使用してスケジュールの隙間を埋めて、効率的なルートを作成できます。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_usage_visits_mass_actions">複数のレコードで同時に訪問を計画してアクションを実行</a></strong><br>複数の取引先に対して訪問を適切なタイミングで一度にスケジュールすることで、顧客の期待に応え、さらにそれ以上の成果を得ることができます。Salesforce Maps でプロットされた凡例から一括アクションを使用することで、マーカーまたは多角形レイヤーのレコードを容易に管理できます。マップで取引先を表示しながら、アクションを実行する取引先を決定できます。マーカーの色や形状は、1 つのアクションまたは一括アクションの変更を始めると、ただちに更新されます。</li><li class="slds-p-bottom_small"><strong><a href="#salesforce_maps_usage_visits_marker_selection">注意が必要なレコードの視覚化とフォーカスの設定</a></strong><br>地図上で重要なレコードを選択し、凡例に表示されているリストからそのレコードに対する一括アクションを実行します。Salesforce Maps で現在重要な項目に注目させるために、図形、色、不透明度のオプションを使用してレコードを明確化します。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_usage_visits_marker_selection">
+<h1 class="slds-text-heading_large">注意が必要なレコードの視覚化とフォーカスの設定</h1>
+  <p>地図上で重要なレコードを選択し、凡例に表示されているリストからそのレコードに対する一括アクションを実行します。Salesforce Maps で現在重要な項目に注目させるために、図形、色、不透明度のオプションを使用してレコードを明確化します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d4211e59" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d4211e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Salesforce Maps にアクセスする</td>
+
+              <td headers="d4211e59" style="vertical-align:top;" class="slds-cell-wrap">Salesforce Maps</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>マーカーまたは多角形レイヤーを開きます。</span>
+      </li><li>
+        <span><strong class="uicontrol">[マーカーを選択してください]</strong> をクリックし、Ctrl キーのショートカットを使用してマーカーを選択します。</span>
+        <div>
+          <div style="text-align:left;"><img alt="Ctrl ショートカットを使用して選択されたマーカー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/selected_markers_ctrl_shortcuts.png"></div>
+        </div>
+      </li><li>
+        <span>レコードのリストを表示し、実行するアクションを選択します。</span>
+      </li><li>
+        <span>選択したレコードを明確にして、選択していないレコードの不透明度を減らすように、表示オプションを設定します。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="salesforce_maps_usage_visits_mass_actions">
+<h1 class="slds-text-heading_large">複数のレコードで同時に訪問を計画してアクションを実行</h1>
+  <p>複数の取引先に対して訪問を適切なタイミングで一度にスケジュールすることで、顧客の期待に応え、さらにそれ以上の成果を得ることができます。Salesforce Maps でプロットされた凡例から一括アクションを使用することで、マーカーまたは多角形レイヤーのレコードを容易に管理できます。マップで取引先を表示しながら、アクションを実行する取引先を決定できます。マーカーの色や形状は、1 つのアクションまたは一括アクションの変更を始めると、ただちに更新されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="サポートされる Salesforce エディション、ユーザーインターフェース、製品領域を特定します。" href="misc_combined.html#salesforce_maps_editions">サポートされている</a>エディションを表示する。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d3053e59" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d3053e59" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Salesforce Maps にアクセスする</td>
+
+              <td headers="d3053e59" style="vertical-align:top;" class="slds-cell-wrap">Salesforce Maps</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>マーカーまたは多角形レイヤーを開きます。</span>
+      </li><li>
+        <span>業種や年間売上など、操作する項目に応じてマーカーを表示します。</span>
+      </li><li>
+        <span>マーカー行を右クリックします。クリックした行が強調表示されるため、簡単に識別できます。そのマーカーで実行したアクションは、その中に含まれるすべてのレコードに適用されます。</span>
+        <div>
+          <div style="text-align:left;">
+            <img alt="凡例のマーカーでの一括アクション" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-sales-salesforce_maps-262-0-0-production-jajp/a9ed4068-ad76-49d7-93bc-01ba622f9cd1/salesforce_maps/images/salesforce_maps_mass_actions_from_legend.png">
+          </div>
+        </div>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="advanced-2.html">&larr; Salesforce Maps Advanced・テリトリープランニング（2/2）</a><a href="field_features.html">現場機能（近隣検索・自動割当・チェックイン・スケジュール） &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=sales.salesforce_maps_setup_maps.htm&type=5&language=ja">help.salesforce.com — Salesforce Maps（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>

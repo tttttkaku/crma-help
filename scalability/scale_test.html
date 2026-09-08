@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Scale Test（負荷テスト） | スケーラビリティ ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（5）</h2>
+    <ol>
+      <li><a href="#scale_test_faq">Scale Test FAQ</a></li>
+      <li><a href="#scale_test_load_generation">Use Load Generation Features in Scale Test</a></li>
+      <li><a href="#scale_test_load_generation_limits">Load Generation Limits and Guardrails</a></li>
+      <li><a href="#scale_test_overview">Scale Test</a></li>
+      <li><a href="#scale_test_view_limits_and_usage">Scale Test’s Limits and Suggested Usage</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>Scale Test（負荷テスト）</h1>
+      <div class="meta">Salesforce スケーラビリティ ヘルプ · 5 記事 · 生成 2026-08-17</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="overview.html">&larr; スケーラビリティ概要</a><a href="scale_center.html">Scale Center（パフォーマンス診断） &rarr;</a></div>
+<section class="article" id="scale_test_faq">
+<h1 class="slds-text-heading_large">Scale Test FAQ</h1>
+  
+  <p>Get answers to common questions about using Scale Test.</p>
+
+            <div><h2 class="slds-text-heading_medium slds-p-top_small">What is Scale Test and how does it differ from traditional performance testing
+        tools?</h2><p>Scale Test is a tool designed exclusively for Salesforce that enhances your sandbox
+        infrastructure to a production-scale configuration, allowing you to test the performance of
+        your Salesforce org under heavy load. Unlike traditional tools like JMeter or LoadRunner,
+        which only generate load against existing environments, Scale Test actually scales your
+        sandbox to a production-like configuration.</p></div>
+            <div><h2 class="slds-text-heading_medium slds-p-top_small">Which types of performance tests does Scale Test support?</h2><p>Scale Test supports all major performance tests, including load, stress, endurance,
+        and spike testing. The tool handles up to 26,000 Transactions Per Second (TPS) in Hyperforce
+        environments and scales beyond 4,500 Requests Per Second (RPS) based on customer
+        requirements.</p></div>
+            <div><h2 class="slds-text-heading_medium slds-p-top_small">How quickly can I set up and run my first performance test?</h2><p>Scale Test simplifies the setup process, allowing developers and architects to
+        schedule tests in minutes. It includes a Test Script Builder for recording user journeys
+        that auto-generates Playwright TypeScript scripts, making it easier to test Lightning
+        components without extensive customization.</p></div>
+            <div><h2 class="slds-text-heading_medium slds-p-top_small">How does Scale Test simulate real-world user interactions?</h2><p>Scale Test offers a Test Script Builder for UI journey recording and supports both
+        Playwright (frontend) and JMeter (API-heavy) workloads. It also includes AI-powered script
+        healing to fix common script issues and build complex workloads.</p></div>
+            <div><h2 class="slds-text-heading_medium slds-p-top_small">How do I calculate my Requests Per Second (RPS)?</h2><p>Visit the Org Performance page in Scale Center. View the Request Volume/10 min graph, and
+        then divide it by 600 to convert it to requests per second. If you don't have any production
+        volume, run a small test with 10 or 20 users on your sandbox and review the graph in Scale
+        Center.</p></div>
+            <div><h2 class="slds-text-heading_medium slds-p-top_small">Which Salesforce clouds does Scale Test support?</h2><p>Scale Test fully supports clouds that run entirely on the Salesforce core platform,
+        including Sales Cloud, Service Cloud, Experience Cloud, Revenue Cloud, and B2B Commerce.
+        Clouds that run partially on the core platform, such as Health Cloud, Marketing Cloud,
+        Energy &amp; Utilities Cloud, Communications Cloud, Media Cloud, and other industry clouds,
+        are supported for the portions of their implementation that are built on the core
+        platform.</p></div>
+            <div><h2 class="slds-text-heading_medium slds-p-top_small">Which performance metrics and reports are available?</h2><p>Scale Test provides live client-side metrics and can differentiate between
+        Lightning rendering and Salesforce backend performance. It includes a Test Plan Creation
+        report that identifies scale hotspots, live observability with metrics, logs, errors, and
+        screenshots, and integration with Scale Center for detailed investigations.</p></div>
+            <div><h2 class="slds-text-heading_medium slds-p-top_small">How long is my test data retained?</h2><p>You can retrieve Test Plan Creation reports from the last 30 days and Trial
+        Accuracy reports from the last 15 days.</p></div>
+            <div><h2 class="slds-text-heading_medium slds-p-top_small">Does Scale Test impact org performance or access my data?</h2><p>No, the logs collected by Scale Test have no impact on your org's performance.
+        Scale Test only accesses observability data collected from execution and doesn’t access your
+        data.</p></div>
+            <div><h2 class="slds-text-heading_medium slds-p-top_small">How is Scale Test licensed and booked?</h2><p>Scale Test is a standalone SKU priced per day, with each day providing 24 hours of
+        enhanced, production-like sandbox infrastructure. A Scale Test day begins at 00:00 and ends
+        at 23:59 local organization time, as configured in your Setup. New bookings require two
+        weeks of notice. Choose a point of contact with access to the Scale Test features. That
+        person receives email reminders and in-app notifications about upcoming activities.</p></div>
+            <div><h2 class="slds-text-heading_medium slds-p-top_small">Why are there unavailable scale test days on my calendar?</h2><p>Another customer in your instance could be testing on those days, or they were blocked for internal reasons.</p></div>
+            <div><h2 class="slds-text-heading_medium slds-p-top_small">What should I do if my sandbox is refreshed or deleted?</h2><p>If you refresh or delete a sandbox, you must cancel any booked Scale Test days to
+        avoid being charged. Cancellations require at least one week of notice. If the test
+        environment upgrade validation fails for a particular scale test day, you can request an
+        additional test from your Salesforce account executive. Bookings are for a specific 24-hour
+        window and can't be extended. You must adhere to the confirmed schedule. If you test beyond
+        that, Salesforce reserves the right to stop your test.</p></div>
+            <div><h2 class="slds-text-heading_medium slds-p-top_small">Can minor sandbox releases impact scale tests?</h2><p>Yes, minor sandbox releases are normal and can occur during scale tests. We can’t
+        prevent them, but you can run your test again to mitigate the impact, especially for
+        standard 24-hour tests. To help us investigate performance issues, provide the request
+        duration, normal response times, and details about the affected requests.</p></div>
+            <div><h2 class="slds-text-heading_medium slds-p-top_small">What happens if I exceed my booked RPS or if Salesforce cancels my
+        test?</h2><p>You must provide your expected maximum RPS when booking your test. If you test beyond that, or if your test causes
+        issues in the overall instance, Salesforce reserves the right to stop it. If Salesforce cancels
+        your test day, you receive at least 12 hours of notice, won't be charged for that day, and can
+        book the next available slot. Contact your account executive.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">How do I get access to Scale Test features?</h2><p>A system admin can assign you to either the
+          <code>ScaleTestingServiceStandardUserPS</code> (basic access without Test
+        Scheduler) or the <code>ScaleTestingServiceAdvancedUserPS</code> permission set (full access). Also,
+        see <a target="_blank" href="https://help.salesforce.com/s/articleView?id=000386961&amp;language=en_US&amp;type=1">Match production and sandbox licenses without a sandbox
+          refresh</a>.</p></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="scale_test_load_generation">
+<h1 class="slds-text-heading_large">Use Load Generation Features in Scale Test</h1>
+ 
+ <p>Validate your app's performance before peak demand by running a full-scale load test in
+  a production-like environment.</p>
+
+  <div><p>The Load Generation feature in Scale Test runs traffic simulations with JMeter or Playwright
+    scripts. Use these simulations to identify governor limit violations, measure response times,
+    and compare sandbox behavior against a production baseline before issues happen in
+    production.</p></div>
+  <ol><li>
+    <span>Set up your test environment.</span>
+    <ol>
+     <li>
+      <span>In Scale Test, go to <strong class="uicontrol">Test Environment Setup</strong> and select
+        <strong class="uicontrol">Manage Workloads</strong>. Enter your GitHub repository URL and personal
+       access token, then click <strong class="uicontrol">Fetch Workloads</strong>. Confirm imported workloads
+       show <strong class="uicontrol">Valid</strong> status.</span>
+     </li>
+
+     <li>
+      <span>Select <strong class="uicontrol">Trial Accuracy Checker</strong>. Enter your production baseline
+       metrics and sandbox trial run metrics, then click <strong class="uicontrol">Submit</strong>. Confirm that
+       accuracy rates are 90% or higher before proceeding. Trial runs show accuracy percentages
+       only. Results files are generated for full scale tests only.</span>
+     </li>
+
+     <li>
+      <span>Select <strong class="uicontrol">Test RPS Estimator</strong>. Select a trial run date and time, then
+       enter a scaling factor to calculate your target Requests Per Second (RPS).</span>
+     </li>
+
+    </ol>
+   </li><li>
+    <span>Book your scale test.</span>
+    <ol>
+     <li>
+      <span>Go to <strong class="uicontrol">Test Scheduler</strong> and click <strong class="uicontrol">New
+       Booking</strong>.</span>
+     </li>
+
+     <li>
+      <span>Review the booking requirements and click <strong class="uicontrol">I Acknowledge</strong>.</span>
+     </li>
+
+     <li>
+      <span>Enter your trial run details and scaling factor, select your test dates, enter a test
+       name, and click <strong class="uicontrol">Submit</strong>.</span>
+     </li>
+
+    </ol>
+   </li><li>
+    <span>Execute and monitor your test.</span>
+    <ol>
+     <li>
+      <span>When your slot is active, go to <strong class="uicontrol">Test Execution</strong>. On the
+        <strong class="uicontrol">Test Runs</strong> tab, select your workload, enter a test name, and click
+        <strong class="uicontrol">Run</strong>.</span>
+     </li>
+
+     <li>
+      <span>Click <strong class="uicontrol">View</strong> under <strong class="uicontrol">Live Test</strong> to monitor
+       real-time metrics. Use <strong class="uicontrol">Suspend</strong>, <strong class="uicontrol">Restart</strong>, or
+        <strong class="uicontrol">Terminate</strong> to manage individual tasks during the run.</span>
+     </li>
+
+     <li>
+      <span>When the test is complete, click <strong class="uicontrol">Create Report</strong>. Enter a name and
+       time range.</span>
+     </li>
+
+    </ol>
+   </li><li>
+    <span>Analyze the report results.</span>
+    <ol>
+     <li>
+      <span>Review summary metrics: total logged-in users, average RPS, governor limit hits, and
+       org throttle status.</span>
+     </li>
+
+     <li>
+      <span>Check the <strong class="uicontrol">Governor Limit Hits</strong> table for exceptions such as too
+       many SOQL queries and resolve them before scheduling a larger test.</span>
+     </li>
+
+     <li>
+      <span>Review <strong class="uicontrol">Apex Performance</strong> for CPU and DB time distribution by
+       entry point. Visit ApexGuru in Scale Center for optimization guidance.</span>
+     </li>
+
+    </ol>
+   </li></ol>
+
+  <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="Load Generation Phases" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-xcloud-scalability-262-0-0-production-enus/10fed30e-b440-4267-91a6-b6264993ae50/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">Load Generation Phases</span> 
+   
+   <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:33.33333333333333%"><col style="width:66.66666666666666%"></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d4981e224" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Phase</th>
+       <th id="d4981e227" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Description</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d4981e224" style="vertical-align:top;" class="slds-cell-wrap" data-label="Phase">Phase 1: Test Environment Setup</td>
+
+       <td headers="d4981e227" style="vertical-align:top;" class="slds-cell-wrap" data-label="Description">Import JMeter or Playwright scripts from GitHub, validate accuracy against a
+        production baseline, and calculate your target RPS.</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d4981e224" style="vertical-align:top;" class="slds-cell-wrap" data-label="Phase">Phase 2: Book Your Scale Test</td>
+
+       <td headers="d4981e227" style="vertical-align:top;" class="slds-cell-wrap" data-label="Description">Reserve a production-like sandbox slot, acknowledge booking policies, and confirm your
+        scaling factor, target RPS, and test dates.</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d4981e224" style="vertical-align:top;" class="slds-cell-wrap" data-label="Phase">Phase 3: Test Execution and Analysis</td>
+
+       <td headers="d4981e227" style="vertical-align:top;" class="slds-cell-wrap" data-label="Description">Run your workload, monitor live JMeter and Playwright metrics, generate a report,
+        and review governor limit hits, RPS projections, and Apex performance.</td>
+
+      </tr>
+     </tbody></table>
+  </div></div></div>
+ 
+<ul><li class="slds-p-bottom_small"><strong><a href="#scale_test_load_generation_limits">Load Generation Limits and Guardrails</a></strong><br>Review execution limits and infrastructure guardrails for the Load Generation feature in Scale Test.</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="scale_test_load_generation_limits">
+<h1 class="slds-text-heading_large">Load Generation Limits and Guardrails</h1>
+ 
+ <p>Review execution limits and infrastructure guardrails for the Load Generation feature in Scale Test.</p>
+
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">Capacity and Execution Limits</h2><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col><col><col><col></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d7133e45" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Scope</th>
+       <th id="d7133e48" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Parameter</th>
+       <th id="d7133e51" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Limit</th>
+       <th id="d7133e54" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Notes</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d7133e45" style="vertical-align:top;" class="slds-cell-wrap" data-label="Scope">Per scale test run</td>
+
+       <td headers="d7133e48" style="vertical-align:top;" class="slds-cell-wrap" data-label="Parameter">Max scripts (tasks)</td>
+
+       <td headers="d7133e51" style="vertical-align:top;" class="slds-cell-wrap" data-label="Limit">25</td>
+
+       <td headers="d7133e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="Notes">JMeter only. Scripts and tasks are synonymous.</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d7133e45" style="vertical-align:top;" class="slds-cell-wrap" data-label="Scope">Per scale test run</td>
+
+       <td headers="d7133e48" style="vertical-align:top;" class="slds-cell-wrap" data-label="Parameter">Max scripts (tasks)</td>
+
+       <td headers="d7133e51" style="vertical-align:top;" class="slds-cell-wrap" data-label="Limit">10</td>
+
+       <td headers="d7133e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="Notes">Playwright only. Scripts and tasks are synonymous.</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d7133e45" style="vertical-align:top;" class="slds-cell-wrap" data-label="Scope">Across all runs</td>
+
+       <td headers="d7133e48" style="vertical-align:top;" class="slds-cell-wrap" data-label="Parameter">Max concurrent users</td>
+
+       <td headers="d7133e51" style="vertical-align:top;" class="slds-cell-wrap" data-label="Limit">4000</td>
+
+       <td headers="d7133e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="Notes">Playwright only.</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d7133e45" style="vertical-align:top;" class="slds-cell-wrap" data-label="Scope">Across all concurrent runs per org</td>
+
+       <td headers="d7133e48" style="vertical-align:top;" class="slds-cell-wrap" data-label="Parameter">Max parallel tasks</td>
+
+       <td headers="d7133e51" style="vertical-align:top;" class="slds-cell-wrap" data-label="Limit">100</td>
+
+       <td headers="d7133e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="Notes">&nbsp;</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d7133e45" style="vertical-align:top;" class="slds-cell-wrap" data-label="Scope">Outside a booked scale test window</td>
+
+       <td headers="d7133e48" style="vertical-align:top;" class="slds-cell-wrap" data-label="Parameter">Max scripts (sanity runs)</td>
+
+       <td headers="d7133e51" style="vertical-align:top;" class="slds-cell-wrap" data-label="Limit">5</td>
+
+       <td headers="d7133e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="Notes">Granted by exception. Applies to test runs outside the booked calendar window.</td>
+
+      </tr>
+      <tr class="">
+       <td headers="d7133e45" style="vertical-align:top;" class="slds-cell-wrap" data-label="Scope">Outside a booked scale test window</td>
+
+       <td headers="d7133e48" style="vertical-align:top;" class="slds-cell-wrap" data-label="Parameter">Max Requests per Second (RPS)</td>
+
+       <td headers="d7133e51" style="vertical-align:top;" class="slds-cell-wrap" data-label="Limit">20</td>
+
+       <td headers="d7133e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="Notes">For script validation only.</td>
+
+      </tr>
+     </tbody></table></div>
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">Booking and Parameter Enforcement</h2><ul>
+    <li>Book scale test days only in the same sandbox where you plan to test.</li>
+
+    <li>The parameters you submit when booking are final. Your actual test must match the booking inputs, including RPS and the maximum number of user logins per minute. Inputs that exceed these values are rejected.</li>
+
+   </ul>
+</div>
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">Resource and Network Guardrails</h2><ul>
+    <li><strong>Per-task RPS monitoring</strong>: Each task is monitored independently to prevent a single
+     high-load task from affecting others running concurrently.</li>
+
+    <li><strong>Per-task concurrent user monitoring</strong>: Concurrent users are capped at the task level,
+     which is especially important for Playwright runs that use more memory per user.</li>
+
+    <li><strong>Outbound IP allowlisting</strong>: Backend access requires an outbound IP allowlist configured
+     at the workflow level before you run a test.</li>
+
+    <li><strong>Endpoint security</strong>: Add external backends by providing an IP address or hostname
+     through the admin UI. Restricting access to My Domain only is no longer supported.</li>
+
+   </ul>
+</div>
+  <div><h2 class="slds-text-heading_medium slds-p-top_small">Load Generation Engine Behavior</h2><ul>
+    <li><strong>JMeter</strong> handles thread-based API load. Guardrails focus on RPS thresholds and
+     connection pooling.</li>
+
+    <li><strong>Playwright</strong> runs one browser instance per virtual user. Concurrent user limits per
+     task are enforced strictly to prevent out-of-memory errors.</li>
+
+   </ul>
+</div>
+ 
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="scale_test_overview">
+<h1 class="slds-text-heading_large">Scale Test</h1>
+  
+  <p>Use metrics to plan scale tests. Book a slot in your sandbox instance calendar, and
+    test at production peak load. Compare performance data from recent tests.</p>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Access Scale Test</h2><p>To get access, contact your customer success representative or account executive. From
+        Setup, in the Quick Find box, enter <kbd>Scale</kbd>, then click
+          <strong class="uicontrol">Scale Test</strong>.</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Considerations</h2><ul>
+        <li>We recommend Scale Test when you're expecting peak production traffic above 120 Requests
+          Per Second (RPS). It lets you validate that your implementation can scale with no issues
+          before you go live with a large rollout or peak event.</li>
+
+        <li>Scale Test is available as a paid add-on for customers with a Full Sandbox.</li>
+
+        <li>Even if your production instance doesn't reside on Hyperforce, you can use Scale Test if
+          your sandbox does.</li>
+
+        <li>Scale Test is available in all Hyperforce regions except Singapore.</li>
+
+        <li>During test execution, Scale Test temporarily captures technical data to help you debug
+          scripts, including user credentials, session information, request and response data, and
+          screenshots. Scale Test stores this data in the AWS region where your test runs and
+          automatically deletes it after 30 days for live monitoring data and 180 days for post-test
+          artifacts.</li>
+
+        <li>If MFA is enforced in your sandbox, <a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.security_networkaccess.htm&amp;language=en_US&amp;type=5">allowlist the IP address range</a> that Scale Test
+          uses to generate traffic.</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Features</h2><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:26.525198938992045%"><col style="width:73.47480106100795%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">Test Plan Creation</td>
+
+              <td style="vertical-align:top;" class="slds-cell-wrap"><ul>
+                  <li>To create test plans, ask your Salesforce admin to turn on Scale Center in
+                    your production org.</li>
+
+                  <li>Use this data to plan your scale tests. See how long pages are taking to load
+                    and optimize them to reduce Experienced Page Time (EPT). Use the <strong>View Server
+                      Side Traffic</strong> feature to get workload metrics such as triggers and platform
+                    events. Include these backend operations in your test scripts and test
+                    data.</li>
+
+                  <li>Users in your users file must be valid sandbox accounts. Dedicated load-test
+                    accounts work. They don't need to be real employee accounts. Encrypt the file
+                    before committing it to Git.</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">Test Environment Setup</td>
+
+              <td style="vertical-align:top;" class="slds-cell-wrap">Create a sandbox trial run using the same code from production and review your
+                test setup for accuracy. In the <strong>Trial Accuracy Checker</strong> section, a green color
+                indicates accurate peak replication. Yellow indicates issues with your test setup
+                that require attention. Red indicates that the sandbox test setup doesn't match
+                production and you must fix it before your scale test.</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">Test Scheduler</td>
+
+              <td style="vertical-align:top;" class="slds-cell-wrap"><p>View available test slots and book a slot. During the slot, we upgrade and
+                enhance your sandbox infrastructure to match a particular production instance.</p><ul><li>New slot bookings require 2 weeks of notice, based on capacity availability. Cancellations
+                    require at least 1 week of notice.</li>
+<li>To see updated bookings after you delete or cancel a scale test, refresh the
+                    page.</li>
+</ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">Load Generation</td>
+
+              <td style="vertical-align:top;" class="slds-cell-wrap">Run traffic simulations using JMeter or Playwright scripts in a production-like
+                sandbox environment to identify governor limit violations and validate app
+                performance before peak demand.</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">Test Execution</td>
+
+              <td style="vertical-align:top;" class="slds-cell-wrap">After the testing slot ends, compare performance metrics from two or three
+                recent tests and optimize your next test run. Use the <strong>Open in Scale Center</strong>
+                link to access other performance and scale-related insights. Test Execution also
+                contains an optional checklist of tasks that you can use to prepare for future
+                testing.</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">Live Monitoring</td>
+
+              <td style="vertical-align:top;" class="slds-cell-wrap">During an active test run, view real-time metrics, logs, errors, and
+                screenshots to observe your org's behavior under load as it happens.</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">Test Reports</td>
+
+              <td style="vertical-align:top;" class="slds-cell-wrap">After a test completes, generate a report summarizing key results to guide
+                optimization before your next run.</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Explore Scale Test</h2></div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#scale_test_view_limits_and_usage">Scale Test’s Limits and Suggested Usage</a></strong><br>Read information about the technical limitations and recommended usage of Scale     Test.</li><li class="slds-p-bottom_small"><strong><a href="#scale_test_load_generation">Use Load Generation Features in Scale Test</a></strong><br>Validate your app's performance before peak demand by running a full-scale load test in   a production-like environment.</li><li class="slds-p-bottom_small"><strong><a href="#scale_test_faq">Scale Test FAQ</a></strong><br>Get answers to common questions about using Scale Test.</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="scale_test_view_limits_and_usage">
+<h1 class="slds-text-heading_large">Scale Test’s Limits and Suggested Usage</h1>
+  
+  <p>Read information about the technical limitations and recommended usage of Scale
+    Test.</p>
+
+    <div><ul>
+        <li>The Scale Test environment isn’t an exact replica of your production but rather a
+          production-like configuration to the best of Salesforce’s capabilities.</li>
+
+        <li>Features are active only after the purchase of a Scale Test license. The Restricted
+          Product Approver (RPA) process includes a certain number of days for lead time.</li>
+
+        <li>After you visit Scale Test for the first time, you’re automatically opted into the
+          collection of telemetry data. We use this data to provide scale test and execution
+          insights. It takes 2 or 3 days after your first visit to populate.</li>
+
+        <li>If it's your first time using the Load Generation feature, setup can take more than two
+          weeks.</li>
+
+        <li>All communications about Scale Test booking are in the app or from the account
+          team.</li>
+
+        <li>The instance isn’t an isolated setting. Other customers in the instance perform low or
+          medium-scale activities.</li>
+
+        <li>You can only book scale test days in the same sandbox where you intend to test.</li>
+
+        <li>The information that you request when booking a test slot is final and must coincide
+          with the actual test stats, including:<ul>
+            <li>Requests per Second (RPS)</li>
+
+            <li>Max user logins per minute, as inputs beyond the maximum number of 60 are
+              rejected</li>
+
+          </ul>
+</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Capacity Evaluations</h2><ul>
+        <li>You have the option of requesting a Capacity Evaluation from your account team to make
+          sure that you have the right environment for your updates.</li>
+
+        <li>If you've run a scale test, including those results in your request is especially
+          useful.</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Key Event Management for Signature Support Customers</h2><ul>
+        <li>While not required, we recommend that our Signature support customers request a Customer
+          Peak Readiness (CPR) review at least 3 months before their peak date.</li>
+
+        <li>A CPR review triggers the Key Event Management (KEM) engagement. This response prepares
+          customers in need of more support during their single most important event of the
+          year.</li>
+
+        <li>Conduct your scale test and share the results with KEM at least 2 weeks before your peak
+          date.</li>
+
+      </ul>
+</div>
+  
+</div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="overview.html">&larr; スケーラビリティ概要</a><a href="scale_center.html">Scale Center（パフォーマンス診断） &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=xcloud.scalability_overview.htm&type=5&language=ja">help.salesforce.com — Salesforce スケーラビリティ（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>

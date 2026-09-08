@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>ID解決・プロファイル統合・照合（1/2） | Data 360 ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（25）</h2>
+    <ol>
+      <li><a href="#c360_a_audience_insights_match_count">広告有効化のオーディエンス一致数</a></li>
+      <li><a href="#c360_a_identity_resolution">ID 解決について</a></li>
+      <li><a href="#c360_a_identity_resolution_anonymous_vs_known_profiles_example">匿名および既知の個人プロファイルの統合例</a></li>
+      <li><a href="#c360_a_identity_resolution_configure_real_time_matching">Data 360 でのリアルタイムマッチングの設定</a></li>
+      <li><a href="#c360_a_identity_resolution_deletion">ID 解決ルールセットの削除</a></li>
+      <li><a href="#c360_a_identity_resolution_evaluate_account_matching">クエリエディターでの取引先の一致の評価</a></li>
+      <li><a href="#c360_a_identity_resolution_filter_records">ID 解決からのソースレコードの絞り込み</a></li>
+      <li><a href="#c360_a_identity_resolution_in_segments">セグメント内の複数の ID 解決ルールセット</a></li>
+      <li><a href="#c360_a_identity_resolution_match_rule_terms">ID 解決一致ルールの用語</a></li>
+      <li><a href="#c360_a_identity_resolution_match_rules_accounts">取引先の一致ルール</a></li>
+      <li><a href="#c360_a_identity_resolution_match_rules_accounts_tips">取引先の照合を改善するためのヒント</a></li>
+      <li><a href="#c360_a_identity_resolution_match_rules_households">世帯の一致ルール</a></li>
+      <li><a href="#c360_a_identity_resolution_match_rules_individuals">個人の一致ルール</a></li>
+      <li><a href="#c360_a_identity_resolution_match_type_compare">ID 解決でのスケジュール済み一致とリアルタイム一致</a></li>
+      <li><a href="#c360_a_identity_resolution_optimize">ID 解決の最適化</a></li>
+      <li><a href="#c360_a_identity_resolution_processing_frequency">ID 解決の処理頻度</a></li>
+      <li><a href="#c360_a_identity_resolution_real_time">リアルタイム ID 解決</a></li>
+      <li><a href="#c360_a_identity_resolution_ruleset">ID 解決ルールセット</a></li>
+      <li><a href="#c360_a_identity_resolution_ruleset_create">ID 解決ルールセットの作成</a></li>
+      <li><a href="#c360_a_identity_resolution_summary_anonymous_vs_known_profiles">ID 解決での匿名プロファイルと既知プロファイル</a></li>
+      <li><a href="#c360_a_identity_resolution_tableau_dashboard">Tableau での個人プロファイル統合の探索</a></li>
+      <li><a href="#c360_a_identity_resolution_terms">ID 解決の用語</a></li>
+      <li><a href="#c360_a_identity_resolution_unification_types">プロファイル統合種別</a></li>
+      <li><a href="#c360_a_identity_resolution_unify_externallink">外部リンクを使用した個人または取引先の統合</a></li>
+      <li><a href="#c360_a_identity_resolution_unify_households">世帯への個人のグループ化</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>ID解決・プロファイル統合・照合（1/2）</h1>
+      <div class="meta">Data 360（旧 Data Cloud）ヘルプ · 25 記事 · 生成 2026-08-12</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="transform_prep-2.html">&larr; データ変換・準備・クレンジング・バッチ/ストリーミング（2/2）</a><a href="identity-2.html">ID解決・プロファイル統合・照合（2/2） &rarr;</a></div>
+<section class="article" id="c360_a_audience_insights_match_count">
+<h1 class="slds-text-heading_large">広告有効化のオーディエンス一致数</h1>
+  <p>[Match Count (一致数)] は、外部広告パートナープラットフォーム (Facebook、Google 広告、TikTok など) で正常にマッチングされたオーディエンスセグメントのおおよそのユーザー数です。セグメントリストの有効化の一致数を監視して、有効化するオーディエンスのリーチと規模を把握します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a target="_blank" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">アドオンライセンスで使用可能: <strong>Ad Audiences</strong></td>
+
+            </tr>
+          </tbody></table>
+    <p>一致数の値は、これらの広告プラットフォームの有効化の [インサイト] タブに表示されます。&nbsp;</p>
+    <ul>
+      <li>Amazon</li>
+
+      <li>Meta (Facebook)</li>
+
+      <li>Google 広告</li>
+
+      <li>Google アドマネージャー</li>
+
+      <li>Google DV360</li>
+
+      <li>LinkedIn</li>
+
+      <li>Pinterest</li>
+
+      <li>Snapchat</li>
+
+      <li>TikTok</li>
+
+    </ul>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Conversion API (CAPI) 目標の一致数値は表示されません。</div></div></div>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">特定のパートナーの一致数の解釈 </h2><ul>
+        <li>Google DV360 および&nbsp; Google 広告: 一致数の値は、Google 検索数に基づきます。</li>
+
+        <li>Amazon: 一致数の値は Amazon Marketing Cloud に基づきます。</li>
+
+        <li>Meta (Facebook): 一致数の値はおおよその上限です。</li>
+
+        <li>LinkedIn: 会社リストの有効化の一致数は、一致する会社リストに関連付けられた一致する個人の数を示します。&nbsp;</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">一致数を最適化するための推奨事項&nbsp; </h2><ul>
+        <li>有効化するデータをマッピングする場合、該当するすべての属性を一致キーとして使用します。</li>
+
+        <li>メールアドレスや電話番号などの属性に複数の値がある場合、有効化時に追加します。各項目には、プロファイルごとに最大 5 個の値を含めることができます。</li>
+
+        <li>広告プラットフォームの要件に基づいて同意値を適切に書式設定します。</li>
+
+      </ul>
+</div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Data 360 で、AppExchange パートナー (Liveramp、Criteo、Tradedesk) や戦略的パートナー (Google、LinkedIn、Meta、Amazon 広告) ターゲットなどの外部プラットフォームにセグメントを公開するための有効化を作成します。" href="segment_activation-2.html#c360_a_create_external_activation_platform_activations">外部プラットフォームの有効化の作成</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=001040168&amp;language=ja&amp;type=1">Knowledge記事: Data 360: Data 360 for Marketing Advertising Audiences - New Consent Settings for Google Activations in the EEA (Data 360: マーケティング広告オーディエンスの Data 360 - EEA での Google 有効化の新しい同意設定) </a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_identity_resolution">
+<h1 class="slds-text-heading_large">ID 解決について</h1>
+  <p>ID 解決は、Data 360 に保存されているソースプロファイルデータから統合プロファイルを生成する処理エンジンです。統合プロファイルは、ソースデータをロック解除するための参照システムとして機能します。ソースプロファイルの処理方法とタイミング、および統合プロファイル出力でできることを理解します。</p>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">統合プロファイルキーリング</h2><p>統合プロファイルはデータのロックを解除する鍵ですが、ゴールデンレコードではありません。統合プロファイルにより、個人または取引先に関するすべてのソースプロファイルデータから作成された各顧客の最も完全で正確、かつ堅牢な把握が可能になります。ID 解決では、プロファイルの統合中に成立値が選択されたり、既存のデータが上書きされることはありません。</p><p>各統合プロファイルを鍵の輪のように考えます。各リングには、同じ個人または会社に属する 1 つ以上の鍵が含まれます。キーリングの各キーは、異なるロックに適合します。このたとえでは、統合プロファイルはソースレコードのキーを含むキーリングです。キーを使用して、1 つのレコードまたは複数のレコードのロックを解除し、レコードに含まれるデータを使用することができます。</p><p>
+      <span style="vertical-align:text-bottom;display:inline-block;"><img alt="複数のソース ID が添付されたリングの画像。鍵のリングを視覚的に表現します。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/identity_resolution_key_ring_analogy.png" style="width:600px;margin-bottom:0;"></span>
+      </p><p>統合プロファイルキーリングを使用すると、個人または会社に属するすべてのレコードを識別し、それらに関するデータにアクセスできるキーを見つけることができます。統合プロファイルキーリングを使用すると、データを 1 つの「最適な」レコードにマージすることなく、顧客の全体像を構築できます。この参照システムを使用して、特定の目的で最も重要となるデータを決定できます。また、使用事例ごとに異なる顧客のビューを選択することもできます。</p><p>ID 解決キーリングの類似点について詳しくは、次のリソースを参照してください。</p><ul>
+        <li><a target="_blank" href="https://medium.com/@derrick.ellis/looking-beyond-the-golden-record-unified-profiles-in-salesforce-data-cloud-ec23bf17bfb5"><u>中: ゴールデンレコードの先を見据えて: Salesforce Data 360 の統合プロファイル</u></a></li>
+
+        <li><a target="_blank" href="https://admin.salesforce.com/blog/2025/rethinking-golden-record-advantages-of-data-cloud-unified-profile"><u>Salesforce 管理者ブログ: 「Rethinking the Golden Record: The Advantages of Data Cloud’s Unified Profile」(ゴールデンレコードの再考: Data Cloud の統合プロファイルの利点)</u></a></li>
+
+        <li>Trailhead: <a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/modules/data-and-identity-in-salesforce-cdp/get-to-know-unified-profiles"><u>統合プロファイルの概要</u></a></li>
+
+      </ul>
+</div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#c360_a_identity_resolution_terms">ID 解決の用語</a></strong><br>ID 解決のコンテキストで使用されるルールセットや統合オブジェクトなどの用語の意味を理解します。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_identity_resolution_processing_frequency">ID 解決の処理頻度</a></strong><br>ID 解決では、データソースに応じて 60 分～ 24 時間ごとにルールセットが処理されます。各データソースは、データが受信されたタイミングと蓄積された変更の数に応じて、独自のタイムラインで処理されます。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_identity_resolution_real_time">リアルタイム ID 解決</a></strong><br>リアルタイムの ID 解決により、ミリ秒で顧客を識別できるため、エンゲージメント中にサイトやコミュニケーションをパーソナライズできます。</li><li class="slds-p-bottom_small"><strong><a href="getstarted-1.html#c360_a_billing_considerations_for_identity_resolution">ID 解決の請求に関する考慮事項</a></strong><br>ID 解決の使用は、次の使用量種別の請求に使用されるクレジットの消費に影響します。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="ルールセットには、複数のデータソースを統合プロファイルにリンクする方法を Customer Data Platform に指示する一致ルールと調整ルールが含まれます。統合プロファイル情報は、ルールセットによって作成されたデータモデルオブジェクトに保存されます。" href="#c360_a_identity_resolution_ruleset">ID 解決ルールセット</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_identity_resolution_anonymous_vs_known_profiles_example">
+<h1 class="slds-text-heading_large">匿名および既知の個人プロファイルの統合例</h1>
+  <p>この例は、既知および匿名の個人プロファイルがどのように統合されるのかを示しています。</p>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> <p>次のプロファイルとエンゲージメントのデータレークオブジェクト (DLO) を結合して、3 つの統合個人プロファイルを作成します。ある一致ルールでデータを統合すると、最初の統合プロファイルは匿名になり、他の 2 つのプロファイルは既知になります。</p><p><strong>DLO 1: Marketing Cloud Engagement Source Individuals データストリーム</strong></p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:14.285714285714285%"><col style="width:14.285714285714285%"><col style="width:14.285714285714285%"><col style="width:14.285714285714285%"><col style="width:14.285714285714285%"><col style="width:14.285714285714285%"><col style="width:14.285714285714285%"></colgroup><thead class="slds-text-title_caps"><tr class=""><th id="d130094e40" style="vertical-align:top;" class="slds-cell-wrap" scope="col">登録者 ID</th><th id="d130094e42" style="vertical-align:top;" class="slds-cell-wrap" scope="col">データソース</th><th id="d130094e44" style="vertical-align:top;" class="slds-cell-wrap" scope="col">匿名</th><th id="d130094e46" style="vertical-align:top;" class="slds-cell-wrap" scope="col">名</th><th id="d130094e48" style="vertical-align:top;" class="slds-cell-wrap" scope="col">姓</th><th id="d130094e50" style="vertical-align:top;" class="slds-cell-wrap" scope="col">メール</th><th id="d130094e52" style="vertical-align:top;" class="slds-cell-wrap" scope="col">登録 ID</th></tr></thead><tbody><tr class=""><td headers="d130094e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="登録者 ID">SUB-6014</td>
+<td headers="d130094e42" style="vertical-align:top;" class="slds-cell-wrap" data-label="データソース">SFMC_1487860</td>
+<td headers="d130094e44" style="vertical-align:top;" class="slds-cell-wrap" data-label="匿名">0</td>
+<td headers="d130094e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="名">Howard</td>
+<td headers="d130094e48" style="vertical-align:top;" class="slds-cell-wrap" data-label="姓">Davis</td>
+<td headers="d130094e50" style="vertical-align:top;" class="slds-cell-wrap" data-label="メール">hdavis@gmail.com</td>
+<td headers="d130094e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="登録 ID">9091-7065</td>
+</tr><tr class=""><td headers="d130094e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="登録者 ID">SUB-4161</td>
+<td headers="d130094e42" style="vertical-align:top;" class="slds-cell-wrap" data-label="データソース">SFMC_1487860</td>
+<td headers="d130094e44" style="vertical-align:top;" class="slds-cell-wrap" data-label="匿名">0</td>
+<td headers="d130094e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="名">Lisa</td>
+<td headers="d130094e48" style="vertical-align:top;" class="slds-cell-wrap" data-label="姓">Jones</td>
+<td headers="d130094e50" style="vertical-align:top;" class="slds-cell-wrap" data-label="メール">L.Jones@yahoo.com</td>
+<td headers="d130094e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="登録 ID">5751-8359</td>
+</tr></tbody></table>Engagement Mobile SDK Registration Id (エンゲージメント Mobile SDK 登録 ID) は、<span>Data 360</span> と MobilePush (Marketing Cloud Engagement 内) で共有される ID です。登録 ID は、モバイルアプリケーションがインストールされたときに一意の識別子として生成されます。<p><strong>DLO 2: モバイル ID データストリーム</strong></p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:12.5%"><col style="width:12.5%"><col style="width:12.5%"><col style="width:12.5%"><col style="width:12.5%"><col style="width:12.5%"><col style="width:12.5%"><col style="width:12.5%"></colgroup><thead class="slds-text-title_caps"><tr class=""><th id="d130094e104" style="vertical-align:top;" class="slds-cell-wrap" scope="col">個人 ID</th><th id="d130094e106" style="vertical-align:top;" class="slds-cell-wrap" scope="col">データソース</th><th id="d130094e108" style="vertical-align:top;" class="slds-cell-wrap" scope="col">匿名</th><th id="d130094e110" style="vertical-align:top;" class="slds-cell-wrap" scope="col">名</th><th id="d130094e112" style="vertical-align:top;" class="slds-cell-wrap" scope="col">姓</th><th id="d130094e114" style="vertical-align:top;" class="slds-cell-wrap" scope="col">メール</th><th id="d130094e116" style="vertical-align:top;" class="slds-cell-wrap" scope="col">登録 ID</th><th id="d130094e118" style="vertical-align:top;" class="slds-cell-wrap" scope="col">タイムスタンプ</th></tr></thead><tbody><tr class=""><td headers="d130094e104" style="vertical-align:top;" class="slds-cell-wrap" data-label="個人 ID">18123-1001</td>
+<td headers="d130094e106" style="vertical-align:top;" class="slds-cell-wrap" data-label="データソース">My_Mobile_App</td>
+<td headers="d130094e108" style="vertical-align:top;" class="slds-cell-wrap" data-label="匿名">1</td>
+<td headers="d130094e110" style="vertical-align:top;" class="slds-cell-wrap" data-label="名">&nbsp;</td>
+<td headers="d130094e112" style="vertical-align:top;" class="slds-cell-wrap" data-label="姓">&nbsp;</td>
+<td headers="d130094e114" style="vertical-align:top;" class="slds-cell-wrap" data-label="メール">&nbsp;</td>
+<td headers="d130094e116" style="vertical-align:top;" class="slds-cell-wrap" data-label="登録 ID">6571-8001</td>
+<td headers="d130094e118" style="vertical-align:top;" class="slds-cell-wrap" data-label="タイムスタンプ">2021/12/16 12:00:00</td>
+</tr><tr class=""><td headers="d130094e104" style="vertical-align:top;" class="slds-cell-wrap" data-label="個人 ID">18123-1002</td>
+<td headers="d130094e106" style="vertical-align:top;" class="slds-cell-wrap" data-label="データソース">My_Mobile_App</td>
+<td headers="d130094e108" style="vertical-align:top;" class="slds-cell-wrap" data-label="匿名">1</td>
+<td headers="d130094e110" style="vertical-align:top;" class="slds-cell-wrap" data-label="名">&nbsp;</td>
+<td headers="d130094e112" style="vertical-align:top;" class="slds-cell-wrap" data-label="姓">&nbsp;</td>
+<td headers="d130094e114" style="vertical-align:top;" class="slds-cell-wrap" data-label="メール">&nbsp;</td>
+<td headers="d130094e116" style="vertical-align:top;" class="slds-cell-wrap" data-label="登録 ID">9091-7065</td>
+<td headers="d130094e118" style="vertical-align:top;" class="slds-cell-wrap" data-label="タイムスタンプ">2021/12/16 12:00:00</td>
+</tr><tr class=""><td headers="d130094e104" style="vertical-align:top;" class="slds-cell-wrap" data-label="個人 ID">18123-1005</td>
+<td headers="d130094e106" style="vertical-align:top;" class="slds-cell-wrap" data-label="データソース">My_Mobile_App</td>
+<td headers="d130094e108" style="vertical-align:top;" class="slds-cell-wrap" data-label="匿名">1</td>
+<td headers="d130094e110" style="vertical-align:top;" class="slds-cell-wrap" data-label="名">&nbsp;</td>
+<td headers="d130094e112" style="vertical-align:top;" class="slds-cell-wrap" data-label="姓">&nbsp;</td>
+<td headers="d130094e114" style="vertical-align:top;" class="slds-cell-wrap" data-label="メール">&nbsp;</td>
+<td headers="d130094e116" style="vertical-align:top;" class="slds-cell-wrap" data-label="登録 ID">5751-8359</td>
+<td headers="d130094e118" style="vertical-align:top;" class="slds-cell-wrap" data-label="タイムスタンプ">2021/12/16 12:00:00</td>
+</tr><tr class=""><td headers="d130094e104" style="vertical-align:top;" class="slds-cell-wrap" data-label="個人 ID">18123-1005</td>
+<td headers="d130094e106" style="vertical-align:top;" class="slds-cell-wrap" data-label="データソース">My_Mobile_App</td>
+<td headers="d130094e108" style="vertical-align:top;" class="slds-cell-wrap" data-label="匿名">0</td>
+<td headers="d130094e110" style="vertical-align:top;" class="slds-cell-wrap" data-label="名">Lisa</td>
+<td headers="d130094e112" style="vertical-align:top;" class="slds-cell-wrap" data-label="姓">Jones</td>
+<td headers="d130094e114" style="vertical-align:top;" class="slds-cell-wrap" data-label="メール">L.Jones@yahoo.com</td>
+<td headers="d130094e116" style="vertical-align:top;" class="slds-cell-wrap" data-label="登録 ID">5751-8359</td>
+<td headers="d130094e118" style="vertical-align:top;" class="slds-cell-wrap" data-label="タイムスタンプ">2021/12/16 12:10:00</td>
+</tr></tbody></table><p><strong>DLO 3: モバイルエンゲージメントクリック数データストリーム</strong></p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:20%"><col style="width:20%"><col style="width:20%"><col style="width:20%"><col style="width:20%"></colgroup><thead class="slds-text-title_caps"><tr class=""><th id="d130094e192" style="vertical-align:top;" class="slds-cell-wrap" scope="col">イベント ID</th><th id="d130094e194" style="vertical-align:top;" class="slds-cell-wrap" scope="col">データソース</th><th id="d130094e196" style="vertical-align:top;" class="slds-cell-wrap" scope="col">デバイス ID</th><th id="d130094e198" style="vertical-align:top;" class="slds-cell-wrap" scope="col">URL</th><th id="d130094e200" style="vertical-align:top;" class="slds-cell-wrap" scope="col">タイムスタンプ</th></tr></thead><tbody><tr class=""><td headers="d130094e192" style="vertical-align:top;" class="slds-cell-wrap" data-label="イベント ID">88111-3001</td>
+<td headers="d130094e194" style="vertical-align:top;" class="slds-cell-wrap" data-label="データソース">My_Mobile_App</td>
+<td headers="d130094e196" style="vertical-align:top;" class="slds-cell-wrap" data-label="デバイス ID">18123-1001</td>
+<td headers="d130094e198" style="vertical-align:top;" class="slds-cell-wrap" data-label="URL">https://www.northerntrailoutfitters.com/default/homepage</td>
+<td headers="d130094e200" style="vertical-align:top;" class="slds-cell-wrap" data-label="タイムスタンプ">2021/12/16 12:00:00</td>
+</tr><tr class=""><td headers="d130094e192" style="vertical-align:top;" class="slds-cell-wrap" data-label="イベント ID">88111-4001</td>
+<td headers="d130094e194" style="vertical-align:top;" class="slds-cell-wrap" data-label="データソース">My_Mobile_App</td>
+<td headers="d130094e196" style="vertical-align:top;" class="slds-cell-wrap" data-label="デバイス ID">18123-1002</td>
+<td headers="d130094e198" style="vertical-align:top;" class="slds-cell-wrap" data-label="URL">https://www.northerntrailoutfitters.com/default/homepage</td>
+<td headers="d130094e200" style="vertical-align:top;" class="slds-cell-wrap" data-label="タイムスタンプ">2021/12/16 12:00:00</td>
+</tr><tr class=""><td headers="d130094e192" style="vertical-align:top;" class="slds-cell-wrap" data-label="イベント ID">88111-5001</td>
+<td headers="d130094e194" style="vertical-align:top;" class="slds-cell-wrap" data-label="データソース">My_Mobile_App</td>
+<td headers="d130094e196" style="vertical-align:top;" class="slds-cell-wrap" data-label="デバイス ID">18123-1005</td>
+<td headers="d130094e198" style="vertical-align:top;" class="slds-cell-wrap" data-label="URL">https://www.northerntrailoutfitters.com/default/homepage</td>
+<td headers="d130094e200" style="vertical-align:top;" class="slds-cell-wrap" data-label="タイムスタンプ">2021/12/16 12:00:00</td>
+</tr><tr class=""><td headers="d130094e192" style="vertical-align:top;" class="slds-cell-wrap" data-label="イベント ID">88111-5002</td>
+<td headers="d130094e194" style="vertical-align:top;" class="slds-cell-wrap" data-label="データソース">My_Mobile_App</td>
+<td headers="d130094e196" style="vertical-align:top;" class="slds-cell-wrap" data-label="デバイス ID">18123-1005</td>
+<td headers="d130094e198" style="vertical-align:top;" class="slds-cell-wrap" data-label="URL">https://www.northerntrailoutfitters.com/default/kids</td>
+<td headers="d130094e200" style="vertical-align:top;" class="slds-cell-wrap" data-label="タイムスタンプ">2021/12/16 12:00:01</td>
+</tr><tr class=""><td headers="d130094e192" style="vertical-align:top;" class="slds-cell-wrap" data-label="イベント ID">88111-5003</td>
+<td headers="d130094e194" style="vertical-align:top;" class="slds-cell-wrap" data-label="データソース">My_Mobile_App</td>
+<td headers="d130094e196" style="vertical-align:top;" class="slds-cell-wrap" data-label="デバイス ID">18123-1005</td>
+<td headers="d130094e198" style="vertical-align:top;" class="slds-cell-wrap" data-label="URL">https://www.northerntrailoutfitters.com/default/kids-toddlers</td>
+<td headers="d130094e200" style="vertical-align:top;" class="slds-cell-wrap" data-label="タイムスタンプ">2021/12/16 12:00:03</td>
+</tr><tr class=""><td headers="d130094e192" style="vertical-align:top;" class="slds-cell-wrap" data-label="イベント ID">88111-5004</td>
+<td headers="d130094e194" style="vertical-align:top;" class="slds-cell-wrap" data-label="データソース">My_Mobile_App</td>
+<td headers="d130094e196" style="vertical-align:top;" class="slds-cell-wrap" data-label="デバイス ID">18123-1005</td>
+<td headers="d130094e198" style="vertical-align:top;" class="slds-cell-wrap" data-label="URL">https://www.northerntrailoutfitters.com/default/toddler-zipline-rain-pant-3010742AZ1.html</td>
+<td headers="d130094e200" style="vertical-align:top;" class="slds-cell-wrap" data-label="タイムスタンプ">2021/12/16 12:00:07</td>
+</tr><tr class=""><td headers="d130094e192" style="vertical-align:top;" class="slds-cell-wrap" data-label="イベント ID">88111-5005</td>
+<td headers="d130094e194" style="vertical-align:top;" class="slds-cell-wrap" data-label="データソース">My_Mobile_App</td>
+<td headers="d130094e196" style="vertical-align:top;" class="slds-cell-wrap" data-label="デバイス ID">18123-1005</td>
+<td headers="d130094e198" style="vertical-align:top;" class="slds-cell-wrap" data-label="URL">https://www.northerntrailoutfitters.com/default/checkout-login</td>
+<td headers="d130094e200" style="vertical-align:top;" class="slds-cell-wrap" data-label="タイムスタンプ">2021/12/16 12:00:10</td>
+</tr><tr class=""><td headers="d130094e192" style="vertical-align:top;" class="slds-cell-wrap" data-label="イベント ID">88111-5006</td>
+<td headers="d130094e194" style="vertical-align:top;" class="slds-cell-wrap" data-label="データソース">My_Mobile_App</td>
+<td headers="d130094e196" style="vertical-align:top;" class="slds-cell-wrap" data-label="デバイス ID">18123-1005</td>
+<td headers="d130094e198" style="vertical-align:top;" class="slds-cell-wrap" data-label="URL">https://www.northerntrailoutfitters.com/default/checkout?stage=shipping#shipping</td>
+<td headers="d130094e200" style="vertical-align:top;" class="slds-cell-wrap" data-label="タイムスタンプ">2021/12/16 12:00:11</td>
+</tr></tbody></table><p>ID 解決一致ルール: 関係者 ID 番号 (完全)。追加情報: 関係者 ID 種別 (アプリケーション識別子) および関係者 ID 名 (Mobile SDK 共有識別子)</p><p><strong>統合プロファイル </strong></p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:12.5%"><col style="width:12.5%"><col style="width:12.5%"><col style="width:12.5%"><col style="width:12.5%"><col style="width:12.5%"><col style="width:12.5%"><col style="width:12.5%"></colgroup><thead class="slds-text-title_caps"><tr class=""><th id="d130094e309" style="vertical-align:top;" class="slds-cell-wrap" scope="col">統合個人 ID</th><th id="d130094e311" style="vertical-align:top;" class="slds-cell-wrap" scope="col">匿名</th><th id="d130094e313" style="vertical-align:top;" class="slds-cell-wrap" scope="col">名</th><th id="d130094e315" style="vertical-align:top;" class="slds-cell-wrap" scope="col">姓</th><th id="d130094e317" style="vertical-align:top;" class="slds-cell-wrap" scope="col">メール</th><th id="d130094e319" style="vertical-align:top;" class="slds-cell-wrap" scope="col">登録 ID</th><th id="d130094e321" style="vertical-align:top;" class="slds-cell-wrap" scope="col">統合プロファイルカテゴリ</th><th id="d130094e323" style="vertical-align:top;" class="slds-cell-wrap" scope="col">プロファイルの説明</th></tr></thead><tbody><tr class=""><td headers="d130094e309" style="vertical-align:top;" class="slds-cell-wrap" data-label="統合個人 ID">UUID-1 (18123-1001) </td>
+<td headers="d130094e311" style="vertical-align:top;" class="slds-cell-wrap" data-label="匿名">1</td>
+<td headers="d130094e313" style="vertical-align:top;" class="slds-cell-wrap" data-label="名">&nbsp;</td>
+<td headers="d130094e315" style="vertical-align:top;" class="slds-cell-wrap" data-label="姓">&nbsp;</td>
+<td headers="d130094e317" style="vertical-align:top;" class="slds-cell-wrap" data-label="メール">&nbsp;</td>
+<td headers="d130094e319" style="vertical-align:top;" class="slds-cell-wrap" data-label="登録 ID">6571-8001</td>
+<td headers="d130094e321" style="vertical-align:top;" class="slds-cell-wrap" data-label="統合プロファイルカテゴリ">匿名</td>
+<td headers="d130094e323" style="vertical-align:top;" class="slds-cell-wrap" data-label="プロファイルの説明">この統合プロファイルには、モバイル ID データストリーム (DLO 2) とモバイルエンゲージメントクリック数データストリーム (DLO 3) の匿名ソースデータのみが含まれます。</td>
+</tr><tr class=""><td headers="d130094e309" style="vertical-align:top;" class="slds-cell-wrap" data-label="統合個人 ID">UUID-2 (18123-1002, SUB-6014)</td>
+<td headers="d130094e311" style="vertical-align:top;" class="slds-cell-wrap" data-label="匿名">0</td>
+<td headers="d130094e313" style="vertical-align:top;" class="slds-cell-wrap" data-label="名">Howard</td>
+<td headers="d130094e315" style="vertical-align:top;" class="slds-cell-wrap" data-label="姓">Davis</td>
+<td headers="d130094e317" style="vertical-align:top;" class="slds-cell-wrap" data-label="メール">hdavis@gmail.com</td>
+<td headers="d130094e319" style="vertical-align:top;" class="slds-cell-wrap" data-label="登録 ID">9091-7065</td>
+<td headers="d130094e321" style="vertical-align:top;" class="slds-cell-wrap" data-label="統合プロファイルカテゴリ">既知</td>
+<td headers="d130094e323" style="vertical-align:top;" class="slds-cell-wrap" data-label="プロファイルの説明">この統合プロファイルには、モバイル ID データストリーム (DLO 2) の匿名ソースデータと、エンゲージメントソース個人データストリーム (DLO 1) の既知のソースデータが含まれます。両方のソースデータ型のプロファイルは、既知として分類されます。</td>
+</tr><tr class=""><td headers="d130094e309" style="vertical-align:top;" class="slds-cell-wrap" data-label="統合個人 ID">UUID-3 (18123-1005, SUB-4161)</td>
+<td headers="d130094e311" style="vertical-align:top;" class="slds-cell-wrap" data-label="匿名">0</td>
+<td headers="d130094e313" style="vertical-align:top;" class="slds-cell-wrap" data-label="名">Lisa</td>
+<td headers="d130094e315" style="vertical-align:top;" class="slds-cell-wrap" data-label="姓">Jones</td>
+<td headers="d130094e317" style="vertical-align:top;" class="slds-cell-wrap" data-label="メール">L.Jones@yahoo.com</td>
+<td headers="d130094e319" style="vertical-align:top;" class="slds-cell-wrap" data-label="登録 ID">5751-8359</td>
+<td headers="d130094e321" style="vertical-align:top;" class="slds-cell-wrap" data-label="統合プロファイルカテゴリ">既知</td>
+<td headers="d130094e323" style="vertical-align:top;" class="slds-cell-wrap" data-label="プロファイルの説明">この統合プロファイルには、モバイル ID データストリーム (DLO 2) の既知のソースデータと、Engagement ソース個人データストリーム (DLO 1) の既知のソースデータが含まれます。
+       </td>
+</tr></tbody></table></div></div></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_identity_resolution_configure_real_time_matching">
+<h1 class="slds-text-heading_large">Data 360 でのリアルタイムマッチングの設定</h1>
+  
+  <p>ルールセットの出力統合プロファイルデータモデルオブジェクトに基づいてリアルタイムデータグラフを作成することで、最初のルールセットの実行が完了した後にリアルタイム照合を行うようにルールセットを設定できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d163900e69" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d163900e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">ID 解決ルールセットを作成または編集する</td>
+
+              <td headers="d163900e69" style="vertical-align:top;" class="slds-cell-wrap"><p>権限セット</p><ul>
+                  <li>Data Cloud アーキテクト</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>必要な対応付けを設定します。</span>
+      </li><li>
+        <span>ID 解決ルールセットを作成します。</span>
+      </li><li>
+        <span>ID 解決を実行します。</span>
+      </li><li>
+        <span>実行が完了したら、ルールセットによって作成された統合プロファイルに基づいてリアルタイムデータグラフを設定します。</span>
+      </li><li>
+        <span>リアルタイムデータグラフは、パイロット期間中に統合個人 DMO から 24 時間ごとに更新されます。</span>
+      </li><li>
+        <span>リアルタイム照合では、ID 解決によって特定の顧客プロファイルがデータグラフの統合プロファイルと照合され、リアルタイムのプロファイルデータが返されます。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_identity_resolution_deletion">
+<h1 class="slds-text-heading_large">ID 解決ルールセットの削除</h1>
+  <p>ルールセットを削除すると、統合されたすべての顧客データが完全に削除され、データモデルオブジェクトの連動関係が排除され、ルールセットのすべての処理が停止し、以前の実行の履歴が削除されます。場合によっては、ルールセットを削除するのではなく、一致ルールや調整ルールを更新することをお勧めします。</p>
+
+    <p>[ID 解決] タブまたはルールセットのレコードホームからルールセットを削除します。削除は、完了するまで最大 24 時間かかります。</p>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-error"><img alt="警告" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_warning.png" style="margin-bottom:0;"></span></div><div id="c360_a_identity_resolution_deletion__note_whr_xm2_hgc" style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><a name="c360_a_identity_resolution_deletion__note_whr_xm2_hgc"></a><span class="slds-text-title_caps">警告</span> ルールセットを削除した後は、以前の統合データを復元することはできません。</div></div></div>
+
+    <p>同じルールセット名とルールセット ID を保持し、既存のデータを上書きするには、ルールセットを削除するのではなく更新します。</p>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_identity_resolution_evaluate_account_matching">
+<h1 class="slds-text-heading_large">クエリエディターでの取引先の一致の評価</h1>
+  <p>クエリエディターで統合取引先プロファイルを確認して、取引先統合一致ルールの有効性を確認します。</p>
+
+    <p>次のクエリは、ルールセットの出力をルールセット ID <code>001</code>、ルールセットの出力をルールセット ID <code>002</code>と比較します。このクエリでは、電話番号 555-234-5678 にリンクされたプロファイルが各ルールセットでどのように統合されているかが比較されます。</p>
+    <p>組織のクエリエディターでこのクエリを実行するには、組織のデータのクエリをカスタマイズします。</p>
+    <ol>
+      <li>
+        <p>指定された UnifiedLinkssotAccount オブジェクトの取引先 ID を組織で有効なルールセット ID に置き換えます。たとえば、ID が <code>ABC</code> および <code>XYZ</code> のルールセットを比較するには、<code>UnifiedLinkssotAccount001__dlm </code>and を<code>
+            UnifiedLinkssotAccount002__dlm </code> <code>UnifiedLinkssotAccountABC__dlm
+            </code>and に<code> UnifiedLinkssotAccountXYZ__dlm.</code>置き換えます。</p>
+      </li>
+
+      <li>
+        <p>サンプル電話番号の <code>(555) 234-5678</code> を、確認する特定のレコードの電話番号に置き換えます。または、異なる条件で <code>WHERE</code> 句を更新します。</p>
+      </li>
+
+    </ol>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> クエリから LIMIT 句を削除しないでください。無制限のクエリ応答では、返されたレコードが多すぎて役に立たない可能性があります。</div></div></div>
+
+    <p>クエリを実行したら、出力を確認して、一致ルールによって作成された一致がビジネス要件を満たしているかどうかを判断します。一致していない場合は、一致条件と照合方法を調整して一致を最適化します。</p>
+    <pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>SELECT
+	"ssot__Account__dlm"."ssot__Id__c",
+	"UnifiedLinkssotAccount001__dlm"."UnifiedRecordId__c" as Med_UUID,
+	"UnifiedLinkssotAccount002__dlm"."UnifiedRecordId__c" as LOW_UUID,
+	"ssot__Account__dlm"."ssot__Name__c",
+	"ssot__ContactPointAddress__dlm"."ssot__AddressLine1__c",
+	"ssot__ContactPointAddress__dlm"."ssot__AddressLine2__c",	
+	"ssot__ContactPointAddress__dlm"."ssot__CityId__c",
+	"ssot__ContactPointAddress__dlm"."ssot__CountryId__c",
+	"ssot__PartyIdentification__dlm"."ssot__PartyIdentificationTypeId__c",
+	"ssot__PartyIdentification__dlm"."ssot__Name__c" AS "Party_Name",
+	"ssot__PartyIdentification__dlm"."ssot__IdentificationNumber__c",
+	"ssot__ContactPointPhone__dlm"."ssot__FormattedE164PhoneNumber__c"	
+FROM "ssot__Account__dlm" 
+	LEFT JOIN "UnifiedLinkssotAccount001__dlm" ON "UnifiedLinkssotAccount001__dlm"."SourceRecordId__c" = "ssot__Account__dlm"."ssot__Id__c"
+	LEFT JOIN "UnifiedLinkssotAccount002__dlm" ON "UnifiedLinkssotAccount002__dlm"."SourceRecordId__c" = "ssot__Account__dlm"."ssot__Id__c"
+	LEFT JOIN "ssot__ContactPointAddress__dlm" ON "ssot__ContactPointAddress__dlm"."ssot__PartyId__c" = "ssot__Account__dlm"."ssot__Id__c"
+	LEFT JOIN "ssot__PartyIdentification__dlm" ON "ssot__PartyIdentification__dlm"."ssot__PartyId__c" = "ssot__Account__dlm"."ssot__Id__c"
+	LEFT JOIN "ssot__ContactPointPhone__dlm" ON "ssot__ContactPointPhone__dlm"."ssot__PartyId__c" = "ssot__Account__dlm"."ssot__Id__c"
+WHERE "ssot__ContactPointPhone__dlm"."ssot__FormattedE164PhoneNumber__c" = '(555) 234-5678'
+ORDER BY 
+	"ssot__ContactPointPhone__dlm"."ssot__FormattedE164PhoneNumber__c",
+	"ssot__Account__dlm"."ssot__Id__c"
+LIMIT 100
+</code></pre>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_identity_resolution_filter_records">
+<h1 class="slds-text-heading_large">ID 解決からのソースレコードの絞り込み</h1>
+  <p>ルールセットのプライマリデータモデルオブジェクトで検索条件を定義して、ID 解決処理パイプラインに入るソースレコードを制御します。検索条件は前処理ゲートとして機能するため、除外条件に一致するレコードが統合パイプラインに入ることはありません。検索条件を使用すると、統合プロファイルをクリーンな状態に保ち、クレジット消費を削減できます。</p>
+
+    <p>検索条件は、広範なパーティションレベルの分離を目的としています。ルールセットのプライマリデータモデルオブジェクトに適用され、ID などのカーディナリティの高い項目に対するレコードレベルの制御には適していません。</p>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">使用事例</h2><ul>
+        <li><strong>Separate B2B and</strong> B2C accounts (B2B および B2C アカウントの分離) — データスペースに同じアカウント DMO の法人取引先と個人取引先の両方が含まれている場合、<samp class="parmname">RecordType = "B2B"</samp> などの検索条件を B2B ルールセットに追加します。法人取引先はコンシューマー統合から、コンシューマー取引先は B2B 統合から除外されます。</li>
+
+        <li>一致ルールをテストするためのサンプルデータセットの<strong>実行 —</strong> データセット全体で ID 解決を実行する前に、データソースで絞り込んで代表的なサンプルのみを処理します。一致ルールと調整ルールの結果を評価し、設定を絞り込み、検索条件を削除してデータセット全体を処理します。</li>
+
+        <li><strong>検証済みデータソース</strong>の分離 — 検証済みのCRMデータと共に処理速度が高いまたは品質が低いデータソースがある場合、検索条件を使用して検証済みのソースのみを特定のルールセットに含めます。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">制限および考慮事項</h2><p>各ルールセットは最大 3 つの検索条件グループをサポートし、グループごとに最大 3 つの項目条件を設定できます。各検索条件グループは、ルールセットのプライマリデータモデルオブジェクトに適用されます。</p><p>AND/OR ロジックを使用して、グループ内およびグループ間で条件を組み合わせます。標準演算子は建物の条件で使用できます。</p><p>有効なルールセットで検索条件を追加または変更すると、ルールセットの完全な再処理がトリガーされます。完全な再実行の回数を最小限に抑えるには、ルールセットの自動スケジュールを一時停止し、検索条件の変更を含むすべての設定変更を一度に行ってからスケジュールを再開します。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="ID 解決で Data 360 の一致するレコードを識別する方法を指定します。" href="identity-2.html#c360_a_match_rules_configure">ID 解決一致ルールの設定</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_identity_resolution_in_segments">
+<h1 class="slds-text-heading_large">セグメント内の複数の ID 解決ルールセット</h1>
+  <p>同じエンティティに対して、異なる ID 解決ルールセットを適用した場合にセグメント母集団の件数に与える影響を比較します。ID 解決を使用して同じエンティティに対して別のルールセットを作成すると、両方のルールセットで作成されたエンティティと属性をセグメンテーションで使用できます。両方のルールセットの属性を使用して、異なる母集団を検証するか、A/B テストを行います。セグメント対象とするエンティティを選択しているか、属性を属性ライブラリに追加している場合、エンティティおよび属性名の末尾にはルールセット ID が含まれます。</p>
+
+    <div id="c360_a_identity_resolution_in_segments__section_asz_rft_wcc"><a name="c360_a_identity_resolution_in_segments__section_asz_rft_wcc"></a><p>ID 解決を使用して、個人エンティティ用の 2 つの異なるルールセットを作成します。1 番目のルールセットには、厳格な一致ルールを使用します。2 番目のルールセットには、より一般的な一致ルールを使用し、ルールセット ID に<kbd>「fzzy」</kbd>を付け加えます。<kbd>fzzy</kbd> ルールセットに基づいて新しいセグメントを作成するために、[セグメント対象] を<strong class="uicontrol">「Unified Individual fzzy」</strong>とします。</p><div id="c360_a_identity_resolution_in_segments__fig_znp_qft_wcc" style="text-align:left;"><a name="c360_a_identity_resolution_in_segments__fig_znp_qft_wcc"></a>
+        <a name="c360_a_identity_resolution_in_segments__image_a4p_qft_wcc"></a><img alt="[セグメント対象] 項目の値が「Unified Individiual fzzy」の [新規セグメント] モーダル" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/cdp_multiple_identity_resolution_new_segment.png" id="c360_a_identity_resolution_in_segments__image_a4p_qft_wcc" style="width:650px;">
+      </div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_tip.png" style="margin-bottom:0;"></span></div><div id="c360_a_identity_resolution_in_segments__note_rvx_qft_wcc" style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><a name="c360_a_identity_resolution_in_segments__note_rvx_qft_wcc"></a><span class="slds-text-title_caps">ヒント</span> 2 番目のルールセットを一時的な方法として使用して、データに最適なルールセットを作成し、その後に 2 番目のルールセットを削除します。すべてのルールセットの統合プロファイルがエンタイトルメントの制限に含まれます。</div></div></div>
+</div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_identity_resolution_match_rule_terms">
+<h1 class="slds-text-heading_large">ID 解決一致ルールの用語</h1>
+  <p>ID 解決ルールセットでの一致ルール、一致条件、一致方法の役割を理解します。一致ルール、一致条件、一致方法を追加、調整、および削除すると、ルールセット全体の統合率が変わる可能性があります。</p>
+
+    <dl>
+      
+        <dt style="font-weight:bold;padding-top:.25rem;">一致ルール</dt>
+
+        <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+          <p style="margin-bottom:0;">各一致ルールは、レコードが一致する機会です。レコードがルールセットに一致するには、1 つの一致ルールの条件にのみ一致する必要があります。作成する一致ルールが多いほど、照合するレコードの商談が増えます。ルールセットにルールを追加すると、ルールセットの統合率が向上します。<span style="vertical-align:text-bottom;display:inline-block;"><img alt="ID 解決一致ルールダイアグラム" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/identity_resolution_match_rule.png" style="width:500px;margin-bottom:0;"></span></p>
+        </dd>
+      
+      
+        <dt style="font-weight:bold;padding-top:.25rem;">一致条件</dt>
+
+        <dd style="padding-left:1.5rem;padding-bottom:.5rem;">
+          <p style="margin-bottom:0;">各一致ルール内で、条件によって特定の一致ルールの精度が決まります。2 つのレコードは、一致ルール内のすべての条件に一致する必要があります。含める条件が多いほど、2 つのレコードの一致が難しくなります。一致ルールに条件を追加すると、ルールセットの統合率が低下します。<span style="vertical-align:text-bottom;display:inline-block;"><img alt="複数の条件を含む ID 解決一致ルールの図" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/identity_resolution_match_rule_criteria.png" style="width:500px;margin-bottom:0;"></span></p>
+        </dd>
+      
+      
+        <dt style="font-weight:bold;padding-top:.25rem;">照合方法</dt>
+
+        <dd style="padding-left:1.5rem;padding-bottom:.5rem;">照合方法は、ID 解決で照合する前にデータを変換するためのさまざまな方法です。最大 5 個の照合方法から選択できますが、すべてのオブジェクトと項目ですべての方法を使用できるわけではありません。[完全] や [完全 (標準化)] など、条件をより厳しくする一致方法では統合率が低下し、[あいまい一致 - 精度低] など、より限定的な一致方法では統合率が増加する可能性があります。<span style="vertical-align:text-bottom;display:inline-block;"><img alt="一致方法がプロファイル統合率にどのように関連するかを示す図" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/identity_resolution_match_criteria_method.png" style="width:500px;margin-bottom:0;"></span><p style="margin-bottom:0;">ルールセットをリアルタイム一致で実行している場合、ルールセットの設定時に選択したスケジュール済み一致方法に関係なく、電話番号とメールアドレスを除くすべての一致条件が完全一致方式で実行されます。リアルタイム一致では、スケジュール済み一致方法として完全一致を指定していない限り、電話番号とメールアドレスは完全正規化一致を使用して実行されます。</p></dd>
+      
+    </dl>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="ID 解決のコンテキストで使用されるルールセットや統合オブジェクトなどの用語の意味を理解します。" href="#c360_a_identity_resolution_terms">ID 解決の用語</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_identity_resolution_match_rules_accounts">
+<h1 class="slds-text-heading_large">取引先の一致ルール</h1>
+  <p>ID 解決では、取引先名と他の一般的なデータの組み合わせに基づく 2 つの事前設定済みのデフォルトの一致ルールが提供されます。デフォルトの一致ルールでは、4 つの一般的な一致ルール設定のいずれかをすばやく選択できます。ルールセットでデフォルトルールとカスタムルールを組み合わせて、レコードの照合方法を複数作成できます。取引先の照合から最良の結果を得るには、取引先名と地理的位置で照合する一致ルールを使用することをお勧めします。選択した特定の住所データは、一致の品質と精度に影響します。</p>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">デフォルトの一致ルールを使用した取引先の照合</h2><p>デフォルトの一致ルールは、ルールセットに含めることを選択できます。一致する取引先には 2 つのデフォルトの一致ルールが用意されています。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d172165e43" style="vertical-align:top;" class="slds-cell-wrap" scope="col">一致ルール名</th>
+              <th id="d172165e46" style="vertical-align:top;" class="slds-cell-wrap" scope="col">一致条件</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d172165e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="一致ルール名">Exact Name and Normalized Address (完全な名前と標準化された住所)</td>
+
+              <td headers="d172165e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="一致条件"><ul>
+                  <li>取引先名 (完全)</li>
+
+                  <li>Contact Point Address - Address-Line-1 (完全標準化)</li>
+
+                  <li>連絡先住所 - 市区郡 (完全)</li>
+
+                  <li>連絡先住所 - 国 (完全標準化)</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d172165e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="一致ルール名">Exact Name and Normalized Address and Normalized Phone (完全な名前と標準化された住所と標準化された電話)</td>
+
+              <td headers="d172165e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="一致条件"><ul>
+                  <li>取引先名 (完全)</li>
+
+                  <li>Contact Point Address - Address-Line-1 (完全標準化)</li>
+
+                  <li>連絡先住所 - 市区郡 (完全)</li>
+
+                  <li>連絡先住所 - 国 (完全標準化)</li>
+
+                  <li>Contact Point Phone - Formatted E164 Phone Number (正確な標準化された E164 電話番号)</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">関係者識別子の取引先を照合</h2><p>ソースデータに強力な取引先識別子が含まれる場合、関係者識別子に基づいて一致ルールを作成することを検討してください。以下は、適切な取引先識別子であり、効率的な一致を作成できます。</p><ul>
+        <li>DUNS 番号</li>
+
+        <li>政府税識別子</li>
+
+        <li>マスターデータ管理システムによって作成された取引先 ID</li>
+
+      </ul>
+<p>関係者識別子を使用して取引先を照合する前に、関係者 ID オブジェクトの関係者項目と取引先オブジェクトの取引先 ID 項目間で N:1 カーディナリティのリレーションを作成します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">名前と場所に関する取引先の照合</h2><p dir="ltr">この 2 つの一致ルールでは、地理的データを使用して名前の一致が確認されるため、過度に制限することなく、一致の精度、正確性、徹底性のバランスが保たれます。取引先の一致のデフォルトの一致ルールと似ていますが、あいまい一致を使用して取引先の名前と住所のバリエーション全体の一致を高めます。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d172165e144" style="vertical-align:top;" class="slds-cell-wrap" scope="col">一致ルール名</th>
+              <th id="d172165e147" style="vertical-align:top;" class="slds-cell-wrap" scope="col">一致条件</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d172165e144" style="vertical-align:top;" class="slds-cell-wrap" data-label="一致ルール名"><p><strong>名前と住所</strong></p><p style="margin-bottom:0;">ソースデータに適切な住所データが含まれている場合、これらの条件を使用する一致ルールによって、地理的に確認され、非常に包括的な一致が生成されます。</p></td>
+
+              <td headers="d172165e147" style="vertical-align:top;" class="slds-cell-wrap" data-label="一致条件"><ul>
+                  <li>(あいまい一致 - 中精度) 取引先名 AND</li>
+
+                  <li>(正規化) Address-Line-1 </li>
+
+                  <li>(あいまい一致 - 中精度) 市区郡</li>
+
+                  <li>(正規化) 国</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d172165e144" style="vertical-align:top;" class="slds-cell-wrap" data-label="一致ルール名"><p><strong>名前と市区郡</strong></p><p style="margin-bottom:0;">町名・番地の詳細が一貫していないか、または使用できない場合、次の条件に一致するルールによって、地理的な確認がしっかりした良好な一致が生成されます。</p></td>
+
+              <td headers="d172165e147" style="vertical-align:top;" class="slds-cell-wrap" data-label="一致条件"><ul>
+                  <li>(あいまい一致 - 高精度) 取引先名</li>
+
+                  <li>(あいまい一致 - 中精度) 市区郡</li>
+
+                  <li>(正規化) 国</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#c360_a_identity_resolution_match_rules_accounts_tips">取引先の照合を改善するためのヒント</a></strong><br>過度に広範な条件でルールを作成すると、取引先の一致率が低下する可能性があります。取引先を統合する ID 解決一致ルールを設定するときは、次のガイドラインを考慮してください。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="過度に広範な条件でルールを作成すると、取引先の一致率が低下する可能性があります。取引先を統合する ID 解決一致ルールを設定するときは、次のガイドラインを考慮してください。" href="#c360_a_identity_resolution_match_rules_accounts_tips">取引先の照合を改善するためのヒント</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_identity_resolution_match_rules_accounts_tips">
+<h1 class="slds-text-heading_large">取引先の照合を改善するためのヒント</h1>
+  <p>過度に広範な条件でルールを作成すると、取引先の一致率が低下する可能性があります。取引先を統合する ID 解決一致ルールを設定するときは、次のガイドラインを考慮してください。</p>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">地理的位置の制限</h2><p>たとえば、次の条件を含む一致ルールでは、良好な一致は期待できません。</p><ul>
+        <li>(あいまい一致 - 高精度) 取引先名</li>
+
+        <li>(正規化) 状態</li>
+
+        <li>(正規化) 国</li>
+
+      </ul>
+<p>条件の範囲が広すぎると、2 つの矛盾するように見える問題が生じる可能性があります。</p><ul>
+        <li><strong>Too Many False Positives</strong> (偽陽性が多すぎます)--大規模なデータセットでは、これらの条件と過度に一致すると、特定の都道府県および国のすべてのアカウントを評価しようとする可能性があります。これにより、1 つのグループに照合される取引先が多すぎる可能性があります。</li>
+
+        <li><strong>一致しなかっ</strong>た--一致するソースプロファイルが多すぎると、処理中に一部のレコードがスキップされる可能性があります。レコードは任意の順序でレビューされるため、ID 解決が実行されるたびにスキップされるレコードが異なる可能性があります。これにより、一致するレコードが欠落する可能性があります。</li>
+
+      </ul>
+<p>より具体的な地域を定義することで、一致の対象となるレコード数を減らすことができます。たとえば、都道府県や国全体での一致を許可するのではなく、市区郡や郵便番号を一致条件として含めます。地理的な面積を減らすと、より信頼性が高く正確な照合が可能になります。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">複数の一致ルールの結合</h2><p>ルールセットに追加する一致ルールごとに、異なる方法で取引先を照合できます。ルールセット内で複数の一致ルールを設定することで、複数の一致条件および一致方法のセットを許可します。</p><p>この 5 つの一致ルールのセットにより、ルールセット内でさまざまな一致オプションを使用できます。</p><ul>
+        <li>あいまいな取引先名と標準化された住所</li>
+
+        <li>あいまいな取引先名と標準化された電話番号</li>
+
+        <li>取引先識別子 -- D-U-N-S Number</li>
+
+        <li>取引先識別子 -- 外部 MDM ID</li>
+
+        <li>取引先識別子 -- Demandbase</li>
+
+      </ul>
+</div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_identity_resolution_match_rules_households">
+<h1 class="slds-text-heading_large">世帯の一致ルール</h1>
+  <p>Data 360 ID 解決で世帯照合を設定する場合、ルールセットに追加できる一致ルールは 1 つのみです。各統合世帯には 1 人以上の個人が含まれます。姓と住所、または関係者 ID に基づいて個人を世帯に一致させることをお勧めします。</p>
+
+    <p>個人は複数の世帯に一致させることができます。たとえば、2 つの町名・番地を持つ個人を、それぞれの町名・番地に基づいて 2 つの異なる世帯に一致させることができます。</p>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">姓と住所で世帯を照合</h2><p>この一致ルールでは、姓と地理的住所の照合が可能です。このルールを使用するには、[あいまいな名前と標準化された住所] デフォルト一致ルールを選択します。</p><ul>
+        <li>(あいまい - 精度中) Individual.姓 AND</li>
+
+        <li>(完全標準化) ContactPointAddress.住所品目 1 AND</li>
+
+        <li>(あいまい - 中精度) 市区郡および</li>
+
+        <li>(完全標準化) 国</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">関係者 ID に関する世帯の照合</h2><p>ソースデータに強力な識別子が含まれている場合は、関係者識別子に基づいて一致ルールを作成することを検討してください。関係者識別子の照合では、名前住所以外の共通性に基づいて個人をグループに照合できます。</p><p>関係者 ID データに強力なデータガバナンス手段を使用している場合に便利な関係者識別子をいくつか紹介します。</p><ul>
+        <li>車両識別番号 (VIN) に基づいて車の所有者を照合する</li>
+
+        <li>ローン申込番号に基づいてローン申込者を照合</li>
+
+        <li>チケット注文番号に基づいてイベント参加者を照合する</li>
+
+      </ul>
+<p>この一致ルールでは、関係者 ID に基づいて照合できます。このルールを使用するには、次の条件を使用してカスタム一致ルールを作成します。</p><ul>
+        <li>(完全一致) 関係者 ID.ID 番号</li>
+
+      </ul>
+</div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_identity_resolution_match_rules_individuals">
+<h1 class="slds-text-heading_large">個人の一致ルール</h1>
+  <p>ID 解決には、個人の名と個人の姓を他の共通データと組み合わせた 4 つのデフォルトの一致ルールが事前設定されています。ルールセットでデフォルトルールとカスタムルールを組み合わせて、レコードの照合方法を複数作成できます。</p>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">個人のデフォルトの一致ルール</h2><p>デフォルトの一致ルールでは、4 つの一般的な一致ルール設定のいずれかをすばやく選択できます。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 
+        <p>ID 解決は、一致するルールを作成しなくても、同じ Individual.Id を持つレコードと一致します。</p>
+      </div></div></div>
+<table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d38015e49" style="vertical-align:top;" class="slds-cell-wrap" scope="col">一致ルール名</th>
+              <th id="d38015e52" style="vertical-align:top;" class="slds-cell-wrap" scope="col">一致条件</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d38015e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="一致ルール名">あいまいな名前と標準化されたメール</td>
+
+              <td headers="d38015e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="一致条件"><ul>
+                  <li>個人 - 名 (あいまい - 中精度)</li>
+
+                  <li>個人 - 姓 (完全)</li>
+
+                  <li>Contact Point Email - Email Address (Email Address) (連絡先メール - メールアドレス (完全標準化))</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d38015e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="一致ルール名">あいまいな名前と標準化された電話</td>
+
+              <td headers="d38015e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="一致条件"><ul>
+                  <li>個人 - 名 (あいまい - 中精度)</li>
+
+                  <li>個人 - 姓 (完全)</li>
+
+                  <li>Contact Point Phone - Formatted E164 Phone Number (正確な標準化された E164 電話番号)</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d38015e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="一致ルール名">あいまいな名前と標準化された住所</td>
+
+              <td headers="d38015e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="一致条件"><ul>
+                  <li>個人 - 名 (あいまい - 中精度)</li>
+
+                  <li>個人 - 姓 (完全)</li>
+
+                  <li>Contact Point Address (連絡先住所) - Address Line 1 (住所品目 1) (完全標準化)</li>
+
+                  <li>連絡先住所 - 市区郡 (完全)</li>
+
+                  <li>連絡先住所 - 国 (完全標準化)</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d38015e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="一致ルール名">あいまいな名前と標準化された電話および標準化されたメール</td>
+
+              <td headers="d38015e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="一致条件"><ul>
+                  <li>個人 - 名 (あいまい - 中精度)</li>
+
+                  <li>個人 - 姓 (完全)</li>
+
+                  <li>Contact Point Phone - Formatted E164 Phone Number (正確な標準化された E164 電話番号)</li>
+
+                  <li>Contact Point Email - Email Address (Email Address) (連絡先メール - メールアドレス (完全標準化))</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">個人のカスタム一致ルール</h2><p>カスタム一致ルールを設定して、デフォルト一致ルールでは対処できない使用事例に対応します。たとえば、関係者 ID データやデバイスなどの他の識別子を使用することで、一致度が向上する場合などが考えられます。次の条件をカスタム一致ルールに追加することを検討してください。</p><p>カスタム一致ルールを設定する場合、条件ごとにオブジェクト、項目、照合方法を選択します。データ型によっては使用できない照合方法もあります。</p><p>項目が空の場合に一致を作成できるようにするには、[空白を照合] を選択します。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-error"><img alt="警告" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_warning.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">警告</span> 空の項目の照合を許可する値は慎重に検討してください。このオプションを選択すると、誤った項目に適用された場合やデータの品質が低い場合、照合品質が低くなったり、プロファイルが異常に大きくなったりする可能性があります。</div></div></div>
+<p>2 つのデータで同じ大文字と小文字が使用されている場合にのみ一致が行われるようにするには、[大文字と小文字を区別する] を選択します。たとえば、15 桁の CRM ID に基づいて一致を識別するとします。 元のデータは大文字と小文字を区別するため、大文字と小文字を区別しない一致では一致エラーが発生する可能性があります。この場合、正確な一致を行うには、大文字と小文字を区別する必要があります。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">関係者 ID に関する個人の照合</h2><p>ソースデータに強力な取引先識別子が含まれる場合、関係者識別子に基づいて一致ルールを作成することを検討してください。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 関係者 ID は、関係者 ID データに強力なデータガバナンス手段がある場合にのみ使用することをお勧めします。</div></div></div>
+<p>この一致ルールでは、関係者 ID に基づいて照合できます。</p><ul>
+        <li>(完全一致) Party Identification.Identification Number (関係者 ID.ID 番号)</li>
+
+      </ul>
+<p>[識別番号(Identification Number)] フィールドのデータ品質の問題が疑われる場合は、個人の名前も考慮することで、関係者 ID の一致の信頼性を高めることができます。</p><ul>
+        <li>(完全一致) PartyIdentification.IdentificationNumber</li>
+
+        <li>(あいまい - 中精度) 個人.名</li>
+
+        <li>(完全一致) Individual.姓</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">デバイスでの個人の照合</h2><p>完全一致のデバイスに基づく照合により、ID 解決で同じデバイスで作成されたプロファイル間の一致を検出できます。マッチングアルゴリズムでは、広告主 ID (Apple の IDFA または Android の AAID) が比較されて一致が判断されます。</p><p>広告主 ID を使用すると、次のようなレコードを統合できます。</p><ul>
+        <li>アプリケーションとモバイルプッシュ間のレコード</li>
+
+        <li>1 人の顧客が複数のアプリケーションで作成したレコード</li>
+
+        <li>アプリケーションとオフラインファイル (メディアログなど) 間のレコード</li>
+
+      </ul>
+<p>この一致ルールでは、デバイスでの照合が許可されます。</p><ul>
+        <li>(完全一致) Device.AdvertiserId</li>
+
+      </ul>
+<p>一致を強化するには、一致条件としてデバイス種別とオペレーティングシステムを追加します。</p><ul>
+        <li>(完全一致) Device.AdvertiserId</li>
+
+        <li>(完全一致) Device.OperatingSystem</li>
+
+      </ul>
+<p>照合を強化するために、一致条件としてデバイス種別とオペレーティングシステムを含めることもできます。</p><p>デバイスで照合するには、デバイスオブジェクトで [広告主 ID] 項目をマッピングします。デバイスオブジェクトは [デバイス] 項目を介して連絡先アプリケーションオブジェクトに関連付けられ、さらに [関係者] 項目を介して個人オブジェクトに関連付けられている必要があります。</p><p>必要に応じて、デバイス種別とオペレーティングシステムをマッピングして、一致ルールに含めます。</p></div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#c360_a_identity_resolution_summary_anonymous_vs_known_profiles">ID 解決での匿名プロファイルと既知プロファイル</a></strong><br>ソースデータでいずれかのソースプロファイルが既知として指定されている場合、統合個人プロファイルは既知とみなされます。匿名ソースプロファイルのみから作成された統合個人プロファイルは、匿名統合プロファイルとみなされます。取引先プロファイルは常に既知のプロファイルです。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_identity_resolution_match_type_compare">
+<h1 class="slds-text-heading_large">ID 解決でのスケジュール済み一致とリアルタイム一致</h1>
+  <p>ID 解決では、スケジュール済みとリアルタイムの 2 種類のルールセットを実行できます。2 つの種別のルールセットの実行方法と実行タイミング、および他の機能とのインタラクションが異なります。</p>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">スケジュール済み一致</h2><p>スケジュール済み照合では、選択した照合方法を使用して、新規および更新されたソースデータが 1 日に数回確認されます。更新された統合プロファイル情報は、統合取引先または統合個人データモデルオブジェクトに保存されます。</p><p>スケジュール済み一致は、ID 解決ルールセットを初めて実行したときに使用されます。最初の実行が成功した後、プライマリデータモデルオブジェクトのデータが変更されたときに、スケジュール済み一致を使用して ID 解決ルールセットが増分更新されます。</p><p>スケジュール済み照合のタイミングは変更または制御できませんが、スケジュールを無効にすれば無効にできます。</p><p>スケジュール済み一致が実行されると、より多くの照合方法を使用できます。スケジュール済み照合では、データの徹底的なレビューを調整できます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">リアルタイム照合</h2><p>リアルタイム照合では、有効なエンドユーザーに関する情報を統合プロファイルと照合するため、ミリ秒以内にアプリケーションまたは Web サイトをパーソナライズできます。リアルタイムマッチングは、リアルタイムパーソナライズプロセスから顧客 ID 情報を受信するたびに使用されます。</p><p>ルールセットの出力オブジェクトがリアルタイムデータグラフの主オブジェクトである場合、ルールセットはリアルタイム一致を使用して実行されます。リアルタイム照合では、特定の一致ルールで選択されたスケジュール済み一致に関係なく、照合方法は [完全] または [完全 (標準化)] 照合のみに制限されます。メールアドレスと電話番号は完全正規化一致で照合できますが、その他の項目は完全一致でのみ照合されます。</p><p>1 日に 1 回、リアルタイムのデータグラフは、スケジュール済みルールセットの実行によって生成された統合プロファイルで更新されます。リアルタイム照合で迅速な結果が返されるように、統合プロファイルに含まれるソースプロファイルとエンゲージメントイベントの数は制限されます。詳細は、Data 360 の制限とガイドラインを参照してください。ソースプロファイルは、リアルタイム一致の値に基づいて含めるように優先順位が付けられます。たとえば、最近の活動、頻繁な活動、ユーザー認証のあるプロファイルは、使用頻度の低いプロファイルよりも優先されます。</p><p>リアルタイム照合は高速で、ID 解決をミリ秒単位で有効な顧客と統合プロファイルと照合できます。顧客 ID 情報が既存の統合プロファイルと完全一致しない場合、一致するプロファイルは返されません。リアルタイム一致を使用して一致しなかったデータは、スケジュールされた一致中にレビューされ、そのときに照合される可能性があります。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">リアルタイム照合の調整ルール</h2><p>ID 解決では、一致ルールがスケジュール済みかリアルタイムかに関係なく、すべてのモードで同じ調整ルールが使用されます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">リアルタイム一致の ID 解決出力</h2><p>リアルタイム照合を使用している場合、ID 解決によって入力値がルールセットの関連リアルタイムデータグラフの統合プロファイルレコードと比較されます。既存の顧客が識別されると、次の 2 つのアクションがトリガーされます。</p><ul>
+        <li>統合プロファイルに基づくリアルタイムインサイトが計算されます。結果はリアルタイムデータグラフレコードに保存されます。</li>
+
+        <li>統合プロファイルに基づくリアルタイムセグメントが作成されます。セグメンテーションはリアルタイムデータグラフレコードに保存されます。</li>
+
+      </ul>
+</div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_identity_resolution_optimize">
+<h1 class="slds-text-heading_large">ID 解決の最適化</h1>
+  <p>統合プロファイルを最大限に活用するために、<span>Data 360</span> で取り込んだり送信したりするデータに関する次のベストプラクティスとトラブルシューティングのヒントを考慮してください。</p>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">ソースデータの確認</h2><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span>  開始する前に、ID 解決に必要なすべての対応付けを完了します。</div></div></div>
+<p>ソースデータから <span>Data 360</span> へのデータの取り込みとモデリングが正常に行われることを確認します。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d106954e52" style="vertical-align:top;" class="slds-cell-wrap" scope="col">考慮すべき質問</th>
+              <th id="d106954e55" style="vertical-align:top;" class="slds-cell-wrap" scope="col">確認方法</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d106954e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="考慮すべき質問">データストリームのすべてのデータが <span>Data 360</span> に取り込まれましたか?</td>
+
+              <td headers="d106954e55" style="vertical-align:top;" class="slds-cell-wrap" data-label="確認方法"><span class="doc_external_link"><a target="_blank" href="ingest_connect-3.html#c360_a_resolution_troubleshooting_ci_summary_by_source">ソースごとの概要の計算済みインサイト</a></span>を使用して、想定と一致することを確認します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d106954e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="考慮すべき質問">すべてのデータマッピングが正しいですか?</td>
+
+              <td headers="d106954e55" style="vertical-align:top;" class="slds-cell-wrap" data-label="確認方法"><p><strong class="uicontrol">[データエクスプローラー]</strong> に移動して、データレークオブジェクト (DLO) とデータモデルオブジェクト (DMO) で重要な項目の正確な値を確認します。</p><p style="margin-bottom:0;"><strong class="uicontrol">[データストリーム]</strong> で重要なオブジェクトのマッピングを確認し、警告をチェックします。</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d106954e52" style="vertical-align:top;" class="slds-cell-wrap" data-label="考慮すべき質問">取引先 DMO または個人 DMO に必要な項目と項目値がありますか?</td>
+
+              <td headers="d106954e55" style="vertical-align:top;" class="slds-cell-wrap" data-label="確認方法"><strong class="uicontrol">[データエクスプローラー]</strong> に移動して、データモデルオブジェクトのデータを確認します。
+       </td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">概要統計と統合プロファイルの確認</h2><p>ルールセットを作成した後に、概要統計と統合プロファイルがソースデータに基づいて妥当であることを確認します。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d106954e132" style="vertical-align:top;" class="slds-cell-wrap" scope="col">考慮すべき質問</th>
+              <th id="d106954e135" style="vertical-align:top;" class="slds-cell-wrap" scope="col">確認方法</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d106954e132" style="vertical-align:top;" class="slds-cell-wrap" data-label="考慮すべき質問">データソースの統合率は妥当ですか?</td>
+
+              <td headers="d106954e135" style="vertical-align:top;" class="slds-cell-wrap" data-label="確認方法">データソースがどの程度クリーンアップされているかについて把握している内容と照らして、ルールセットの統合率を確認します。Identity Resolution Tableau ダッシュボードを使用するか、計算済みインサイトを作成して、「ID 解決の概要」の統合率を確認できます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d106954e132" style="vertical-align:top;" class="slds-cell-wrap" data-label="考慮すべき質問">統合プロファイルに必要な情報がありますか?</td>
+
+              <td headers="d106954e135" style="vertical-align:top;" class="slds-cell-wrap" data-label="確認方法">プロファイルエクスプローラーまたは Identity Resolution Tableau ダッシュボードを使用して、ランダムに統合プロファイルをチェックして正確な値を確認します。</td>
+
+            </tr>
+          </tbody></table></div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#c360_a_identity_resolution_tableau_dashboard">Tableau での個人プロファイル統合の探索</a></strong><br>Identity Resolution Tableau アクセラレーターを使用して、統合データを視覚的に掘り下げます。事前設定されたグラフでは、各ソースから取り込まれたプロファイル数や、それらが統合個人プロファイルにどのように寄与したかなどの情報を一目で確認できます。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_identity_resolution_evaluate_account_matching">クエリエディターでの取引先の一致の評価</a></strong><br>クエリエディターで統合取引先プロファイルを確認して、取引先統合一致ルールの有効性を確認します。</li><li class="slds-p-bottom_small"><strong><a href="identity-2.html#c360_a_resolution_troubleshooting_ir_errors">ID 解決ルールセット処理エラーのトラブルシューティング</a></strong><br>ルールセット処理エラーの意味と解決方法を理解します。</li><li class="slds-p-bottom_small"><strong><a href="identity-2.html#c360_a_resolution_troubleshooting">計算済みインサイトを使用した ID 解決の結果のトラブルシューティング</a></strong><br>計算済みインサイトを作成して、統合プロファイルデータの品質とプロファイル統合率を調査します。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_identity_resolution_processing_frequency">
+<h1 class="slds-text-heading_large">ID 解決の処理頻度</h1>
+  <p>ID 解決では、データソースに応じて 60 分～ 24 時間ごとにルールセットが処理されます。各データソースは、データが受信されたタイミングと蓄積された変更の数に応じて、独自のタイムラインで処理されます。</p>
+
+    <p>すべてのデータをより迅速に処理するには、手動でルールセットを実行するか、API コマンドを使用して開始します。前回の実行以降にレコードが変更されていない場合、ルールセットは実行されません。</p>
+    <table summary="ID 解決処理頻度" class="slds-table slds-table_bordered slds-m-bottom_small"><caption>ID 解決処理頻度</caption><colgroup><col style="width:25%"><col style="width:25%"><col style="width:25%"><col style="width:25%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d156176e45" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Data Source (データソース)</th>
+            <th id="d156176e48" style="vertical-align:top;" class="slds-cell-wrap" scope="col">コネクタ</th>
+            <th id="d156176e51" style="vertical-align:top;" class="slds-cell-wrap" scope="col">データの前処理</th>
+            <th id="d156176e54" style="vertical-align:top;" class="slds-cell-wrap" scope="col">処理頻度</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d156176e45" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data Source (データソース)"><ul>
+                <li>新しいデータストリームによる最初の取り込み</li>
+
+                <li>データソースのフル更新</li>
+
+                <li>100 万件を超えるレコードの一括更新</li>
+
+              </ul>
+</td>
+
+            <td headers="d156176e48" style="vertical-align:top;" class="slds-cell-wrap" data-label="コネクタ">任意の取り込みコネクタ</td>
+
+            <td headers="d156176e51" style="vertical-align:top;" class="slds-cell-wrap" data-label="データの前処理">はい</td>
+
+            <td headers="d156176e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="処理頻度">最大 18 時間</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d156176e45" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data Source (データソース)"><ul>
+                <li>最初の取り込み後のストリーミング取り込みコネクタ</li>
+
+                <li>100 万件を超えるレコードの一括更新</li>
+
+              </ul>
+</td>
+
+            <td headers="d156176e48" style="vertical-align:top;" class="slds-cell-wrap" data-label="コネクタ"><p>ストリーミング取り込みコネクタ</p><ul>
+                <li>Web サイトとモバイルアプリケーションの接続</li>
+
+                <li>取り込み API</li>
+
+                <li>ストリーミング取り込み方法を使用する他のコネクタ</li>
+
+              </ul>
+<p style="margin-bottom:0;">任意の一括取り込みコネクタ</p></td>
+
+            <td headers="d156176e51" style="vertical-align:top;" class="slds-cell-wrap" data-label="データの前処理">いいえ。データストリームには新規および変更されたレコードのみが含まれるため</td>
+
+            <td headers="d156176e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="処理頻度">1 時間または変更データキャプチャで 500 件の変更が累積したときのいずれか早い方</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d156176e45" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data Source (データソース)">統合データ</td>
+
+            <td headers="d156176e48" style="vertical-align:top;" class="slds-cell-wrap" data-label="コネクタ"><p>Zero Copy Data Federation (ゼロコピーデータ統合) (高速化)</p><ul>
+                <li>Amazon Redshift</li>
+
+                <li>データブリックス</li>
+
+                <li>Google BigQuery</li>
+
+                <li>Snowflake</li>
+
+              </ul>
+</td>
+
+            <td headers="d156176e51" style="vertical-align:top;" class="slds-cell-wrap" data-label="データの前処理">はい</td>
+
+            <td headers="d156176e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="処理頻度">高速化データを受信した場合 (1 時間ごと)</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d156176e45" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data Source (データソース)">統合データ</td>
+
+            <td headers="d156176e48" style="vertical-align:top;" class="slds-cell-wrap" data-label="コネクタ"><p>ゼロコピーデータの統合 (非加速)</p><ul>
+                <li>Amazon Redshift</li>
+
+                <li>データブリックス</li>
+
+                <li>Google BigQuery</li>
+
+                <li>Snowflake</li>
+
+              </ul>
+</td>
+
+            <td headers="d156176e51" style="vertical-align:top;" class="slds-cell-wrap" data-label="データの前処理">はい</td>
+
+            <td headers="d156176e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="処理頻度">最大 24 時間</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d156176e45" style="vertical-align:top;" class="slds-cell-wrap" data-label="Data Source (データソース)">リアルタイムデータ</td>
+
+            <td headers="d156176e48" style="vertical-align:top;" class="slds-cell-wrap" data-label="コネクタ">Data 360 Web SDK</td>
+
+            <td headers="d156176e51" style="vertical-align:top;" class="slds-cell-wrap" data-label="データの前処理">いいえ</td>
+
+            <td headers="d156176e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="処理頻度">すぐに</td>
+
+          </tr>
+        </tbody></table>
+    <p dir="ltr">コネクタの完全なリストについては、「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=data.c360_a_sources_targets.htm&amp;language=ja&amp;type=5"><u>Data 360: Connectors and Integrations</u></a>」を参照してください。</p>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">ID 解決のデータ前処理</h2><p>一括処理ソースおよび統合ソースからのデータは、ソースレコードが ID 解決に送信される前に一致させる必要がないレコードを削除するために前処理されます。これにより、ID 解決では新規または変更されたレコードのみが処理され、変更されていないソースレコードは再実行されません。前処理は、増分処理を実現するために ID 解決をより迅速に実行し、現在の形式ですでに統合されているレコードに対して ID 解決を実行することでクレジットが消費されないようにします。</p><p>レコードが新規または変更されたかどうかを判断するために、ソースレコードは MD5 ハッシュ値に変換されます。各レコードのハッシュ値は、ID 解決によって以前に実行されたレコードのハッシュ値と比較されます。ID 解決による処理では、一意のハッシュ値を持つレコードのみが送信されます。</p><p><span style="vertical-align:text-bottom;display:inline-block;"><img alt="レコードとハッシュ履歴の比較を示す図。新規または変更されたレコードは、照合のために ID 解決に送信されます。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/data_cloud/images/ir_preprocessing.png" style="width:800px;margin-bottom:0;"></span></p><p>レコードの前処理により、データソースでフル更新が実行されても、ID 解決で変更のないレコードが実行されなくなります。</p></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_identity_resolution_real_time">
+<h1 class="slds-text-heading_large">リアルタイム ID 解決</h1>
+  <p>リアルタイムの ID 解決により、ミリ秒で顧客を識別できるため、エンゲージメント中にサイトやコミュニケーションをパーソナライズできます。</p>
+
+    <p>リアルタイム ID 解決は、既存のルールセットのルールを使用して、有効なユーザーのプロファイル情報を既存のプロファイルと比較することで実行されます。リアルタイム ID 解決のルールセットを指定するには、その出力をリアルタイムデータグラフの入力として使用します。</p>
+    <p>リアルタイム ID 解決にルールセットを使用する場合、ルールセットの設定時に別の照合方法を選択しても、すべての一致ルール条件は完全または完全正規化された照合方法を使用して実行されます。リアルタイム実行では、[空白の一致] は無視されます。</p>
+    <p>リアルタイム ID 解決のために受信されたプロファイル情報も保存され、選択した照合方法を使用して次回のスケジュール済みルールセットの実行中にプロファイルに統合されます。スケジュール済みルールセットの実行でリアルタイムの ID 情報を統合することで、統合プロファイルに顧客に関する最新かつ完全な情報を含めることができます。</p>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="リアルタイムプロファイル統合では、プロファイル情報がすぐに確認され、ミリ秒でリアルタイムプロファイルの照合が完了します。リアルタイム照合では、有効なエンドユーザーに関する情報を統合プロファイルと照合するため、ミリ秒以内にアプリケーションまたは Web サイトをパーソナライズできます。" href="identity-2.html#c360_a_identity_resolution_unify_realtime">リアルタイムでの個人プロファイルの統合</a></li><li><a title="ルールセットの出力統合プロファイルデータモデルオブジェクトに基づいてリアルタイムデータグラフを作成することで、最初のルールセットの実行が完了した後にリアルタイム照合を行うようにルールセットを設定できます。" href="#c360_a_identity_resolution_configure_real_time_matching">Data 360 でのリアルタイムマッチングの設定</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_identity_resolution_ruleset">
+<h1 class="slds-text-heading_large">ID 解決ルールセット</h1>
+  <p>ルールセットには、複数のデータソースを統合プロファイルにリンクする方法を Customer Data Platform に指示する一致ルールと調整ルールが含まれます。統合プロファイル情報は、ルールセットによって作成されたデータモデルオブジェクトに保存されます。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="#c360_a_identity_resolution_ruleset_create">ID 解決ルールセットの作成</a></strong><br>ID 解決を開始するには、取引先、個人、リード、世帯を統合するルールセットを設定します。ルールセットの主データモデルオブジェクトによって、統合されるレコードが決まります。ルールセットを作成した後にルールセットに追加する一致ルールと調整ルールでは、レコードの照合方法をガイドします。</li><li class="slds-p-bottom_small"><strong><a href="identity-2.html#c360_a_match_rules">ID 解決一致ルール</a></strong><br>一致ルールは、ID解決プロセス中にどのプロファイルを統合するかを<span>Data 360に</span>指示します。各一致ルールに 1 つ以上の条件が含まれています。一致ルールのすべての条件を満たすと、プロファイルが一致します。</li><li class="slds-p-bottom_small"><strong><a href="identity-2.html#c360_a_reconciliation_rules">ID 解決調整ルール</a></strong><br>調整ルールでは、ID 解決プロセス中に、複数の値を含めることができない統合項目 (個人の名前など) に保存する 1 つの値を選択する方法を指定します。調整ルールはオブジェクトレベルで設定され、項目固有の調整ルールで上書きできます。調整プロセスでは、ソースプロファイルデータの削除や変更、接続済みソースシステムの更新、顧客との作業時に使用するソースデータの通知は行われません。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_identity_resolution_match_type_compare">ID 解決でのスケジュール済み一致とリアルタイム一致</a></strong><br>ID 解決では、スケジュール済みとリアルタイムの 2 種類のルールセットを実行できます。2 つの種別のルールセットの実行方法と実行タイミング、および他の機能とのインタラクションが異なります。</li><li class="slds-p-bottom_small"><strong><a href="identity-2.html#c360_a_resolution_summary">ID 解決ルールセット処理結果</a></strong><br>ルールセットジョブが初めて実行された後に、概要統計を使用できるようになります。最新の実行の結果は [解決の概要] に表示されます。前の日の結果は処理履歴テーブルにリストされます。ルールセットが 1 日に複数回処理された場合、処理履歴テーブルの結果にはその日に完了した最後の実行が反映されます。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="ID 解決のコンテキストで使用されるルールセットや統合オブジェクトなどの用語の意味を理解します。" href="#c360_a_identity_resolution_terms">ID 解決の用語</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_identity_resolution_ruleset_create">
+<h1 class="slds-text-heading_large">ID 解決ルールセットの作成</h1>
+  <p>ID 解決を開始するには、取引先、個人、リード、世帯を統合するルールセットを設定します。ルールセットの主データモデルオブジェクトによって、統合されるレコードが決まります。ルールセットを作成した後にルールセットに追加する一致ルールと調整ルールでは、レコードの照合方法をガイドします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: Data 360 でサポートされる<strong>すべてのエディション</strong>。 「<a title="Data 360 は、サポートされている複数の Salesforce エディションで使用できます。一部の Data 360 機能では、追加のライセンスも必要です。" href="getstarted-2.html#c360_a_dc_editions">Data 360 Edition</a> の可用性」を参照してください。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d66722e66" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要な権限セット</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d66722e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要な権限セット">ID 解決ルールセットを作成する</td>
+
+              <td headers="d66722e66" style="vertical-align:top;" class="slds-cell-wrap"><p>権限セット</p><ul>
+                  <li>Data Cloud アーキテクト</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span><strong class="uicontrol">[ID 解決]</strong> タブで、<strong class="uicontrol">[新規]</strong> をクリックします。</span>
+      </li><li>
+        <span>データスペースを選択します。</span>
+      </li><li>
+        <span>ルールセットの基になるプライマリデータモデルオブジェクトを選択します。</span>
+        <div>
+          <ul>
+            <li>使用可能なオブジェクトが表示されない場合は、データが適切にモデル化されていることと、ルールセットの最大数に達していないことを確認します。</li>
+
+            <li>世帯統合は、個人に基づくルールセットを実行した後にのみ使用できます。</li>
+
+          </ul>
+
+        </div>
+      </li><li>
+        <span>ルールセット ID (省略可能) を最大 4 文字のテキストで追加します。</span>
+        <div>必要に応じて、ルールセット ID を最大 4 文字のテキストで追加します。ルールセット ID は変更できず、データモデルオブジェクト名や API 参照名の一部になります。1 つのオブジェクトに 2 つのルールセットがある場合、少なくとも 1 つにルールセット ID が必要です。</div>
+        <div>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> ルールセット ID として<kbd>「test」</kbd>を使用します。 <kbd>test</kbd> ルールセットを使用して一致ルールと調整ルールの異なる組み合わせをテストした後で、ルールセットを削除します。ルールセットを削除して、後で同じルールセット ID をもう一度使用しようとした場合、エラーが発生することもあります。<span>Data 360 が</span>目的のルールセット ID のルールセットの削除を完了するまで待ってから、もう一度お試しください。</div></div></div>
+
+        </div>
+      </li><li>
+        <span><strong class="uicontrol">[次へ]</strong> をクリックします。</span>
+      </li><li>
+        <span>ルールセットに名前を付け、必要に応じて説明を追加します。</span>
+        <div>ルールセットで個人を統合する場合、同じ個人 ID とキー修飾子を共有するすべての個人をリンクできます。</div>
+      </li><li>
+        <span>世帯を統合するルールセットを作成する場合、出力を世帯のソースデータとして使用する個人ルールセットを選択します。</span>
+      </li><li>
+        <span>ルールセットによって作成されたデータモデルオブジェクトと API 参照名をメモします。</span>
+      </li><li>
+        <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+      </li></ol>
+
+    <div><p>一致ルールと調整ルールをルールセットに追加します。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> ルールセットは公開後 1 日 1 回以上実行するようにスケジュールされています。不要なクレジット消費を防止するため、ルールセットの設定時に [ジョブを自動的に実行] を無効にすることをお勧めします。[<strong class="uicontrol">今すぐ実行</strong>] ボタンを使用して、設定中にルールセットを実行します。<p>ルールセットの ID 解決の統合率の概要には、前回正常に完了した実行の結果の詳細が示されます。2 つのルールセットの統合率を比較して、各自のニーズにより合致するルールセットを決定します。使用量コストを削減するには、1 つの有効なルールセットのみを保持することをお勧めします。</p></div></div></div>
+</div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#c360_a_identity_resolution_filter_records">ID 解決からのソースレコードの絞り込み</a></strong><br>ルールセットのプライマリデータモデルオブジェクトで検索条件を定義して、ID 解決処理パイプラインに入るソースレコードを制御します。検索条件は前処理ゲートとして機能するため、除外条件に一致するレコードが統合パイプラインに入ることはありません。検索条件を使用すると、統合プロファイルをクリーンな状態に保ち、クレジット消費を削減できます。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_identity_resolution_deletion">ID 解決ルールセットの削除</a></strong><br>ルールセットを削除すると、統合されたすべての顧客データが完全に削除され、データモデルオブジェクトの連動関係が排除され、ルールセットのすべての処理が停止し、以前の実行の履歴が削除されます。場合によっては、ルールセットを削除するのではなく、一致ルールや調整ルールを更新することをお勧めします。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="ID 解決で Data 360 の一致するレコードを識別する方法を指定します。" href="identity-2.html#c360_a_match_rules_configure">ID 解決一致ルールの設定</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_identity_resolution_summary_anonymous_vs_known_profiles">
+<h1 class="slds-text-heading_large">ID 解決での匿名プロファイルと既知プロファイル</h1>
+  <p>ソースデータでいずれかのソースプロファイルが既知として指定されている場合、統合個人プロファイルは既知とみなされます。匿名ソースプロファイルのみから作成された統合個人プロファイルは、匿名統合プロファイルとみなされます。取引先プロファイルは常に既知のプロファイルです。</p>
+
+    <p>ソースの個人プロファイルが後で識別された場合、匿名プロファイルは既知のプロファイルになります。既知のプロファイルと匿名プロファイルを統合すると、セグメンテーションと有効化に使用できる内容が充実した統合個人プロファイルを作成できます。</p>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> 
+      <p>Customer Data Platform ライセンスを持つ Data Cloud 組織に、個人データモデルオブジェクト (DMO) に基づく 2 つのルールセットがあるとします。最初のルールセットでは、Unified Individual Main (統合個人メイン) DMO に 8,000,000 件の既知のプロファイルが作成されました。2 番目のルールセットでは、8,500,000 の件の既知のプロファイルが作成され、Unified Individual Test (統合個人テスト) DMO に保存されました。両方の統合個人 DMO の 16,500,000 件の既知のプロファイルがエンタイトルメントの制限に含まれます。組織ではルールセットが使用されているため、個人 DMO のプロファイルはエンタイトルメントに含まれません。</p>
+      <p>最初のルールセットの ID は Main (メイン) です。2 番目のルールセットの ID は Test (テスト) です。これらのルールセット ID は、各ルールセットの出力先であるオブジェクトの表示ラベルと API 参照名に表示されます。</p>
+      <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:25%"><col style="width:25%"><col style="width:25%"><col style="width:25%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d28292e54" style="vertical-align:top;" class="slds-cell-wrap" scope="col">オブジェクトの表示ラベル</th>
+              <th id="d28292e57" style="vertical-align:top;" class="slds-cell-wrap" scope="col">オブジェクト API 参照名</th>
+              <th id="d28292e60" style="vertical-align:top;" class="slds-cell-wrap" scope="col">匿名プロファイル</th>
+              <th id="d28292e63" style="vertical-align:top;" class="slds-cell-wrap" scope="col">既知のプロファイル</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d28292e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="オブジェクトの表示ラベル">Individual (個人) </td>
+
+              <td headers="d28292e57" style="vertical-align:top;" class="slds-cell-wrap" data-label="オブジェクト API 参照名">ssot_Individual__c</td>
+
+              <td headers="d28292e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="匿名プロファイル">
+                <samp>3M</samp>
+              </td>
+
+              <td headers="d28292e63" style="vertical-align:top;" class="slds-cell-wrap" data-label="既知のプロファイル">
+                <samp>10M</samp>
+              </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d28292e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="オブジェクトの表示ラベル">Unified Individual Main (統合個人メイン)</td>
+
+              <td headers="d28292e57" style="vertical-align:top;" class="slds-cell-wrap" data-label="オブジェクト API 参照名">UnifiedIndividualMain__dlm</td>
+
+              <td headers="d28292e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="匿名プロファイル">
+                <samp>2M</samp>
+              </td>
+
+              <td headers="d28292e63" style="vertical-align:top;" class="slds-cell-wrap" data-label="既知のプロファイル">
+                <samp>8M</samp>
+              </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d28292e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="オブジェクトの表示ラベル">Unified Individual Test (統合個人テスト)</td>
+
+              <td headers="d28292e57" style="vertical-align:top;" class="slds-cell-wrap" data-label="オブジェクト API 参照名">UnifiedssotIndividualTest__dlm</td>
+
+              <td headers="d28292e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="匿名プロファイル">
+                <samp>2.5M</samp>
+              </td>
+
+              <td headers="d28292e63" style="vertical-align:top;" class="slds-cell-wrap" data-label="既知のプロファイル">
+                <samp>8.5M</samp>
+              </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d28292e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="オブジェクトの表示ラベル">Account</td>
+
+              <td headers="d28292e57" style="vertical-align:top;" class="slds-cell-wrap" data-label="オブジェクト API 参照名">ssot__Account__dlm</td>
+
+              <td headers="d28292e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="匿名プロファイル">&nbsp;</td>
+
+              <td headers="d28292e63" style="vertical-align:top;" class="slds-cell-wrap" data-label="既知のプロファイル">
+                <samp>1M</samp>
+              </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d28292e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="オブジェクトの表示ラベル">Unified Account (統合取引先)</td>
+
+              <td headers="d28292e57" style="vertical-align:top;" class="slds-cell-wrap" data-label="オブジェクト API 参照名">UnifiedLinkssotAccount__dlm</td>
+
+              <td headers="d28292e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="匿名プロファイル">&nbsp;</td>
+
+              <td headers="d28292e63" style="vertical-align:top;" class="slds-cell-wrap" data-label="既知のプロファイル">900,000</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d28292e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="オブジェクトの表示ラベル">Other Record in Profile DMOs Categorized as Profile (プロファイルとして分類されたプロファイル DMO のその他のレコード)</td>
+
+              <td headers="d28292e57" style="vertical-align:top;" class="slds-cell-wrap" data-label="オブジェクト API 参照名">CustomProfileDMO__dlm</td>
+
+              <td headers="d28292e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="匿名プロファイル">&nbsp;</td>
+
+              <td headers="d28292e63" style="vertical-align:top;" class="slds-cell-wrap" data-label="既知のプロファイル">
+                <samp>5M</samp>
+              </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d28292e54" style="vertical-align:top;" class="slds-cell-wrap" data-label="オブジェクトの表示ラベル"> Total Counted Against Entitlement (エンタイトルメントに含まれる合計) </td>
+
+              <td headers="d28292e57" style="vertical-align:top;" class="slds-cell-wrap" data-label="オブジェクト API 参照名">&nbsp;</td>
+
+              <td headers="d28292e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="匿名プロファイル">&nbsp;</td>
+
+              <td headers="d28292e63" style="vertical-align:top;" class="slds-cell-wrap" data-label="既知のプロファイル">
+                <samp>22.4M</samp>
+              </td>
+
+            </tr>
+          </tbody></table>
+      <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> 2 番目のルールセットをデータに対する別の一致ルールと調整ルールをテストするための一時的な手段として使用し、その後に 2 番目のルールセットを削除します。すべてのルールセットの既知のプロファイルがエンタイトルメントの制限に含まれます。</div></div></div>
+
+    </div></div></div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#c360_a_identity_resolution_anonymous_vs_known_profiles_example">匿名および既知の個人プロファイルの統合例</a></strong><br>この例は、既知および匿名の個人プロファイルがどのように統合されるのかを示しています。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="ソースプロファイルは、取り込み時にデータストリームの個人 DMO の [匿名] 項目の値に基づいて匿名または既知に分類されます。この項目がマッピングされていないソースプロファイルは常に既知とみなされます。既知のプロファイルと匿名プロファイルを分類できるように、このマッピングを追加してください。" href="ingest_connect-3.html#c360_a_ingestion_anonymous_vs_known_profiles">匿名プロファイルと既知のプロファイルの分類</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_identity_resolution_tableau_dashboard">
+<h1 class="slds-text-heading_large">Tableau での個人プロファイル統合の探索</h1>
+  <p>Identity Resolution Tableau アクセラレーターを使用して、統合データを視覚的に掘り下げます。事前設定されたグラフでは、各ソースから取り込まれたプロファイル数や、それらが統合個人プロファイルにどのように寄与したかなどの情報を一目で確認できます。</p>
+
+    
+    <p>また、Identity Resolution Tableau アクセラレーターでは、統合個人の構成を探索し、一致ルールとデータ品質が ID 解決の結果にどのように影響しているかを確認できます。</p>
+    <p>Identity Resolution Tableauダッシュボードの詳細とダウンロード方法については、<a target="_blank" href="https://exchange.tableau.com/products/624">Tableau Exchange</a>または<a target="_blank" href="https://appexchange.salesforce.com/appxListingDetail?listingId=998f2129-6168-4193-8cac-248a49ece04a">Salesforce AppExchange</a>の<span>Data 360</span> ID Resolutionを参照してください。</p>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-data-data_cloud-262-0-0-production-jajp/3b8d9fb5-7c4a-4068-98fe-03985b47c48f/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> このアプリケーションを使用するには、Tableau ライセンスが必要です。アクセラレーターを使用するときに問題が発生した場合は、Tableau アカウントチームに詳細を提供し、Tableau アクセラレーターチームに連絡して問題を確認するよう依頼してください。Salesforce サポートでは、<a target="_blank" href="https://exchange.tableau.com/accelerators">Tableau Exchange</a> および <a target="_blank" href="https://appexchange.salesforce.com/mktcollections/curated/tableau-accelerators?_ga=2.121680143.505645265.1694449023-1607241779.1694449023">Salesforce AppExchange</a> で使用可能な Data 360 用の Tableau アクセラレーターはサポートされていません。</div></div></div>
+
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_identity_resolution_terms">
+<h1 class="slds-text-heading_large">ID 解決の用語</h1>
+  <p>ID 解決のコンテキストで使用されるルールセットや統合オブジェクトなどの用語の意味を理解します。</p>
+
+    <dl>
+      
+        <dt style="font-weight:bold;padding-top:.25rem;">ルールセット</dt>
+
+        <dd style="padding-left:1.5rem;padding-bottom:.5rem;">ID 解決ルールセットは、複数のデータソースを統合プロファイルにリンクする方法を指定する一致ルールと調整ルールで構成されます。一致ルールでは、項目値を比較して一致レコードを特定する方法を指定します。調整ルールでは、統合プロファイルでサマリーデータとして使用する複数のデータソースから値を選択する方法を指定します。<p>一致ルールについての詳細は、「<a title="ID 解決ルールセットでの一致ルール、一致条件、一致方法の役割を理解します。一致ルール、一致条件、一致方法を追加、調整、および削除すると、ルールセット全体の統合率が変わる可能性があります。" href="#c360_a_identity_resolution_match_rule_terms">ID 解決一致ルール</a>の用語」を参照してください。</p><p style="margin-bottom:0;">調整ルールについての詳細は、「<a title="調整ルールでは、ID 解決プロセス中に、複数の値を含めることができない統合項目 (個人の名前など) に保存する 1 つの値を選択する方法を指定します。調整ルールはオブジェクトレベルで設定され、項目固有の調整ルールで上書きできます。調整プロセスでは、ソースプロファイルデータの削除や変更、接続済みソースシステムの更新、顧客との作業時に使用するソースデータの通知は行われません。" href="identity-2.html#c360_a_reconciliation_rules">ID 解決調整ルール</a>」を参照してください。</p></dd>
+      
+      
+        <dt style="font-weight:bold;padding-top:.25rem;">ルールセットジョブ</dt>
+
+        <dd style="padding-left:1.5rem;padding-bottom:.5rem;">ルールセットジョブは、ソースデータのマッピング方法、一致、および設定した調整ルールに従ってソースプロファイルを処理します。ソースデータやルールセットの設定に変更が検出された場合を除き、ジョブは各ルールセットで 1 日に 1 回以上実行されます。何も変更されていなければ、ルールセットジョブは省略されます。</dd>
+      
+      
+        <dt style="font-weight:bold;padding-top:.25rem;">統合プロファイルオブジェクト</dt>
+
+        <dd style="padding-left:1.5rem;padding-bottom:.5rem;">ID 解決では、ソースプロファイルと、セグメンテーションや有効化、計算済みインサイト、レポートなどのプロセスで使用できる統合プロファイル情報がリンクされます。統合は、作成するデータマッピングと、ルールセットで指定された一致ルールと調整ルールに基づいて決定されます。<p style="margin-bottom:0;">ルールセットが個人 DMO に基づいている場合、複数のデータソースからの名と姓などの情報が統合個人オブジェクトに統合されます。ルールセットが取引先 DMO に基づいている場合、会社名、場所、種別などの情報が統合取引先オブジェクトに統合されます。各統合プロファイルオブジェクトには、ソースデータを参照する調整ルールと ID を使用して選択されたプロファイルに関する概要情報が含まれており、特定の使用事例に最適なデータソースを決定できます。</p></dd>
+      
+      
+        <dt style="font-weight:bold;padding-top:.25rem;">統合連絡先オブジェクト</dt>
+
+        <dd style="padding-left:1.5rem;padding-bottom:.5rem;">個人または取引先には、統合個人または統合取引先ごとに保持する必要がある複数の有効な連絡先を設定できます。たとえば、個人には自宅電話番号と携帯電話番号の両方を設定できます。Data 360 では、各ルールセットの対応付けとルールに基づいて、さまざまなデータソースからの連絡先を集計する統合連絡先オブジェクトが作成されます。統合連絡先オブジェクトには、統合プロファイルの一意の連絡先がすべて保持されます。<p style="margin-bottom:0;">調整時に、ソース間で競合がある場合、連絡先を説明する属性のみが調整されます。たとえば、電話番号が一部のソースでは個人番号としてリストされ、他のソースでは法人番号としてリストされる場合、調整ルールによって電話番号が個人番号と法人番号のどちらとしてリストされるかが決定されます。</p></dd>
+      
+      
+        <dt style="font-weight:bold;padding-top:.25rem;">統合リンクオブジェクト</dt>
+
+        <dd style="padding-left:1.5rem;padding-bottom:.5rem;">統合リンクオブジェクトはソースデータと統合オブジェクト間のリンクとして機能します。統合リンクオブジェクトでは、各統合プロファイルのソースデータを参照できます。統合プロファイルの計算済みインサイトを作成する場合にこのオブジェクトが必要になります。</dd>
+      
+    </dl>
+
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="model_mapping-2.html#c360_a_identity_resolution_data_modeling_unified_and_link_objects">統合リンクオブジェクトと統合オブジェクトへのリレーション</a></strong><br>ID 解決では、ソースオブジェクトと統合プロファイルオブジェクト間のブリッジとして次のリンクテーブルが作成されます。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="ID 解決ルールセットでの一致ルール、一致条件、一致方法の役割を理解します。一致ルール、一致条件、一致方法を追加、調整、および削除すると、ルールセット全体の統合率が変わる可能性があります。" href="#c360_a_identity_resolution_match_rule_terms">ID 解決一致ルールの用語</a></li><li><a title="調整ルールでは、ID 解決プロセス中に、複数の値を含めることができない統合項目 (個人の名前など) に保存する 1 つの値を選択する方法を指定します。調整ルールはオブジェクトレベルで設定され、項目固有の調整ルールで上書きできます。調整プロセスでは、ソースプロファイルデータの削除や変更、接続済みソースシステムの更新、顧客との作業時に使用するソースデータの通知は行われません。" href="identity-2.html#c360_a_reconciliation_rules">ID 解決調整ルール</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_identity_resolution_unification_types">
+<h1 class="slds-text-heading_large">プロファイル統合種別</h1>
+  <p>Data 360 の ID 解決では、レコードを統合するいくつかの異なる方法が提供されます。選択した統合種別によって、統合プロファイルのベースとなるオブジェクトの種別、ルールセットによって作成される出力オブジェクト、レコードの統合速度が決まります。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="identity-2.html#c360_a_identity_resolution_unify_individuals">個人または取引先の統合</a></strong><br>Data 360 の ID 解決では、レコードを統合するいくつかの異なる方法が提供されます。選択した統合種別によって、統合プロファイルのベースとなるオブジェクトの種別、ルールセットによって作成される出力オブジェクト、レコードの統合速度が決まります。</li><li class="slds-p-bottom_small"><strong><a href="identity-2.html#c360_a_identity_resolution_unify_leads_accounts">取引先へのリードの照合</a></strong><br>クロスオブジェクト照合では、リードを既存の取引先と照合できるため、すでにリレーションがある顧客を識別できます。</li><li class="slds-p-bottom_small"><strong><a href="#c360_a_identity_resolution_unify_households">世帯への個人のグループ化</a></strong><br>世帯照合では、統合個人を世帯と呼ばれる個人のグループに統合できます。世帯では、ルールセットの主データモデルオブジェクトとして統合個人オブジェクトが使用され、統合世帯オブジェクトに出力されます。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_identity_resolution_unify_externallink">
+<h1 class="slds-text-heading_large">外部リンクを使用した個人または取引先の統合</h1>
+  <p>外部リンクの一致により、外部データソースで一致として識別されたプロファイルを統合できます。ソースデータには、一致するレコードを識別する ID が含まれている必要があります。</p>
+
+    <p>外部リンクに基づく照合では、属性データが変更されてもレコードが確実にリンクされるため、複雑な状況でのプロファイルの照合が改善されます。たとえば、ブラウザーセッション中にリンクを寄稿して、匿名ユーザープロファイルをログインユーザープロファイルと照合します。または、ソースプロファイルに識別子を追加して、通常のルールでは一致しないプロファイルを統合します。</p>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="ID 解決で Data 360 の一致するレコードを識別する方法を指定します。" href="identity-2.html#c360_a_match_rules_configure">ID 解決一致ルールの設定</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="c360_a_identity_resolution_unify_households">
+<h1 class="slds-text-heading_large">世帯への個人のグループ化</h1>
+  <p>世帯照合では、統合個人を世帯と呼ばれる個人のグループに統合できます。世帯では、ルールセットの主データモデルオブジェクトとして統合個人オブジェクトが使用され、統合世帯オブジェクトに出力されます。</p>
+
+    <p>世帯を作成するには、まず個人オブジェクトに基づいてルールセットを設定し、それを実行して統合個人プロファイルを生成する必要があります。次に、個人ルールセットの出力に基づいてルールセットを設定します。</p>
+    <p>各世帯グループは個別の UUID で指定されます。ルールセットからの出力は統合世帯オブジェクトに保存されます。</p>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="Data 360 ID 解決で世帯照合を設定する場合、ルールセットに追加できる一致ルールは 1 つのみです。各統合世帯には 1 人以上の個人が含まれます。姓と住所、または関係者 ID に基づいて個人を世帯に一致させることをお勧めします。" href="#c360_a_identity_resolution_match_rules_households">世帯の一致ルール</a></li></ul></div>
+</div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="transform_prep-2.html">&larr; データ変換・準備・クレンジング・バッチ/ストリーミング（2/2）</a><a href="identity-2.html">ID解決・プロファイル統合・照合（2/2） &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=data.c360_a_data_cloud.htm&type=5&language=ja">help.salesforce.com — Data 360（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>
