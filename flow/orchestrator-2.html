@@ -1,0 +1,2309 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Flow Orchestration（オーケストレーション）（2/3） | Salesforce Flow ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（34）</h2>
+    <ol>
+      <li><a href="#orchestrator_concepts_steps_interactive">フローオーケストレーションの対話型ステップ</a></li>
+      <li><a href="#orchestrator_concepts_steps_mulesoft">フローオーケストレーション MuleSoft ステップ</a></li>
+      <li><a href="#orchestrator_concepts_trigger">オーケストレーションのトリガー</a></li>
+      <li><a href="#orchestrator_concepts_type">オーケストレーションタイプ</a></li>
+      <li><a href="#orchestrator_concepts_versioning">オーケストレーションのバージョン管理</a></li>
+      <li><a href="#orchestrator_concepts_work_items">フローオーケストレーション作業項目</a></li>
+      <li><a href="#orchestrator_considerations">Flow オーケストレーションの制限と考慮事項</a></li>
+      <li><a href="#orchestrator_considerations_entitlements">フローオーケストレーションエンタイトルメント</a></li>
+      <li><a href="#orchestrator_considerations_evaluation_flows">オーケストレーションの評価フローに関する考慮事項</a></li>
+      <li><a href="#orchestrator_considerations_limit">一般的なフローオーケストレーションの制限</a></li>
+      <li><a href="#orchestrator_considerations_orchestrations">オーケストレーションに関する考慮事項</a></li>
+      <li><a href="#orchestrator_considerations_security_considerations">オーケストレーションのセキュリティに関する考慮事項</a></li>
+      <li><a href="#orchestrator_customize_email_notification">割り当て先へのメールをカスタマイズ</a></li>
+      <li><a href="#orchestrator_deploy_create_org_wide_email_address">オーケストレーション用の組織のメールアドレスの設定</a></li>
+      <li><a href="#orchestrator_deploy_with_change_sets">変更セットを使用したオーケストレーションの展開</a></li>
+      <li><a href="#orchestrator_design">フローオーケストレーションの設計</a></li>
+      <li><a href="#orchestrator_distribute">オーケストレーションのリリース</a></li>
+      <li><a href="#orchestrator_distribute_activate">オーケストレーションの有効化または無効化</a></li>
+      <li><a href="#orchestrator_flow_builder">フローオーケストレーション用 Flow Builder</a></li>
+      <li><a href="#orchestrator_flow_orchestrator">オーケストレーションを使用した複雑なプロセスの自動化</a></li>
+      <li><a href="#orchestrator_get_started">フローオーケストレーションの使用開始</a></li>
+      <li><a href="#orchestrator_manage">オーケストレーションと作業項目の管理</a></li>
+      <li><a href="#orchestrator_manage_add_comments_column_to_run_log">オーケストレーション実行ログへのコメント列の追加</a></li>
+      <li><a href="#orchestrator_manage_add_comments_to_run_log">オーケストレーション実行ログへのコメントの追加</a></li>
+      <li><a href="#orchestrator_manage_add_usage_component">オーケストレーションレコードバージョンページへのオートメーション利用状況コンポーネントの追加</a></li>
+      <li><a href="#orchestrator_manage_cancel_running_orchestration">実行中のオーケストレーションのキャンセル</a></li>
+      <li><a href="#orchestrator_manage_control_emails_sent_by_interactive_steps_assigned_to_queue">キューメンバーのオーケストレーション作業項目メール通知の制御</a></li>
+      <li><a href="#orchestrator_manage_disable_default_email_notifications">作業項目割り当てのすべてのメール通知の無効化</a></li>
+      <li><a href="#orchestrator_manage_orchestration_flow_usage">オーケストレーションバージョンでのフローの利用状況の判断</a></li>
+      <li><a href="#orchestrator_manage_orchestration_statuses">オーケストレーションの状況とマイルストーン</a></li>
+      <li><a href="#orchestrator_manage_reassign_work_item">オーケストレーション作業項目の再割り当て</a></li>
+      <li><a href="#orchestrator_manage_resume_failed_orchestration">失敗したオーケストレーションの再開</a></li>
+      <li><a href="#orchestrator_manage_resume_suspended_orchestration">一時停止されたオーケストレーションの再開</a></li>
+      <li><a href="#orchestrator_manage_suspend_running_orchestration">処理中のオーケストレーションの一時停止</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>Flow Orchestration（オーケストレーション）（2/3）</h1>
+      <div class="meta">Salesforce Flow ヘルプ · 34 記事 · 生成 2026-11-08</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="orchestrator-1.html">&larr; Flow Orchestration（オーケストレーション）（1/3）</a><a href="orchestrator-3.html">Flow Orchestration（オーケストレーション）（3/3） &rarr;</a></div>
+<section class="article" id="orchestrator_concepts_steps_interactive">
+<h1 class="slds-text-heading_large">フローオーケストレーションの対話型ステップ</h1>
+  <p>対話型ステップは有効な画面フローを参照し、オーケストレーション作業項目を生成します。割り当てられたユーザーは、関連レコードページの [フローオーケストレーション作業ガイド] で有効な画面フローを完了します。対話型ステップを開始できるタイミング、またはその状況を [完了] に設定するタイミングを制御できます。すべての対話型ステップは非同期で処理されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col style="width:100%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="フローオーケストレーションでサポートされる製品とエディションを確認します。" href="orchestrator-1.html#automate_orchestrator_about_supported_editions">フローオーケストレーションでサポートされるエディションを表示します。</a>
+              </td>
+
+            </tr>
+          </tbody></table></div>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> フローオーケストレーションのステップリソースは、フロー内で廃止されたステップ要素とは関係していません。</div></div></div>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">対話型ステップ作業サイクル</h2><div>
+        
+        <img alt="オーケストレーションの対話型ステップのワークフロー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/platform_automation/images/orchestration/orchestrator_interactive_step_work_cycle.png">
+      </div><p>バージョン 57.0 以前で実行されているフローの場合、対話型ステップが完了としてマークされると、関連付けられた作業項目を完了したユーザーのコンテキストでオーケストレーションの実行が再開されます。作業項目を完了したユーザーに「フローを実行」権限がなく、特定のフローへの詳細なアクセス権がある<span>場合、オーケストレーションの実行を再開することはできません。オーケストレーションを再開するには、「フローを実行」権限を持つユーザーが別の作業項目を実行するか、システム管理者が一時停止中のオーケストレーション実行の ID を使用してフローオーケストレーションイベントをトリガーします。</span></p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">ステップを開始するタイミング</h2><p>対話型ステップを開始するタイミングを制御するには、条件を選択します。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d105232e98" style="vertical-align:top;" class="slds-cell-wrap" scope="col">ステップ条件</th>
+              <th id="d105232e101" style="vertical-align:top;" class="slds-cell-wrap" scope="col">必要なもの</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d105232e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="ステップ条件">
+                <strong class="uicontrol">ステージが開始されたら、ステップを開始する</strong>
+              </td>
+
+              <td headers="d105232e101" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なもの">—</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d105232e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="ステップ条件">
+                <strong class="uicontrol">別のステップが [完了] とマークされると、ステップが開始されます。</strong>
+              </td>
+
+              <td headers="d105232e101" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なもの">ステップを開始する前に完了する必要があるステップの名前</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d105232e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="ステップ条件">
+                <strong class="uicontrol">指定された要件が満たされたら、ステップを開始する</strong>
+              </td>
+
+              <td headers="d105232e101" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なもの">ステップを開始できるかどうかを決定する最大 10 個の要件 </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d105232e98" style="vertical-align:top;" class="slds-cell-wrap" data-label="ステップ条件">
+                <strong class="uicontrol">指定された評価フローが True を返したら、ステップを開始する</strong>
+              </td>
+
+              <td headers="d105232e101" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なもの">ステップを開始できるかどうかを決定する有効な評価フローの名前</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">ステップを完了するタイミング</h2><p>対話型ステップを完了するタイミングを制御するには、条件を選択します。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d105232e180" style="vertical-align:top;" class="slds-cell-wrap" scope="col">ステップ条件</th>
+              <th id="d105232e183" style="vertical-align:top;" class="slds-cell-wrap" scope="col">必要なもの</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d105232e180" style="vertical-align:top;" class="slds-cell-wrap" data-label="ステップ条件">
+                <strong class="uicontrol">割り当てられたユーザーが画面フローを完了すると、ステップは [完了] とマークされます。</strong>
+              </td>
+
+              <td headers="d105232e183" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なもの">—</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d105232e180" style="vertical-align:top;" class="slds-cell-wrap" data-label="ステップ条件">
+                <strong class="uicontrol">指定された要件が満たされたら、ステップを [完了] とマークする</strong>
+              </td>
+
+              <td headers="d105232e183" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なもの">ステップを完了できるかどうかを決定する最大 10 個の要件</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d105232e180" style="vertical-align:top;" class="slds-cell-wrap" data-label="ステップ条件">
+                <strong class="uicontrol">指定された評価フローが True を返すと、ステップは [完了] とマークされます。</strong>
+              </td>
+
+              <td headers="d105232e183" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なもの">ステップを完了できるかどうかを決定する評価フローの名前</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">ステップを完了するユーザー</h2><p>オーケストレーションを設計するときに、対話型ステップはユーザー、グループ、またはキューに割り当てられます。</p><table summary="ステップ割り当て先" class="slds-table slds-table_bordered slds-m-bottom_small"><caption>ステップ割り当て先</caption><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d105232e251" style="vertical-align:top;" class="slds-cell-wrap" scope="col">種別</th>
+              <th id="d105232e254" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d105232e251" style="vertical-align:top;" class="slds-cell-wrap" data-label="種別">ユーザー</td>
+
+              <td headers="d105232e254" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><ul>
+                  <li>内部ユーザーのユーザー名</li>
+
+                  <li>ログイン情報が設定された Experience Cloud サイト訪問者のユーザー名</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d105232e251" style="vertical-align:top;" class="slds-cell-wrap" data-label="種別">グループ</td>
+
+              <td headers="d105232e254" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><ul>
+                  <li>内部ユーザーのみを含むグループの API 参照名</li>
+
+                  <li>ログイン情報が設定された Aura サイト訪問者のみが含まれるグループの API 参照名</li>
+
+                  <li>ログイン情報が設定された LWR サイト訪問者のみが含まれるグループの API 参照名</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d105232e251" style="vertical-align:top;" class="slds-cell-wrap" data-label="種別">キュー</td>
+
+              <td headers="d105232e254" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><ul>
+                  <li>内部ユーザーのみが含まれるキューの API 参照名</li>
+
+                  <li>ログイン情報が設定された Aura サイト訪問者のみが含まれるキューの API 参照名</li>
+
+                  <li>ログイン情報が設定された LWR サイト訪問者のみが含まれるキューの API 参照名</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d105232e251" style="vertical-align:top;" class="slds-cell-wrap" data-label="種別">リソース</td>
+
+              <td headers="d105232e254" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>実行時に次のいずれかの項目が含まれるリソースの API 参照名。</p><ul>
+                  <li>内部ユーザーのユーザー名</li>
+
+                  <li>ログイン情報が設定された Experience Cloud サイト訪問者のユーザー名</li>
+
+                  <li>内部ユーザーのみを含むグループの API 参照名</li>
+
+                  <li>ログイン情報が設定された Aura サイト訪問者のみが含まれるグループの API 参照名</li>
+
+                  <li>ログイン情報が設定された LWR サイト訪問者のみが含まれるグループの API 参照名</li>
+
+                  <li>内部ユーザーのみが含まれるキューの API 参照名</li>
+
+                  <li>ログイン情報が設定された Aura サイト訪問者のみが含まれるキューの API 参照名</li>
+
+                  <li>ログイン情報が設定された LWR サイト訪問者のみが含まれるキューの API 参照名</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table><p>実行時に、割り当てられたユーザー、グループ、キューに作業項目が割り当てられたことを通知するメールが送信されます。メール通知を割り当て先に送信しない場合は、「作業項目割り当ての<a title="デフォルトでは、オーケストレーション作業項目がユーザー、グループ、またはキューに割り当てられるか、再割り当てされると、オーケストレーションからメール通知が送信されます。内部ユーザーとログイン情報が設定された Experience Cloud サイト訪問者へのメール送信を停止するには、すべての作業項目通知を無効にします。" href="#orchestrator_manage_disable_default_email_notifications">すべてのメール</a>通知の無効化」</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d105232e380" style="vertical-align:top;" class="slds-cell-wrap" scope="col">割り当て先種別</th>
+              <th id="d105232e383" style="vertical-align:top;" class="slds-cell-wrap" scope="col">通知</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d105232e380" style="vertical-align:top;" class="slds-cell-wrap" data-label="割り当て先種別">内部ユーザー</td>
+
+              <td headers="d105232e383" style="vertical-align:top;" class="slds-cell-wrap" data-label="通知">内部関連レコードページへのリンクを含むパーソナライズされたメール通知</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d105232e380" style="vertical-align:top;" class="slds-cell-wrap" data-label="割り当て先種別">ログイン情報が設定された Experience Cloud サイト訪問者</td>
+
+              <td headers="d105232e383" style="vertical-align:top;" class="slds-cell-wrap" data-label="通知">メンバーである最も古いライブ Experience Cloud サイトの関連レコードページへのリンクを含むパーソナライズされたメール通知 </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d105232e380" style="vertical-align:top;" class="slds-cell-wrap" data-label="割り当て先種別">内部ユーザーのグループまたはキュー</td>
+
+              <td headers="d105232e383" style="vertical-align:top;" class="slds-cell-wrap" data-label="通知">内部関連レコードページへのリンクを含む一般的なメール通知</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d105232e380" style="vertical-align:top;" class="slds-cell-wrap" data-label="割り当て先種別">全員が同じサイトのメンバーである、ログイン情報が設定された Aura または LWR サイト訪問者のグループまたはキュー</td>
+
+              <td headers="d105232e383" style="vertical-align:top;" class="slds-cell-wrap" data-label="通知">全員がメンバーであるライブ Experience Cloud サイトの関連レコードページへのリンクを含む一般的なメール通知</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d105232e380" style="vertical-align:top;" class="slds-cell-wrap" data-label="割り当て先種別">全員が 1 つ以上の共通サイトのメンバーである、ログイン情報が設定された Aura または LWR サイト訪問者のグループまたはキュー</td>
+
+              <td headers="d105232e383" style="vertical-align:top;" class="slds-cell-wrap" data-label="通知">全員がメンバーである最も古いライブ Experience Cloud サイトのレコードページへのリンクを含む一般的なメール通知</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d105232e380" style="vertical-align:top;" class="slds-cell-wrap" data-label="割り当て先種別">共通のサイトがない、ログイン情報が設定された Aura または LWR サイト訪問者のグループまたはキュー</td>
+
+              <td headers="d105232e383" style="vertical-align:top;" class="slds-cell-wrap" data-label="通知"><p>内部関連レコードページへのリンクを含む一般的なメール通知
+                  </p><p style="margin-bottom:0;">Experience Cloud サイト訪問者には内部ページへのアクセス権がないため、このリンクは無効です。ユーザーは [オーケストレーション作業項目オブジェクトリスト] ページを使用して、メンバーである Experience Cloud サイトから割り当てられた作業項目を表示およびアクセスできます。</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d105232e380" style="vertical-align:top;" class="slds-cell-wrap" data-label="割り当て先種別">内部ユーザーとログイン情報が設定された Aura または LWR サイト訪問者のグループまたはキュー</td>
+
+              <td headers="d105232e383" style="vertical-align:top;" class="slds-cell-wrap" data-label="通知"><p>内部関連レコードページへのリンクを含む一般的なメール通知
+                  </p><p style="margin-bottom:0;">Experience Cloud サイト訪問者には内部ページへのアクセス権がないため、このリンクは無効です。ユーザーは [オーケストレーション作業項目オブジェクトリスト] ページを使用して、メンバーである Experience Cloud サイトから割り当てられた作業項目を表示およびアクセスできます。</p></td>
+
+            </tr>
+          </tbody></table><p><span>オーケストレーションは、[プロセスの自動化設定] で指定した [自動化プロセスユーザーのメールアドレス] からメール通知を送信します。この設定を指定しない場合、Salesforce は [デフォルトの No-Reply アドレス] が目的の組織のメールアドレスを検索します。存在しない場合、Salesforce は検証済みの組織のメールアドレスを使用します。組織のメールアドレスが存在しない場合、Salesforce はオーケストレーションを実行しているユーザーのメールアドレスを使用します。オーケストレーションがユーザーのいないシステムコンテキストで実行されている場合、Salesforce はメールを送信しません。</span>「<a title="フローオーケストレーションからメールを送信するには、組織のメールアドレスを作成します。" href="#orchestrator_deploy_create_org_wide_email_address">オーケストレーション用の</a>組織のメールアドレスの設定」を参照してください。</p><p>最初の割り当て先に送信する作業項目メール通知をカスタマイズできます。オーケストレーション作業項目が再割り当てされると、Salesforce はデフォルトの通知を使用します。通知メールのカスタマイズについての詳細は、「<a title="デフォルトでは、オーケストレーションの実行でオーケストレーション作業項目が作成されるたびに、割り当て先に通知が送信されます。オーケストレーション作業項目の作成時に送信されるメール通知を変更するには、関連付けられた承認ステップをカスタマイズします。" href="#orchestrator_customize_email_notification">Customize Emails to Assignees</a> (割り当て先へのメールのカスタマイズ)」を参照してください。
+      </p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">ステップの完了場所</h2><p>割り当て先ユーザーまたは割り当てられたグループまたはキューのユーザーが、関連レコードページで関連付けられた画面フローを完了します。この関連レコードページへのリンクは、割り当てられたユーザー、グループ、またはキューに送信されるメールに含まれます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">対話型ステップでコールされたフローの実行コンテキスト</h2><p>対話型ステップによってコールされる有効な画面フローは、完了者のコンテキストで実行されます。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="ステージとステップの実行を制御するために 3 個を超える要件が必要な場合は、評価フローを使用します。[新規フロー] ウィンドウで [評価フロー] タイルを選択して、評価フローを作成します。" href="orchestrator-1.html#orchestrator_concepts_flows_evaluation_flows">オーケストレーションの評価フロー</a></li><li><a title="実行コンテキストによって、Salesforce データに対するオーケストレーションのアクセス権と、一時停止中のオーケストレーションの再開に使用されるコンテキストが決まります。デフォルトでは、オーケストレーションの実行コンテキストはシステムコンテキストの自動化プロセス本ユーザです。" href="orchestrator-1.html#orchestrator_concepts_running_user">オーケストレーションの実行コンテキスト</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="orchestrator_concepts_steps_mulesoft">
+<h1 class="slds-text-heading_large">フローオーケストレーション MuleSoft ステップ</h1>
+  <p>MuleSoft ステップは、MuleSoft API からインポートされた操作を非同期で実行し、ユーザー操作はありません。MuleSoft ステップを開始するタイミングを制御できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col style="width:100%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="フローオーケストレーションでサポートされる製品とエディションを確認します。" href="orchestrator-1.html#automate_orchestrator_about_supported_editions">フローオーケストレーションでサポートされるエディションを表示します。</a>
+              </td>
+
+            </tr>
+          </tbody></table>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> フローオーケストレーションのステップリソースは、フロー内で廃止されたステップ要素とは関係していません。</div></div></div>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">MuleSoft ステップ作業サイクル</h2><div>
+        <img alt="オーケストレーションの MuleSoft ステップのワークフロー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/platform_automation/images/orchestration/orchestrator_mulesoft_step_work_cycle.png">
+      </div></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">ステップを開始するタイミング</h2><p>MuleSoft ステップを開始するタイミングを制御するには、[ステップを開始するタイミングを選択] で条件を選択します。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d319159e87" style="vertical-align:top;" class="slds-cell-wrap" scope="col">ステップ条件</th>
+              <th id="d319159e90" style="vertical-align:top;" class="slds-cell-wrap" scope="col">必要なもの</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d319159e87" style="vertical-align:top;" class="slds-cell-wrap" data-label="ステップ条件">
+                <strong class="uicontrol">ステージが開始されたら、ステップを開始する</strong>
+              </td>
+
+              <td headers="d319159e90" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なもの">—</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d319159e87" style="vertical-align:top;" class="slds-cell-wrap" data-label="ステップ条件">
+                <strong class="uicontrol">別のステップが [完了] とマークされると、ステップが開始されます。</strong>
+              </td>
+
+              <td headers="d319159e90" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なもの">ステップを開始する前に完了する必要があるステップの名前</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d319159e87" style="vertical-align:top;" class="slds-cell-wrap" data-label="ステップ条件">
+                <strong class="uicontrol">指定された要件が満たされたら、ステップを開始する</strong>
+              </td>
+
+              <td headers="d319159e90" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なもの">ステップを開始できるかどうかを決定する最大 10 個の要件 </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d319159e87" style="vertical-align:top;" class="slds-cell-wrap" data-label="ステップ条件">
+                <strong class="uicontrol">指定された評価フローが True を返したら、ステップを開始する</strong>
+              </td>
+
+              <td headers="d319159e90" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なもの">ステップを開始できるかどうかを決定する有効な評価フローの名前</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">MuleSoft ステップによってコールされた MuleSoft アクションの実行コンテキスト</h2><p>API バージョン 60.0 以降では、デフォルトで、MuleSoft ステップによってコールされた MuleSoft アクションは自動化プロセスユーザーのコンテキストで実行されます。別のユーザーのコンテキストで MuleSoft アクションを実行するには、MuleSoft ステップのプロパティパネルにある「アクションを誰として実行するかを選択」セクションを使用します。</p><p>API バージョン 59.0 以前では、MuleSoft ステップによってコールされた MuleSoft アクションは、MuleSoft ステップが開始する前にオーケストレーションが実行されたユーザーのコンテキストで実行されます。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="ステージとステップの実行を制御するために 3 個を超える要件が必要な場合は、評価フローを使用します。[新規フロー] ウィンドウで [評価フロー] タイルを選択して、評価フローを作成します。" href="orchestrator-1.html#orchestrator_concepts_flows_evaluation_flows">オーケストレーションの評価フロー</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="orchestrator_concepts_trigger">
+<h1 class="slds-text-heading_large">オーケストレーションのトリガー</h1>
+  <p>レコードトリガーオーケストレーションを作成して、ユーザー入力や追加のレコード更新が必要なレコードの変更に対応します。[開始] 要素で、特定のオブジェクトの新規および変更されたレコードに基づいてオーケストレーションをトリガーするかどうかを指定します。フロートリガーエクスプローラーを使用して、レコードトリガーオートメーションの順序を管理します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col style="width:100%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="フローオーケストレーションでサポートされる製品とエディションを確認します。" href="orchestrator-1.html#automate_orchestrator_about_supported_editions">フローオーケストレーションでサポートされるエディションを表示します。</a>
+              </td>
+
+            </tr>
+          </tbody></table>
+    <p>自動起動オーケストレーションではトリガーが使用されないため、トリガーを起動する別のメカニズム(カスタムApexクラスやカスタムURLなど)が必要です。</p>
+    <p>フローオーケストレーションでは、トリガーはレコードの保存後に発生します。</p>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="orchestrator_concepts_type">
+<h1 class="slds-text-heading_large">オーケストレーションタイプ</h1>
+  <p>オーケストレーションの種別によって、オーケストレーションの配布方法が決まります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col style="width:100%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="フローオーケストレーションでサポートされる製品とエディションを確認します。" href="orchestrator-1.html#automate_orchestrator_about_supported_editions">フローオーケストレーションでサポートされるエディションを表示します。</a>
+              </td>
+
+            </tr>
+          </tbody></table>
+    <p>すべてのオーケストレーションは、一連のフェーズ内でグループ化されたステップで構成されます。対話型ステップには画面フローが含まれており、ユーザー操作が必要です。バックグラウンドステップには自動起動フローが含まれており、ユーザー操作は不要です。オーケストレーションの種別は、オーケストレーションの起動方法に影響します。</p>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d322320e66" style="vertical-align:top;" class="slds-cell-wrap" scope="col">オーケストレーションタイプ</th>
+            <th id="d322320e69" style="vertical-align:top;" class="slds-cell-wrap" scope="col">使用可能な配布方法</th>
+            <th id="d322320e72" style="vertical-align:top;" class="slds-cell-wrap" scope="col">メモ</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d322320e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="オーケストレーションタイプ">自動起動オーケストレーション (トリガーなし)</td>
+
+            <td headers="d322320e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な配布方法"><ul>
+                <li>カスタム Apex クラス</li>
+
+                <li>カスタムボタンまたはカスタムリンク</li>
+
+              </ul>
+</td>
+
+            <td headers="d322320e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="メモ">&nbsp;</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d322320e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="オーケストレーションタイプ">レコードトリガーオーケストレーション</td>
+
+            <td headers="d322320e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な配布方法">レコードトリガーオーケストレーションは、レコードの作成時または更新時にのみ実行されます。</td>
+
+            <td headers="d322320e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="メモ">&nbsp;</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d322320e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="オーケストレーションタイプ">外部システム変更トリガーオーケストレーション</td>
+
+            <td headers="d322320e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な配布方法">外部システム変更トリガーオーケストレーションは、サポートされている外部システムでデータが変更された場合にのみ実行されます。</td>
+
+            <td headers="d322320e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="メモ">MuleSoft for Flow アドオンが必要です。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d322320e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="オーケストレーションタイプ">自動起動フロー承認プロセス (トリガーなし)</td>
+
+            <td headers="d322320e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な配布方法"><ul>
+                <li>カスタム Apex クラス</li>
+
+                <li>カスタムボタンまたはカスタムリンク</li>
+
+              </ul>
+</td>
+
+            <td headers="d322320e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="メモ">フロー承認プロセスのフロー承認プロセスを作成するために使用される。<samp class="parmname">recordId</samp>、<samp class="parmname">submitter</samp>、および <samp class="parmname">submissionComments</samp> 入力変数が含まれます。「<a title="会社の成長に伴い、承認の複雑さも増し、多くの場合、異なるタイムゾーンの異なる部門の複数の担当者からの入力が必要になります。この複雑さにより、各ユーザーが適切な順序でレビューを完了するまでの待ち時間が長くなります。フロー承認プロセスは、ユーザー、システム、条件付きパスを含む複数ステップのレビューを調整するのに役立ちます。" href="approvals-2.html#automate_automated_approvals">Automate Your Approvals</a> with Flow Approval Processes (フロー承認プロセスを使用した承認の自動化)」を参照してください。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d322320e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="オーケストレーションタイプ">レコードトリガーフロー承認プロセス</td>
+
+            <td headers="d322320e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な配布方法">レコードトリガーフロー承認プロセスは、レコードが作成または更新された場合にのみ実行されます。</td>
+
+            <td headers="d322320e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="メモ">レビューするレコードが作成または更新され、指定された条件を満たしたときにトリガーされるフロー承認プロセスを作成するために使用されます。「<a title="会社の成長に伴い、承認の複雑さも増し、多くの場合、異なるタイムゾーンの異なる部門の複数の担当者からの入力が必要になります。この複雑さにより、各ユーザーが適切な順序でレビューを完了するまでの待ち時間が長くなります。フロー承認プロセスは、ユーザー、システム、条件付きパスを含む複数ステップのレビューを調整するのに役立ちます。" href="approvals-2.html#automate_automated_approvals">Automate Your Approvals</a> with Flow Approval Processes (フロー承認プロセスを使用した承認の自動化)」を参照してください。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d322320e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="オーケストレーションタイプ">外部システム変更トリガーフロー承認プロセス</td>
+
+            <td headers="d322320e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な配布方法">外部システム変更トリガーフロー承認プロセスは、サポートされている外部システムでデータが変更された場合にのみ実行されます。</td>
+
+            <td headers="d322320e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="メモ"><p>サポートされている外部システムのデータが変更されたときにトリガーされるフロー承認プロセスのフロー承認プロセスを作成するために使用される。「<a title="会社の成長に伴い、承認の複雑さも増し、多くの場合、異なるタイムゾーンの異なる部門の複数の担当者からの入力が必要になります。この複雑さにより、各ユーザーが適切な順序でレビューを完了するまでの待ち時間が長くなります。フロー承認プロセスは、ユーザー、システム、条件付きパスを含む複数ステップのレビューを調整するのに役立ちます。" href="approvals-2.html#automate_automated_approvals">Automate Your Approvals</a> with Flow Approval Processes (フロー承認プロセスを使用した承認の自動化)」を参照してください。</p><p style="margin-bottom:0;">MuleSoft for Flow アドオンが必要です。</p></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d322320e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="オーケストレーションタイプ">管理コンテンツ作成ワークフロー (ベータ)</td>
+
+            <td headers="d322320e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用可能な配布方法">デジタルエクスペリエンスアプリケーションの Salesforce CMS</td>
+
+            <td headers="d322320e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="メモ">CMS のオーケストレーションを作成するために使用されます。<samp class="parmname">mContentVariantId</samp> および <samp class="parmname">mContentSpaceId</samp> 入力変数を含みます。詳細は、<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.cms_workflows.htm&amp;language=ja&amp;type=5">「CMS ワークフローと承認」</a>を参照してください。</td>
+
+          </tr>
+        </tbody></table>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="orchestrator_concepts_versioning">
+<h1 class="slds-text-heading_large">オーケストレーションのバージョン管理</h1>
+  <p>フローオーケストレーションには、オーケストレーションのバージョンと、オーケストレーションによってコールされるフローのバージョンの 2 つのバージョン設定があります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col style="width:100%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="フローオーケストレーションでサポートされる製品とエディションを確認します。" href="orchestrator-1.html#automate_orchestrator_about_supported_editions">フローオーケストレーションでサポートされるエディションを表示します。</a>
+              </td>
+
+            </tr>
+          </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">オーケストレーション定義のバージョン設定</h2><p>オーケストレーション定義は、一度に1つの有効なバージョンを持つことができます。オーケストレーション実行で使用されるオーケストレーション定義バージョンは、実行が開始された時点で有効なバージョンです。</p><ul>
+        <li>オーケストレーション定義に基づくオーケストレーション実行が開始された後に新しいバージョンのオーケストレーション定義を有効化すると、オーケストレーション実行は開始元の定義バージョンを引き続き実行します。</li>
+
+        <li>新しいバージョンが有効化された後に開始されたオーケストレーション実行でのみ、新しい有効なバージョンが使用されます。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">フロー定義のバージョン設定</h2><p>対話型ステップとバックグラウンドステップはフローを呼び出します。ステップでは、ステップの開始時に有効なフローの定義バージョンが使用されます。</p><ul>
+        <li>関連付けられたステップが作成された後に参照されるフローの新しい定義バージョンを有効化すると、フローの以前の有効なバージョンが実行されます。</li>
+
+        <li>オーケストレーション実行が開始された後、関連付けられたステップ実行が作成される前に参照されるフローの新しい定義バージョンを有効化すると、新しいバージョンのフローが実行されます。</li>
+
+      </ul>
+</div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="orchestrator_concepts_work_items">
+<h1 class="slds-text-heading_large">フローオーケストレーション作業項目</h1>
+  <p>オーケストレーションの対話型ステップが実行されると、作業項目が作成され、ユーザー、グループ、またはキューに割り当てられます。その後、オーケストレーション実行によって、指定されたレコードページへのリンクが記載されたメールが、割り当てられたすべてのユーザーに送信されます。指定されたレコードページのオーケストレーション作業ガイドコンポーネントで作業を完了します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col style="width:100%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="フローオーケストレーションでサポートされる製品とエディションを確認します。" href="orchestrator-1.html#automate_orchestrator_about_supported_editions">フローオーケストレーションでサポートされるエディションを表示します。</a>
+              </td>
+
+            </tr>
+          </tbody></table>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 
+        <p>Salesforce からメールを送信するには、フローオーケストレーションでドメインレベルとユーザーレベルのメール検証が必要です。ユーザーのメールアドレスまたはメール送信ドメインが検証されていない場合、メールの送信は失敗します。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.security_email_verification_requirements.htm&amp;language=ja&amp;type=5">Requirements to Send Email from Salesforce </a> (Salesforce からメールを送信するための要件)」を参照してください。</p>
+      </div></div></div>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">作業が割り当てられたときにメール通知を受信するユーザー</h2><p>デフォルトでは、対話型ステップが実行されると、オーケストレーションによって作業項目が作成され、指定されたユーザー、グループ、またはキューに割り当てられます。割り当て先に送信される通知の種別は、割り当て先の種別によって異なります。</p><p>割り当てられたすべてのユーザーへのデフォルトのメール通知を無効にするには、「作業項目割り当てのすべてのメール通知の<a title="デフォルトでは、オーケストレーション作業項目がユーザー、グループ、またはキューに割り当てられるか、再割り当てされると、オーケストレーションからメール通知が送信されます。内部ユーザーとログイン情報が設定された Experience Cloud サイト訪問者へのメール送信を停止するには、すべての作業項目通知を無効にします。" href="#orchestrator_manage_disable_default_email_notifications">無効化</a>」を参照してください。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d179306e92" style="vertical-align:top;" class="slds-cell-wrap" scope="col">割り当て先種別</th>
+              <th id="d179306e95" style="vertical-align:top;" class="slds-cell-wrap" scope="col">通知</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d179306e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="割り当て先種別">内部ユーザー</td>
+
+              <td headers="d179306e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="通知">内部関連レコードページへのリンクを含むパーソナライズされたメール通知</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d179306e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="割り当て先種別">ログイン情報が設定された Experience Cloud サイト訪問者</td>
+
+              <td headers="d179306e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="通知">メンバーである最も古いライブ Experience Cloud サイトの関連レコードページへのリンクを含むパーソナライズされたメール通知 </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d179306e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="割り当て先種別">内部ユーザーのグループまたはキュー</td>
+
+              <td headers="d179306e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="通知">内部関連レコードページへのリンクを含む一般的なメール通知</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d179306e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="割り当て先種別">全員が同じサイトのメンバーである、ログイン情報が設定された Aura または LWR サイト訪問者のグループまたはキュー</td>
+
+              <td headers="d179306e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="通知">全員がメンバーであるライブ Experience Cloud サイトの関連レコードページへのリンクを含む一般的なメール通知</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d179306e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="割り当て先種別">全員が 1 つ以上の共通サイトのメンバーである、ログイン情報が設定された Aura または LWR サイト訪問者のグループまたはキュー</td>
+
+              <td headers="d179306e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="通知">全員がメンバーである最も古いライブ Experience Cloud サイトのレコードページへのリンクを含む一般的なメール通知</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d179306e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="割り当て先種別">共通のサイトがない、ログイン情報が設定された Aura または LWR サイト訪問者のグループまたはキュー</td>
+
+              <td headers="d179306e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="通知"><p>内部関連レコードページへのリンクを含む一般的なメール通知
+                  </p><p style="margin-bottom:0;">Experience Cloud サイト訪問者には内部ページへのアクセス権がないため、このリンクは無効です。ユーザーは [オーケストレーション作業項目オブジェクトリスト] ページを使用して、メンバーである Experience Cloud サイトから割り当てられた作業項目を表示およびアクセスできます。</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d179306e92" style="vertical-align:top;" class="slds-cell-wrap" data-label="割り当て先種別">内部ユーザーとログイン情報が設定された Aura または LWR サイト訪問者のグループまたはキュー</td>
+
+              <td headers="d179306e95" style="vertical-align:top;" class="slds-cell-wrap" data-label="通知"><p>内部関連レコードページへのリンクを含む一般的なメール通知
+                  </p><p style="margin-bottom:0;">Experience Cloud サイト訪問者には内部ページへのアクセス権がないため、このリンクは無効です。ユーザーは [オーケストレーション作業項目オブジェクトリスト] ページを使用して、メンバーである Experience Cloud サイトから割り当てられた作業項目を表示およびアクセスできます。</p></td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">オムニチャネルウィジェットを使用して割り当て通知が行われる場合 </h2><p>オーケストレーション作業項目オブジェクトに関連付けられたキューに対話型ステップが割り当てられると、キューメンバーは定義されたルーティングロジックに基づいてオムニチャネルウィジェットで通知を受信します。オムニチャネルウィジェットによる通知は、キューメンバーに送信されるデフォルトのメール通知とは別に行われます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">作業項目への内部ユーザーアクセス権</h2><p>内部ユーザーは、割り当てられた作業項目を完了できる関連レコードページへのリンクをメール通知で受け取ります。また、[Flow Orchestration Work Items (フローオーケストレーション作業項目)] リストビューまたは [ToDo] リストで、割り当てられた作業を表示およびアクセスすることもできます。内部ユーザーが割り当てられた作業を完了できるようにするには、オーケストレーションを実行する前に、Lightningアプリケーション ビルダーの関連レコード ページ レイアウトにオーケストレーション作業ガイド コンポーネントを配置します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">作業項目への Experience Cloud サイト訪問者のアクセス権</h2><p>が常、ログイン情報が設定された Experience Cloud サイト訪問者は、自分がメンバーである最も古いライブ Experience Cloud サイトの関連レコードページへのリンクをメール通知で受け取ります。また、割り当てられた作業をオーケストレーション作業項目オブジェクトのリストビューで表示してアクセスすることもできます。</p><p>オーケストレーションを実行する前に、エクスペリエンスビルダーでシステム管理者がオーケストレーション作業項目へのサイト訪問者のアクセス権を設定します。</p><ul>
+        <li>エクスペリエンスビルダーで、システム管理者はオーケストレーション作業ガイドコンポーネントを Aura および LWR サイトの関連レコードページに配置します。</li>
+
+        <li>エクスペリエンスビルダーで、システム管理者はオーケストレーション作業項目リストオブジェクトページを Aura サイトと LWR サイトに追加します。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">内部ユーザーに割り当てられた作業</h2><p>対話型ステップが実行されると、オーケストレーションによって作業項目が作成され、指定された内部ユーザーに割り当てられます。割り当てられたユーザーに内部関連レコードページへのリンクが記載されたメールが送信され、完了すべき作業項目があることが通知されます。作業項目は、割り当てられたユーザーの [ToDo] リストにも表示されます。ユーザーが作業項目へのリンクをクリックすると、内部関連レコードページの作業ガイドで対話型ステップに関連付けられた画面フローを完了できます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">ログイン情報が設定された Experience Cloud サイト訪問者に割り当てられた作業</h2><p>対話型ステップが実行されると、オーケストレーションによって作業項目が作成され、指定されたログイン情報が設定された Experience Cloud サイト訪問者に割り当てられます。割り当て先には、完了すべき作業項目があることを通知するメールが送信されます。このメールには、そのユーザーがメンバーである最も古いライブサイトの関連レコードページへのリンクが含まれています。サイト訪問者はメールリンクをクリックすると関連レコードページにリダイレクトされ、そのページの [作業ガイド] で関連する画面フローを完了します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">内部グループまたはキューに割り当てられた作業</h2><p>対話型ステップが実行されると、オーケストレーションによって作業項目が作成され、指定されたグループまたはキューに割り当てられます。割り当てられた内部グループまたは内部キュー内のすべてのユーザーに、内部関連レコードページへのリンクが記載されたメールが送信され、完了すべきアクションがあることが通知されます。ユーザーがメール内のリンクをクリックして作業項目を開くと、内部関連レコードページの作業ガイドで画面フローを実行できます。</p><p>割り当てられた作業項目は、画面フローを最初に完了したユーザーによって完了されます。2 人のユーザーが画面フローを同時に実行すると、フローを 2 番目に完了したユーザーにはエラーが表示されます。作業項目が完了すると、作業ガイドを参照している他のグループまたはキューメンバーには、期限切れのバッジが付けられた項目が無効になります。ページを離れるか、ページを更新するか、別の作業項目を完了するまで、リストから削除されません。作業ガイドを積極的に表示していない場合、次にページにアクセスするときに関連作業が表示されなくなります。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">ログイン情報が設定された Experience Cloud サイト訪問者のグループまたはキューに割り当てられた作業</h2><p>対話型ステップが実行されると、オーケストレーションによって作業項目が作成され、ログイン情報が設定された Experience Cloud サイト訪問者の指定されたグループまたはキューに割り当てられます。割り当てられたグループまたはキュー内のサイト訪問者は、完了すべきアクションがあることをメールで通知されます。通常、このメールには、訪問者全員がメンバーである最も古いライブ Experience Cloud サイトの関連レコードページへのリンクが含まれます。グループまたはキューのメンバーがリンクをクリックすると、訪問者は、グループまたはキューのすべてのメンバーのログイン情報が設定された最も古いライブ Experience Cloud サイトの関連レコードページに移動します。サイト訪問者は、その関連レコードページから作業ガイドの関連画面フローを完了できます。</p><p>Experience Cloud サイト訪問者は、自分に割り当てられた作業項目をオーケストレーション作業項目リストオブジェクトページでも参照できます。[オーケストレーション作業項目リスト] から、割り当てられた作業にアクセスすることもできます。ログイン情報が設定されたサイト訪問者は、自分がメンバーである Aura または LWR サイトの関連レコードページに移動して、作業ガイドの画面フローを実行できます。</p><p>割り当てられた作業項目は、最初に画面フローを完了したログイン情報が設定されたサイト訪問者によって完了されます。2 人のログイン情報サイトが設定された訪問者が画面フローを同時に実行すると、2 番目にフローを完了した訪問者にはエラーが表示されます。作業項目が完了すると、作業ガイドを参照している他のグループまたはキューメンバーには、期限切れのバッジが付けられた項目が無効になります。ページを離れるか、ページを更新するか、別の作業項目を完了するまで、リストから削除されません。作業ガイドを積極的に表示していない場合、次にページにアクセスするときに関連作業が表示されなくなります。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">ユーザー、グループ、またはキューに再割り当てされた作業項目</h2><p>実行中のオーケストレーションの進行中の作業項目を別のユーザー、グループ、またはキューに再割り当てできます。再割り当て後、作業項目は実行中のオーケストレーションで作成された後と同じように処理されます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">作業項目の状況</h2><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d179306e286" style="vertical-align:top;" class="slds-cell-wrap" scope="col">作業項目の状況</th>
+              <th id="d179306e289" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d179306e286" style="vertical-align:top;" class="slds-cell-wrap" data-label="作業項目の状況">割り当て済み</td>
+
+              <td headers="d179306e289" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><ul>
+                  <li>作業項目は作成されていますが、割り当てられたユーザーがまだ完了しておらず、オーケストレーションが進行中です。</li>
+
+                  <li>作業項目が別のユーザーに再割り当てされ、オーケストレーションが進行中です。</li>
+
+                  <li>割り当てられたユーザーが作業項目を完了しておらず、オーケストレーションがキャンセルされました。</li>
+
+                  <li>割り当てられたユーザーが作業項目を完了し、オーケストレーションがキャンセルされました。</li>
+
+                  <li>割り当てられたユーザーが作業項目を完了しておらず、オーケストレーションでエラーが発生しています。</li>
+
+                  <li>割り当てられたユーザーが作業項目を完了しておらず、作業項目のインタラクティブステップに関連付けられた画面フローでエラーが発生しています。</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d179306e286" style="vertical-align:top;" class="slds-cell-wrap" data-label="作業項目の状況">完了</td>
+
+              <td headers="d179306e289" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><ul>
+                  <li>割り当てられたユーザーが作業項目を完了し、オーケストレーションが完了しました。</li>
+
+                  <li>割り当てられたユーザーが作業項目を完了しておらず、関連付けられたステップを含むフェーズが完了しました。</li>
+
+                  <li>割り当てられたユーザーが作業項目を完了し、オーケストレーションがキャンセルされました。</li>
+
+                  <li>割り当てられたユーザーが作業項目を完了し、オーケストレーションでエラーが発生しました。</li>
+
+                  <li>割り当てられたユーザーが作業項目を完了し、関連付けられたステップが含まれるフェーズでエラーが発生しました。</li>
+
+                  <li>割り当てられたユーザーが作業項目を完了しておらず、関連付けられたステップが含まれるフェーズでエラーが発生しました。</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">履歴</h2><p>履歴では、オーケストレーション作業項目にはいくつかのマイルストーンが考えられます。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d179306e382" style="vertical-align:top;" class="slds-cell-wrap" scope="col">作業項目マイルストーン</th>
+              <th id="d179306e385" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d179306e382" style="vertical-align:top;" class="slds-cell-wrap" data-label="作業項目マイルストーン">作業項目を開始</td>
+
+              <td headers="d179306e385" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">作業項目が作成され、割り当てられました。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d179306e382" style="vertical-align:top;" class="slds-cell-wrap" data-label="作業項目マイルストーン">作業項目を終了</td>
+
+              <td headers="d179306e385" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>割り当てられたユーザーが作業項目を完了しました。</p><p style="margin-bottom:0;">作業項目が [作業項目を終了] マイルストーンに達すると、[Completed By (完了者)] 項目は、作業を完了したユーザーまたはログイン情報が設定された Experience Cloud サイト訪問者のユーザー名に設定されます。作業項目がこのマイルストーンに達すると、[所要時間] 項目はステップの所要時間 (秒) に設定されます。</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d179306e382" style="vertical-align:top;" class="slds-cell-wrap" data-label="作業項目マイルストーン">作業項目を再割り当て</td>
+
+              <td headers="d179306e385" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">作業項目が再割り当てされました。</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">フローオーケストレーション作業項目レコードの所有権</h2><p>Winter '23 以降に作成されたフローオーケストレーション作業項目レコードの場合、所有者は割り当てられたユーザーまたは自動化プロセスユーザーになります。</p><p>Summer '24 より前に作成され、キューに割り当てられたフローオーケストレーション作業項目の場合、所有者は自動化プロセスユーザーです。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d179306e448" style="vertical-align:top;" class="slds-cell-wrap" scope="col">シナリオ</th>
+              <th id="d179306e451" style="vertical-align:top;" class="slds-cell-wrap" scope="col">所有者 ID </th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d179306e448" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオ">割り当て先は 1 人の内部ユーザーである。</td>
+
+              <td headers="d179306e451" style="vertical-align:top;" class="slds-cell-wrap" data-label="所有者 ID">割り当てられたユーザーの ID</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d179306e448" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオ">割り当て先が 1 人のログイン情報が設定された Experience Cloud サイト訪問者である。</td>
+
+              <td headers="d179306e451" style="vertical-align:top;" class="slds-cell-wrap" data-label="所有者 ID">ログイン情報が設定された Experience Cloud サイト訪問者の ID</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d179306e448" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオ">作業項目が 1 人の内部ユーザーに再割り当てされた。</td>
+
+              <td headers="d179306e451" style="vertical-align:top;" class="slds-cell-wrap" data-label="所有者 ID">作業項目を再割り当てしたユーザーの ID</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d179306e448" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオ">作業項目が 1 人のログイン情報が設定された Experience Cloud サイト訪問者に再割り当てされた。</td>
+
+              <td headers="d179306e451" style="vertical-align:top;" class="slds-cell-wrap" data-label="所有者 ID">作業項目を再割り当てしたログイン情報が設定された Experience Cloud サイト訪問者の ID</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d179306e448" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオ">割り当て先はグループである。</td>
+
+              <td headers="d179306e451" style="vertical-align:top;" class="slds-cell-wrap" data-label="所有者 ID">自動化プロセスユーザーの ID</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d179306e448" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオ">作業項目がグループに再割り当てされた。</td>
+
+              <td headers="d179306e451" style="vertical-align:top;" class="slds-cell-wrap" data-label="所有者 ID">自動化プロセスユーザーの ID</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d179306e448" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオ">割り当て先は、オーケストレーション作業項目オブジェクトに関連付けられたキューである。</td>
+
+              <td headers="d179306e451" style="vertical-align:top;" class="slds-cell-wrap" data-label="所有者 ID">割り当てられたキューの ID</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d179306e448" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオ">作業項目がオーケストレーション作業項目オブジェクトに関連付けられたキューに再割り当てされた。</td>
+
+              <td headers="d179306e451" style="vertical-align:top;" class="slds-cell-wrap" data-label="所有者 ID">割り当てられたキューの ID</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d179306e448" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオ">割り当て先がオーケストレーション作業項目オブジェクトに関連付けられていないキューである。</td>
+
+              <td headers="d179306e451" style="vertical-align:top;" class="slds-cell-wrap" data-label="所有者 ID">自動化プロセスユーザーの ID</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d179306e448" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオ">作業項目がオーケストレーション作業項目オブジェクトに関連付けられていないキューに再割り当てされた。</td>
+
+              <td headers="d179306e451" style="vertical-align:top;" class="slds-cell-wrap" data-label="所有者 ID">自動化プロセスユーザーの ID</td>
+
+            </tr>
+          </tbody></table></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=service.omnichannel_intro.htm&amp;language=ja&amp;type=5">Salesforce ヘルプ: オムニチャネルを使用した作業の転送 </a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="orchestrator_considerations">
+<h1 class="slds-text-heading_large">Flow オーケストレーションの制限と考慮事項</h1>
+  <p>オーケストレーションを設計、管理、実行するときは、次の問題を考慮してください。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="#orchestrator_considerations_limit">一般的なフローオーケストレーションの制限</a></strong><br>オーケストレーションを使用する場合は、オーケストレーションの制限、フローの制限、Apexガバナ制限に留意してください。</li><li class="slds-p-bottom_small"><strong><a href="#orchestrator_considerations_orchestrations">オーケストレーションに関する考慮事項</a></strong><br>オーケストレーションを設計および使用するときは、次の考慮事項に留意してください。</li><li class="slds-p-bottom_small"><strong><a href="#orchestrator_considerations_evaluation_flows">オーケストレーションの評価フローに関する考慮事項</a></strong><br>オーケストレーションで評価フローを入力条件または終了条件として使用するときは、次の考慮事項に留意してください。</li><li class="slds-p-bottom_small"><strong><a href="#orchestrator_considerations_security_considerations">オーケストレーションのセキュリティに関する考慮事項</a></strong><br>オーケストレーションを設計するときは、次のセキュリティに関する事項を考慮してください。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="orchestrator_considerations_entitlements">
+<h1 class="slds-text-heading_large">フローオーケストレーションエンタイトルメント</h1>
+  <p>フローオーケストレーションは、使用量ベースの制限のない特定のエディションに含まれています。オーケストレーション<dfn>実行</dfn>は、オーケストレーションの実行インスタンスです。<dfn>オーケストレーション</dfn>は、フェーズ、ステップ、決定を使用して複雑なビジネスプロセスを整理する、システム管理者が作成したアプリケーションです。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col style="width:100%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="フローオーケストレーションでサポートされる製品とエディションを確認します。" href="orchestrator-1.html#automate_orchestrator_about_supported_editions">フローオーケストレーションでサポートされるエディションを表示します。</a>
+              </td>
+
+            </tr>
+          </tbody></table>
+    <div><p>フローオーケストレーションは、必要なエディションの表に記載されているエディションで自動的に有効になります。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="orchestrator_considerations_evaluation_flows">
+<h1 class="slds-text-heading_large">オーケストレーションの評価フローに関する考慮事項</h1>
+  <p>オーケストレーションで評価フローを入力条件または終了条件として使用するときは、次の考慮事項に留意してください。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col style="width:100%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="フローオーケストレーションでサポートされる製品とエディションを確認します。" href="orchestrator-1.html#automate_orchestrator_about_supported_editions">フローオーケストレーションでサポートされるエディションを表示します。</a>
+              </td>
+
+            </tr>
+          </tbody></table>
+    <div><p>評価フローは、プロセスタイプが [評価フロー] のフローです。これは、<samp class="parmname">isOrchestrationConditionMet</samp> という名前の定義済みの Boolean 出力変数が含まれる自動起動フローです。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">一般的なガイドライン</h2><p>特定の項目自動更新が発生するまでオーケストレーションを一時停止するには評価フローを使用します。</p><p>評価フローでレコードをループ処理したり、外部コールアウトを行ったりしないでください。</p><p>オーケストレーションから評価フローに変数を渡すには、評価フロー入力変数を使用します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">出力変数</h2><p>評価フローには、<samp class="parmname">isOrchestrationConditionMet</samp> という名前の 1 つの出力変数があります。</p><p><samp class="parmname">isOrchestrationConditionMet</samp> 出力変数は Boolean 型で、false に初期設定する必要があります。</p><p><samp class="parmname">isOrchestrationConditionMet</samp> 以外のすべての出力変数の値は破棄され、オーケストレーションで使用されません。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="orchestrator_considerations_limit">
+<h1 class="slds-text-heading_large">一般的なフローオーケストレーションの制限</h1>
+  <p>オーケストレーションを使用する場合は、オーケストレーションの制限、フローの制限、Apexガバナ制限に留意してください。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col style="width:100%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="フローオーケストレーションでサポートされる製品とエディションを確認します。" href="orchestrator-1.html#automate_orchestrator_about_supported_editions">フローオーケストレーションでサポートされるエディションを表示します。</a>
+              </td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:80%"><col style="width:20%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d331556e62" style="vertical-align:top;" class="slds-cell-wrap" scope="col">組織単位の制限</th>
+              <th id="d331556e65" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Enterprise Edition、Unlimited Edition、Performance Edition、または Developer Edition</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d331556e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="組織単位の制限">オーケストレーションあたりのバージョン数</td>
+
+              <td headers="d331556e65" style="vertical-align:top;" class="slds-cell-wrap" data-label="Enterprise Edition、Unlimited Edition、Performance Edition、または Developer Edition">
+                <span id="orchestrator_considerations_limit__OrchestrationVersionLimit"><a name="orchestrator_considerations_limit__OrchestrationVersionLimit"></a>50</span>
+              </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d331556e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="組織単位の制限">有効なオーケストレーション </td>
+
+              <td headers="d331556e65" style="vertical-align:top;" class="slds-cell-wrap" data-label="Enterprise Edition、Unlimited Edition、Performance Edition、または Developer Edition">
+                <span id="orchestrator_considerations_limit__OrchestrationActiveVersionLimit"><a name="orchestrator_considerations_limit__OrchestrationActiveVersionLimit"></a>2000</span>
+              </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d331556e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="組織単位の制限">Total Orchestrations (オーケストレーション総数)</td>
+
+              <td headers="d331556e65" style="vertical-align:top;" class="slds-cell-wrap" data-label="Enterprise Edition、Unlimited Edition、Performance Edition、または Developer Edition">
+                <span id="orchestrator_considerations_limit__TotalOrchestrationLimit"><a name="orchestrator_considerations_limit__TotalOrchestrationLimit"></a>4,000</span>
+              </td>
+
+            </tr>
+          </tbody></table></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="overview-3.html#flow_considerations_usage_entitlements"> ビジネスプロセスの自動化: フロー使用量ベースのエンタイトルメント </a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=sales.allocations_email_general.htm&amp;language=ja&amp;type=5"> Sales Productivity : Email Allocations per Edition (営業の生産性: エディションごとのメール割り当て)
+                        </a></li><li><a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.platform_events.meta/platform_events/platform_event_limits.htm">プラットフォームイベント開発者ガイド: プラットフォームイベントの割り当て
+                        </a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="orchestrator_considerations_orchestrations">
+<h1 class="slds-text-heading_large">オーケストレーションに関する考慮事項</h1>
+  <p>オーケストレーションを設計および使用するときは、次の考慮事項に留意してください。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col style="width:100%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="フローオーケストレーションでサポートされる製品とエディションを確認します。" href="orchestrator-1.html#automate_orchestrator_about_supported_editions">フローオーケストレーションでサポートされるエディションを表示します。</a>
+              </td>
+
+            </tr>
+          </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">エントリ条件と終了条件の要件</h2><p>ステップのエントリ条件やフェーズまたはステップの終了条件の要件で選択されたリソースには、オーケストレーションリソースまたはグローバル変数を含めることができます。要件に含めることができる内容には制限があります。</p><ul>
+        <li>[リソース] 項目または [値] 項目のレコードを使用するには、そのレコードの項目を選択する必要があります。</li>
+
+        <li>参照されるレコードでは、関連レコードの項目ではなく、そのオブジェクトの項目を使用する必要があります。
+    </li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">レコード変更トリガーフローオーケストレーションイベント</h2><p>ステップのエントリ条件やフェーズまたはステップの終了条件の要件には、レコードへの参照を含めることができます。そのレコードを変更すると、オーケストレーションがトリガーされ、現在のフェーズの状況とフェーズ内の未完了のステップが評価される場合があります。レコードで条件の評価をトリガーできるタイミングには制限があります。</p><ul>
+        <li>参照されるレコードの親オブジェクトで変更イベントがサポートされている必要がある。</li>
+
+        <li>参照されるレコード項目が IsDeleted、SystemModeStamp、または関連レコードや数式から派生した項目ではない。</li>
+
+        <li>参照されるレコードが null であるか、無効な ID である。</li>
+
+        <li>参照されるレコードが自動起動オーケストレーションのグローバル変数である。</li>
+
+        <li>レコードトリガーオーケストレーションで参照されるレコードが $Record 以外のグローバル変数である。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">フローの入力値</h2><p><span id="orchestrator_considerations_orchestrations__orchestrator_flow_input_value_limitations"><a name="orchestrator_considerations_orchestrations__orchestrator_flow_input_value_limitations"></a>オーケストレーションステップでコールされたフローの合計入力値が 32,768 文字を超えると、オーケストレーションは失敗します。このエラーは、ステップでコールされたフローに 1 つ以上のレコードを渡したことが原因である可能性があります。このエラーを回避するには、参照されるフローにレコード ID を渡し、渡された ID のフローでレコードを取得要素を使用します。レコードを取得要素で渡された ID を使用すると、常に最新バージョンのレコードを使用できます。</span></p><p>フロー承認プロセスステップによってコールされたフローの合計入力値が 32,768 文字を超える<span id="orchestrator_considerations_orchestrations__approval_orchestration_flow_input_value_limitations"><a name="orchestrator_considerations_orchestrations__approval_orchestration_flow_input_value_limitations"></a>場合、フロー承認プロセスは失敗します。このエラーは、ステップでコールされたフローに 1 つ以上のレコードを渡したことが原因である可能性があります。このエラーを回避するには、参照されるフローにレコード ID を渡し、渡された ID のフローでレコードを取得要素を使用します。レコードを取得要素で渡された ID を使用すると、常に最新バージョンのレコードを使用できます。</span></p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">メール通知</h2><p>ステップでコールされたフローが失敗し、オーケストレーションが失敗すると、2 つのメール通知が送信されます。</p><ul>
+        <li>フローエラー通知</li>
+
+        <li>オーケストレーションエラー通知</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">ガバナ制限とオーケストレーションステップの同時実行</h2><p>フローオーケストレーションでステップを一括で実行すると、同時インタビューがユーザーコンテキストとフローバージョンでバッチにグループ化されます。ユーザーコンテキストまたはフローバージョンが異なるインタビューは、別々のグループで実行されます。グループは順序どおりに実行されますが、同じトランザクション内で実行されます。</p><p>フローオーケストレーションは、次のような状況でステップの実行を一括処理します。</p><ul>
+        <li>複数のユーザーが同時に作業項目を完了 </li>
+
+        <li>一括レコード更新によって複数のオーケストレーションの実行がトリガーされる</li>
+
+        <li>レコード変更イベントで複数のオーケストレーションの実行を再開する</li>
+
+      </ul>
+<p>一括処理のすべてのグループは 1 つのトランザクションで実行され、ガバナ制限を共有します。SOQL クエリ、DML ステートメント、および Apex CPU 時間は、すべてのグループで累積されます。ステップでコールされるフローがレコードを作成、更新、または削除したときに実行されるレコードトリガーフローと Apex トリガーは、同じ制限に含まれます。</p><p>フローオーケストレーションでは、ユーザーがいつ開始したかではなく、実行時点で処理キューにあるインタビューに基づいてインタビューがグループ化されます。実行時間をずらすことは、バッチサイズを確実には削減しません。</p><p>SOQL 101 および Apex CPU 制限エラーの最も一般的な原因は、次の 1 つです。</p><ul>
+        <li>ステップがコールするフロー内の SOQL クエリ、DML、またはループ内のコールアウト</li>
+
+        <li>同じトランザクションのカスケード自動化 (レコードトリガーフローや、ステップでコールされるフローがレコードを作成、更新、削除したときに実行される Apex トリガーなど)</li>
+
+        <li>ガバナ制限をリセットするために、ステップが多数の連続操作を含みトランザクション境界のないフローをコールする</li>
+
+      </ul>
+<p>ガバナ制限に近づかないようにするには、次の設計方法に従ってください。</p><ul>
+        <li>SOQL クエリ、DML、コールアウトをループから除外して、フローで自動的に一括処理されるようにします。</li>
+
+        <li>ステップがコールする呼び出し可能な Apex アクションの場合、コレクション パラメータ (<code>List&lt;RequestType&gt;</code>、<code>List&lt;ResponseType&gt;</code>) を使用し、ループ内ではなくコレクション全体に対して DML を実行します。</li>
+
+        <li>コールアウトと DML 操作は別々のステップに配置し、それぞれガバナ制限をリセットする独自のトランザクションで実行されます。</li>
+
+        <li>待機要素をバックグラウンドステップの自動起動フローに追加します。待機要素では、ステップを個別のトランザクションで非同期に実行します。</li>
+
+      </ul>
+</div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="orchestrator_considerations_security_considerations">
+<h1 class="slds-text-heading_large">オーケストレーションのセキュリティに関する考慮事項</h1>
+  <p>オーケストレーションを設計するときは、次のセキュリティに関する事項を考慮してください。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col style="width:100%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="フローオーケストレーションでサポートされる製品とエディションを確認します。" href="orchestrator-1.html#automate_orchestrator_about_supported_editions">フローオーケストレーションでサポートされるエディションを表示します。</a>
+              </td>
+
+            </tr>
+          </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Shield Platform Encryption</h2><p>セキュリティを強化するには、<code>Flow Orchestration Work
+     Item</code> オブジェクトの <code>Screen Flow Inputs</code> 項目で Shield Platform Encryption を有効にします。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.security_pe_overview.htm&amp;language=ja&amp;type=5">Salesforce ヘルプ: Shield Platform Encryption を使用したデータのセキュリティの強化 </a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="orchestrator_customize_email_notification">
+<h1 class="slds-text-heading_large">割り当て先へのメールをカスタマイズ</h1>
+  <p>デフォルトでは、オーケストレーションの実行でオーケストレーション作業項目が作成されるたびに、割り当て先に通知が送信されます。オーケストレーション作業項目の作成時に送信されるメール通知を変更するには、関連付けられた承認ステップをカスタマイズします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col style="width:100%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="フローオーケストレーションでサポートされる製品とエディションを確認します。" href="orchestrator-1.html#automate_orchestrator_about_supported_editions">フローオーケストレーションでサポートされるエディションを表示します。</a>
+              </td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d331406e60" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d331406e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Flow Builder でオーケストレーションを開く、編集または作成する</td>
+
+              <td headers="d331406e60" style="vertical-align:top;" class="slds-cell-wrap">「フローの管理」</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d331406e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">割り当てられた作業を完了し、一時停止中のオーケストレーションを再開する</td>
+
+              <td headers="d331406e60" style="vertical-align:top;" class="slds-cell-wrap">「フローを実行」</td>
+
+            </tr>
+          </tbody></table><p>対話型ステップを含むオーケストレーションが必要です。オーケストレーション作業項目の作成時にカスタムメール通知を送信する対話型ステップを作成するには、「<a title="オーケストレーションのステップを個人、グループ、またはキューに割り当てるには、対話型ステップを作成します。オーケストレーションの実行では、実行する対話型ステップごとに作業項目が作成されます。" href="orchestrator-1.html#orchestrator_build_assign_interactive_step">Create a Step</a> to Interact with Users (ユーザーとやりとりするステップの作成)」を参照してください。</p><p>メール通知を割り当て先に送信するには、[プロセスの自動化設定でのオーケストレーション作業項目メール通知の送信を停止] を選択解除する必要があります。<a title="デフォルトでは、オーケストレーション作業項目がユーザー、グループ、またはキューに割り当てられるか、再割り当てされると、オーケストレーションからメール通知が送信されます。内部ユーザーとログイン情報が設定された Experience Cloud サイト訪問者へのメール送信を停止するには、すべての作業項目通知を無効にします。" href="#orchestrator_manage_disable_default_email_notifications">作業項目割り当てのすべてのメール通知の無効化</a>を参照してください。</p></div>
+    <div><p>最初の通知メールの内容は対話型ステップごとにカスタマイズできますが、送信者はカスタマイズできません。<span>オーケストレーションは、[プロセスの自動化設定] で指定した [自動化プロセスユーザーのメールアドレス] からメール通知を送信します。この設定を指定しない場合、Salesforce は [デフォルトの No-Reply アドレス] が目的の組織のメールアドレスを検索します。存在しない場合、Salesforce は検証済みの組織のメールアドレスを使用します。組織のメールアドレスが存在しない場合、Salesforce はオーケストレーションを実行しているユーザーのメールアドレスを使用します。オーケストレーションがユーザーのいないシステムコンテキストで実行されている場合、Salesforce はメールを送信しません。</span></p><p>テキストテンプレートリソースを使用して、カスタムメールのユニークでパーソナル化された件名と本文を生成します。対話型ステップごとに異なるテキストテンプレートのセットを使用できます。
+      </p></div>
+    <ol><li>
+        <span>カスタマイズするオーケストレーションを開きます。</span>
+      </li><li>
+        <span>省略可能。カスタムメールの件名に使用するテキストを含むテキストテンプレートリソースを作成します。</span>
+      </li><li>
+        <span>省略可能。カスタムメールに使用する本文を含むテキストテンプレートリソースを作成します。</span>
+      </li><li>
+        <span>インタラクティブステップを編集します。</span>
+        <div>インタラクティブステップの [プロパティ] パネルが開きます。</div>
+      </li><li>
+        <span>[アクションを完了するユーザーを選択] で、[<strong class="uicontrol">通知メールをカスタマイズ</strong>] を選択します。</span>
+        <ol>
+          <li>
+            <span>[<strong class="uicontrol">件名]</strong> で、カスタムメールの件名が含まれるテキストテンプレートを選択します。または、件名の文字列を入力します。</span>
+          </li>
+
+          <li>
+            <span>[<strong class="uicontrol">本文]</strong> で、カスタムメールの本文が含まれるテキストテンプレートを選択します。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>作業内容を保存します。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="orchestrator_deploy_create_org_wide_email_address">
+<h1 class="slds-text-heading_large">オーケストレーション用の組織のメールアドレスの設定</h1>
+  <p>フローオーケストレーションからメールを送信するには、組織のメールアドレスを作成します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col style="width:100%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="フローオーケストレーションでサポートされる製品とエディションを確認します。" href="orchestrator-1.html#automate_orchestrator_about_supported_editions">フローオーケストレーションでサポートされるエディションを表示します。</a>
+              </td>
+
+            </tr>
+          </tbody></table><p><span>オーケストレーションは、[プロセスの自動化設定] で指定した [自動化プロセスユーザーのメールアドレス] からメール通知を送信します。この設定を指定しない場合、Salesforce は [デフォルトの No-Reply アドレス] が目的の組織のメールアドレスを検索します。存在しない場合、Salesforce は検証済みの組織のメールアドレスを使用します。組織のメールアドレスが存在しない場合、Salesforce はオーケストレーションを実行しているユーザーのメールアドレスを使用します。オーケストレーションがユーザーのいないシステムコンテキストで実行されている場合、Salesforce はメールを送信しません。</span></p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> [ユーザー選択] と [デフォルトの No-Reply アドレス] を目的とする既存の組織のメールアドレスがある場合、新しいメールアドレスを設定する必要はありませんが、[設定] の [プロセスの自動化設定] で [自動プロセスユーザーのメールアドレス] として指定されていることを確認してください。</div></div></div>
+</div>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 
+        <p>Salesforce からメールを送信するには、フローオーケストレーションでドメインレベルとユーザーレベルのメール検証が必要です。ユーザーのメールアドレスまたはメール送信ドメインが検証されていない場合、メールの送信は失敗します。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.security_email_verification_requirements.htm&amp;language=ja&amp;type=5">Requirements to Send Email from Salesforce </a> (Salesforce からメールを送信するための要件)」を参照してください。</p>
+      </div></div></div>
+</div>
+    <ol><li>
+        <span>[設定] の [クイック検索] ボックスに<kbd>メール</kbd>と入力し、<strong class="uicontrol">組織全体のアドレス</strong>を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">追加</strong>を選択します。</span>
+      </li><li>
+        <span>組織全体のメールアドレスフォームに入力します。</span>
+        <ol>
+          <li>
+            <span><strong class="uicontrol">表示名</strong>に、組織全体のメールアドレスのラベルとなる名前を入力します。</span>
+            <div>受信者の受信箱にはこの名前が表示されますが、このアドレスは返信に応答しません。明確な期待値を設定するわかりやすい名前を使用します。</div>
+          </li>
+
+          <li>
+            <span>[<strong class="uicontrol">Email Address</strong> (メールアドレス)] に、メールの [<strong class="uicontrol">From Address (</strong>送信元アドレス)] として使用できる会社のメールアドレスを入力します。</span>
+          </li>
+
+          <li>
+            <span>[目的] で、[<strong class="uicontrol">ユーザー選択] と</strong> [デフォルトの No-Reply アドレス] を選択します。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[すべてのプロファイルにこの送信元アドレスの使用を許可]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>作業内容を保存します。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>組織のアドレスと <strong class="uicontrol">[確認要求送信済み]</strong> という状況を表示します。</span>
+      </li><li>
+        <span>メールアドレス項目に指定したメールアドレスへ移動します。</span>
+      </li><li>
+        <span>前に入力した会社のアドレスに Salesforce からメールが送信されたら、会社のメールアドレスを承認して確認します。</span>
+      </li><li>
+        <span>Salesforce に戻り、住所の状況が <strong class="uicontrol">検証済み</strong> であることを確認します。</span>
+      </li><li>
+        <span>[設定] から、[クイック検索] ボックスに<kbd>「オートメーション設定」</kbd>と入力し、<strong class="uicontrol">[プロセスの自動化設定]</strong> を選択します</span>
+      </li><li>
+        <span>[自動化プロセスユーザーのメールアドレス] で、組織のメールアドレスを指定します。</span>
+      </li><li>
+        <span>変更を保存します。</span>
+      </li></ol>
+
+    <div><p>オーケストレーションを有効化します。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="orchestrator_deploy_with_change_sets">
+<h1 class="slds-text-heading_large">変更セットを使用したオーケストレーションの展開</h1>
+  <p>サンドボックスでオーケストレーションを作成、テスト、デバッグします。リリースの準備ができたら、変更セットを使用してオーケストレーションとそれに関連付けられたフローを本番に展開します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col style="width:100%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="フローオーケストレーションでサポートされる製品とエディションを確認します。" href="orchestrator-1.html#automate_orchestrator_about_supported_editions">フローオーケストレーションでサポートされるエディションを表示します。</a>
+              </td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d295358e63" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d295358e63" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロセスを作成、編集、参照する</td>
+
+              <td headers="d295358e63" style="vertical-align:top;" class="slds-cell-wrap"><p>「フローの管理」</p><p>および</p><p style="margin-bottom:0;">「すべてのデータの参照」</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d295358e63" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">リリース接続を編集する</td>
+
+              <td headers="d295358e63" style="vertical-align:top;" class="slds-cell-wrap"><p>「変更セットのリリース」</p><p>および</p><p style="margin-bottom:0;">「メタデータ API 関数を使用したメタデータを変更」</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d295358e63" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">送信変更セットを使用する</td>
+
+              <td headers="d295358e63" style="vertical-align:top;" class="slds-cell-wrap">「変更セットの作成とアップロード」</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d295358e63" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">受信変更セットを使用する</td>
+
+              <td headers="d295358e63" style="vertical-align:top;" class="slds-cell-wrap">「変更セットのリリース」および「メタデータ API 関数を使用したメタデータの変更」</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>サンドボックスで送信変更セットを作成してアップロードし、受信変更セットを本番に展開します。</p></div>
+    <ol><li>
+        <span>対話型ステップをユーザーに割り当てるためにソース組織で使用されるすべてのグループ名とキュー名が、対象組織で使用される名前と重複していることを確認します。</span>
+      </li><li>
+        <span>対話型ステップが特定のユーザーに直接割り当てられていないことを確認します。</span>
+        <ol>
+          <li>
+            <span>オーケストレーションの対話型ステップに直接割り当てられた本ユーザごとに定数を作成します。</span>
+          </li>
+
+          <li>
+            <span>各対話型ステップを適切な割り当て済みユーザー定数に割り当てます。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>オーケストレーションとそのすべての参照されるフローを有効化します。</span>
+      </li><li>
+        <span>送信変更セットを作成します。</span>
+      </li><li>
+        <span>コンポーネントを新しい変更セットに追加します。これらのコンポーネントには、オーケストレーション、関連付けられたフロー、および関連付けられたフローが依存する新しいカスタムアクションまたは新しいカスタムフロー画面コンポーネントが含まれます。</span>
+      </li><li>
+        <span>送信変更セットをアップロードします。</span>
+      </li><li>
+        <span>受信変更セットを対象組織に展開します。</span>
+      </li><li>
+        <span>オーケストレーションの割り当て済み本ユーザ定数を更新し、新しいバージョンのオーケストレーションを保存します。</span>
+      </li><li>
+        <span>新しいバージョンのオーケストレーションを有効化します。</span>
+      </li></ol>
+
+    <div><p>オーケストレーションで参照される各コンテキストレコードのページレイアウトに、オーケストレータ仕事ガイド Lightning アプリケーションビルダーコンポーネントが含まれていることを確認します。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.changesets.htm&amp;language=ja&amp;type=5"> Sandbox: カスタマイズとテストのためのステージング環境: 変更セット
+                        </a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="orchestrator_design">
+<h1 class="slds-text-heading_large">フローオーケストレーションの設計</h1>
+  <p>オーケストレーションの構成とフローとの関連について説明します。
+  </p>
+<ul><li class="slds-p-bottom_small"><strong><a href="orchestrator-1.html#orchestrator_concept_orchestrations">オーケストレーション</a></strong><br>オーケストレーションでは、フェーズ、ステップ、決定を使用して複雑なビジネスプロセスを整理します。</li><li class="slds-p-bottom_small"><strong><a href="#orchestrator_concepts_type">オーケストレーションタイプ</a></strong><br>オーケストレーションの種別によって、オーケストレーションの配布方法が決まります。</li><li class="slds-p-bottom_small"><strong><a href="#orchestrator_concepts_trigger">オーケストレーションのトリガー</a></strong><br>レコードトリガーオーケストレーションを作成して、ユーザー入力や追加のレコード更新が必要なレコードの変更に対応します。[開始] 要素で、特定のオブジェクトの新規および変更されたレコードに基づいてオーケストレーションをトリガーするかどうかを指定します。フロートリガーエクスプローラーを使用して、レコードトリガーオートメーションの順序を管理します。</li><li class="slds-p-bottom_small"><strong><a href="orchestrator-1.html#orchestrator_concepts_building_blocks">オーケストレーションのビルディングブロック</a></strong><br>フェーズとステップはオーケストレーションのビルディングブロックです。</li><li class="slds-p-bottom_small"><strong><a href="orchestrator-1.html#orchestrator_concepts_error_handling">オーケストレーションでのエラー処理</a></strong><br>エラー処理では、オーケストレーションの実行中に段階的に発生する予期しない問題を管理します。フェーズの障害パスを設定して、フェーズエラーが発生したときの復旧アクションを定義し、オーケストレーションが失敗するのではなく正常に完了するようにします。</li><li class="slds-p-bottom_small"><strong><a href="orchestrator-1.html#orchestrator_concepts_running_user">オーケストレーションの実行コンテキスト</a></strong><br>実行コンテキストによって、Salesforce データに対するオーケストレーションのアクセス権と、一時停止中のオーケストレーションの再開に使用されるコンテキストが決まります。デフォルトでは、オーケストレーションの実行コンテキストはシステムコンテキストの自動化プロセス本ユーザです。</li><li class="slds-p-bottom_small"><strong><a href="#orchestrator_concepts_versioning">オーケストレーションのバージョン管理</a></strong><br>フローオーケストレーションには、オーケストレーションのバージョンと、オーケストレーションによってコールされるフローのバージョンの 2 つのバージョン設定があります。</li><li class="slds-p-bottom_small"><strong><a href="orchestrator-3.html#orchestrator_orchestration_run">オーケストレーション実行</a></strong><br>オーケストレーション実行は、実行中のオーケストレーションのインスタンスを表します。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="orchestrator_distribute">
+<h1 class="slds-text-heading_large">オーケストレーションのリリース</h1>
+  <p>オーケストレーションの設計とテストが完了したら、オーケストレーションを実行しましょう!</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="#orchestrator_deploy_create_org_wide_email_address">オーケストレーション用の組織のメールアドレスの設定</a></strong><br>フローオーケストレーションからメールを送信するには、組織のメールアドレスを作成します。</li><li class="slds-p-bottom_small"><strong><a href="#orchestrator_distribute_activate">オーケストレーションの有効化または無効化</a></strong><br>Salesforce では、オーケストレーションの複数のバージョンを持つことができますが、各オーケストレーションにつき一度にアクティブにできるバージョンは 1 つだけです。オーケストレーションの有効化または無効化は、Flow Builder で行うか、Setup のオーケストレーションの詳細ページから行うことができます。</li><li class="slds-p-bottom_small"><strong><a href="#orchestrator_deploy_with_change_sets">変更セットを使用したオーケストレーションの展開</a></strong><br>サンドボックスでオーケストレーションを作成、テスト、デバッグします。リリースの準備ができたら、変更セットを使用してオーケストレーションとそれに関連付けられたフローを本番に展開します。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="orchestrator_distribute_activate">
+<h1 class="slds-text-heading_large">オーケストレーションの有効化または無効化</h1>
+  <p>Salesforce では、オーケストレーションの複数のバージョンを持つことができますが、各オーケストレーションにつき一度にアクティブにできるバージョンは 1 つだけです。オーケストレーションの有効化または無効化は、Flow Builder で行うか、Setup のオーケストレーションの詳細ページから行うことができます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col style="width:100%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="フローオーケストレーションでサポートされる製品とエディションを確認します。" href="orchestrator-1.html#automate_orchestrator_about_supported_editions">フローオーケストレーションでサポートされるエディションを表示します。</a>
+              </td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d220493e63" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d220493e63" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">オーケストレーションを有効化または無効化する</td>
+
+              <td headers="d220493e63" style="vertical-align:top;" class="slds-cell-wrap">「フローの管理」</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d220493e63" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">
+                <span>レコードトリガーオーケストレーションを有効化する:</span>
+              </td>
+
+              <td headers="d220493e63" style="vertical-align:top;" class="slds-cell-wrap">「すべてのデータの参照」</td>
+
+            </tr>
+          </tbody></table><p>
+      <span id="orchestrator_distribute_activate__orchestrator_activate_process_note"><a name="orchestrator_distribute_activate__orchestrator_activate_process_note"></a>オーケストレーションバージョンを有効化すると、以前に有効化されたバージョン (存在する場合) は無効になります。実行中のオーケストレーションは、起動時に使用したバージョンを使用して実行を続行します。</span>
+    </p></div>
+    <ol><li>
+        <span>Flow Builder で、オーケストレーションバージョンを開きます。</span>
+      </li><li>
+        <span>ボタンバーで、<strong class="uicontrol">有効化</strong> または <strong class="uicontrol">無効化</strong> をクリックします。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="orchestrator_flow_builder">
+<h1 class="slds-text-heading_large">フローオーケストレーション用 Flow Builder</h1>
+  <p>Flow Builder の要件およびフローオーケストレーションのユーザーインターフェースについてご紹介します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col style="width:100%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="フローオーケストレーションでサポートされる製品とエディションを確認します。" href="orchestrator-1.html#automate_orchestrator_about_supported_editions">フローオーケストレーションでサポートされるエディションを表示します。</a>
+              </td>
+
+            </tr>
+          </tbody></table>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d126578e58" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d126578e58" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Flow Builder でオーケストレーションを開く、編集または作成する</td>
+
+              <td headers="d126578e58" style="vertical-align:top;" class="slds-cell-wrap">「フローの管理」</td>
+
+            </tr>
+          </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">フローオーケストレーション用 Flow Builder ユーザーインターフェースのツアー</h2><p>フローオーケストレーションでは、Flow Builder の自動レイアウトキャンバスが使用されます。</p><div>
+        <img alt="Flow Builder の UI" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/platform_automation/images/orchestration/orchestrator_flow_builder_interface.png">
+      </div><p>ボタンバー (1) — 作成時にオーケストレーションを管理します。</p><ul>
+        <li>開いているオーケストレーションの最後に保存されたバージョンを実行するには、<strong class="uicontrol">[実行]</strong> をクリックします。
+        <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> [実行] ボタンは、自動起動オーケストレーションでのみ使用できます。</div></div></div>
+</li>
+
+        <li>ボタンの左側に、バージョンのアクティブまたは非アクティブの状況や前回保存された日時が表示されます。</li>
+
+        <li>オーケストレーションのエラーと警告を表示するには、[エラーを表示] アイコン (<a name="orchestrator_flow_builder__image_znx_jyw_sdc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="[エラーを表示] ボタン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/platform_automation/images/flow_builder_show_errors.png" id="orchestrator_flow_builder__image_znx_jyw_sdc" style="height:16px;margin-bottom:0;"></span>) をクリックします。</li>
+
+      </ul>
+<p>ツールボックス (2) — オーケストレーションで使用する変数、定数、数式、またはテンプレートを作成します。または、追加したすべてのリソースと要素のリストを確認できます。ツールボックスを表示するには、ボタンバーの [ツールボックスを切り替え] アイコン (<a name="orchestrator_flow_builder__image_yng_d5x_qdc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="[ツールボックスを切り替え] ボタン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/platform_automation/images/flow_builder_toggle_toolbox.png" id="orchestrator_flow_builder__image_yng_d5x_qdc" style="margin-bottom:0;"></span>) をクリックします。</p><p>エラーと警告 (表示されていません) — オーケストレーションのエラーと警告を表示します。[エラー] タブには、オーケストレーションを有効化する前に解決すべきすべてのエラーが表示されます。[警告] タブには、オーケストレーションに関連するすべての警告が表示されます。エラーと警告を表示するには、ボタンバーの [エラーを表示] アイコン (<a name="orchestrator_flow_builder__image_ujr_pyw_sdc"></a><span style="vertical-align:text-bottom;display:inline-block;"><img alt="[エラーを表示] ボタン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/platform_automation/images/flow_builder_show_errors.png" id="orchestrator_flow_builder__image_ujr_pyw_sdc" style="height:16px;margin-bottom:0;"></span>) をクリックします。</p><p>キャンバス (3) — キャンバスでオーケストレーションを作成します。キャンバスに要素を追加して接続するときに、オーケストレーションのダイアグラムを確認できます。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 要素を挿入するには、目的の場所で [<span style="vertical-align:text-bottom;display:inline-block;"><img alt="[要素を追加] ノード" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/platform_automation/images/orchestration/orchestrator_fbuilder_circleplus.png" style="height:16px;margin-bottom:0;"></span>] をクリックします。Flow Builder に、この場所でのオプションと可能な要素が表示されます。</div></div></div>
+<p>プロパティ (4) — キャンバスで選択した要素の属性を設定します。[プロパティ] パネルを閉じるには、[<span style="vertical-align:text-bottom;display:inline-block;"><img alt="閉じるアイコン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/platform_automation/images/flow/flow_builder_close_element_panel.png" style="margin-bottom:0;"></span>] をクリックします。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">キーボードショートカット</h2><p>オーケストレーションをすばやく操作するには、macOS および Windows で次の便利なキーボードショートカットを使用してください。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d126578e181" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">アクション</th>
+              <th id="d126578e184" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">macOS</th>
+              <th id="d126578e187" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">Windows</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d126578e181" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="アクション">ズームイン</td>
+
+              <td headers="d126578e184" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="macOS">Cmd+Option+=</td>
+
+              <td headers="d126578e187" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Windows">Ctrl+Alt+=</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126578e181" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="アクション">ズームアウト</td>
+
+              <td headers="d126578e184" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="macOS">Cmd+Option+-</td>
+
+              <td headers="d126578e187" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Windows">Ctrl+Alt+-</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126578e181" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="アクション">サイズに合わせてズーム</td>
+
+              <td headers="d126578e184" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="macOS">Cmd+Option+1</td>
+
+              <td headers="d126578e187" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Windows">Ctrl+Alt+1</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126578e181" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="アクション">ズームして表示</td>
+
+              <td headers="d126578e184" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="macOS">Cmd+Option+0</td>
+
+              <td headers="d126578e187" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Windows">Ctrl+Alt+0</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d126578e181" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="アクション">使用可能なキーボードショートカットを表示</td>
+
+              <td headers="d126578e184" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="macOS">Cmd+/</td>
+
+              <td headers="d126578e187" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="Windows">Ctrl+/</td>
+
+            </tr>
+          </tbody></table></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="orchestrator_flow_orchestrator">
+<h1 class="slds-text-heading_large">オーケストレーションを使用した複雑なプロセスの自動化</h1>
+  <p>会社の成長に伴い、ワークフローの複雑さも増します。プロセスでは、複数のタイムゾーンにまたがる複数の部門の複数のユーザーからの入力が必要になることがよくあります。この複雑さの増加により、各ユーザーが適切な順序でタスクを完了するまでの待機時間が長くなります。フローオーケストレーションは、オーケストレーション (複数のユーザーやシステムを操作する複数ステップのプロセス) を使用してこのプロセスを合理化するのに役立ちます。</p>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">フローオーケストレーションとは?</h2><p>オーケストレーションは、各フェーズが 1 つ以上のステップで構成される一連のフェーズです。フェーズには、バックグラウンドステップ、対話型ステップ、MuleSoft ステップを含めることができます。</p><p>対話型ステップにはユーザーが割り当てられ、指定された画面フローが実行されます。システム管理者は、オーケストレーション作業ガイド Lightning アプリケーションビルダーコンポーネントを、自分に割り当てられた対話型ステップを完了できるレコードタイプのページレイアウトに配置します。オーケストレーションで対話型ステップを実行すると、指定されたユーザーに、割り当てられたアクションへのリンクが記載されたメールが送信されます。割り当てられたユーザーはリンクをクリックすると、作業ガイドのアクションを実行するレコードに移動します。</p><p>バックグラウンドステップは、Salesforce が実行する自動起動フローをコールします。同期または非同期で実行でき、ユーザー操作はありません。</p><p>MuleSoft ステップは、Salesforce が実行する MuleSoft アクションをコールします。非同期で実行され、ユーザー操作はありません。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">フローオーケストレーションを使用するケース</h2><p>フローオーケストレーションを使用して、高度な承認プロセス、グループの ToDo リスト、または複数の相互関連ステップが必要なその他のプロセスを作成します。たとえば、新入社員が機器を入手し、デジタル会社のリソースにアクセスするために、複数レベルのマルチユーザー、複数システムの承認プロセスを実行する必要がある従業員オンボーディングについて考えてみます。フローオーケストレーションを使用して複雑なプロセスを構成してオーケストレーションし、すべてのオンボーディングを管理および監視するトップレベルの環境を利用できます。</p></div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="orchestrator-1.html#orchestrator_about">フローオーケストレーションについて</a></strong><br>Flowオーケストレーションの権限、エディション、制限事項、考慮事項、エンタイトルメントを確認します。</li><li class="slds-p-bottom_small"><strong><a href="#orchestrator_get_started">フローオーケストレーションの使用開始</a></strong><br>フローオーケストレーションについて理解するのに役立つリソースを確認してください。</li><li class="slds-p-bottom_small"><strong><a href="#orchestrator_design">フローオーケストレーションの設計</a></strong><br>オーケストレーションの構成とフローとの関連について説明します。   </li><li class="slds-p-bottom_small"><strong><a href="orchestrator-1.html#orchestrator_build">オーケストレーションの作成</a></strong><br>フローオーケストレーションを使用して、フローを組み合わせて調整することで高度なビジネスプロセスを作成します。</li><li class="slds-p-bottom_small"><strong><a href="orchestrator-3.html#orchestrator_troubleshoot">オーケストレーションのトラブルシューティング</a></strong><br>失敗したオーケストレーションの実行をトラブルシューティングするには、オーケストレーション障害メールを使用します。オーケストレーションをテストし、実行時に何が起こるのかを確認するには、デバッグオプションを使用します。</li><li class="slds-p-bottom_small"><strong><a href="#orchestrator_distribute">オーケストレーションのリリース</a></strong><br>オーケストレーションの設計とテストが完了したら、オーケストレーションを実行しましょう!</li><li class="slds-p-bottom_small"><strong><a href="#orchestrator_manage">オーケストレーションと作業項目の管理</a></strong><br>リストビューを使用してオーケストレーションと作業項目を管理します。実行中のオーケストレーションをキャンセルまたは一時停止します。ステップでコールされたアクションまたはフローのエラーが原因で過去 14 日以内に失敗したオーケストレーションの実行を再開します。または、手動で一時停止されたオーケストレーションの実行を再開します。割り当てられているが完了していない作業項目を再割り当てします。</li><li class="slds-p-bottom_small"><strong><a href="orchestrator-3.html#orchestrator_ref">フローオーケストレーションリファレンス</a></strong><br>オーケストレーション要素、リソース、イベントなどの情報にすばやくアクセスできるように、このページをブックマークしてください。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="orchestrator_get_started">
+<h1 class="slds-text-heading_large">フローオーケストレーションの使用開始</h1>
+  <p>フローオーケストレーションについて理解するのに役立つリソースを確認してください。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="orchestrator-3.html#orchestrator_vs_flow">フローとオーケストレーションの比較</a></strong><br>フローとオーケストレーションを比較して、ビジネスプロセスに適した自動化ツールを選択します。機能、使用事例、実装方法の主要な違いを理解します。</li><li class="slds-p-bottom_small"><strong><a href="#orchestrator_flow_builder">フローオーケストレーション用 Flow Builder</a></strong><br>Flow Builder の要件およびフローオーケストレーションのユーザーインターフェースについてご紹介します。</li><li class="slds-p-bottom_small"><strong><a href="orchestrator-1.html#automate_orchestrator_orchestration_anatomy">オーケストレーションの構造</a></strong><br>要素、コネクタ、リソースを組み合わせてオーケストレーションを作成します。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="orchestrator_manage">
+<h1 class="slds-text-heading_large">オーケストレーションと作業項目の管理</h1>
+  <p>リストビューを使用してオーケストレーションと作業項目を管理します。実行中のオーケストレーションをキャンセルまたは一時停止します。ステップでコールされたアクションまたはフローのエラーが原因で過去 14 日以内に失敗したオーケストレーションの実行を再開します。または、手動で一時停止されたオーケストレーションの実行を再開します。割り当てられているが完了していない作業項目を再割り当てします。</p>
+<ul><li class="slds-p-bottom_small"><strong><a href="orchestrator-3.html#orchestrator_manage_view_work_items">すべてのオーケストレーション作業項目の表示</a></strong><br>すべての作業項目を表示するには、[すべての作業項目] リストビューを使用します。All Open Orchestration Work Items リストビューを使用して、割り当てられているが完了していない作業項目をすべて表示します。割り当てられたユーザーは、All Open Orchestration Work Items リストビューで自分の未完了の作業項目のみを表示およびアクセスできます。</li><li class="slds-p-bottom_small"><strong><a href="orchestrator-3.html#orchestrator_manage_view_work_items_on_record">レコードでのオーケストレーション作業項目の表示</a></strong><br>割り当てられたオーケストレーション作業項目は、オーケストレーション作業ガイドコンポーネントのレコードページに直接表示されます。日付による項目の並び替え、ToDo の優先順位付け、完了状況の追跡を行います。</li><li class="slds-p-bottom_small"><strong><a href="orchestrator-3.html#orchestrator_manage_view_orchestrations">オーケストレーション実行の表示</a></strong><br>[オーケストレーション実行] リストビューを使用して、組織で進行中、キャンセル済み、完了したすべてのオーケストレーション実行を確認します。オーケストレーション実行リストビューからオーケストレーションの詳細と履歴にアクセスします。</li><li class="slds-p-bottom_small"><strong><a href="#orchestrator_manage_reassign_work_item">オーケストレーション作業項目の再割り当て</a></strong><br>割り当て済みの作業項目は、別のユーザー、グループ、またはキューに再割り当てできます。</li><li class="slds-p-bottom_small"><strong><a href="#orchestrator_manage_disable_default_email_notifications">作業項目割り当てのすべてのメール通知の無効化</a></strong><br>デフォルトでは、オーケストレーション作業項目がユーザー、グループ、またはキューに割り当てられるか、再割り当てされると、オーケストレーションからメール通知が送信されます。内部ユーザーとログイン情報が設定された Experience Cloud サイト訪問者へのメール送信を停止するには、すべての作業項目通知を無効にします。</li><li class="slds-p-bottom_small"><strong><a href="#orchestrator_manage_control_emails_sent_by_interactive_steps_assigned_to_queue">キューメンバーのオーケストレーション作業項目メール通知の制御</a></strong><br>対話型ステップがキューに割り当てられたときにオーケストレーション作業項目のメール通知を送信するユーザーを制御します。</li><li class="slds-p-bottom_small"><strong><a href="#orchestrator_manage_suspend_running_orchestration">処理中のオーケストレーションの一時停止</a></strong><br>オーケストレーション実行は、続行の準備ができるまで一時停止できます。実行中のオーケストレーションを一時停止すると、現在のフェーズも一時停止されます。処理中のステップは引き続き実行されますが、新しいステップは開始されません。処理中のステップに出力がある場合、オーケストレーションが再開されたときに処理できるように保存されます。</li><li class="slds-p-bottom_small"><strong><a href="#orchestrator_manage_resume_suspended_orchestration">一時停止されたオーケストレーションの再開</a></strong><br>一時停止されたオーケストレーション実行を再開してその処理を続行します。一時停止されたオーケストレーション実行が再開されると、一時停止されたフェーズも再開されます。オーケストレーション実行が再開されると、進行中のステップの状況が評価され、必要に応じてステップの状況が更新されます。オーケストレーション実行が一時停止されたときに進行中であったステップからの保存済み出力が処理されます。</li><li class="slds-p-bottom_small"><strong><a href="#orchestrator_manage_resume_failed_orchestration">失敗したオーケストレーションの再開</a></strong><br>ステップでコールされたアクションのエラーが原因で過去 14 日以内にオーケストレーションの実行に失敗した場合、エラーを修正してオーケストレーションを再開できます。</li><li class="slds-p-bottom_small"><strong><a href="#orchestrator_manage_cancel_running_orchestration">実行中のオーケストレーションのキャンセル</a></strong><br>[オーケストレーション実行] リストビューから処理中のオーケストレーションをキャンセルします。</li><li class="slds-p-bottom_small"><strong><a href="orchestrator-3.html#orchestrator_manage_view_usage">オートメーションアプリケーションでのオーケストレーション連動関係の表示</a></strong><br>オーケストレーションでは、フローを使用してステップを実行し、複雑な条件を評価します。オーケストレーションと参照されるフロー間のリレーションを理解するには、オートメーションアプリケーションの [オーケストレーションバージョン] ページの [利用状況] タブを表示します。</li><li class="slds-p-bottom_small"><strong><a href="orchestrator-3.html#orchestrator_manage_use_orchestration_reports">オーケストレーションレポートの使用</a></strong><br>サンプルフローオーケストレーションレポートを使用して、オーケストレーションの利用状況を追跡します。サンプルレポートには、[オーケストレーション実行]、[オーケストレーションフェーズ実行]、[オーケストレーションステップ実行]、[オーケストレーション作業項目]、[オーケストレーション実行ログ] があります。これらのサンプルレポートは、オーケストレーション実行 Spring '24、オーケストレーションフェーズ実行 Spring '24、オーケストレーションステップ実行 Spring '24、オーケストレーション作業項目 Spring '24、オーケストレーション実行ログ Spring '24 カスタムレポートタイプに基づいています。</li><li class="slds-p-bottom_small"><strong><a href="#orchestrator_manage_orchestration_statuses">オーケストレーションの状況とマイルストーン</a></strong><br>オーケストレーションの各部分には、オーケストレーションの実行時に状況が割り当てられます。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="orchestrator_manage_add_comments_column_to_run_log">
+<h1 class="slds-text-heading_large">オーケストレーション実行ログへのコメント列の追加</h1>
+  <p>オーケストレーションステップでコールされたフローのコメントをオーケストレーション実行ログに追加して、ログ情報をカスタマイズします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col style="width:100%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="フローオーケストレーションでサポートされる製品とエディションを確認します。" href="orchestrator-1.html#automate_orchestrator_about_supported_editions">フローオーケストレーションでサポートされるエディションを表示します。</a>
+              </td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>[オーケストレーション実行] リストビューから、[<span style="vertical-align:text-bottom;display:inline-block;"><img alt="設定アイコン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/resources-global/_corporate/images/gear.png" style="height:16px;margin-bottom:0;"></span>] をクリックし、[<strong class="uicontrol">オブジェクトを編集</strong>] を選択します。</span>
+      </li><li>
+        <span>[オーケストレーション実行] 設定ページで、<strong class="uicontrol">[ページレイアウト]</strong> をクリックし、<strong class="uicontrol">[オーケストレーションインスタンスレイアウト]</strong> を選択します。</span>
+      </li><li>
+        <span>[Related Lists (関連リスト)] セクションで、[<span style="vertical-align:text-bottom;display:inline-block;"><img alt="レンチアイコン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/resources-global/_corporate/images/wrench.png" style="margin-bottom:0;"></span> for Orchestration Run Log (オーケストレーション実行ログ)] をクリックします。</span>
+      </li><li>
+        <span>[Related List Properties - Orchestration Run Log (関連リストのプロパティ - オーケストレーション実行ログ)] ウィンドウの [Available Fields (使用可能なフィールド)] で、[<strong class="uicontrol">Comments (コメント</strong>)] を選択し、[<span style="vertical-align:text-bottom;display:inline-block;"><img alt="右矢印" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/platform_automation/images/rightArrow.gif" style="margin-bottom:0;"></span>] をクリックします。</span>
+        <div>[コメント] 項目が [選択済みの項目] リストに追加されます。</div>
+      </li><li>
+        <span>オーケストレーション実行ログの [コメント] 項目の場所を変更するには、上下矢印を使用します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[OK]</strong> をクリックし、<strong class="uicontrol">[保存]</strong> をクリックします。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="orchestrator_manage_add_comments_to_run_log">
+<h1 class="slds-text-heading_large">オーケストレーション実行ログへのコメントの追加</h1>
+  <p>オーケストレーションステップでコールされるフローの変数を使用して、オーケストレーション実行ログにカスタムコメントを追加します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col style="width:100%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="フローオーケストレーションでサポートされる製品とエディションを確認します。" href="orchestrator-1.html#automate_orchestrator_about_supported_editions">フローオーケストレーションでサポートされるエディションを表示します。</a>
+              </td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>オーケストレーションステップでコールされるフローで、「Comments」 (コメント) という変数を追加します。</span>
+        <ol>
+          <li>
+            <span>[リソース種別] で、<strong class="uicontrol">[変数]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[API 参照名] に<kbd>「Comments」</kbd>と入力します。</span>
+          </li>
+
+          <li>
+            <span>[説明] に、<kbd>「Stores custom text to be added to the Comments in the Flow Orchestration Log」</kbd> (フローオーケストレーションログのコメントに追加するカスタムテキストを保存) と入力します。</span>
+          </li>
+
+          <li>
+            <span><strong class="uicontrol">[出力で使用可能]</strong> を選択します。</span>
+          </li>
+
+          <li>
+            <span>[データ型] で <strong class="uicontrol">[テキスト]</strong> を選択します。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>フローの [割り当て] 要素で、<code>Comments</code> 変数を文字列に設定します。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="orchestrator_manage_add_usage_component">
+<h1 class="slds-text-heading_large">オーケストレーションレコードバージョンページへのオートメーション利用状況コンポーネントの追加</h1>
+ 
+ <p>オートメーションアプリケーションには、オーケストレーションバージョンで使用するフローが表示されます。[デフォルトのオーケストレーションバージョンレコード] ページをカスタマイズした場合は、[オートメーションの利用状況] コンポーネントをページに追加して、組織のデフォルトとして保存します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+  <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col style="width:100%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="フローオーケストレーションでサポートされる製品とエディションを確認します。" href="orchestrator-1.html#automate_orchestrator_about_supported_editions">フローオーケストレーションでサポートされるエディションを表示します。</a>
+              </td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d65219e62" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d65219e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Lightning アプリケーションビルダーで Lightning ページを作成および保存する</td>
+
+       <td headers="d65219e62" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+      </tr>
+     </tbody></table></div>
+  <ol><li>
+          <span>ナビゲーションバーで、[<span style="vertical-align:text-bottom;display:inline-block;"><img alt="[アプリケーションランチャー] アイコン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/resources-global/_corporate/images/app_launcher_icon.png" style="height:20px;width:20px;margin-bottom:0;"></span>] をクリックします。</span>
+        </li><li>
+          <span>検索ボックスに「<kbd>automation」</kbd>と入力し、[<strong class="uicontrol">Automation</strong>] を選択します。</span>
+          <div>オートメーションアプリケーションが開きます。</div>
+        </li><li>
+    <span>[<strong class="uicontrol">オーケストレーション</strong>] タブを選択し、オーケストレーションの表示ラベルをクリックします。</span>
+   </li><li>
+    <span>[<strong class="uicontrol">バージョン</strong>] タブを選択し、任意のオーケストレーションバージョンの名前をクリックします。</span>
+   </li><li>
+    <span><span style="vertical-align:text-bottom;display:inline-block;"><img alt="歯車アイコン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/resources-global/_corporate/images/gear.png" style="height:20px;width:20px;margin-bottom:0;"></span> をクリックし、<strong class="uicontrol">[編集ページ]</strong> を選択します。</span>
+    <div>Lightning アプリケーションビルダーで [オーケストレーションバージョンレコード] ページが開きます。</div>
+   </li><li>
+    <span>省略可能。オートメーションの利用状況コンポーネントをタブに追加するには、既存のタブコンポーネントにタブを追加します。</span>
+    <ol>
+     <li>
+      <span>ページレイアウトで [タブ] コンポーネントを選択します。</span>
+     </li>
+
+     <li>
+      <span>[タブ] パネルで、[<strong class="uicontrol">タブを追加</strong>] をクリックします。</span>
+     </li>
+
+     <li>
+      <span>[タブ] パネルの [タブ] で、最後のタブをクリックします。</span>
+     </li>
+
+     <li>
+      <span>タブの表示ラベルをクリックし、<kbd>「Usage」</kbd> (使用) と入力して、[<strong class="uicontrol">Usage]</strong> を選択します。</span>
+     </li>
+
+     <li>
+      <span><strong class="uicontrol">[完了]</strong> をクリックします。</span>
+     </li>
+
+    </ol>
+   </li><li>
+    <span>[オートメーションの利用状況] コンポーネントをページレイアウトにドラッグします。</span>
+    <ol>
+     <li>
+      <span>タブコンポーネントのタブにコンポーネントを追加するには、コンポーネントを追加するタブを選択します。[Components (コンポーネント)] リストで、[<strong class="uicontrol">Automation Usage (</strong>オートメーション使用状況)] コンポーネントを [<strong class="uicontrol">Add Component(s) Here</strong> (コンポーネントを追加)] という表示ラベルの付いた領域にドラッグします。</span>
+     </li>
+
+     <li>
+      <span>ページにコンポーネントを追加するには、[コンポーネント] リストで、[<strong class="uicontrol">オートメーション利用状況</strong>] コンポーネントをページにドラッグします。</span>
+     </li>
+
+    </ol>
+   </li><li>
+    <span>変更内容を保存します。</span>
+   </li><li>
+    <span>[有効化: オーケストレーションバージョンレコードページ] ウィンドウが表示されたら、デフォルトページを設定します。</span>
+    <ol>
+     <li>
+      <span><strong class="uicontrol">[組織のデフォルトとして割り当て]</strong> を選択します。</span>
+     </li>
+
+     <li>
+      <span>[フォーム要素の割り当て] ウィンドウで、組織のデフォルトページを使用可能にするフォーム要素を選択し、[<strong class="uicontrol">次へ</strong>] をクリックします。</span>
+     </li>
+
+     <li>
+      <span>割り当てを確認して、[<strong class="uicontrol">保存] を</strong>クリックします。</span>
+     </li>
+
+    </ol>
+   </li><li>
+    <span>戻る矢印をクリックして、Lightning アプリケーションビルダーを終了します。</span>
+   </li></ol>
+
+ 
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="orchestrator_manage_cancel_running_orchestration">
+<h1 class="slds-text-heading_large">実行中のオーケストレーションのキャンセル</h1>
+  <p>[オーケストレーション実行] リストビューから処理中のオーケストレーションをキャンセルします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col style="width:100%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="フローオーケストレーションでサポートされる製品とエディションを確認します。" href="orchestrator-1.html#automate_orchestrator_about_supported_editions">フローオーケストレーションでサポートされるエディションを表示します。</a>
+              </td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d290034e61" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d290034e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">実行中のオーケストレーションをキャンセルする</td>
+
+              <td headers="d290034e61" style="vertical-align:top;" class="slds-cell-wrap"><ul>
+                  <li>オーケストレーション実行の管理<p>または</p></li>
+
+                  <li>オーケストレーションの実行と作業項目の管理</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>キャンセルできるのは進行中のオーケストレーションのみです。</p></div>
+    <ol><li>
+        <span>アプリケーションランチャーで、<strong class="uicontrol">[オーケストレーション実行]</strong> を見つけて選択します。</span>
+      </li><li>
+        <span>オーケストレーション実行ページで、処理中のオーケストレーションのドロップダウンから <strong class="uicontrol">キャンセル</strong> を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">キャンセル</strong> をクリックします。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="orchestrator_manage_control_emails_sent_by_interactive_steps_assigned_to_queue">
+<h1 class="slds-text-heading_large">キューメンバーのオーケストレーション作業項目メール通知の制御</h1>
+ 
+ <p>対話型ステップがキューに割り当てられたときにオーケストレーション作業項目のメール通知を送信するユーザーを制御します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+  <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col style="width:100%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="フローオーケストレーションでサポートされる製品とエディションを確認します。" href="orchestrator-1.html#automate_orchestrator_about_supported_editions">フローオーケストレーションでサポートされるエディションを表示します。</a>
+              </td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d40558e62" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d40558e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限"> プロセスの自動化設定を編集する</td>
+
+       <td headers="d40558e62" style="vertical-align:top;" class="slds-cell-wrap"> 「アプリケーションのカスタマイズ」 </td>
+
+      </tr>
+     </tbody></table></div>
+  <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span>  [オーケストレーション作業項目のキューメールをキューメンバーにのみ送信] 設定は、ロール階層が有効になっていない場合は無効です。また、[オーケストレーション作業項目メール通知の送信を停止] 設定が有効になっている場合も影響しません。</div></div></div>
+</div>
+  <ol><li>
+    <span>[設定] の [クイック検索] ボックスで、[<strong class="uicontrol">プロセス自動化設定</strong>] を検索して選択します。</span>
+   </li><li>
+    <span>オーケストレーション作業項目のメール通知をキューメンバーのみに制限するには、[<strong class="uicontrol">オーケストレーション作業項目</strong>のキューメールのみをキューメンバーに送信する] を選択します。</span>
+   </li><li>
+    <span>オーケストレーション作業項目のメール通知をキューメンバーおよびロール階層でキューメンバーの上位にある個人に送信するには、[<strong class="uicontrol">オーケストレーション作業項目</strong>のキューメールのみをキューメンバーに送信する] をオフにします。</span>
+   </li></ol>
+
+ 
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="orchestrator_manage_disable_default_email_notifications">
+<h1 class="slds-text-heading_large">作業項目割り当てのすべてのメール通知の無効化</h1>
+  <p>デフォルトでは、オーケストレーション作業項目がユーザー、グループ、またはキューに割り当てられるか、再割り当てされると、オーケストレーションからメール通知が送信されます。内部ユーザーとログイン情報が設定された Experience Cloud サイト訪問者へのメール送信を停止するには、すべての作業項目通知を無効にします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col style="width:100%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="フローオーケストレーションでサポートされる製品とエディションを確認します。" href="orchestrator-1.html#automate_orchestrator_about_supported_editions">フローオーケストレーションでサポートされるエディションを表示します。</a>
+              </td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d83791e60" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d83791e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限"> プロセスの自動化設定を編集する</td>
+
+              <td headers="d83791e60" style="vertical-align:top;" class="slds-cell-wrap"> 「アプリケーションのカスタマイズ」 </td>
+
+            </tr>
+          </tbody></table></div>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 
+        <p>Salesforce からメールを送信するには、フローオーケストレーションでドメインレベルとユーザーレベルのメール検証が必要です。ユーザーのメールアドレスまたはメール送信ドメインが検証されていない場合、メールの送信は失敗します。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.security_email_verification_requirements.htm&amp;language=ja&amp;type=5">Requirements to Send Email from Salesforce </a> (Salesforce からメールを送信するための要件)」を参照してください。</p>
+      </div></div></div>
+</div>
+    <ol><li>
+        <span>[設定] の [クイック検索] ボックスに<kbd>「プロセスの自動化」</kbd>と入力し、<strong class="uicontrol">[プロセスの自動化設定]</strong> を選択します。</span>
+      </li><li>
+        <span>[プロセスの自動化設定] ページで、<strong class="uicontrol">[オーケストレーション作業項目のメール通知の送信を停止]</strong> を選択します。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="orchestrator_manage_orchestration_flow_usage">
+<h1 class="slds-text-heading_large">オーケストレーションバージョンでのフローの利用状況の判断</h1>
+ 
+ <p>オーケストレーションバージョンでは、フローを使用して対話型ステップとバックグラウンドステップを実行します。オーケストレーションバージョンのフェーズとステップでは、フローを使用して複雑な条件を評価できます。これらの条件によって、バックグラウンドステップ、対話型ステップ、または MuleSoft ステップを開始するタイミングと、フェーズまたは対話型ステップを完了としてマークするタイミングを決定できます。オーケストレーションバージョンが参照するフローとオーケストレーションバージョン間のリレーションを理解するためにオーケストレーションバージョンで使用するフローを表示します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+  <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col style="width:100%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="フローオーケストレーションでサポートされる製品とエディションを確認します。" href="orchestrator-1.html#automate_orchestrator_about_supported_editions">フローオーケストレーションでサポートされるエディションを表示します。</a>
+              </td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d185886e62" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d185886e62" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">オートメーション Lightning アプリケーションの [オーケストレーション] タブで利用状況の詳細を表示する</td>
+
+       <td headers="d185886e62" style="vertical-align:top;" class="slds-cell-wrap">「フローの管理」</td>
+
+      </tr>
+     </tbody></table></div>
+  <div><p>[フローを使用] リストは、選択したオーケストレーションバージョンが組織で作成されたかどうかによって異なります。Salesforce または管理パッケージでオーケストレーションバージョンが提供されている場合、[フローを使用] リストに項目はありません。</p></div>
+  <ol><li>
+          <span>ナビゲーションバーで、[<span style="vertical-align:text-bottom;display:inline-block;"><img alt="[アプリケーションランチャー] アイコン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/resources-global/_corporate/images/app_launcher_icon.png" style="height:20px;width:20px;margin-bottom:0;"></span>] をクリックします。</span>
+        </li><li>
+          <span>検索ボックスに「<kbd>automation」</kbd>と入力し、[<strong class="uicontrol">Automation</strong>] を選択します。</span>
+          <div>オートメーションアプリケーションが開きます。</div>
+        </li><li>
+    <span>[<strong class="uicontrol">オーケストレーション]</strong> タブを選択し、オーケストレーションの表示ラベルをクリックして、[<strong class="uicontrol">バージョン</strong>] タブを選択します。</span>
+    <div>[オーケストレーション] ページが開き、選択したオーケストレーションのバージョンのリストが表示されます。</div>
+   </li><li>
+    <span>オーケストレーションバージョン名のリンクをクリックし、[<strong class="uicontrol">Usage (使用</strong>状況)] タブを選択します。</span>
+    <div>このタブには、オーケストレーションバージョンで使用するフローが表示されます。<div><img alt="サンプルオーケストレーションバージョンで使用するフローのリスト" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/platform_automation/images/orchestration/orchestrator_orchestration_version_uses_flows_view.png"></div></div>
+   </li></ol>
+
+ 
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="orchestrator_manage_orchestration_statuses">
+<h1 class="slds-text-heading_large">オーケストレーションの状況とマイルストーン</h1>
+  <p>オーケストレーションの各部分には、オーケストレーションの実行時に状況が割り当てられます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col style="width:100%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="フローオーケストレーションでサポートされる製品とエディションを確認します。" href="orchestrator-1.html#automate_orchestrator_about_supported_editions">フローオーケストレーションでサポートされるエディションを表示します。</a>
+              </td>
+
+            </tr>
+          </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">オーケストレーションの詳細</h2><p>オーケストレーションの詳細ページには、現在実行中のオーケストレーションの状況が表示されます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">オーケストレーションの状況</h2><p>オーケストレーションが実行されると、完了する、キャンセルされる、フローのエラーで終了する、または進行中のままになる可能性があります。オーケストレーションのフェーズ、ステップ、作業項目の状況は場面によって異なります。
+    </p><p>
+        <strong>完了したオーケストレーション内の項目の状況</strong>
+      </p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d53192e82" style="vertical-align:top;" class="slds-cell-wrap" scope="col">項目</th>
+              <th id="d53192e85" style="vertical-align:top;" class="slds-cell-wrap" scope="col">状況</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d53192e82" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">オーケストレーション実行</td>
+
+              <td headers="d53192e85" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">完了</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e82" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">完了したフェーズ</td>
+
+              <td headers="d53192e85" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">完了</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e82" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">完了したステップ</td>
+
+              <td headers="d53192e85" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">完了</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e82" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">実行中のステップ</td>
+
+              <td headers="d53192e85" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">中止</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e82" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">未開始のステップ</td>
+
+              <td headers="d53192e85" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">未開始</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e82" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">完了した作業項目</td>
+
+              <td headers="d53192e85" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">完了</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e82" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">未開始の作業項目</td>
+
+              <td headers="d53192e85" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">完了</td>
+
+            </tr>
+          </tbody></table><p>
+        <strong>キャンセルされたオーケストレーションの項目の状況</strong>
+      </p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d53192e178" style="vertical-align:top;" class="slds-cell-wrap" scope="col">項目</th>
+              <th id="d53192e181" style="vertical-align:top;" class="slds-cell-wrap" scope="col">状況</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d53192e178" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">オーケストレーション実行</td>
+
+              <td headers="d53192e181" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">キャンセル済み</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e178" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">完了したフェーズ</td>
+
+              <td headers="d53192e181" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">完了</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e178" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">実行中のフェーズ</td>
+
+              <td headers="d53192e181" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">キャンセル済み</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e178" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">完了したステップ</td>
+
+              <td headers="d53192e181" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">完了</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e178" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">実行中のフェーズの実行中のステップ</td>
+
+              <td headers="d53192e181" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">キャンセル済み</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e178" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">未開始のステップ</td>
+
+              <td headers="d53192e181" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">未開始</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e178" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">完了した作業項目</td>
+
+              <td headers="d53192e181" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">完了</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e178" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">未開始の作業項目</td>
+
+              <td headers="d53192e181" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">完了</td>
+
+            </tr>
+          </tbody></table><p>
+        <strong>オーケストレーションエラーで停止したオーケストレーション内の項目の状況</strong>
+      </p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d53192e282" style="vertical-align:top;" class="slds-cell-wrap" scope="col">項目</th>
+              <th id="d53192e285" style="vertical-align:top;" class="slds-cell-wrap" scope="col">状況</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d53192e282" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">オーケストレーション実行</td>
+
+              <td headers="d53192e285" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">エラー</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e282" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">実行中のフェーズ</td>
+
+              <td headers="d53192e285" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">中止</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e282" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">実行中のステップ</td>
+
+              <td headers="d53192e285" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">中止</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e282" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">未開始のステップ</td>
+
+              <td headers="d53192e285" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">未開始</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e282" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">完了した作業項目</td>
+
+              <td headers="d53192e285" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">完了</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e282" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">未開始の作業項目</td>
+
+              <td headers="d53192e285" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">割り当て済み</td>
+
+            </tr>
+          </tbody></table><p>
+        <strong>フェーズエラーで停止したオーケストレーションの項目の状況</strong>
+      </p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d53192e368" style="vertical-align:top;" class="slds-cell-wrap" scope="col">項目</th>
+              <th id="d53192e371" style="vertical-align:top;" class="slds-cell-wrap" scope="col">状況</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d53192e368" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">オーケストレーション実行</td>
+
+              <td headers="d53192e371" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">エラー</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e368" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">失敗したフェーズ</td>
+
+              <td headers="d53192e371" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">エラー</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e368" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">完了したフェーズ</td>
+
+              <td headers="d53192e371" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">完了</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e368" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">完了したステップ</td>
+
+              <td headers="d53192e371" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">完了</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e368" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">実行中のステップ</td>
+
+              <td headers="d53192e371" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">中止</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e368" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">未開始のステップ</td>
+
+              <td headers="d53192e371" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">未開始</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e368" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">完了した作業項目</td>
+
+              <td headers="d53192e371" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">完了</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e368" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">未開始の作業項目</td>
+
+              <td headers="d53192e371" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">完了</td>
+
+            </tr>
+          </tbody></table><p>
+        <strong>インタラクティブステップエラーで停止したオーケストレーションの項目の状況</strong>
+      </p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d53192e473" style="vertical-align:top;" class="slds-cell-wrap" scope="col">項目</th>
+              <th id="d53192e476" style="vertical-align:top;" class="slds-cell-wrap" scope="col">状況</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d53192e473" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">オーケストレーション実行</td>
+
+              <td headers="d53192e476" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">エラー</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e473" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">完了したフェーズ</td>
+
+              <td headers="d53192e476" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">完了</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e473" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">実行中のフェーズ</td>
+
+              <td headers="d53192e476" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">エラー</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e473" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">失敗したステップ</td>
+
+              <td headers="d53192e476" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">エラー</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e473" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">完了したステップ</td>
+
+              <td headers="d53192e476" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">完了</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e473" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">実行中のステップ</td>
+
+              <td headers="d53192e476" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">中止</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e473" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">未開始のステップ</td>
+
+              <td headers="d53192e476" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">未開始</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e473" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">完了した作業項目</td>
+
+              <td headers="d53192e476" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">完了</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e473" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">未開始の作業項目</td>
+
+              <td headers="d53192e476" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">割り当て済み</td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> これらの状況は、対話型ステップが失敗した場合に適用されます。対話型ステップに関連付けられた画面フローが失敗すると、実行中のフェーズと失敗したステップの状況は [進行中] になり、未開始の作業項目の状況は [割り当て済み] になります。</div></div></div>
+<p>
+        <strong>バックグラウンドステップエラーで停止したオーケストレーションの項目の状況</strong>
+      </p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d53192e589" style="vertical-align:top;" class="slds-cell-wrap" scope="col">項目</th>
+              <th id="d53192e592" style="vertical-align:top;" class="slds-cell-wrap" scope="col">状況</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d53192e589" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">オーケストレーション実行</td>
+
+              <td headers="d53192e592" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">エラー</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e589" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">完了したフェーズ</td>
+
+              <td headers="d53192e592" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">完了</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e589" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">実行中のフェーズ</td>
+
+              <td headers="d53192e592" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">エラー</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e589" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">失敗したステップ</td>
+
+              <td headers="d53192e592" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">エラー</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e589" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">完了したステップ</td>
+
+              <td headers="d53192e592" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">完了</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e589" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">実行中のステップ</td>
+
+              <td headers="d53192e592" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">中止</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e589" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">未開始のステップ</td>
+
+              <td headers="d53192e592" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">未開始</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e589" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">完了した作業項目</td>
+
+              <td headers="d53192e592" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">完了</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e589" style="vertical-align:top;" class="slds-cell-wrap" data-label="項目">未開始の作業項目</td>
+
+              <td headers="d53192e592" style="vertical-align:top;" class="slds-cell-wrap" data-label="状況">完了</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">オーケストレーション実行のマイルストーン</h2><p>オーケストレーションが実行されると、マイルストーンがオーケストレーション履歴に記録されます。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d53192e705" style="vertical-align:top;" class="slds-cell-wrap" scope="col">オーケストレーション実行のマイルストーン</th>
+              <th id="d53192e708" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d53192e705" style="vertical-align:top;" class="slds-cell-wrap" data-label="オーケストレーション実行のマイルストーン">実行を開始</td>
+
+              <td headers="d53192e708" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">オーケストレーション実行が開始されたか、手動で再開されました。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e705" style="vertical-align:top;" class="slds-cell-wrap" data-label="オーケストレーション実行のマイルストーン">実行を終了</td>
+
+              <td headers="d53192e708" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">オーケストレーション実行が完了しました。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e705" style="vertical-align:top;" class="slds-cell-wrap" data-label="オーケストレーション実行のマイルストーン">実行を一時停止</td>
+
+              <td headers="d53192e708" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">オーケストレーション実行が手動で一時停止されました。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e705" style="vertical-align:top;" class="slds-cell-wrap" data-label="オーケストレーション実行のマイルストーン">実行をキャンセル</td>
+
+              <td headers="d53192e708" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">オーケストレーション実行が手動でキャンセルされました。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e705" style="vertical-align:top;" class="slds-cell-wrap" data-label="オーケストレーション実行のマイルストーン">実行を再開</td>
+
+              <td headers="d53192e708" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">オーケストレーション実行が手動で再開されました。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d53192e705" style="vertical-align:top;" class="slds-cell-wrap" data-label="オーケストレーション実行のマイルストーン">実行失敗</td>
+
+              <td headers="d53192e708" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><ul>
+                  <li>オーケストレーション実行でエラーが発生しました。</li>
+
+                  <li>オーケストレーション実行内のフェーズでエラーが発生しました。</li>
+
+                  <li>オーケストレーション実行内のステップでエラーが発生しました。</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="orchestrator_manage_reassign_work_item">
+<h1 class="slds-text-heading_large">オーケストレーション作業項目の再割り当て</h1>
+  <p>割り当て済みの作業項目は、別のユーザー、グループ、またはキューに再割り当てできます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col style="width:100%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="フローオーケストレーションでサポートされる製品とエディションを確認します。" href="orchestrator-1.html#automate_orchestrator_about_supported_editions">フローオーケストレーションでサポートされるエディションを表示します。</a>
+              </td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d59460e64" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d59460e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">作業項目の再割り当てを行う</td>
+
+              <td headers="d59460e64" style="vertical-align:top;" class="slds-cell-wrap"><ul>
+                  <li>「オーケストレーション作業項目を再割り当て」<p>または</p></li>
+
+                  <li>オーケストレーションの実行と作業項目の管理</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d59460e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">割り当てられた作業を完了する</td>
+
+              <td headers="d59460e64" style="vertical-align:top;" class="slds-cell-wrap">「フローの実行」</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>割り当て済みの作業項目は、オーケストレーションが処理中であっても再割り当てできます。</p></div>
+    <ol><li>
+        <span>アプリケーションランチャーで、<strong class="uicontrol">[オーケストレーション作業項目]</strong> を見つけて選択します。</span>
+      </li><li>
+        <span>[すべての進行中の作業項目] ページで、割り当て済みの作業項目のドロップダウンから <strong class="uicontrol">[オーケストレーション作業項目を再割り当て]</strong> を選択します。</span>
+      </li><li>
+        <span>[オーケストレーション作業項目を再割り当て] ウィンドウで、作業項目の再割り当てを行うユーザー、グループ、またはキューを選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[オーケストレーション作業項目を再割り当て]</strong> をクリックします。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="orchestrator_manage_resume_failed_orchestration">
+<h1 class="slds-text-heading_large">失敗したオーケストレーションの再開</h1>
+  <p>ステップでコールされたアクションのエラーが原因で過去 14 日以内にオーケストレーションの実行に失敗した場合、エラーを修正してオーケストレーションを再開できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col style="width:100%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="フローオーケストレーションでサポートされる製品とエディションを確認します。" href="orchestrator-1.html#automate_orchestrator_about_supported_editions">フローオーケストレーションでサポートされるエディションを表示します。</a>
+              </td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d313693e60" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d313693e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">実行中のオーケストレーションを一時停止する</td>
+
+              <td headers="d313693e60" style="vertical-align:top;" class="slds-cell-wrap"><ul>
+                  <li>オーケストレーション実行の管理<p>または</p></li>
+
+                  <li>オーケストレーションの実行と作業項目の管理</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>回復可能なエラーと回復不可能なエラーについての詳細は、<a title="オーケストレーション実行は、実行中のオーケストレーションのインスタンスを表します。" href="orchestrator-3.html#orchestrator_orchestration_run">オーケストレーション実行</a>の「失敗したオーケストレーションの再開」セクションを参照してください。</p><p>ステップでコールされたアクションのエラーが原因で過去 14 日以内に失敗したオーケストレーションを再開できます。</p><p>失敗したオーケストレーションの実行を再開する前に、コールされたフローまたはアクションのエラーを修正してください。</p></div>
+    <ol><li>
+        <span>アプリケーションランチャーで、<strong class="uicontrol">[オーケストレーション実行]</strong> を見つけて選択します。</span>
+      </li><li>
+        <span>オーケストレーション実行のページで、状態がエラーのオーケストレーションのドロップダウンから、<strong class="uicontrol">再開</strong> を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">再開</strong> をクリックします。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="orchestrator_manage_resume_suspended_orchestration">
+<h1 class="slds-text-heading_large">一時停止されたオーケストレーションの再開</h1>
+  <p>一時停止されたオーケストレーション実行を再開してその処理を続行します。一時停止されたオーケストレーション実行が再開されると、一時停止されたフェーズも再開されます。オーケストレーション実行が再開されると、進行中のステップの状況が評価され、必要に応じてステップの状況が更新されます。オーケストレーション実行が一時停止されたときに進行中であったステップからの保存済み出力が処理されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col style="width:100%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="フローオーケストレーションでサポートされる製品とエディションを確認します。" href="orchestrator-1.html#automate_orchestrator_about_supported_editions">フローオーケストレーションでサポートされるエディションを表示します。</a>
+              </td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d178089e60" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d178089e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">実行中のオーケストレーションを一時停止する</td>
+
+              <td headers="d178089e60" style="vertical-align:top;" class="slds-cell-wrap"><ul>
+                  <li>オーケストレーション実行の管理<p>または</p></li>
+
+                  <li>オーケストレーションの実行と作業項目の管理</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>一時停止されたオーケストレーションを再開できるほか、ステップによって呼び出されたアクションまたはフローのエラーが原因で過去14日以内に失敗したオーケストレーションも再開できます。</p></div>
+    <ol><li>
+        <span>アプリケーションランチャーで、<strong class="uicontrol">[オーケストレーション実行]</strong> を見つけて選択します。</span>
+      </li><li>
+        <span>オーケストレーション実行ページで、一時停止されたオーケストレーションのドロップダウンから<strong class="uicontrol">再開</strong>を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">再開</strong>をクリックします。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="orchestrator_manage_suspend_running_orchestration">
+<h1 class="slds-text-heading_large">処理中のオーケストレーションの一時停止</h1>
+  <p>オーケストレーション実行は、続行の準備ができるまで一時停止できます。実行中のオーケストレーションを一時停止すると、現在のフェーズも一時停止されます。処理中のステップは引き続き実行されますが、新しいステップは開始されません。処理中のステップに出力がある場合、オーケストレーションが再開されたときに処理できるように保存されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col style="width:100%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><a title="フローオーケストレーションでサポートされる製品とエディションを確認します。" href="orchestrator-1.html#automate_orchestrator_about_supported_editions">フローオーケストレーションでサポートされるエディションを表示します。</a>
+              </td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d224270e60" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d224270e60" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">実行中のオーケストレーションを一時停止する</td>
+
+              <td headers="d224270e60" style="vertical-align:top;" class="slds-cell-wrap"><ul>
+                  <li>オーケストレーション実行の管理<p>または</p></li>
+
+                  <li>オーケストレーションの実行と作業項目の管理</li>
+
+                </ul>
+</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>一時停止できるのは処理中のオーケストレーションのみです。</p></div>
+    <ol><li>
+        <span>アプリケーションランチャーで、<strong class="uicontrol">[オーケストレーション実行]</strong> を見つけて選択します。</span>
+      </li><li>
+        <span>[オーケストレーション実行] ページで、進行中のオーケストレーションのドロップダウンから [<strong class="uicontrol">一時停止]</strong> を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[一時停止]</strong> をクリックします。</span>
+      </li></ol>
+
+    <div><p>準備ができたら、オーケストレーションの実行を再開します。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="一時停止されたオーケストレーション実行を再開してその処理を続行します。一時停止されたオーケストレーション実行が再開されると、一時停止されたフェーズも再開されます。オーケストレーション実行が再開されると、進行中のステップの状況が評価され、必要に応じてステップの状況が更新されます。オーケストレーション実行が一時停止されたときに進行中であったステップからの保存済み出力が処理されます。" href="#orchestrator_manage_resume_suspended_orchestration">一時停止されたオーケストレーションの再開</a></li></ul></div>
+</div></div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="orchestrator-1.html">&larr; Flow Orchestration（オーケストレーション）（1/3）</a><a href="orchestrator-3.html">Flow Orchestration（オーケストレーション）（3/3） &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=platform.automate_with_salesforce_flow.htm&type=5&language=ja">help.salesforce.com — Salesforce Flow（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>

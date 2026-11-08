@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>セキュリティ・WAF・アクセス制御（2/2） | B2C Commerce ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（31）</h2>
+    <ol>
+      <li><a href="#b2c_security_best_practices_for_developers">B2C Commerce のデベロッパーのためのセキュリティのベストプラクティス</a></li>
+      <li><a href="#b2c_security_event_auditing">B2C Commerce でのセキュリティイベントの監査</a></li>
+      <li><a href="#b2c_security_logs_streaming">セキュリティログストリーミング</a></li>
+      <li><a href="#b2c_security_managed_by_salesforce">Salesforce が管理するセキュリティ</a></li>
+      <li><a href="#b2c_set_up_user_access">ユーザーアクセスの設定</a></li>
+      <li><a href="#b2c_shopper_authentication">B2C Commerce での買い物客の認証</a></li>
+      <li><a href="#b2c_stream_security_logs">セキュリティログのストリーミング</a></li>
+      <li><a href="#b2c_supply_chain_security">B2C Commerce のサプライチェーンのセキュリティ</a></li>
+      <li><a href="#b2c_support_for_dkim_authentication">DomainKeys Identified Mail (DKIM) 認証のサポート</a></li>
+      <li><a href="#b2c_update_a_zones_certificate">eCDN ゾーンの証明書の更新</a></li>
+      <li><a href="#b2c_update_a_zones_managed_certificate">eCDN ゾーンの管理証明書の更新</a></li>
+      <li><a href="#b2c_update_a_zones_self_managed_certificate">eCDN ゾーンの自己管理証明書の更新</a></li>
+      <li><a href="#b2c_use_a_positive_security_model">ポジティブセキュリティモデルの使用</a></li>
+      <li><a href="#b2c_user_authentication">B2C Commerce のユーザー認証</a></li>
+      <li><a href="#b2c_user_authentication_and_authorization">B2C Commerce でのユーザーの認証と承認</a></li>
+      <li><a href="#b2c_waf_application">eCDN Web アプリケーションファイアウォール</a></li>
+      <li><a href="#b2c_waf_configuring_how">eCDN WAF 設定の変更</a></li>
+      <li><a href="#b2c_waf_ecdn_wafv2_exposed_credentials_check">eCDN WAFv2 公開認証情報チェック</a></li>
+      <li><a href="#b2c_waf_ecdn_wafv2_exposed_credentials_check_settings">eCDN 公開認証情報チェック設定の変更</a></li>
+      <li><a href="#b2c_waf_ecdn_wafv2_managed_ruleset">eCDN WAFv2 管理ルールセット</a></li>
+      <li><a href="#b2c_waf_log_ocapi_call">Open Commerce API (OCAPI) 呼び出しを使用した eCDN-web アプリケーションファイアウォール (WAF) ログのリクエスト</a></li>
+      <li><a href="#b2c_waf_log_ocapi_json_log_outputs">JSON ログ出力</a></li>
+      <li><a href="#b2c_waf_log_ocapi_log_fields">B2C Commerce のログフィールド情報</a></li>
+      <li><a href="#b2c_waf_log_ocapi_references">eCDN-web アプリケーションファイアウォール (WAF) ログの OCAPI リファレンス</a></li>
+      <li><a href="#b2c_waf_modify_ecdn_owasp_wafv2_ruleset_settings">eCDN 管理ルールセット設定の変更</a></li>
+      <li><a href="#b2c_waf_modify_ecdn_owasp_wafv2_settings">eCDN OWASP WAFv2 設定の変更</a></li>
+      <li><a href="#b2c_waf_net_traffic_logs">Web アプリケーション ファイアウォール (WAF) とネットワーク トラフィック ログ</a></li>
+      <li><a href="#b2c_waf_owasp_wafv2_managed_ruleset">OWASP WAFv2 管理ルールセット</a></li>
+      <li><a href="#b2c_waf_protection">Web アプリケーション ファイアウォール (WAF) 保護</a></li>
+      <li><a href="#b2c_waf_using_waf_first_time">Web アプリケーション ファイアウォール (WAF) の初めての使用</a></li>
+      <li><a href="#b2c_webdav_authentication_and_authorization">B2C Commerce での WebDAV の認証と承認</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>セキュリティ・WAF・アクセス制御（2/2）</h1>
+      <div class="meta">Salesforce B2C Commerce ヘルプ · 31 記事 · 生成 2026-11-03</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="security-1.html">&larr; セキュリティ・WAF・アクセス制御（1/2）</a><a href="api_integration.html">API・OCAPI・連携 &rarr;</a></div>
+<section class="article" id="b2c_security_best_practices_for_developers">
+<h1 class="slds-text-heading_large">B2C Commerce のデベロッパーのためのセキュリティのベストプラクティス</h1>
+   <p>B2C Commerce のデベロッパーは、これらのセキュリティのベストプラクティスを使用して安全なストアフロントを開発します。</p>
+
+<ul><li class="slds-p-bottom_small"><strong><a href="general-4.html#b2c_encryption_and_cryptography">B2C Commerce での暗号化と暗号法</a></strong><br>Salesforce B2C Commerce では、強力な暗号化トークンとセキュアなランダム識別子を安全に暗号化、署名、生成することを可能にする、Salesforce が維持する暗号化ライブラリを拡張しています。Salesforce では、Salesforce の Trust Compliance Web サイトの B2C Commerce ページに記載されているように、業界標準のコンプライアンスフレームワークを維持しています。</li><li class="slds-p-bottom_small"><strong><a href="site_admin-1.html#b2c_cross_site_scripting">B2C Commerce でのクロスサイトスクリプティング</a></strong><br>クロスサイトスクリプティング (XSS) を使用すると、攻撃者は、ターゲットとなるユーザーが表示している Web ページにクライアント側の JavaScript を注入できます。コンテンツの操作による悪意をもった攻撃を防止するには、すべてのユーザーが提供するコンテンツを適切にエンコードする必要があります。</li><li class="slds-p-bottom_small"><strong><a href="security-1.html#b2c_declarative_security_via_http_headers">B2C Commerce における HTTP ヘッダーでの宣言によるセキュリティ</a></strong><br>宣言によるセキュリティコントロールを、クリックジャックなどのクライアントのブラウザーをベースとする攻撃に対する強力な防御手段として使用し、クロスサイトスクリプティング (XSS) に対するビルトインのブラウザー保護を提供できます。OWASP Secure Headers Project は、アプリケーションのセキュリティを向上するためにアプリケーションで使用することのできる HTTP 応答ヘッダーを記述しています。</li><li class="slds-p-bottom_small"><strong><a href="storefront-1.html#b2c_content_security_policy">コンテンツセキュリティポリシー(CSP)の設定</a></strong><br>コンテンツセキュリティポリシー (CSP) は、ストアフロントに対して構成するセキュリティ機能です。CSP を実装するときは、構成によって必要なスクリプトが意図したとおりに実行されることを確認する責任があります。</li><li class="slds-p-bottom_small"><strong><a href="general-2.html#b2c_commerce_script_injection">B2C Commerce でのコマーススクリプトインジェクション</a></strong><br>サーバースクリプトインジェクション、またはリモートコード実行は、攻撃クラスの 1 つで、許可を付与されたコード実行によって悪意をもって作成された入力が実行されます。このクラスの攻撃により、攻撃者はサーバー上で実行されるコードを制御することができます。     </li><li class="slds-p-bottom_small"><strong><a href="site_admin-1.html#b2c_cross_site_request_forgery">B2C Commerce でのクロスサイトリクエストフォージェリ (CSRF)</a></strong><br>各ストアフロントには、高レベルのセキュリティ保護を必要とする、保護されたリクエストがいくつかあります。通常これらのリクエストは、認証済みの買い物客がアカウントを変更する場合や、操作を完了するためにサーバーに個人データを送信する場合に実行されます。ユーザーは、これらのリクエストは自分がリクエストを開始した場合にのみ行われると考えています。         </li><li class="slds-p-bottom_small"><strong><a href="general-6.html#b2c_secret_storage">B2C Commerce での機密事項の保存</a></strong><br>機密事項の保存と使用は、買い物客の情報のセキュリティを万全にするために、デベロッパーが行うもっとも重要なアクションの 1 つです。機密事項には以下のものがあり、また、これには限られません。</li><li class="slds-p-bottom_small"><strong><a href="general-7.html#b2c_using_hooks_securely">B2C Commerce でのフックセキュリティの使用</a></strong><br>Salesforce B2C Commerce では、デフォルトの機能を拡張するパワフルなツールとしてフックを使用できます。ただし、他のすべてのパワフルなツールと同様に、フックは適切に使用しないと危険です。     </li><li class="slds-p-bottom_small"><strong><a href="data_jobs-2.html#b2c_data_validation">B2C Commerce でのデータの検証</a></strong><br>ユーザー入力の検証は、アプリケーションセキュリティの基礎です。データの検証によって、データがアプリケーションで予想されている種類のものであることが確認されます。B2C Commerce では通常、無効なリクエストは完全に拒否され、ユーザーにエラーが返されます。データの検証を行う場所を選択しますが、ここではクライアント側とサーバー側の検証に重点を置きます。</li><li class="slds-p-bottom_small"><strong><a href="general-6.html#b2c_open_redirect_attacks">B2C Commerce でのオープンリダイレクト攻撃</a></strong><br>Web アプリケーションがユーザー入力をリダイレクト先として信頼すると、攻撃者はこの入力を使用してユーザーを自分がコントロールする Web サイトにリダイレクトし、ユーザーの情報を盗むことができます。</li><li class="slds-p-bottom_small"><strong><a href="security-1.html#b2c_developer_authentication_and_authorization">B2C Commerce での認証と承認のベストプラクティス</a></strong><br>アクセスコントロールの脆弱性を利用するのは、攻撃者の中核となるスキルです。攻撃者に対する保護を行うために、アカウント管理、注文管理、購入などのビジネス機能に対するサーバー側アクセスのコントロールチェックを強制します。 </li><li class="slds-p-bottom_small"><strong><a href="#b2c_supply_chain_security">B2C Commerce のサプライチェーンのセキュリティ</a></strong><br>アップロードと外部リンクを通じて含めた未検証のソフトウェアソースは、攻撃の潜在的な侵入経路となる可能性があります。</li><li class="slds-p-bottom_small"><strong><a href="general-6.html#b2c_secure_logging">B2C Commerce のセキュアなログ</a></strong><br>Salesforce B2C Commerce のログは安全に保存されており、<code>site_admin</code> 役割または <code>developer</code> 役割のユーザーのみがアクセスできます。ログは Web インターフェイスまたは WebDAV を通じてアクセスできます。ログに記録する情報のタイプを決定する際には、これらを考慮してください。</li><li class="slds-p-bottom_small"><strong><a href="general-4.html#b2c_general_secure_coding_practices">B2C Commerce での安全なコーディングのための一般的なプラクティス</a></strong><br>Salesforce B2C Commerce が提供するすべてのセキュリティコントロールを使用しても、コーディングで適切なプラクティスを行わないと、これらの管理に悪影響を与え、脆弱性を導入する可能性があります。一般的な推奨事項については、OWASP Secure Coding Practices - Quick Reference Guide (OWASP セキュアコーディングプラクティス - クイックリファレンスガイド) を参照してください。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_security_event_auditing">
+<h1 class="slds-text-heading_large">B2C Commerce でのセキュリティイベントの監査</h1>
+   
+   <p>Salesforce B2C Commerce は、セキュリティログを含むさまざまなログファイルを提供しています。セキュリティログには Business Manager ログインのログエントリが含まれます。
+    </p>
+
+      <p>B2C Commerce サービスのプロビジョニングに使用するすべての Salesforce システム (ファイアウォール、ルーター、ネットワークスイッチ、オペレーティングシステムを含む) は、それぞれのシステムログ機能、または一元化されたログ収集サーバーに情報をログします。これにより、セキュリティのためのレビューと分析を行えます。セキュリティログでは、セキュリティの状態を認識できます。詐欺行為、乱用、その他の疑わしい行為などの、セキュリティ関連の問題が発生した場合に、より適切に調査して情報を共有するために、インスタンスで使用可能なログをダウンロードして収集します。セキュリティログ情報は、発生したサイバー攻撃の対象、内容、日時、方法を見極めるために役立ちます。 </p>
+      <p>セキュリティログファイルはこちらにあります: <code>https://&lt;instance-name&gt;/on/demandware.servlet/webdav/Sites/Securitylogs</code>
+      </p>
+      <p>セキュリティログエントリは以下のサンプルエントリのようになります。</p>
+      <pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-text">[2015-10-28 02:23:19.139 GMT] [DW-SEC] (User: 'username' (Sites), IP: 100.100.10.100 [LOGIN] : logged in.)</code></pre>
+      <p>セキュリティログには以下の情報も含まれています。</p>
+      <ul>
+         <li>
+                    Business Manager ログインのログエントリへのセッション ID。
+                </li>
+
+         <li> アイドル状態が続いたために Business Manager がパスワードを要求する場合は、再ログインのログエントリ。これらのログエントリは、古いセッション ID と新しいセッション ID を記録します。 </li>
+
+      </ul>
+
+      <p>セキュリティログファイルは 90 日後に自動的に削除されます。ユーザーとクライアントは、セキュリティログを削除したり、セキュリティログの記録をオフにしたりすることはできません。ログファイルを 90 日間を超えて保持するには、ファイルをダウンロードして、ローカルまたは専用のストレージに保存する必要があります。</p>
+      
+      <div><h2 class="slds-text-heading_medium slds-p-top_small">WebDAV</h2><p>B2C Commerce では、すべてのユーザーのセキュリティログに、WebDAV を介したファイルとフォルダーへのアクセスが記録されます。各ファイルとフォルダーへのアクセスログメッセージは同じ構造になっています。メッセージには、使用された WebDAV メソッドと、アクセス可能なディレクトリ構造内でアクセスまたはリクエストされたファイルやフォルダーのパスが含まれます。以下は WebDAV メソッドのメッセージの例です。</p><ul>
+            <li>ディレクトリの作成 (MKCOL) <pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-text">[DW-SEC] User: 'support' (Sites), IP: 100.100.10.100, [MKCOL] : /src/myfolder - starting (inIMPEX)
+                     
+[DW-SEC] User: 'support' (Sites), IP: 100.100.10.100, [MKCOL] : /src/myfolder - finished successfully (in IMPEX)</code></pre></li>
+
+            <li>ファイルのアップロード (PUT) <pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-text">[DW-SEC] User: 'support' (Sites), IP: 100.100.10.100, [PUT] : /src/myfolder/my-testfile.pdf - starting (in IMPEX)
+
+[DW-SEC] User: 'support' (Sites), IP: 100.100.10.100, [PUT] : /src/myfolder/my-testfile.pdf - finished successfully (in IMPEX)</code></pre></li>
+
+            <li>別の場所にファイルを移動 (MOVE) <pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-text">[DW-SEC] User: 'support' (Sites), IP: 100.100.10.100, [MOVE] : /src/myfolder/my-testfile.pdf --&gt; /src/myfolder2/my-testfile.pdf - starting (in IMPEX)
+
+[DW-SEC] User: 'support' (Sites), IP: 100.100.10.100, [MOVE] : /src/myfolder/my-testfile.pdf --&gt; /src/myfolder2/my-testfile.pdf - finished successfully (in IMPEX)</code></pre></li>
+
+            <li>ファイルのダウンロード (GET) <pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-text">[DW-SEC] User: 'support' (Sites), IP: 100.100.10.100, [GET] : /src/myfolder2/my-testfile.pdf - starting (in IMPEX)
+
+[DW-SEC] User: 'support' (Sites), IP: 100.100.10.100, [GET] : /src/myfolder2/my-testfile.pdf - finished successfully, downloaded 425 kb of 425 kb (in IMPEX)</code></pre></li>
+
+         </ul>
+<p>各 WebDAV メソッドについて、開始と終了が記録されます。</p></div>
+      <div><h2 class="slds-text-heading_medium slds-p-top_small">フォルダーブラウザー</h2><p>B2C Commerce では、すべてのユーザーのセキュリティログに、フォルダーブラウザーからのファイルアクセスが記録されます。フォルダーの参照は意図的に記録されません。ファイルのビューとダウンロードのログメッセージは同じです。</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-text">[DW-SEC] User: 'support' (Sites), IP: 100.100.10.100, [GET] : /src/myfolder2/my-testfile.pdf - starting (in IMPEX) 
+
+[DW-SEC] User: 'support' (Sites), IP: 100.100.10.100, [GET] : /src/myfolder2/my-testfile.pdf - finished successfully, downloaded 425 kb of 425 kb (in IMPEX)</code></pre></div>
+      
+      <div><h2 class="slds-text-heading_medium slds-p-top_small">内部ユーザーアクセスの追跡</h2><p>Salesforce の従業員が顧客のレルムで行うアクションに関する B2C Commerce セキュリティモデルには、すべての機密性の高い領域で透明性の高いログ記録が含まれています。機密性の高い領域で読み取りまたは書き込みのアクションが行われると、B2C Commerce では、Salesforce 従業員の Business Manager ユーザー名、領域、およびアクションが、顧客が利用できるセキュリティログに記録されます。このセキュリティコントロールの目的は、監視によって、またはレルム固有の顧客情報の変更を介して、Salesforce 従業員のアクションを明白にすることです。</p><ul>
+            <li>この時点では、機密性の高い領域が Salesforce で定義されます。これには、セキュリティ設定、買い物客や注文データへのアクセス、キャンペーンやクーポンへのアクセスが含まれますが、これらに限定されるものではありません。</li>
+
+            <li>(読み取りまたは書き込みのアクションに関係なく) すべてのアクセスがログに記録されます。</li>
+
+            <li>ユーザーの役割と許可に対するすべての変更がログに記録されます。</li>
+
+            <li>マーチャントが Business Manager にインストールしているあらゆるカスタムモジュールへのすべてのアクセスがログに記録されます。</li>
+
+            <li>アクセスは、Business Manager のセキュリティログに記録および保存されます。</li>
+
+            <li>Salesforce 従業員の Business Manager ユーザー名 (Eメールアドレス) はログに記録されます。</li>
+
+         </ul>
+<p>以下はセキュリティログの対象外です。</p><ul>
+            <li>フォルダーブラウザーによるフォルダーの参照</li>
+
+            <li>インポートとエクスポートによるファイルアクセス</li>
+
+            <li>スクリプト API によるファイルアクセス</li>
+
+         </ul>
+<p>以下に、ログに記録される機密性の高い領域の一部 (すべてではありません) を示します。</p><ul>
+            <li>site-urls_aliases</li>
+
+            <li>site-prefs_apple-pay</li>
+
+            <li>orders_paymethods</li>
+
+            <li>orders_paymentmethods</li>
+
+            <li>marketing_coupons</li>
+
+            <li>marketing_giftcert</li>
+
+            <li>marketing_campaigns</li>
+
+            <li>customer_groups (API アクセス許可が制限されているため、事実上読み取り専用)</li>
+
+            <li>customers_gdpr</li>
+
+            <li>customers_batchprocs</li>
+
+            <li>customer_service_center_module</li>
+
+            <li>content_pages</li>
+
+            <li>content_impex</li>
+
+            <li>sourcecode</li>
+
+         </ul>
+</div>
+   
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_security_logs_streaming">
+<h1 class="slds-text-heading_large">セキュリティログストリーミング</h1>
+   
+   <p>セキュリティログには、ログイン情報やクライアントのダウンロード情報などの機密情報が含まれています。 
+      </p>
+
+      <div><h2 class="slds-text-heading_medium slds-p-top_small">役割と許可</h2><p>セキュリティログのストリーミングを設定するには、Log Center External Admin (外部管理者) の役割が必要です。Log Center External Admin の役割では、次のことができます。</p><ul>
+            <li>セキュリティログのストリーミング構成の作成と更新</li>
+
+            <li>編集許可リストへのユーザーの追加。この許可リストに含まれるユーザーは、セキュリティログのストリーミング構成を更新できます</li>
+
+         </ul>
+<p>ユーザーの役割が「Log Center 外部管理者」から「ユーザー」に変更されると、そのユーザーが設定したストリーミングセキュリティログはすべて無効になります。別の「Log Center 外部管理者」ユーザーが新しいストリームを設定する必要があります。ユーザーが編集許可リストに含まれていた場合でも、既存の構成を編集できます。</p><p>「Enable Security Logs」(セキュリティログの有効化) オプションは、Log Center External Admin の役割が割り当てられていないユーザーに対してはアクティブになりません。</p></div>
+      <div><p>その他の参照項目: </p><ul>
+            <li><a target="_blank" href="customer-2.html#b2c_account_manager_roles">Account Manager で管理される役割</a></li>
+
+         </ul>
+</div>
+      
+   
+<ul><li class="slds-p-bottom_small"><strong><a href="#b2c_stream_security_logs">セキュリティログのストリーミング</a></strong><br>セキュリティログのストリーミングを設定するには、セキュリティログを有効にするオプションを設定します。        </li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_security_managed_by_salesforce">
+<h1 class="slds-text-heading_large">Salesforce が管理するセキュリティ</h1>
+   
+   <p>Salesforce では、B2C Commerce の開発においてセキュリティが焦点であることを保証し、安全な開発とプラットフォームレベルのセキュリティを提供しています。</p>
+
+      <div id="b2c_security_managed_by_salesforce__b2c_security-focused_development"><a name="b2c_security_managed_by_salesforce__b2c_security-focused_development"></a><h2 class="slds-text-heading_medium slds-p-top_small">セキュリティに焦点をあてた開発</h2><p>Salesforce セキュア開発ライフサイクル (SSDL) は、開発プロセスの各段階でセキュリティを提供します。SSDL は教育、業界をリードするプロセス、およびツールを提供して、予測可能性、責任、透明性を確実にします。安全な開発のベストプラクティスには、多層防御、最小権限、安全なデフォルト、定期的な静的および動的な脆弱性分析などがあります。</p><p>Salesforce セキュア開発ライフサイクル: </p><a name="b2c_security_managed_by_salesforce__ul_gnl_s5h_rkb"></a><ul id="b2c_security_managed_by_salesforce__ul_gnl_s5h_rkb">
+                <li> Open Web Application Security Project (OWASP) のセキュアコーディング原則を適用します。 </li>
+
+                <li> すべての商品と新しく開発した機能に対して、実装前に脅威のモデリングアクティビティを実行します。 </li>
+
+                <li> 静的および動的な脆弱性スキャンを実行します。 </li>
+
+                <li> 定期的にサードパーティのセキュリティの評価を行います。 </li>
+
+                <li> 顧客が開始したセキュリティ評価をサポートします。 </li>
+
+                <li> 質疑応答セッションとピアレビューで顧客をサポートします。 </li>
+
+            </ul>
+</div>
+      <div id="b2c_security_managed_by_salesforce__b2c_commerce_platform-level_security"><a name="b2c_security_managed_by_salesforce__b2c_commerce_platform-level_security"></a><h2 class="slds-text-heading_medium slds-p-top_small">B2C Commerce プラットフォームレベルのセキュリティ</h2><p>B2C Commerce では、本番環境を保護するために多層防御のアプローチをとっています。このアプローチには、アプリケーション、インフラストラクチャ、およびネットワークレベルでの複数のセキュリティ制御が含まれており、顧客データが安全に処理および保存されるようにします。</p><p>B2C Commerce を構成する複数のアプリケーションは、強力な認証メカニズムを提供しています。認証済みのユーザーに対し、ユーザーの役割に応じてアプリケーションのさまざまな部分へのアクセスを承認できます。SSDL によって、カスタマイズが可能となる一方、これらの機能でユーザーを保護するためのセキュリティコントロールが確実に提供されます。</p><p>インフラストラクチャレベルは複数のレイヤーの信頼性をもち、データベースレイヤーを含むシステムのすべてのレベルにファイアウォールとアクセスコントロールがあります。 </p><a name="b2c_security_managed_by_salesforce__ul_irc_1qy_fwb"></a><ul id="b2c_security_managed_by_salesforce__ul_irc_1qy_fwb">
+                <li>データベースレイヤーでは、データがテナントを超えてアクセスされないようにするため、複数テナント制が強制されています。</li>
+
+                <li>各テナントは独自のデータベースをもち、すべてのデータはテナントの Org ID と利用資格にリンクされています。</li>
+
+                <li>暗号化は、転送中のデータを保護し、主要な場所とバックアップの場所の間で転送される際のオープンデータの漏洩の可能性を防ぎます。</li>
+
+                <li>また、セキュリティは当社のデータセンターの物理レイヤーにも広がっています。たとえば、当社のデータセンターのディスクが寿命に達した場合、データが復元できないように、ディスクは消去され、細断されます。</li>
+
+            </ul>
+<p>B2C Commerce プラットフォームのセキュリティに関する勧告は、Security Advisories サイトで顧客に通知されます。</p></div>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">内部ユーザーアクセスの追跡</h2><p>Salesforce の従業員が顧客のレルムで行うアクションに関する B2C Commerce セキュリティモデルには、すべての機密性の高い領域の透明性の高いログ記録が含まれています。詳細については、<a title="Salesforce B2C Commerce は、セキュリティログを含むさまざまなログファイルを提供しています。セキュリティログには Business Manager ログインのログエントリが含まれます。" href="#b2c_security_event_auditing">B2C Commerce でのセキュリティイベントの監査</a>を参照してください。</p></div>
+   
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_set_up_user_access">
+<h1 class="slds-text-heading_large">ユーザーアクセスの設定</h1>
+   
+   
+
+   <p>Account Manager 管理者の認証情報をもつユーザーは、Reports &amp; Dashboards ポータルへのアクセスをユーザーに付与できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>         <tr class="">           <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+         </tr>       </tbody></table></div>
+      <div><p>ユーザーアクセスを設定するには、管理者が Account Manager で Reports &amp; Dashboards の役割を追加します。</p></div>
+      <ol><li>
+            <span>Account Manager に Administrator (管理者) としてログインします。</span>
+         </li><li>
+            <span>既存のユーザーに役割を追加します。</span>
+            <ol>
+               <li>
+                  <span>組織、役割、ステータスのフィルターを使用して、ユーザーをリストします。</span>
+               </li>
+
+               <li>
+                  <span><strong class="uicontrol">User's ID</strong> (ユーザーの ID) をクリックして、ステップ 5 に進みます。</span>
+               </li>
+
+            </ol>
+         </li><li>
+            <span>新規ユーザーにこの役割を追加します。</span>
+            <ol>
+               <li>
+                  <span><span class="menucascade"><strong class="uicontrol">Account Manager</strong> | <strong class="uicontrol">User (ユーザー)</strong></span>の順に移動し、<strong class="uicontrol">Add User (ユーザーの追加)</strong> をクリックします。</span>
+               </li>
+
+               <li>
+                  <span>ユーザーアカウント情報と組織の割り当てを完了して、ステップ 5 に進みます。</span>
+               </li>
+
+            </ol>
+         </li><li>
+            <span>Roles (役割) セクションまでスクロールして、<strong class="uicontrol">Add</strong> (追加) をクリックします。</span>
+         </li><li>
+            <span>Reports &amp; Dashboards セクションまでスクロールして、適切な役割を選択します。ユーザーごとに役割を 1 つのみ割り当てます。役割の割り当てのオプションには次のものがあります。</span>
+            <div>
+               <ul>
+                  <li>Customer Manager (顧客マネージャー) の役割: すべてのレポートとアカウント設定へのアクセスを許可します。</li>
+
+                  <li>Performance User (パフォーマンスユーザー) の役割: すべてのレポートへのアクセスを許可します。</li>
+
+                  <li>User (ユーザー) の役割: リアルタイムのパフォーマンスレポートを除く、すべてのレポートへのアクセスを許可します。</li>
+
+               </ul>
+
+            </div>
+         </li><li>
+            <span><strong class="uicontrol">Add</strong> (追加) をクリックします。</span>
+         </li><li>
+            <span><span class="menucascade"><strong class="uicontrol">Roles (役割)</strong> | <strong class="uicontrol">Reports &amp; Dashboards</strong></span>までスクロールして戻り、「no role scope defined (役割範囲が未定義)」というメッセージの左側にあるフィルターをクリックします。
+        </span>
+         </li><li>
+            <span>インスタンスの追加フィルターで、ユーザーにアクセスを付与するレルムの組織名と Production (本番) インスタンスを選択します。</span>
+         </li><li>
+            <span>組織とインスタンスを追加するには、<strong class="uicontrol">Add</strong> (追加) をクリックします。</span>
+         </li><li>
+            <span>更新した役割を追加するには、<strong class="uicontrol">Save</strong> (保存) をクリックします。</span>
+         </li><li>
+            <span>これでユーザーは、自分の Account Manager 認証情報を使用して Reports &amp; Dashboards にアクセスできるようになります。</span>
+         </li></ol>
+
+   
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_shopper_authentication">
+<h1 class="slds-text-heading_large">B2C Commerce での買い物客の認証</h1>
+   
+   <p>買い物客はストアフロントで登録を行ってアカウントを作成するか、匿名のままでいることができます。たとえば、ストアフロントを閲覧するには、買い物客はアカウントにログインしたり、アカウントを作成したりする必要はありません。ただし、買い物客がアカウントを作成すると、請求先住所、クレジットカード、以前の注文などの情報を取得します。また、認証済みの買い物客は、ギフトレジストリやほしい物リストなど、匿名の買い物客は利用できない機能にアクセスできます。</p>
+
+      <p>アカウントを作成するには、買い物客はユーザー名とパスワードを入力します。登録後、買い物客はパスワードを変更できます。Business Manager を使用して、買い物客の認証のための主要なセキュリティコントロールとしてパスワードポリシーを設定します。セキュリティを向上するには、パスワードの長さをデフォルトの 8 文字から 10 文字に増やします。</p>
+      <p>Salesforce B2C Commerce では、買い物客を認証し、Google や Facebook などのサードパーティの OAuth プロバイダーから買い物客に関する情報を取得するために、OAuth2 がサポートされています。買い物客はこのアクセスを承認する必要があります。またこの機能では、買い物客がストアフロントでよりすばやく簡単に登録してログインできるようになります。個人情報を入力する代わりに、買い物客は Google アカウントなどの既存のアカウントを使用してログインできます。既存のアカウントを使用することで、そのアカウントから個人情報を取得する許可がストアフロントに与えられます。</p>
+      <p>これらの認証スキームは、ストアフロントが本番になる際に適用されます。ただし、ストアフロントが開発またはテストの段階にある場合、潜在的な消費者が検索エンジンを使用してそのストアフロントを見つけられないようにする必要があります。これを防止するには、Business Manager を使用して Development (開発)、Staging (ステージング)、Production (本番) インスタンスへのアクセスをマーチャントとプロジェクト関係者に制限します。 </p>
+      <p>これを行うには、ストアフロント<code>の保護モードを有効にし</code>、共有のユーザー名とパスワードを構成します。この共有のユーザー名とパスワードは、開発やテストなどの、内部での使用のためのストアフロントアクセスに使用します。ストアフロントの保護モードはデフォルトで無効になっていますが、有効にするようにしてください。</p>
+      <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 買い物客の認証はマーチャントの責任です。</div></div></div>
+
+   
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_stream_security_logs">
+<h1 class="slds-text-heading_large">セキュリティログのストリーミング</h1>
+   
+   <p>セキュリティログのストリーミングを設定するには、セキュリティログを有効にするオプションを設定します。 
+      </p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+      <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+                  <tr class="">
+                     <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+
+                  </tr>
+               </tbody></table></div>
+      <ol><li>
+            <span>Log Center にログインします。</span>
+         </li><li>
+            <span><strong class="uicontrol">Log Streaming</strong> (ログストリーミング)を選択します。</span>
+         </li><li>
+            <span><strong class="uicontrol">Enable Security Logs</strong> (セキュリティログの有効化) をオンにします。</span>
+         </li><li>
+            <span>ログストリームの名前を入力します</span>
+         </li><li>
+            <span>「Destination Type」(宛先タイプ) ドロップダウンから、サードパーティの統合も選択します。</span>
+         </li><li>
+            <span>エンドポイント URL、API トークン、およびレルムを構成します。</span>
+         </li><li>
+            <span>(オプション) ユーザー ID を「Edit Permissions List」(編集許可リスト) に追加します。</span>
+         </li><li>
+            <span>フィルター条件を構成します。</span>
+         </li><li>
+            <span>構成を保存します。</span>
+         </li></ol>
+
+      <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> <span style="vertical-align:text-bottom;display:inline-block;"><img alt="セキュリティログの設定" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_log_center_security_logs.png" style="height:300px;margin-bottom:0;"></span></div></div></div>
+      <div><p>その他の参照項目: </p><ul>
+         <li><a target="_blank" href="general-6.html#b2c_set_up_log_streaming">ログストリーミングの設定</a></li>
+
+      </ul>
+</div>
+      
+   
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_supply_chain_security">
+<h1 class="slds-text-heading_large">B2C Commerce のサプライチェーンのセキュリティ</h1>
+        
+        <p>アップロードと外部リンクを通じて含めた未検証のソフトウェアソースは、攻撃の潜在的な侵入経路となる可能性があります。</p>
+
+                <div><h2 class="slds-text-heading_medium slds-p-top_small">コードのアップロード</h2><p>コードのアップロードは注意を要する操作です。信頼できないコードがアップロードされる危険性が少しでもあると、悪意をもった人物がレルムのデータや機能のほとんどにアクセスできる可能性が生じ、サイトや買い物客のデータの機密性、整合性、可用性に悪影響が及びます。</p></div>
+                <div><h2 class="slds-text-heading_medium slds-p-top_small">サードパーティのライブラリ</h2><p>サードパーティのソフトウェアは、簡単に機能を追加し、製品を市場に導入するまでの時間を短縮するために、頻繁にカスタムコードに統合されています。これには、不要なライブラリや安全ではないライブラリがストアフロントのコードに含まれてしまうリスクが伴います。SiteGenesis と Salesforce Reference Architecture (SFRA) にも、いくつかのサードパーティライブラリが含まれています。これらのライブラリをカスタムコードに組み込んだ場合、潜在的な問題や脆弱性がないか、注意して監視する必要があります。</p><p>不要な、または脆弱性をもつ可能性のあるライブラリをストアフロントに含めないようにするには、以下のガイドラインに従います。</p><a name="b2c_supply_chain_security__ul_at2_5l5_gwb"></a><ul id="b2c_supply_chain_security__ul_at2_5l5_gwb">
+                                <li> ストアフロントを適切に操作するために必要なライブラリのリストを維持します。 </li>
+
+                                <li> 必要でないライブラリをコードベースから破棄します。 </li>
+
+                                <li> サードパーティのソフトウェアは、信頼できる安全なソースから入手します。 </li>
+
+                                <li> 使用している各ライブラリの特定のバージョンを追跡します。 </li>
+
+                                <li> ライブラリに既知の弱点がないかを定期的に確認し、これらのライブラリを安全なサポートされているバージョンにアップグレードします。
+                                </li>
+
+                        </ul>
+</div>
+                <div><h2 class="slds-text-heading_medium slds-p-top_small">リモートでホストされるリソース</h2><p>現在 eコマースでは、サプライチェーン攻撃がより頻繁に発生するようになりました。たとえば、Magecart は多くの場合サードパーティのリモートでホストされているリソースをターゲットとして、Web ページで入力された機密情報をスキミングするドライブバイをインストールします。攻撃者は JavaScript のみを使用して暗号通貨を採掘し、マシンを DDoS ネットワークに従属するものとし、場合によってはさらにコントロールと被害を広げるためにクライアントマシンに直接マルウェアをインストールすることを試みます。</p><p>これを行うために、攻撃者はリモートでホストされているリソースを侵害し、かつては信頼されていた JavaScript リソースに悪意のあるコードを挿入します。その後、このスクリプトを含むすべての Web サイトには、この悪意をもつ JavaScript が含まれることになります。</p><p>最近、セキュリティ業界は、この種の攻撃を抑制するのに役立つ新しい制御を導入しました。これらのコントロールは、リモート リソースを含む HTML 要素に整合性ハッシュを挿入します。たとえば、フェッチするリソースをブラウザーが検証できるようにするセキュリティ機能である Subresource Integrity (SI) では、リモートリソースのコンテンツのハッシュをもつ HTML 要素に整合性値が必要です。攻撃者がリモートリソースを侵害した場合、ハッシュ値は事前構成された信頼されたハッシュ値とは一致せず、クライアントのブラウザーは悪意のあるスクリプトを読み込みません。</p><p>SFRA の実装では、<code>addJs</code> と <code>addCss</code> のヘルパーメソッドが整合性ハッシュをオプションの二次引数として受け入れます。サブリソース完全性の実装の例は、Mozilla Developer Network のドキュメントを参照してください。</p></div>
+        
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_support_for_dkim_authentication">
+<h1 class="slds-text-heading_large">DomainKeys Identified Mail (DKIM) 認証のサポート</h1>
+    
+    <p>Salesforce B2C Commerce では、顧客がメール要件に合わせて使用できる、すぐに使用可能なソリューションをファーストパーティの POD (Point of Deployment) で提供しています。このサービスは、DKIM および SPF 認証のサポートを提供します。DKIMは、送信メールに暗号化デジタル署名を追加するメール認証プロトコルです。DKIMを使用すると、受信者はドメイン所有者がメールを承認し、送信中に変更されていないことを確認できます。DKIMは、スパムメールやフィッシングメールを減らすのに役立ちます。</p>
+
+        <p><a target="_blank" href="https://help.salesforce.com/s/articleView?id=commerce.comm_what_product.htm&amp;language=ja&amp;type=5">所有している Salesforce Commerce 製品</a></p>
+        <div><h2 class="slds-text-heading_medium slds-p-top_small">Google、Yahoo、および Microsoft の DKIM 認証の要件</h2><ul>
+                <li>Googleは、2024年から、1日あたり5,000+通のメールを送信するユーザーに、Sender Policy Framework(SPF)とDKIMの両方を義務付けると発表しました。<a target="_blank" href="https://support.google.com/mail/answer/81126?hl=en">Email sender guidelines</a> (Eメール送信者のガイドライン) を参照してください。</li>
+
+                <li>Yahoo も 2024 年第 1 四半期に向けた同様の計画を発表しています。<a target="_blank" href="https://blog.postmaster.yahooinc.com/post/730172167494483968/more-secure-less-spam">More Secure, Less Spam ENforcing Email Standards for a Better Experience</a> (よりセキュアでスパムを減らし、より良いエクスペリエンスを実現する Eメール基準の適用) を参照してください。 </li>
+
+                <li>同様に、Microsoftは、バルク送信者のDKIM、DMARC、およびSPFを使用した認証要件を発表しました。<a target="_blank" href="https://techcommunity.microsoft.com/blog/microsoftdefenderforoffice365blog/strengthening-email-ecosystem-outlook%E2%80%99s-new-requirements-for-high%E2%80%90volume-senders/4399730"><u>「Strengthening Email Ecosystem」を参照してください。大量の送信者に対する Outlook の新しい要件</u></a>。 </li>
+
+            </ul>
+<p>一括送信者認証の要件に確実に準拠するために、次の手順の概要を次に示します。</p><ul>
+                <li>DKIM の秘密鍵と公開鍵のペアを生成します。<a title="DKIM 認証では、B2C Commerce の Business Manager で秘密鍵を指定する必要があります。これらのコマンドを使用して、端末で秘密鍵を生成します。" href="general-4.html#b2c_generate_private_key">秘密鍵と公開鍵のペアの生成</a>を参照してください。
+                </li>
+
+                <li>新しい公開鍵を反映するために、DNS レコードを更新します。<a title="Google、Microsoft、Yahooなどの主要なメールプロバイダーは、DomainKeys Identified Mail(DKIM)認証を必要とするようになりました。DKIMの設定は、Eメールが顧客の受信箱に届き、拒否されたり、スパムとしてフラグが立てられたりしないようにするために不可欠です。DKIM を設定して、メールが送信元であると主張するドメインから送信されたことを確認します。" href="general-3.html#b2c_deploy_dkim">B2C Commerce の DKIM の構成</a>を参照してください。</li>
+
+                <li>Business Manager で秘密鍵をインポートします。<a title="Google、Microsoft、Yahooなどの主要なメールプロバイダーは、DomainKeys Identified Mail(DKIM)認証を必要とするようになりました。DKIMの設定は、Eメールが顧客の受信箱に届き、拒否されたり、スパムとしてフラグが立てられたりしないようにするために不可欠です。DKIM を設定して、メールが送信元であると主張するドメインから送信されたことを確認します。" href="general-3.html#b2c_deploy_dkim">B2C Commerce の DKIM の構成</a>を参照してください。<ul>
+                        <li>キーはすべての送信メールに使用され、Google、Yahoo、および Microsoft の要件を満たします。</li>
+
+                        <li>キーの指定はインスタンスごとに 1 回のみ必要です。</li>
+
+                    </ul>
+</li>
+
+                <li>変更内容を Development (開発) または Staging (ステージング) インスタンスでテストしてから、Production (本番) インスタンスに導入します。</li>
+
+            </ul>
+</div>
+        <div><p>このセクションの内容:</p></div>
+    
+<ul><li class="slds-p-bottom_small"><strong><a href="general-3.html#b2c_deploy_dkim">B2C Commerce の DKIM の構成</a></strong><br>Google、Microsoft、Yahooなどの主要なメールプロバイダーは、DomainKeys Identified Mail(DKIM)認証を必要とするようになりました。DKIMの設定は、Eメールが顧客の受信箱に届き、拒否されたり、スパムとしてフラグが立てられたりしないようにするために不可欠です。DKIM を設定して、メールが送信元であると主張するドメインから送信されたことを確認します。</li><li class="slds-p-bottom_small"><strong><a href="general-4.html#b2c_generate_private_key">秘密鍵と公開鍵のペアの生成</a></strong><br>DKIM 認証では、B2C Commerce の Business Manager で秘密鍵を指定する必要があります。これらのコマンドを使用して、端末で秘密鍵を生成します。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://en.wikipedia.org/wiki/DomainKeys_Identified_Mail"><em>ウィキペディア</em> :DomainKeys 識別メール</a></li><li><a target="_blank" href="https://en.wikipedia.org/wiki/Sender_Policy_Framework"><em>ウィキペディア</em> :送信者ポリシーフレームワーク</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_update_a_zones_certificate">
+<h1 class="slds-text-heading_large">eCDN ゾーンの証明書の更新</h1>
+   <p>SSL 証明書の有効期限が切れた場合、または SSL 証明書に割り当てられたホスト名を更新する場合は、Business Manager で証明書を更新します。eCDN 管理証明書と自己管理証明書の更新</p>
+
+<ul><li class="slds-p-bottom_small"><strong><a href="#b2c_update_a_zones_managed_certificate">eCDN ゾーンの管理証明書の更新</a></strong><br>管理 SSL 証明書の有効期限が切れた場合、または管理 SSL 証明書に割り当てられたホスト名を更新する場合は、Business Manager で証明書を更新します。</li><li class="slds-p-bottom_small"><strong><a href="#b2c_update_a_zones_self_managed_certificate">eCDN ゾーンの自己管理証明書の更新</a></strong><br>自己管理 SSL 証明書の有効期限が切れた場合、または SSL 証明書に割り当てられたホスト名を更新する場合は、Business Manager で証明書を更新します。</li><li class="slds-p-bottom_small"><strong><a href="general-1.html#b2c_add_wildcard_custom_hostname">ワイルドカードカスタムホスト名の構成</a></strong><br>単一のワイルドカードカスタムホスト名 (例: <code>*.merchantsite.com</code>) を使用して複数のサブドメインをカバーし、Business Manager を通じた eCDN のオンボーディングと管理のオーバーヘッドを削減します。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_update_a_zones_managed_certificate">
+<h1 class="slds-text-heading_large">eCDN ゾーンの管理証明書の更新</h1>
+   
+   <p>管理 SSL 証明書の有効期限が切れた場合、または管理 SSL 証明書に割り当てられたホスト名を更新する場合は、Business Manager で証明書を更新します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+               <tr class="">
+                  <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+
+               </tr>
+            </tbody></table></div>
+      <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> プロキシゾーンで証明書に割り当てられているホスト名を更新するには、証明書を追加し、ホスト名を正しく追加して、古い証明書を削除します。可用性を保証するために、古い証明書を削除する前にすべてのホスト名を証明書に追加することを推奨します。</div></div></div>
+</div>
+      <ol><li>
+            <span>Business Manager で、アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、<span class="menucascade"><strong class="uicontrol">管理</strong> | <strong class="uicontrol">サイト</strong> | <strong class="uicontrol">埋め込み CDN 設定</strong></span>の順に選択します。</span>
+         </li><li>
+            <span>証明書を追加するゾーンの<strong class="uicontrol">証明書</strong>または<strong class="uicontrol">設定</strong>をクリックします。</span>
+         </li><li>
+            <span>ホスト名リストからゾーンを選択し、<strong class="uicontrol">証明書</strong>をクリックします。</span>
+         </li><li>
+            <span>暗号化タブで、リストからゾーンを選択します。</span>
+         </li><li>
+            <span>更新したい証明書の<strong class="uicontrol">設定アイコン</strong>をクリックします。</span>
+         </li><li>
+            <span><strong class="uicontrol">eCDN 管理証明書</strong>を選択します。</span>
+            <div><p><span style="vertical-align:text-bottom;display:inline-block;"><img alt="eCDN 管理証明書を選択します。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_ecdn_managed_cert_update.png" style="margin-bottom:0;"></span></p></div>
+         </li><li>
+            <span>SSL 認証局のドロップダウンから、<strong class="uicontrol">Lets Encrypt</strong> (デフォルト) または <strong class="uicontrol">Google</strong> を選択します。</span>
+         </li><li>
+            <span>証明書検証メソッドのドロップダウンから、<strong class="uicontrol">HTTP 検証</strong> (推奨) または <strong class="uicontrol">TXT 検証</strong> を選択します。</span>
+         </li><li>
+            <span>SSL 証明書を割り当てたいホスト名を選択します。</span>
+         </li><li>
+            <span><strong class="uicontrol">証明書の置き換え</strong>をクリックします。</span>
+         </li><li>
+            <span>(オプション) HTTP で検証します。</span>
+            <ol>
+               <li>
+                  <span>表示されるホスト名検証テキストを自分の DNS ポータルにコピーします。</span>
+                  <div>
+                     <p><span style="vertical-align:text-bottom;display:inline-block;"><img alt="表示されるホスト名検証テキストを自分の DNS ポータルにコピーします。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_ecdn_enter_host_name_cert_update.png" style="margin-bottom:0;"></span></p>
+                  </div>
+               </li>
+
+               <li>
+                  <span>ホスト名検証のステータスを確認するには、<strong class="uicontrol">ホスト名の検証</strong>をクリックします。検証には最大で 6 時間かかります。</span>
+               </li>
+
+               <li>
+                  <span>ホスト名がアクティブになった後に、SSL for SaaS V2 経由でトラフィックを新しいゾーンに導く CNAME レコードを作成します。</span>
+               </li>
+
+               <li>
+                  <span>ゾーン用に DNS マッピングを構成します。</span>
+                  <div>
+                     <ol>
+                        <li>DNS プロバイダーアカウントにログインします。</li>
+
+                        <li>ゾーンを検索し、リストから選択します。</li>
+
+                        <li>DNS タブで、マッピングするホスト名を見つけます。</li>
+
+                        <li> “is an alias of” (は次のエイリアス: ) の後のすべてのテキストを、Business Manager からの DNS CNAME に置き換えます。</li>
+
+                        <li>ステータス列の<strong class="uicontrol">クラウド</strong>を、ツールヒント「DNS のみ」をもつグレーのクラウドとして表示されるまでクリックします。</li>
+
+                     </ol>
+                  </div>
+               </li>
+
+               <li>
+                  <span>CNAME レコードがトラフィックを新しいゾーンに導く場合は、証明書検証のステータスを確認します。<strong class="uicontrol">eCDN 管理証明書の検証</strong>をクリックします。この検証には最大で 6 時間かかります。 </span>
+               </li>
+
+            </ol>
+         </li><li>
+            <span>(オプション) TXT で検証します。</span>
+            <ol>
+               <li>
+                  <span>表示されるホスト名の検証テキストを自分の DNS ポータルにコピーします。</span>
+                  <div>
+                     <p><span style="vertical-align:text-bottom;display:inline-block;"><img alt="表示される証明書とホスト名の検証テキストを自分の DNS ポータルにコピーします" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_ecdn_enter_host_name_txt.png" style="margin-bottom:0;"></span></p>
+                  </div>
+               </li>
+
+               <li>
+                  <span>ホスト名検証のステータスを確認するには、<strong class="uicontrol">ホスト名の検証</strong>をクリックします。検証には最大で 6 時間かかります。</span>
+                  <div>
+                     <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> ワイルドカードホスト名は TXT 検証を使用し、DCV 委任によって自動更新が可能です。詳細については、<a title="単一のワイルドカードカスタムホスト名 (例: *.merchantsite.com) を使用して複数のサブドメインをカバーし、Business Manager を通じた eCDN のオンボーディングと管理のオーバーヘッドを削減します。" href="general-1.html#b2c_add_wildcard_custom_hostname">ワイルドカードカスタムホスト名</a>を参照してください。
+                      </div></div></div>
+
+                  </div>
+               </li>
+
+               <li>
+                  <span>ホスト名がアクティブになった後、<strong class="uicontrol">eCDN 管理証明書の検証</strong>をクリックします。検証には最大で 6 時間かかります。</span>
+               </li>
+
+               <li>
+                  <span>ホスト名と証明書がアクティブになったら、SSL for SaaS V2 経由でトラフィックを新しいゾーンに導く CNAME レコードを作成します。</span>
+               </li>
+
+               <li>
+                  <span>ゾーン用に DNS マッピングを構成します。</span>
+                  <div>
+                     <ol>
+                        <li>DNS プロバイダーアカウントにログインします。</li>
+
+                        <li>ゾーンを検索し、リストから選択します。</li>
+
+                        <li>DNS タブで、マッピングするホスト名を見つけます。</li>
+
+                        <li> “is an alias of” (は次のエイリアス: ) の後のすべてのテキストを、Business Manager からの DNS CNAME に置き換えます。</li>
+
+                        <li>ステータス列の<strong class="uicontrol">クラウド</strong>を、ツールヒント「DNS のみ」をもつグレーのクラウドとして表示されるまでクリックします。</li>
+
+                     </ol>
+                  </div>
+               </li>
+
+               <li>
+                  <span>CNAME レコードがトラフィックを新しいゾーンに導く場合、証明書検証のステータスを確認するには、「eCDN 管理証明書の検証」をクリックします。この検証には最大で 6 時間かかります。 </span>
+               </li>
+
+            </ol>
+         </li></ol>
+
+   
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_update_a_zones_self_managed_certificate">
+<h1 class="slds-text-heading_large">eCDN ゾーンの自己管理証明書の更新</h1>
+   
+   <p>自己管理 SSL 証明書の有効期限が切れた場合、または SSL 証明書に割り当てられたホスト名を更新する場合は、Business Manager で証明書を更新します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>         <tr class="">           <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+         </tr>       </tbody></table></div>
+      <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> プロキシゾーンで証明書に割り当てられているホスト名を更新するには、証明書を追加し、ホスト名を正しく追加して、古い証明書を削除します。可用性を保証するために、古い証明書を削除する前にすべてのホスト名を証明書に追加することを推奨します。</div></div></div>
+<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 自己管理証明書を使用するワイルドカードホスト名の場合は、ワイルドカードドメインとルートドメインの両方の SAN を含めてください。<a title="単一のワイルドカードカスタムホスト名 (例: *.merchantsite.com) を使用して複数のサブドメインをカバーし、Business Manager を通じた eCDN のオンボーディングと管理のオーバーヘッドを削減します。" href="general-1.html#b2c_add_wildcard_custom_hostname">ワイルドカードカスタムホスト名</a>を参照してください。
+            </div></div></div>
+</div>
+      <ol><li>
+            <span>Business Manager で、アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、<span class="menucascade"><strong class="uicontrol">管理</strong> | <strong class="uicontrol">サイト</strong> | <strong class="uicontrol">埋め込み CDN 設定</strong></span>の順に選択します。</span>
+         </li><li>
+            <span>ホスト名リストからゾーンを選択して、<strong class="uicontrol">証明書</strong>をクリックします。</span>
+         </li><li>
+            <span>暗号化タブで、リストからゾーンを選択します。</span>
+         </li><li>
+            <span>更新したい証明書の<strong class="uicontrol">設定アイコン</strong>をクリックします。</span>
+         </li><li>
+            <span><strong class="uicontrol">自己管理証明書</strong>を選択します。</span>
+         </li><li>
+            <span><strong class="uicontrol">証明書の更新</strong>をクリックします。</span>
+         </li><li>
+            <span>証明書プロバイダーから受け取った証明書と秘密鍵を貼り付けます。</span>
+         </li><li>
+            <span><strong class="uicontrol">証明書の置き換え</strong>をクリックします。</span>
+            <div><p><span style="vertical-align:text-bottom;display:inline-block;"><img alt="自己管理証明書を更新します。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_ecdn_self_managed_cert_update.png" style="margin-bottom:0;"></span></p></div>
+         </li></ol>
+
+   
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_use_a_positive_security_model">
+<h1 class="slds-text-heading_large">ポジティブセキュリティモデルの使用</h1>
+   
+   <p>ポジティブセキュリティモデルは、セーフリストアプローチとも呼ばれ、何を許可するかを定義し、それ以外はすべて拒否します。このアプローチを使用して、悪意をもつ可能性のある入力をすべて拒否する代わりに、既知の正規の入力のみを許可リストに追加できます。</p>
+
+      <p>また、以下の点に注意します。</p>
+      <ul>
+         <li>
+                    ユーザーのデータ入力を検証する際には、悪意をもった入力をフィルターする代わりに、英数文字のセーフリストに対して入力を検証します。
+                </li>
+
+         <li>
+                    アクセスコントロールエリアを構成する際には、すべてのアクセスを拒否し、特定の承認を受けたリソースや関数のみにアクセスを許可します。
+                </li>
+
+      </ul>
+
+   
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_user_authentication">
+<h1 class="slds-text-heading_large">B2C Commerce のユーザー認証</h1>
+   
+   <p>管理者は常に Salesforce B2C Commerce で統合認証を使用します。従来は常にローカルユーザー認証を使用していましたが、ローカルユーザーのローカルログインは、認証情報が作成された Business Manager インスタンスのみに限られていました。サイトが統合認証に移行した後は、サイトでは Account Manager での統合認証が要求され、ユーザーは自分の組織の任意の Business Manager インスタンスにグローバルにログインできます。</p>
+
+      <div id="b2c_user_authentication__b2c_local_authentication"><a name="b2c_user_authentication__b2c_local_authentication"></a><h2 class="slds-text-heading_medium slds-p-top_small">ローカル認証</h2><p>ローカルユーザー認証では、管理者、または適切な許可をもつ既存のユーザーが Business Manager で新規ユーザーをプロビジョニングし、そのユーザーの認証情報をインスタンスに保存します。ユーザーが複数のインスタンスにログインできるようにするには、各インスタンスでユーザーのアカウントを作成する必要があります。主要なセキュリティコントロールは、ユーザーパスワードポリシーとログインロックアウトポリシーに関連します。これらの設定は適切なデフォルト値をもっていますが、自分のポリシーの要件に合わせて変更できます。 </p><p>セキュリティを向上するには、パスワードの長さをデフォルトの 8 文字から 12 文字に増やします。リリース 17.5 より前に構成した顧客リストを更新します。</p></div>
+      <div id="b2c_user_authentication__b2c_unified_authentication"><a name="b2c_user_authentication__b2c_unified_authentication"></a><h2 class="slds-text-heading_medium slds-p-top_small">統合認証</h2><p>統合ユーザー認証では、Account Manager がマルチサイト組織のすべての Business Manager ユーザーを管理します。ユーザーは Account Manager の認証情報を使用して Business Manager にログインする必要があります。Account Manager は、パスワードの変更やリセットなど、ユーザーに関連するすべてのアクションを処理します。これらのプロセスでは、対応する Business Manager の設定は無視されます。 </p><p>主要なセキュリティコントロールは、ユーザーパスワード、ログイン、およびロックアウトポリシーです。自分のポリシーの要件に合わせてデフォルト値を変更できます。Business Manager とは異なり、Account Manager は 2 要素認証 (2FA) を使用します。攻撃者がアクセスするには、パスワードとユーザーの 2FA アプリケーションの両方にアクセスする必要があるため、セキュリティが大幅に向上します。</p></div>
+   
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_user_authentication_and_authorization">
+<h1 class="slds-text-heading_large">B2C Commerce でのユーザーの認証と承認</h1>
+   <p>管理者は、Business Manager でセキュリティコントロールを構成します。Business Manager ユーザーが実際に名乗っている人物かどうかを判定するために認証を行う必要があります。また、ユーザーが実行しようとしている特定の操作を行う許可があるかどうかを判定するために承認を行います。</p>
+
+<ul><li class="slds-p-bottom_small"><strong><a href="#b2c_user_authentication">B2C Commerce のユーザー認証</a></strong><br>管理者は常に Salesforce B2C Commerce で統合認証を使用します。従来は常にローカルユーザー認証を使用していましたが、ローカルユーザーのローカルログインは、認証情報が作成された Business Manager インスタンスのみに限られていました。サイトが統合認証に移行した後は、サイトでは Account Manager での統合認証が要求され、ユーザーは自分の組織の任意の Business Manager インスタンスにグローバルにログインできます。</li><li class="slds-p-bottom_small"><strong><a href="general-7.html#b2c_user_authorization">B2C Commerce でのユーザーの承認</a></strong><br>Salesforce B2C Commerce では役割ベースのアクセスコントロールを使用して承認を行います。ユーザーは 1 つまたは複数の役割に割り当てられます。各役割は一連の許可で構成されています。ユーザーの承認は、Business Manager でカスタムの役割と許可を使用して構成します。このプロセスは、ローカル認証と統合認証のどちらを使用する場合でも、基本的に同様に機能します。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_waf_application">
+<h1 class="slds-text-heading_large">eCDN Web アプリケーションファイアウォール</h1>
+   
+   <p>Embedded Content Delivery Network (eCDN) Web Application Firewall (WAF) は、レイヤー 7 による保護を使用してストアフロントの保護を支援します。</p>
+
+      <div><h2 class="slds-text-heading_medium slds-p-top_small">WAF on On-Demand Sandboxes (ODS)</h2><p>OWASP ルールセット、eCDN マネージドルールセット、カスタムファイアウォールルール、ボット保護、DDoS 軽減、レート制限など、すべての標準 WAF 機能は ODS デフォルトドメインゾーンで使用できます。これらは、Business Manager eCDN UI または CDN API を使用して構成します。</p><p>ODSは共有ゾーン・モデルを使用するため、ゾーンで構成されたWAFルールはレルム内のすべてのODSインスタンスに適用されます。ルールはインスタンスごとにスコープが設定されていません。ルールの変更は慎重に計画し、インスタンス間で意図しない影響が発生しないようにします。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> ODS ゾーンには、既定の [すべてブロック] ファイアウォール規則はありません。一部の生産ゾーンとは異なり、ODS ゾーンはデフォルトで開いています。必要に応じて明示的なルールを追加し、アクセスを制限します。</div></div></div>
+<p>ODS および共有ゾーンモデルでのデフォルトドメインの可用性の詳細については、<a target="_blank" href="general-3.html#b2c_default_domain">B2C Commerce のデフォルトドメインサポート</a>を参照してください。</p></div>
+   
+<ul><li class="slds-p-bottom_small"><strong><a href="#b2c_waf_protection">Web アプリケーション ファイアウォール (WAF) 保護</a></strong><br>WAF は、プロキシゾーンの作成の際にデフォルトで有効になり、レイヤーを使用してセキュリティを提供し、攻撃を緩和するマルチレイヤーによる対策で非常に重要な要素です。</li><li class="slds-p-bottom_small"><strong><a href="#b2c_waf_owasp_wafv2_managed_ruleset">OWASP WAFv2 管理ルールセット</a></strong><br>潜在的な Web アプリケーションの脅威に対応する場合、eCDN Web アプリケーションファイアウォール (WAF) は受信する各リクエストを確認し、リクエストに脅威スコアを割り当て、適切に対応します。受信リクエストが OWASP ルールをトリガーするたびに、全体的な脅威スコアが上昇します。一部のルールは他のルールよりもスコアに対する影響が大きくなります。</li><li class="slds-p-bottom_small"><strong><a href="#b2c_waf_ecdn_wafv2_managed_ruleset">eCDN WAFv2 管理ルールセット</a></strong><br>eCDN セキュリティチームによって作成されたこのルールセットは、迅速かつ効果的な保護をすべてのアプリケーションに提供します。eCDN セキュリティチームは、新しい脆弱性をカバーし、誤検知を減らすために、ルールセットを頻繁に更新します。</li><li class="slds-p-bottom_small"><strong><a href="#b2c_waf_ecdn_wafv2_exposed_credentials_check">eCDN WAFv2 公開認証情報チェック</a></strong><br>エンドユーザー認証エンドポイントに自動認証情報チェックをデプロイします。認証情報のペアにかかわらず、eCDN Web アプリケーションファイアウォール (WAF) は、盗まれた認証情報の公開データベースに対してルックアップを実行します。CDN セキュリティチームによって作成されたこのルールセットは、迅速かつ効果的な保護をすべてのアプリケーションに提供します。CDN セキュリティチームは、新しい脆弱性をカバーし、誤検知を減らすために、ルールセットを頻繁に更新します。</li><li class="slds-p-bottom_small"><strong><a href="#b2c_waf_using_waf_first_time">Web アプリケーション ファイアウォール (WAF) の初めての使用</a></strong><br>WAF を初めて使用する場合は、WAF を少なくとも 1 週間、ログモードまたはシミュレーションモードで実行することをお勧めします。</li><li class="slds-p-bottom_small"><strong><a href="#b2c_waf_modify_ecdn_owasp_wafv2_settings">eCDN OWASP WAFv2 設定の変更</a></strong><br>潜在的な Web アプリケーションの脅威に対応する場合、eCDN Web アプリケーションファイアウォール (WAF) は受信する各リクエストを確認し、リクエストに脅威スコアを割り当て、適切に対応します。受信リクエストが OWASP ルールをトリガーするたびに、全体的な脅威スコアが上昇します。一部のルールは他のルールよりもスコアに対する影響が大きくなります。</li><li class="slds-p-bottom_small"><strong><a href="#b2c_waf_modify_ecdn_owasp_wafv2_ruleset_settings">eCDN 管理ルールセット設定の変更</a></strong><br>eCDN セキュリティチームによって作成されたこのルールセットは、迅速かつ効果的な保護をすべてのアプリケーションに提供します。eCDN セキュリティチームは、新しい脆弱性をカバーし、誤検知を減らすために、ルールセットを頻繁に更新します。ルールセットのデフォルト設定は有効になっています。</li><li class="slds-p-bottom_small"><strong><a href="#b2c_waf_ecdn_wafv2_exposed_credentials_check_settings">eCDN 公開認証情報チェック設定の変更</a></strong><br>エンドユーザー認証エンドポイントに自動認証情報チェックをデプロイします。認証情報のペアにかかわらず、eCDN Web アプリケーションファイアウォール (WAF) は、盗まれた認証情報の公開データベースに対してルックアップを実行します。CDN セキュリティチームによって作成されたこのルールセットは、迅速かつ効果的な保護をすべてのアプリケーションに提供します。CDN セキュリティチームは、新しい脆弱性をカバーし、誤検知を減らすために、ルールセットを頻繁に更新します。</li><li class="slds-p-bottom_small"><strong><a href="#b2c_waf_net_traffic_logs">Web アプリケーション ファイアウォール (WAF) とネットワーク トラフィック ログ</a></strong><br>このログには、WAF によって識別されたトラフィックだけではなく、すべての eCDN ネットワークトラフィックが含まれています。IP 評価によってブロックされたトラフィックを追跡し、WAF 設定をトリガーしないトラフィックがどの程度あるかを分析します。 </li><li class="slds-p-bottom_small"><strong><a href="#b2c_waf_configuring_how">eCDN WAF 設定の変更</a></strong><br>eCDN Web Application Firewall (WAF) は、HTTP/s トラフィックを分析および解釈して、ストアフロントを保護します。WAF は、コードレベルの脆弱性を悪用するアプリケーションレベルの攻撃を防止します。セキュリティの機密性レベルを構成し、疑わしい Web リクエストがストアフロントへのアクセスを試みている場合に WAF が実行するアクションを決定します。</li><li class="slds-p-bottom_small"><strong><a href="#b2c_waf_log_ocapi_references">eCDN-web アプリケーションファイアウォール (WAF) ログの OCAPI リファレンス</a></strong><br>Open Commerce API (OCAPI) から eCDN-WAF ログファイルをリクエストします。各レルムは、最大 24 の保留中のログリクエストのダウンロードをサポートします。WAF ログの取得に、5 分の最小期間が強制されるようになりました。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_waf_configuring_how">
+<h1 class="slds-text-heading_large">eCDN WAF 設定の変更</h1>
+   
+   <p>eCDN Web Application Firewall (WAF) は、HTTP/s トラフィックを分析および解釈して、ストアフロントを保護します。WAF は、コードレベルの脆弱性を悪用するアプリケーションレベルの攻撃を防止します。セキュリティの機密性レベルを構成し、疑わしい Web リクエストがストアフロントへのアクセスを試みている場合に WAF が実行するアクションを決定します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+      <div id="b2c_waf_configuring_how__prereq_udc_cvr_cfb"><a name="b2c_waf_configuring_how__prereq_udc_cvr_cfb"></a><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+                  <tr class="">
+                     <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+
+                  </tr>
+               </tbody></table><p>前提条件: WAF 設定を構成する前に、埋め込みコンテンツ配信ネットワーク (eCDN) にホスト名を追加し、ゾーンを作成します。</p></div>
+      <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> WAF は、新しいプロキシゾーンを作成した場合、デフォルトで有効になっています。デフォルト設定では機密性モードが “低” で、アクションは “チャレンジ” です。</div></div></div>
+<p>ECDN WAF 設定を変更するには: </p></div>
+      <ol><li>
+            <span>Business Manager で、アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、<span class="menucascade"><strong class="uicontrol">管理</strong> | <strong class="uicontrol">サイト</strong> | <strong class="uicontrol">埋め込み CDN 設定</strong></span>の順に選択します。</span>
+         </li><li>
+            <span>ゾーンを選択します。</span>
+         </li><li>
+            <span>WAF タブで、WAF を有効にする (新しいプロキシゾーンのデフォルト) には、<strong class="uicontrol">有効</strong>を選択 (チェック)します。ゾーンで WAF を無効にするには、<strong class="uicontrol">有効</strong>の選択を解除 (チェックを外す) します。</span>
+         </li><li>
+            <span>アクションドロップダウンリストから、アクションを選択します。</span>
+            <div>
+               <ul>
+                  <li>
+                     <strong>シミュレーション</strong> — Web リクエストのブロックやチャレンジは行われず、イベントがログに記録されます。<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 初めて使用する場合は、このモードを少なくとも 1 週間使用して、受信トラフィックを分析することをお勧めします。その後、ログファイルを確認して、適切なアクションと機密性レベルを決定します。</div></div></div>
+
+                  </li>
+
+                  <li>
+                     <strong>チャレンジ</strong> - 受信した Web リクエストが疑わしい場合は、続行する前に、Completely Automated Public Turing test to tell Computers and Humans Apart (CAPTCHA) チャレンジ応答が必要です。</li>
+
+                  <li>
+                     <strong>ブロック</strong> — リクエストがサーバーに到達するのを阻止します。</li>
+
+               </ul>
+
+            </div>
+         </li><li>
+            <span>機密性ドロップダウンリストから、<strong class="uicontrol">機密性レベル</strong>を選択します。</span>
+            <div>機密性を高いレベルに設定すると、WAF による保護が厳重になり、より多くのリクエストがブロックされる可能性が高くなります。反対に、機密性を低いレベルに設定すると、WAF による保護が緩まり、より多くのトラフィックが通過する可能性が高くなります。一般的に、機密性は中から高に設定することを推奨します。ただし、ログの分析に基づいて、機密性レベルを上げたり下げたりできます。これらの調整により、WAF が不正なユーザーとして検出した実際の買い物客が多すぎる場合や、不正なユーザーが十分に検出されない場合に、管理を行うことができます。</div>
+            <div>
+               <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> <strong>オフ</strong>のオプションを選択すると、OWASP ルールセットが無効になります。</div></div></div>
+
+            </div>
+            <div>
+               <p>
+                  <u>HTTP リクエスト</u>
+               </p>
+               <ul>
+                  <li>
+                     <strong>低</strong>—脅威スコアが 60 以上</li>
+
+                  <li>
+                     <strong>中</strong>—脅威スコアが 40 以上</li>
+
+                  <li>
+                     <strong>高</strong>—脅威スコアが 25 以上</li>
+
+               </ul>
+
+               <p>
+                  <u>Ajax リクエスト</u>
+               </p>
+               <ul>
+                  <li>
+                     <strong>低</strong>—脅威スコアが 120 以上</li>
+
+                  <li>
+                     <strong>中</strong>—脅威スコアが 80 以上</li>
+
+                  <li>
+                     <strong>高</strong>—脅威スコアが 65 以上</li>
+
+               </ul>
+
+            </div>
+         </li><li>
+            <span>1 つまたは複数の日付に対し<strong class="uicontrol">時刻</strong> (すべての時刻はローカルブラウザーの時刻に基づく) を選択し、<strong class="uicontrol">リクエストログ</strong>をクリックします。</span>
+            <div>
+               <p>ログファイルのダウンロードの準備ができると、リンクを記載した Eメールが、Business Manager で使用している Eメールアカウントに送信されます。ログをダウンロードして、トラフィックを分析し、機密性を調整します。</p>
+            </div>
+         </li></ol>
+
+   
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_waf_ecdn_wafv2_exposed_credentials_check">
+<h1 class="slds-text-heading_large">eCDN WAFv2 公開認証情報チェック</h1>
+  
+   <p>エンドユーザー認証エンドポイントに自動認証情報チェックをデプロイします。認証情報のペアにかかわらず、eCDN Web アプリケーションファイアウォール (WAF) は、盗まれた認証情報の公開データベースに対してルックアップを実行します。CDN セキュリティチームによって作成されたこのルールセットは、迅速かつ効果的な保護をすべてのアプリケーションに提供します。CDN セキュリティチームは、新しい脆弱性をカバーし、誤検知を減らすために、ルールセットを頻繁に更新します。</p>
+
+    <p>公開されている資格情報チェックルールセットはデフォルトで無効になっているため、有効にします。</p>
+    <ul>
+      <li>実行するアクションを選択します。デフォルトのオプションを選択することが推奨されます。ルールセットのアクションを定義すると、各ルールに定義されているデフォルトのアクションが上書きされます。実行可能なアクションは次のとおりです。 <ul>
+          <li>デフォルト</li>
+
+          <li>管理されたチャレンジ</li>
+
+          <li>ブロック</li>
+
+          <li>JS チャレンジ</li>
+
+          <li>ログ記録</li>
+
+          <li>レガシー CAPTCHA</li>
+
+        </ul>
+
+      </li>
+
+    </ul>
+
+    <span style="vertical-align:text-bottom;display:inline-block;"><img alt="埋め込み CDN 設定" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_wafv2_8.png" style="width:600px;margin-bottom:0;"></span>
+    <p><span style="vertical-align:text-bottom;display:inline-block;"><img alt="WAFv2 管理ルールセットの設定" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_wafv2_9.png" style="width:300px;margin-bottom:0;"></span></p>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_waf_ecdn_wafv2_exposed_credentials_check_settings">
+<h1 class="slds-text-heading_large">eCDN 公開認証情報チェック設定の変更</h1>
+  
+  <p>エンドユーザー認証エンドポイントに自動認証情報チェックをデプロイします。認証情報のペアにかかわらず、eCDN Web アプリケーションファイアウォール (WAF) は、盗まれた認証情報の公開データベースに対してルックアップを実行します。CDN セキュリティチームによって作成されたこのルールセットは、迅速かつ効果的な保護をすべてのアプリケーションに提供します。CDN セキュリティチームは、新しい脆弱性をカバーし、誤検知を減らすために、ルールセットを頻繁に更新します。</p>
+
+    <p>公開認証情報チェックルールセットを有効化します。</p>
+    <p>実行するアクションを選択します。デフォルトが推奨されます。実行可能なアクションには次が含まれます。</p>
+    <ul>
+      <li>ブロック (デフォルト)</li>
+
+      <li>管理されたチャレンジ</li>
+
+      <li>JS チャレンジ</li>
+
+      <li>ログ記録</li>
+
+      <li>レガシー CAPTCHA</li>
+
+      </ul>
+
+    <p>ルールセットのアクションを定義すると、各ルールに定義されているデフォルトのアクションが上書きされます。アクションの上書きを削除するには、ルールセットのアクションを「デフォルト」に設定します。</p>
+    <span style="vertical-align:text-bottom;display:inline-block;"><img alt="埋め込み CDN 設定" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_wafv2_12.png" style="width:600px;margin-bottom:0;"></span>
+    <p><span style="vertical-align:text-bottom;display:inline-block;"><img alt="WAFv2 管理ルールセットの設定" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_wafv2_13.png" style="width:300px;margin-bottom:0;"></span></p>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_waf_ecdn_wafv2_managed_ruleset">
+<h1 class="slds-text-heading_large">eCDN WAFv2 管理ルールセット</h1>
+  
+  <p>eCDN セキュリティチームによって作成されたこのルールセットは、迅速かつ効果的な保護をすべてのアプリケーションに提供します。eCDN セキュリティチームは、新しい脆弱性をカバーし、誤検知を減らすために、ルールセットを頻繁に更新します。</p>
+
+    <p>このルールセットはデフォルトで有効になっています。</p>
+    <ul>
+      <li>実行するアクションを選択します。デフォルトのオプションが推奨されます。ルールセットのアクションを定義すると、各ルールに定義されているデフォルトのアクションが上書きされます。実行可能なアクションは次のとおりです。 <ul>
+          <li>デフォルト</li>
+
+          <li>管理されたチャレンジ</li>
+
+          <li>ブロック</li>
+
+          <li>JS チャレンジ</li>
+
+          <li>ログ記録</li>
+
+          <li>レガシー CAPTCHA</li>
+
+        </ul>
+
+      </li>
+
+    </ul>
+
+    <span style="vertical-align:text-bottom;display:inline-block;"><img alt="埋め込み CDN 設定" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_wafv2_6.png" style="width:600px;margin-bottom:0;"></span>
+    <p><span style="vertical-align:text-bottom;display:inline-block;"><img alt="WAFv2 管理ルールセットの設定" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_wafv2_7.png" style="width:300px;margin-bottom:0;"></span></p>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_waf_log_ocapi_call">
+<h1 class="slds-text-heading_large">Open Commerce API (OCAPI) 呼び出しを使用した eCDN-web アプリケーションファイアウォール (WAF) ログのリクエスト</h1>
+   
+   <p>OCAPI 呼び出しを使用して eCDN-WAF ログをリクエストします。WAF ログの取得に、5 分の最小期間が強制されるようになりました。</p>
+ 
+      <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> 現在の時刻を午後 11 時とします。60 分単位のログファイルを取得するには、開始時刻を午後 9 時 55 分に、終了時刻を午後 10 時 55 分に設定します。設定は 60 分単位であり、終了時刻は現在の時刻 (午後 2 時) から 5 分以内ではありません。これにより、現在の時刻から 5 分以内にログリクエストの終了時刻を設定できなくなります。</div></div></div>
+      <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:100%"></colgroup><thead class="slds-text-title_caps">
+               <tr class="">
+                  <th id="d18570e31" style="vertical-align:top;" class="slds-cell-wrap" scope="col">OCAPI 呼び出しの例</th>
+               </tr>
+            </thead><tbody>
+               <tr class="">
+                  <td headers="d18570e31" style="vertical-align:top;" class="slds-cell-wrap" data-label="OCAPI 呼び出しの例"><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>POST https//&lt;yourvanityhostname&gt;/s/-/dw/data/v18_8/log_requests/ecdn
+
+HEADER
+Authorization: Bearer aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa
+
+REQUEST BODY
+{zone_name: "redcliff.de", start_time: "2024-04-04T09:55:00.000Z", end_time: "2024-04-04T10:55:00.000Z"}
+</code></pre></td>
+
+               </tr>
+            </tbody></table>
+   
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_waf_log_ocapi_json_log_outputs">
+<h1 class="slds-text-heading_large">JSON ログ出力</h1>
+   
+   <p>すべての Open Commerce API (OCAPI) 呼び出しは、JavaScript Object Notation (JSON) ログ出力に表示されるすべてのフィールドを返します。</p>
+
+      <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:100%"></colgroup><thead class="slds-text-title_caps">
+               <tr class="">
+                  <th id="d100847e28" style="vertical-align:top;" class="slds-cell-wrap" scope="col">ログ出力</th>
+               </tr>
+            </thead><tbody>
+               <tr class="">
+                  <td headers="d100847e28" style="vertical-align:top;" class="slds-cell-wrap" data-label="ログ出力"><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>{"CacheStatus":["unknown", "hit", "miss”,"dynamic"]
+"ClientCountry":"us",
+"ClientDeviceType":"mobile",
+"ClientIP":"1.1.1.1"
+"Client IP class:'badHost',
+"ClientRequestHost":"www.customer.com",
+"ClientRequestMethod":"GET",
+"ClientRequestURI":"/dw/image/v2/xxxx_PRD/on/demandware.st
+atic/-/template/default/uniqueid/productimages/aaaaaa.jpg?sw=470",
+"ClientRequestUserAgent":"Mozilla/5.0 (Linux; Android 7.1.1;
+XT1650 Build/NCLS26.118-23-13-6-5) AppleWebKit/537.36
+(KHTML, like Gecko Chrome/66.0.3359.158 Mobile
+Safari/537.36",
+"EdgeResponseStatus":xxx,
+"EdgeStartTimestamp":1528631882657999872,
+"FirewallMatchesActions":["simulate", “challenge”, "drop"],
+"FirewallMatchesSources":["firewallRules", “waf”, “rateLimit”],
+"FirewallMatchesRuleIDs":["4861c39f2cf84aa985d5d813576d08b8"],
+"RayID":"xxxxxxxxxx",
+</code></pre></td>
+
+               </tr>
+            </tbody></table>
+   
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_waf_log_ocapi_log_fields">
+<h1 class="slds-text-heading_large">B2C Commerce のログフィールド情報</h1>
+   
+   <p>JSON リクエスト形式は、ログ出力のカテゴリ、フィールド、および説明を提供します。</p>
+
+      <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"></colgroup><thead class="slds-text-title_caps">
+               <tr class="">
+                  <th id="d119601e32" style="text-align:left;vertical-align:bottom;" class="slds-cell-wrap" scope="col">カテゴリ</th>
+                  <th id="d119601e35" style="text-align:left;vertical-align:bottom;" class="slds-cell-wrap" scope="col">フィールド</th>
+                  <th id="d119601e38" style="text-align:left;vertical-align:bottom;" class="slds-cell-wrap" scope="col">説明</th>
+               </tr>
+            </thead><tbody>
+               <tr class="">
+                  <td headers="d119601e32" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="カテゴリ">general</td>
+
+                  <td headers="d119601e35" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="フィールド">CacheStatus</td>
+
+                  <td headers="d119601e38" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="説明">リソースがキャッシュされるかどうかを定義する文字列の配列。使用可能なソース: hit | miss | dynamic</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d119601e32" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="カテゴリ">client</td>
+
+                  <td headers="d119601e35" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="フィールド">ClientCountry</td>
+
+                  <td headers="d119601e38" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="説明">クライアントの IP アドレスの国</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d119601e32" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="カテゴリ">client</td>
+
+                  <td headers="d119601e35" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="フィールド">ClientDeviceType</td>
+
+                  <td headers="d119601e38" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="説明">クライアントのデバイスタイプ</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d119601e32" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="カテゴリ">client</td>
+
+                  <td headers="d119601e35" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="フィールド">ClientIP</td>
+
+                  <td headers="d119601e38" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="説明">クライアントの IP アドレス</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d119601e32" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="カテゴリ">client</td>
+
+                  <td headers="d119601e35" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="フィールド">ClientIPClass</td>
+
+                  <td headers="d119601e38" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="説明">悪い評価のステータスのためブロックされた IP</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d119601e32" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="カテゴリ">clientRequest</td>
+
+                  <td headers="d119601e35" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="フィールド">ClientRequestHost</td>
+
+                  <td headers="d119601e38" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="説明">クライアントによってリクエストされたホスト</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d119601e32" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="カテゴリ">clientRequest</td>
+
+                  <td headers="d119601e35" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="フィールド">ClientRequestMethod</td>
+
+                  <td headers="d119601e38" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="説明">クライアントのリクエストの HTTP メソッド</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d119601e32" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="カテゴリ">clientRequest</td>
+
+                  <td headers="d119601e35" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="フィールド">ClientRequestURI</td>
+
+                  <td headers="d119601e38" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="説明">クライアントによってリクエストされた URI</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d119601e32" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="カテゴリ">clientRequest</td>
+
+                  <td headers="d119601e35" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="フィールド">ClientRequestUserAgent</td>
+
+                  <td headers="d119601e38" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="説明">クライアントによってレポートされたユーザーエージェント</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d119601e32" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="カテゴリ">edge</td>
+
+                  <td headers="d119601e35" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="フィールド">EdgeResponseStatus</td>
+
+                  <td headers="d119601e38" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="説明">eCDN からクライアントに返された HTTP ステータスコード</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d119601e32" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="カテゴリ">edge</td>
+
+                  <td headers="d119601e35" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="フィールド">EdgeStartTimestamp</td>
+
+                  <td headers="d119601e38" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="説明">Edge がクライアントからリクエストを受信した、UNIX のナノ秒のタイムスタンプ</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d119601e32" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="カテゴリ">edgeWAF</td>
+
+                  <td headers="d119601e35" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="フィールド">FirewallMatchesActions</td>
+
+                  <td headers="d119601e38" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="説明">リクエストに応答して eCDN ファイアウォールが実行するアクション (文字列) の配列: allow | log | simulate | drop | challenge | jschallenge | connection close</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d119601e32" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="カテゴリ">edgeWAF</td>
+
+                  <td headers="d119601e35" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="フィールド">FirewallMatchesSources</td>
+
+                  <td headers="d119601e38" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>リクエストに応じてアクションを実行したファイアウォールソースタイプ (文字列) の配列: asn | country | ip | ipRange | securityLevel | zoneLockdown | waf | firewallRules | uaBlock | rateLimit | bic | hot | l7ddos</p><p style="margin-bottom:0;">同じ商品が複数回表示される場合は、異なるルールまたはアクションがアクティブになったことを示しています。 </p></td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d119601e32" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="カテゴリ">edgeWAF</td>
+
+                  <td headers="d119601e35" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="フィールド">FirewallMatchesRuleIDs</td>
+
+                  <td headers="d119601e38" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="説明">リクエストに一致した RuleID (文字列) の配列</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d119601e32" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="カテゴリ">general</td>
+
+                  <td headers="d119601e35" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="フィールド">RayID</td>
+
+                  <td headers="d119601e38" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="説明">一意のリクエスト識別子。64 ビットのバイナリ ID</td>
+
+               </tr>
+            </tbody></table>
+   
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_waf_log_ocapi_references">
+<h1 class="slds-text-heading_large">eCDN-web アプリケーションファイアウォール (WAF) ログの OCAPI リファレンス</h1>
+   
+        <p>Open Commerce API (OCAPI) から eCDN-WAF ログファイルをリクエストします。各レルムは、最大 24 の保留中のログリクエストのダウンロードをサポートします。WAF ログの取得に、5 分の最小期間が強制されるようになりました。</p>
+ 
+                <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> 現在の時刻を午後 11 時とします。60 分単位のログファイルを取得するには、開始時刻を午後 9 時 55 分に、終了時刻を午後 10 時 55 分に設定します。設定は 60 分単位であり、終了時刻は現在の時刻 (午後 2 時) から 5 分以内ではありません。これにより、現在の時刻から 5 分以内にログリクエストの終了時刻を設定できなくなります。</div></div></div>
+   
+<ul><li class="slds-p-bottom_small"><strong><a href="#b2c_waf_log_ocapi_call">Open Commerce API (OCAPI) 呼び出しを使用した eCDN-web アプリケーションファイアウォール (WAF) ログのリクエスト</a></strong><br>OCAPI 呼び出しを使用して eCDN-WAF ログをリクエストします。WAF ログの取得に、5 分の最小期間が強制されるようになりました。</li><li class="slds-p-bottom_small"><strong><a href="#b2c_waf_log_ocapi_json_log_outputs">JSON ログ出力</a></strong><br>すべての Open Commerce API (OCAPI) 呼び出しは、JavaScript Object Notation (JSON) ログ出力に表示されるすべてのフィールドを返します。</li><li class="slds-p-bottom_small"><strong><a href="#b2c_waf_log_ocapi_log_fields">B2C Commerce のログフィールド情報</a></strong><br>JSON リクエスト形式は、ログ出力のカテゴリ、フィールド、および説明を提供します。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_waf_modify_ecdn_owasp_wafv2_ruleset_settings">
+<h1 class="slds-text-heading_large">eCDN 管理ルールセット設定の変更</h1>
+  
+  <p>eCDN セキュリティチームによって作成されたこのルールセットは、迅速かつ効果的な保護をすべてのアプリケーションに提供します。eCDN セキュリティチームは、新しい脆弱性をカバーし、誤検知を減らすために、ルールセットを頻繁に更新します。ルールセットのデフォルト設定は有効になっています。</p>
+
+    <p>実行するアクションを選択します (デフォルトを推奨)。実行可能なアクションは次のとおりです。 </p>
+    <ul>
+      <li>ブロック (デフォルト)</li>
+
+      <li>管理されたチャレンジ</li>
+
+      <li>JS チャレンジ</li>
+
+      <li>ログ記録</li>
+
+      <li>レガシー CAPTCHA</li>
+
+      </ul>
+
+    <p>ルールセットのアクションを定義すると、各ルールに定義されているデフォルトのアクションが上書きされます。アクションの上書きを削除するには、ルールセットのアクションを「デフォルト」に設定します。</p>
+    <span style="vertical-align:text-bottom;display:inline-block;"><img alt="埋め込み CDN 設定" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_wafv2_10.png" style="width:600px;margin-bottom:0;"></span>
+    <p><span style="vertical-align:text-bottom;display:inline-block;"><img alt="WAFv2 管理ルールセットの設定" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_wafv2_11.png" style="width:300px;margin-bottom:0;"></span></p>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_waf_modify_ecdn_owasp_wafv2_settings">
+<h1 class="slds-text-heading_large">eCDN OWASP WAFv2 設定の変更</h1>
+  
+  <p>潜在的な Web アプリケーションの脅威に対応する場合、eCDN Web アプリケーションファイアウォール (WAF) は受信する各リクエストを確認し、リクエストに脅威スコアを割り当て、適切に対応します。受信リクエストが OWASP ルールをトリガーするたびに、全体的な脅威スコアが上昇します。一部のルールは他のルールよりもスコアに対する影響が大きくなります。</p>
+
+    <p>WAF では、OWASP で検出された脅威への対応として、以下のアクションモードが使用されます。OWASP WAFv2 管理ルールセットのデフォルトは有効に設定されています。</p>
+    <ul>
+      <li>パラノイアレベル (PL) の設定 - 管理ルールセットは、特定の PL (PL1 デフォルト、PL2、PL3、または PL4) を各ルールに割り当てます。被害妄想のレベルを高くすると保護が強化されますが、誤検知が原因で WAF によってより正当なトラフィックがブロックされる可能性があります。(構成されたパラノイアレベルまでの) パラノイアレベルに関連付けられたすべてのルールが有効になります。</li>
+
+      <li>異常スコアのしきい値の定義 - スコアのしきい値を定義します。利用可能なしきい値は次のとおりです。
+      <ul>
+        <li>低 (60 以上)</li>
+
+        <li>中 (40 以上 - デフォルト)</li>
+
+        <li>高 (25 以上)</li>
+
+        <li>「低」しきい値を設定すると、しきい値はより高くなり、通常 60 以上になります。マネージドルールセットがこの設定で構成されたアクションを開始するには、現在のリクエストと一致するルールの数が多くなります。一致するルールの累積スコアによって、リクエストの脅威スコアが決定されます。</li>
+
+      </ul>
+</li>
+
+      <li>実行するアクションを選択 - 計算された脅威スコアがスコアのしきい値を超えたときに、WAF によってアクションが実行されます。実行可能なアクションは、
+      <ul>
+        <li>ブロック</li>
+
+        <li>デフォルト</li>
+
+        <li>管理されたチャレンジ</li>
+
+        <li>JS チャレンジ</li>
+
+        <li>ログ記録</li>
+
+        <li>レガシー CAPTCHA</li>
+
+      </ul>
+</li>
+
+    </ul>
+
+    <span style="vertical-align:text-bottom;display:inline-block;"><img alt="WAFv2 管理ルールセットの設定" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_wafv2_5.png" style="width:600px;margin-bottom:0;"></span>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_waf_net_traffic_logs">
+<h1 class="slds-text-heading_large">Web アプリケーション ファイアウォール (WAF) とネットワーク トラフィック ログ</h1>
+   
+   <p>このログには、WAF によって識別されたトラフィックだけではなく、すべての eCDN ネットワークトラフィックが含まれています。IP 評価によってブロックされたトラフィックを追跡し、WAF 設定をトリガーしないトラフィックがどの程度あるかを分析します。 </p>
+
+      <p>指定した時刻に最大 7 日間、ログファイルをリクエストします。ログをダウンロードするリンクを記載した Eメールが、Business Manager で使用している Eメールアドレスに送信されます。GDPR (General Data Protection Regulation: 一般データ保護規則) により、Salesforce はログファイルを 7 日後に削除します。このため、ログファイルはお客様自身のサーバーに保存することをお勧めします。</p>
+      <p>ログ項目は、60 分間隔によるストアフロントへのトラフィックリクエスト数です。60 分間隔のログファイルは、OCAPI (Open Commerce API) を通じてリクエストできます。OCAPI を使用する場合、API はログをダウンロードするための URL を API 応答で返します。ログのダウンロードに対するすべての API 呼び出しで Eメールが生成されないようにするには、一時トークンを使用し OCAPI を通じてログをダウンロードできます。</p>
+      <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> CDN Logpush を使用して、より包括的なログのセットを取得することもできます。ログには、ファイアウォールのイベントと HTTP リクエストを S3 バケットに保存してログをすぐ確認できるようにする CDN-API が含まれています。この API は、CDN ログでの HTTP リクエストとファイアウォールイベントの表示をサポートします。</div></div></div>
+
+      <p>その他の参照項目</p>
+      <ul>
+         <li>
+             <a target="_blank" href="https://developer.salesforce.com/docs/commerce/commerce-api/guide/cdn-zones-logpush-filter.html">Logpush フィルター</a>
+         </li>
+
+         <li> <a target="_blank" href="https://developer.salesforce.com/docs/commerce/commerce-api/guide/cdn-zones-logpush-log-field.html">Logpush フィールド</a></li>
+
+      </ul>
+
+   
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_waf_owasp_wafv2_managed_ruleset">
+<h1 class="slds-text-heading_large">OWASP WAFv2 管理ルールセット</h1>
+  
+  <p>潜在的な Web アプリケーションの脅威に対応する場合、eCDN Web アプリケーションファイアウォール (WAF) は受信する各リクエストを確認し、リクエストに脅威スコアを割り当て、適切に対応します。受信リクエストが OWASP ルールをトリガーするたびに、全体的な脅威スコアが上昇します。一部のルールは他のルールよりもスコアに対する影響が大きくなります。</p>
+
+    <p>WAF では、OWASP で検出された脅威への対応として、以下のアクションモードが使用されます。OWASP WAF v2 管理ルールセットのデフォルト設定は有効になっています。</p>
+    <ul>
+      <li>パラノイアレベルの設定 (PL1 デフォルト、PL2、PL3、または PL4) - 管理ルールセットは、PL1 から PL4 の範囲で特定のパラノイアレベル (PL) を各ルールに割り当てます。パラノイア レベルを高くすると保護が強化されますが、誤検知により、より正当なトラフィックがブロックされる可能性があります。脅威に対応して、(構成されたパラノイアレベルまでの) パラノイアレベルに関連付けられたすべてのルールが有効になります。</li>
+
+      <li>異常スコアのしきい値の定義 - スコアのしきい値を定義します。利用可能なしきい値は次のとおりです。 <ul>
+          <li>低 (60 以上)</li>
+
+          <li>中 (40 以上 - デフォルト)</li>
+
+          <li>高 (25 以上)</li>
+
+        </ul>
+</li>
+
+      <li>「低」しきい値を設定すると、しきい値はより高くなり、通常 60 以上になります。この設定では、構成されたアクションを開始するためのマネージドルールセットに対する現在のリクエストに合わせて、より多くのルールが調整されます。一致するルールの累積スコアによって、リクエストの脅威スコアが決定されます。</li>
+
+      <li>実行するアクションを選択します。WAF は、計算された脅威スコアがスコアのしきい値を超えるとアクションを実行します。実行可能なアクションは、 <ul>
+          <li>レガシー CAPTCHA</li>
+
+          <li>ログ記録</li>
+
+          <li>JS チャレンジ</li>
+
+          <li>ブロック</li>
+
+          <li>管理されたチャレンジ</li>
+
+        </ul>
+</li>
+
+    </ul>
+
+    <span style="vertical-align:text-bottom;display:inline-block;"><img alt="埋め込み CDN 設定" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_wafv2_1.png" style="width:600px;margin-bottom:0;"></span>
+    <p><span style="vertical-align:text-bottom;display:inline-block;"><img alt="WAFv2 管理ルールセットの設定" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_wafv2_5.png" style="width:600px;margin-bottom:0;"></span></p>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_waf_protection">
+<h1 class="slds-text-heading_large">Web アプリケーション ファイアウォール (WAF) 保護</h1>
+   
+   <p>WAF は、プロキシゾーンの作成の際にデフォルトで有効になり、レイヤーを使用してセキュリティを提供し、攻撃を緩和するマルチレイヤーによる対策で非常に重要な要素です。</p>
+
+     <p>WAF は、発生する可能性のあるすべての攻撃に対して保護を提供するものではありませんが、Production (本番)、Staging (ステージング)、Development (開発) のストアフロントホスト名を特定のコードレベルの脆弱性から保護します。これらの脆弱性には以下が含まれる場合があります。</p>
+     <ul>
+       <li>SQL インジェクション攻撃</li>
+
+       <li>クロスサイトスクリプティング</li>
+
+       <li>Open Web Application Security Project (OWASP) WAFv2 管理ルールセット - アプリケーション層を標的とする脅威を特定。CDN プロバイダーは、Open Web Application Security Project (OWASP) ModSecurity Core Rule Set をプラットフォームに統合します。定期的な監視により、WAF ルールセットが最新の状態に保たれ、公式コードリポジトリから入手できる最新バージョンの OWASP が維持されます。 <ul>
+          <li>CDN によって実装される OWASP WAFv2 管理ルールセットは、OWASP ModSecurity Core Rule Set (CRS) をミラーリングし、OWASP からの更新を定期的にモニタリングします。この更新により、ルールセットが最新の公式コードリポジトリバージョンと一致するようになります。</li>
+
+          <li>OWASP WAFv2 管理ルールセットは統合されたエンティティとして機能し、脅威スコアを計算し、このスコアに基づいて適切なアクションを決定します。リクエストがルールセット内のルールに一致すると、脅威スコアはルールのスコアに従って段階的に上がります。最終的な脅威スコアが構成されたしきい値を超えた場合、CDN はルールセットの最後のルールで指定されたアクションを実行します。</li>
+
+        </ul>
+</li>
+
+       <li>eCDN 管理ルールセット - これらは CDN セキュリティチームによって特定された脅威です。このルールセットは、迅速かつ効果的な保護をすべてのアプリケーションに提供します。このルールセットは、新しい脆弱性をカバーして誤検知を減らすために頻繁に更新されます。</li>
+
+       <li>eCDN 公開認証情報チェック管理ルールセット - 盗まれた認証情報に関する公開データベースに対して検索を実行する、広く知られたコンテンツ管理システム (CMS) アプリケーション用に事前設定された一連のルール。エンドユーザー認証エンドポイントに自動認証情報チェックを実装すると、WAF ルールセットを使用して、侵害された認証情報の公開データベースに対して認証情報ペアが検索されるようになります。</li>
+
+     </ul>
+
+     <p>WAF を使用する際には、以下を念頭に置いてください。</p>
+      <ul>
+         <li>WAF は、一般的なコードの脆弱性を悪用するボットによる攻撃の試みを止めることができます。ただし、総当りのクーポンコードの試行では、リクエストは正常な HTTP および Web フォームのリクエストであるため、WAF ではボットの試みが見逃されることがあります。 <p>該当する場合は、アカウントチームに連絡して、当社が推奨するボット専門のパートナーから管理ソリューションを取得してください。</p></li>
+
+        <li>OWASP ルールセットは「オン」または「オフ」にすることができます。WAF OWASP ルールセットでは、OWASP ルールセット内の個々のルールのカスタマイズはサポートされていません。</li>
+
+        <li>eCDN 管理ルールセットは「オン」またはオフにすることができます。eCDN 管理ルールセットでは、eCDN 管理ルールセット内の個々のルールのカスタマイズはサポートされていません。</li>
+
+        <li>CDN 公開認証情報チェックは「オン」または「オフ」にすることができます。eCDN 公開認証情報チェックでは、eCDN 公開認証情報チェック内の個々のルールのカスタマイズはサポートされていません。</li>
+
+      </ul>
+
+      <p>WAF はインターネットトラフィックを監視し、ストアフロントに対して行われたすべての HTTP または HTTPS (フルサイト) と Ajax (小規模なデータスニペット) のリクエストを検討します。OWASP による最も一般的な Web アプリケーションの脆弱性を利用して、効果的なルールセットを決定します。ルールは、ユーザーエージェント、パス、国、クエリ文字列、IP アドレスなどの複数のリクエスト属性に基づくことができます。</p>
+      <p>ストアフロントの保護を支援するために、WAF は次の処理を行います。</p>
+      <a name="b2c_waf_protection__ul_pbq_ycq_jfb"></a><ul id="b2c_waf_protection__ul_pbq_ycq_jfb">
+         <li>Web サイトアドレスや URL を検査して、正常ではないものがないかを検出します。</li>
+
+         <li>アプリケーションの特定の脆弱性を標的とする、悪意のあるトラフィックをフィルターにかけます。</li>
+
+         <li>悪意をもつユーザーによる、コードの脆弱性の悪用を防止します。</li>
+
+      </ul>
+
+      <p>WAF のデフォルト設定では、機密性モードが低で、アクションはチャレンジになります。</p>
+   
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_waf_using_waf_first_time">
+<h1 class="slds-text-heading_large">Web アプリケーション ファイアウォール (WAF) の初めての使用</h1>
+   
+   <p>WAF を初めて使用する場合は、WAF を少なくとも 1 週間、ログモードまたはシミュレーションモードで実行することをお勧めします。</p>
+
+      <p>シミュレーションモードは、サイトのトラフィックに関する情報を収集して記録します。生成されたログを確認して、ファイアウォールのニーズに関してデータに基づいた決定を行い、ストアフロントのアクションと機密の設定方法をより適切に判断します。</p>
+      <p>ログを確認する際には、次の点を考慮します。</p>
+         <ul>
+            <li>トリガーされているルールと頻度。</li>
+
+            <li>ルールをトリガーしている地域 (国)。これらの国に商品を販売しているかどうか。これらの国に配送を行っているかどうか。</li>
+
+            <li>悪意をもつユーザーまたはトリガーされた WAF ルールに関連付けられている IP アドレス。問題のある IP アドレスで IP ルックアップを実行すると、どこで登録されているかを特定できる場合があります。<table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+                        <tr class="">
+                           <th id="d199311e46" style="vertical-align:top;" class="slds-cell-wrap" scope="col">IP アドレスの登録ソース</th>
+                           <th id="d199311e49" style="vertical-align:top;" class="slds-cell-wrap" scope="col">アクセスの理由</th>
+                        </tr>
+                     </thead><tbody>
+                        <tr class="">
+                           <td headers="d199311e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="IP アドレスの登録ソース">Google</td>
+
+                           <td headers="d199311e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクセスの理由">検索エンジン (通常は悪意をもたないボット)。</td>
+
+                        </tr>
+                        <tr class="">
+                           <td headers="d199311e46" style="vertical-align:top;" rowspan="2" class="slds-cell-wrap" data-label="IP アドレスの登録ソース">Amazon Web Services (AWS)</td>
+
+                           <td headers="d199311e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクセスの理由">悪意をもたないアクセス (販売を向上させるためにインターネットで使用する情報を収集)</td>
+
+                        </tr>
+                        <tr class="">
+                           <td headers="d199311e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクセスの理由">悪意をもつアクセス (テキスト、画像、価格などの価値のあるコンテンツを特定するためにサイトをターゲットにしている在庫データ取得ボット)</td>
+
+                        </tr>
+                        <tr class="">
+                           <td headers="d199311e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="IP アドレスの登録ソース">競合会社</td>
+
+                           <td headers="d199311e49" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクセスの理由">インテリジェンスを収集するためにサイトをスキャンしている競合会社。</td>
+
+                        </tr>
+                     </tbody></table></li>
+
+         </ul>
+
+      <p>WAF のシミュレーションモードでの実行で多くの悪意をもつアクセスが見つかった場合は、WAF の機密性レベルを上げることができます。または、WAF が実際の買い物客でトリガーされている場合は、機密性を下げることができます。</p>
+   
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_webdav_authentication_and_authorization">
+<h1 class="slds-text-heading_large">B2C Commerce での WebDAV の認証と承認</h1>
+   
+   <p>WebDAV は、データやコードファイルのアップロードとダウンロードを可能にするプロトコルです。マーチャントは WebDAV リクエストをインスタンスの WebDAV サーバーに送信します。マーチャントの WebDAV クライアントは Business Manager ユーザー、またはマシン対マシンのインタラクションのための API クライアントとすることができます。</p>
+
+      <p>マーチャントの WebDAV クライアントが Cyberduck などの Business Manager ユーザーである場合、Salesforce B2C Commerce では基本認証 (ユーザー名とパスワード) を使用して認証が行われます。Business Manager で認証ルールを指定するには、役割モジュール (WebDAV の許可タブ) でフォルダーごとのルールを設定します。</p>
+      <p>マーチャントの WebDAV クライアントが API クライアントの場合は、B2C Commerce では Account Manager によって作成された認証トークンを使用して認証が行われます。認証トークンを取得するには、API クライアントは client-id と client-secret を Account Manager に示します。Business Manager で認証ルールを指定するには、WebDAV クライアントの許可モジュールでフォルダーごとのルールを構成します。</p>
+      <p>さらに、OAuth 2.0 Authorization Code Grant は WebDAV に使用できます。詳細については、インターネット技術標準化委員会 (IETF) 仕様の<a target="_blank" href="http://tools.ietf.org/html/rfc6749#section-1.3.1">「Authorization Code Grant</a>」セクションを参照してください。このシナリオでは、Account Managerのユーザーには OAuth のトークンを使用するインスタンスに一致するテナントフィルターとともに、<em>Business Manager 管理者</em> または <em>Business Manager User</em> の役割が割り当てられている必要があります。</p>
+   
+</div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="security-1.html">&larr; セキュリティ・WAF・アクセス制御（1/2）</a><a href="api_integration.html">API・OCAPI・連携 &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=cc.b2c_getting_started.htm&type=5&language=ja">help.salesforce.com — Salesforce B2C Commerce（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>

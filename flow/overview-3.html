@@ -1,0 +1,2540 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>概要・考慮事項・はじめに（3/4） | Salesforce Flow ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（35）</h2>
+    <ol>
+      <li><a href="#flow_considerations_design_fb">Flow Builder に関する考慮事項</a></li>
+      <li><a href="#flow_considerations_design_formulas">フローの数式に関する考慮事項</a></li>
+      <li><a href="#flow_considerations_design_layout">2 列フローに関する考慮事項</a></li>
+      <li><a href="#flow_considerations_design_multiselect">フローの複数選択リソースおよび画面項目に関する考慮事項</a></li>
+      <li><a href="#flow_considerations_design_pause">一時停止中のフローインタビューに関する考慮事項</a></li>
+      <li><a href="#flow_considerations_design_stages">フローステージと標準の進行状況インジケーターに関する考慮事項</a></li>
+      <li><a href="#flow_considerations_feature">フローの機能に関する考慮事項</a></li>
+      <li><a href="#flow_considerations_feature_variable">フロー変数に関する考慮事項</a></li>
+      <li><a href="#flow_considerations_lex_runtime">フロー Lightning ランタイムに関する考慮事項</a></li>
+      <li><a href="#flow_considerations_manage">フローの管理に関する考慮事項</a></li>
+      <li><a href="#flow_considerations_manage_install">パッケージからインストールされたフローの考慮事項</a></li>
+      <li><a href="#flow_considerations_packaging">フローをパッケージ化する際の考慮事項</a></li>
+      <li><a href="#flow_considerations_readonlyfields">フローレコード処理の参照のみの項目制限</a></li>
+      <li><a href="#flow_considerations_readonlyfields_behavior">フローが参照のみの項目の値を設定しているときに発生することの制御</a></li>
+      <li><a href="#flow_considerations_readonlyfields_fix">フローの参照のみの項目エラーの修正</a></li>
+      <li><a href="#flow_considerations_readonlyfields_parent">フローの操作と参照のみの項目</a></li>
+      <li><a href="#flow_considerations_salesforce_data">フローに関する Salesforce データの考慮事項</a></li>
+      <li><a href="#flow_considerations_salesforce_features">フローの Salesforce 機能に関する考慮事項</a></li>
+      <li><a href="#flow_considerations_salesforce_features_external_object">フローの外部オブジェクトに関する考慮事項</a></li>
+      <li><a href="#flow_considerations_salesforce_features_lc">フローの Lightning コンポーネントに関する考慮事項</a></li>
+      <li><a href="#flow_considerations_salesforce_features_lc_attribute">フロー画面コンポーネントとアクションコンポーネントの設計属性に関する考慮事項</a></li>
+      <li><a href="#flow_considerations_salesforce_features_lc_aura">フローでサポートされる Lightning コンポーネントの属性種別</a></li>
+      <li><a href="#flow_considerations_salesforce_features_lc_runtime">フローの Aura コンポーネントランタイムに関する考慮事項</a></li>
+      <li><a href="#flow_considerations_salesforce_features_security">フローのセキュリティに関する考慮事項</a></li>
+      <li><a href="#flow_considerations_salesforce_features_translation">フロー翻訳のベストプラクティス</a></li>
+      <li><a href="#flow_considerations_trigger_record">レコードトリガーフローに関する考慮事項</a></li>
+      <li><a href="#flow_considerations_trigger_schedule">スケジュールトリガーフローの制限および考慮事項</a></li>
+      <li><a href="#flow_considerations_usage_entitlements">フローの使用量ベースのエンタイトルメント</a></li>
+      <li><a href="#flow_edit_history">フローバージョンの編集履歴の表示と復元</a></li>
+      <li><a href="#flow_formula_builder">Flow Formula Builder を使用したフロー数式の作成</a></li>
+      <li><a href="#flow_get_started_learning_map">Flow Builder 学習マップの使用開始</a></li>
+      <li><a href="#flow_interviews">フローインタビュー</a></li>
+      <li><a href="#flow_interviews_delete">フローインタビューの削除</a></li>
+      <li><a href="#flow_interviews_pause">フローインタビューの一時停止</a></li>
+      <li><a href="#flow_interviews_resume">フローインタビューの再開</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>概要・考慮事項・はじめに（3/4）</h1>
+      <div class="meta">Salesforce Flow ヘルプ · 35 記事 · 生成 2026-11-08</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="overview-2.html">&larr; 概要・考慮事項・はじめに（2/4）</a><a href="overview-4.html">概要・考慮事項・はじめに（4/4） &rarr;</a></div>
+<section class="article" id="flow_considerations_design_fb">
+<h1 class="slds-text-heading_large">Flow Builder に関する考慮事項</h1>
+  <p>Flow Builder でフローを作成するときは、その制限と動作についてよく理解してください。たとえば、Flow Builder では、わずかな数のロケールのみがサポートされます。知的財産の保護のため、管理パッケージからインストールされたフローは、フローがテンプレートでない限り、開くことはできません。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><a title="Flow Builder をサポートするエディションとユーザーインターフェースについて説明します。一部の Flow Builder 機能は、追加ライセンスが必要な他の Salesforce 製品と統合されます。" href="elements_ref-4.html#flow_ref_supported_editions">サポートされているエディションを表示する。</a></td>
+
+      </tr>
+     </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Salesforce データへのアクセス</h2><ul>
+        <li>
+          
+          Flow Builder では、現在のユーザーに割り当てられている権限とロケールが使用されます。</li>
+
+        <li>Flow Builder では、Flow Builder を開いたときに存在する情報にアクセスできます。組織のデータまたはメタデータを変更し、フローで参照する必要がある場合は、Flow Builder を閉じて再度開きます。たとえば、Flow Builder が開いているときにカスタム項目を追加するか Apex クラスを変更した場合は、Flow Builder を閉じてからもう一度開きます。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Cloud Flow Designer で保存されたフローを開く</h2><p>クラウドフローデザイナーで作成したフローバージョンを Flow Builder で開くと、[保存] ボタンが無効になっています。このバージョンを Flow Builder で編集するには、Flow Builder で新しいバージョンとして保存します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">テキストの書式設定</h2><p>
+        <span>表示テキスト画面コンポーネント、選択肢リソースの表示ラベル、ヘルプテキスト、一時停止確認画面、または入力規則を開くと、Flow Builder は、既存の HTML をリッチテキストに変換します。サポートされない HTML は削除されます。HTML タグの &lt;a&gt;、&lt;b&gt;、&lt;br&gt;、&lt;font&gt;、&lt;i&gt;、&lt;li&gt;、&lt;p&gt;、&lt;span&gt;、&lt;u&gt;、および &lt;div&gt; は、リッチテキストに変換されます。リッチテキストエディターに貼り付けられた HTML は、サポートされません。</span>
+      </p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">リッチテキスト</h2><ul>
+        <li>リッチテキストエディターでアップロードされた画像は [ファイル] タブに保存され、組織内の全員が表示できます。</li>
+
+        <li>リッチテキストエディターでアップロードされた画像は Experience Cloud サイトには表示されません。</li>
+
+        <li>テキストテンプレートを [Chatter に投稿] アクション、[メールを送信] アクション、またはプレーンテキストが必要なカスタムアクションで使用する場合はプレーンテキストに切り替えてください。<span style="vertical-align:text-bottom;display:inline-block;"><img alt="ドロップダウンメニュー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/platform_automation/images/flow/flow_rich_text_dropdown.png" style="width:25px;margin-bottom:0;"></span>をクリックして、<strong class="uicontrol">[テキスト形式]</strong> を選択します。</li>
+
+        <li>
+          <p>リッチテキストに <kbd>&lt;</kbd> などの不完全な HTML 記号を含めると、Flow Builder によって記号と隣接する文字列が削除されます。たとえば、Flow Builder では <kbd>2&lt;3</kbd> は <samp>2</samp> として表示されます。HTML 記号を表示するには、記号をスペースで囲みます。たとえば、<kbd>2 &lt; 3</kbd> です。</p>
+        </li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">日付/時間の値</h2><p>
+        <span>実行時に、日付/時間値のタイムゾーンが、Flow Builder に表示される値と異なる場合があります。実行中の日付/時間値は、フローを実行しているユーザーのタイムゾーン設定を反映します。</span>Flow Builder の日付/時間値は、フローを設定するシステム管理者のタイムゾーン設定を反映します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">制限</h2><ul>
+        <li>
+          フロー要素 [レコードを取得] または [レコードを更新] を実行する<span id="flow_considerations_design_fb__in_and_notin_op_rhs_char_max_limit"><a name="flow_considerations_design_fb__in_and_notin_op_rhs_char_max_limit"></a>各フローインタビューでは、この要素で SOQL クエリが使用されるため、最大文字数に SOQL クエリ制限が適用されます。フローインタビューあたりの各要素の SOQL クエリ制限は 100,000 文字です。たとえば、フローインタビューで、取引先 ID のコレクションに対して In 演算子を使用するレコードを取得要素を実行するとします。要素に 4,700 件を超える ID の取引先 ID のコレクションが含まれていて、他の条件を指定して 100,000 文字の制限を超えた場合、フローインタビューが失敗する可能性があります。</span>
+        </li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">権限</h2><ul>
+        <li>
+          Salesforce データベースを操作するフローの場合、関連するレコードと項目を作成、参照、編集、および削除する権限がユーザーにあることを確認します。権限がない場合、ユーザーがフローを起動しようとすると権限が不十分であるというエラーが表示されます。たとえば、フローがケースレコードの状況を検索して更新するとします。このフローユーザーは、ケースオブジェクトの <strong class="uicontrol">[状況]</strong> 項目に対する「参照」権限と「編集」権限が必要です。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">変数</h2><ul>
+        <li>レコード変数またはレコードコレクション変数を削除すると、削除された変数を使用する変数割り当ては <code>null</code> に設定されます。</li>
+
+        <li>
+          <span>プロセスまたはフローで別のフローを起動する場合、起動時にそのフローの入力変数に値を割り当てることができます。</span><span>ただし、コレクションでないテキスト変数、選択リスト変数、複数選択リスト変数では、<code>null</code> の値が空の文字列に変換されます。</span>
+        </li>
+
+        <li>画面フローと自動起動フローの場合のみ、レコードを取得要素で項目値を自動的に保存できます。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">テキスト値</h2><ul>
+        <li>
+          Flow Builder ではユーザー入力項目のテキストで UTF-8 エンコードがサポートされません。</li>
+
+        <li>
+          
+          <p>Flow Builder にはサポートしているすべてのロケールの埋め込みフォントが含まれています。サポートしているロケールは次のとおりです。</p>
+          <ul>
+            <li>中国語 (繁体字)</li>
+
+            <li>中国語 (簡体字)</li>
+
+            <li>英語 (米国)</li>
+
+            <li>フランス語 (フランス)</li>
+
+            <li>ドイツ語 (ドイツ)</li>
+
+            <li>日本語 (日本)</li>
+
+            <li>スペイン語 (スペイン)</li>
+
+          </ul>
+
+          <p>
+            サポートされるロケールでサポートされていない文字を入力すると、埋め込みフォントではなくシステムフォントを使用して表示されます。</p>
+          <p> サポートされていないロケールでは、システムフォント設定は、Flow Builder ですべての文字を表示するために使用されます。</p>
+        </li>
+
+        <li>
+          Flow Builder のテキストフィールドの値として文字列 <kbd>null</kbd> を入力しないでください。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">出力値</h2><p>同じ出力値を複数の変数に保存するには、値を 1 つの変数に割り当てます。次に、割り当て要素をアクションの後に追加し、他の変数を最初の変数の値に設定します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">管理パッケージ</h2><p>
+        <span>管理パッケージからインストールされたフローがテンプレートでも上書き可能でもない場合、Flow Builder は、そのフローを開くことはできません。</span>
+      </p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">フロー要素</h2><ul>
+        <li>ステップ要素: Flow Builder では、ステップ要素をフローに追加または更新できません。また、ステップを画面に変換することもできません。クラウドフローデザイナーでステップが追加された場合、ステップは引き続きキャンバスに表示されます。フローからすべてのステップを削除することをお勧めします。</li>
+
+        <li><span>アクション要素: 従来の Apex アクションは、プラグインコードのタグで整理されません。</span></li>
+
+        <li>メールアクション要素: メールアクション要素の受信者リストに内部アドレスと外部アドレスの両方が含まれている場合、フローは 2 つの別々のメールを作成して送信します。この分離により、内部メールアドレスが誤って外部閲覧者に表示されることを防ぎます。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Winter '12 以前からアップグレードされたフロー</h2><p>最後に開いたフローを Winter '12 以前で開くと、各 Boolean 決定は、次の条件の複数結果形式の決定要素に変換されます。</p><ul>
+        <li>古い決定と同じ表示ラベルを使用する。</li>
+
+        <li>古い決定の API 参照名を取得して「_switch」が追加される。</li>
+
+        <li>「True」という結果ラベルが付いている。この結果の API 参照名は、古い決定の API 参照名に一致し、その条件は、古い決定の True 結果から移行されます。</li>
+
+        <li>「False」というデフォルトの結果ラベルが付いている。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">用語</h2><p>
+        
+        Flow Builder またはクラウドフローデザイナーの一部の警告、エラーメッセージ、およびデバッグの詳細内の用語は更新されていません。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="flow_considerations_design_formulas">
+<h1 class="slds-text-heading_large">フローの数式に関する考慮事項</h1>
+  <p>数式リソースを作成するか、画面入力コンポーネントに入力規則を追加する場合は、フローでの数式の動作を理解しておく必要があります。</p>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">数式関数</h2><ul>
+        <li>フロー数式では、次の関数はサポートされません。
+          <ul>
+            <li>GETRECORDIDS</li>
+
+            <li>IMAGE</li>
+
+            <li>INCLUDES</li>
+
+            <li>PARENTGROUPVAL</li>
+
+            <li>PREVGROUPVAL</li>
+
+            <li>PRIORVALUE</li>
+
+            <li>REQUIRE SCRIPT</li>
+
+            <li>VLOOKUP</li>
+
+          </ul>
+
+          <p>Salesforce で数式を作成するための演算子と関数の完全なリストについては、<a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.customize_functions.htm&amp;language=ja&amp;type=5">「コンテキスト別の数式の演算子と関数」</a>を参照してください。</p></li>
+
+        <li>フローでは、括弧内のすべての文字が <code>CONTAINS</code> 関数でチェックされます。クロスオブジェクト項目の参照では、<code>CONTAINS</code> は Salesforce の他の部分と同様に動作します。参照の最初の 250 文字のみがチェックされます。
+            <div><p>例を示します。<code>varContract</code> は、契約レコードの値が含まれるレコード変数です。次の数式は、最初の 250 文字のみをチェックします。
+            </p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>CONTAINS({!varContract.Account.Description}, "description")</code></pre></div>
+          <div><p>次の数式は、項目内のすべての文字をチェックします。
+            </p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>CONTAINS({!varContract.Description}, "description")</code></pre></div></li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">数式でのフローデータ</h2><ul>
+        <li>数式でのグローバル変数への参照は検証されません。</li>
+
+        <li>数式でプラットフォームイベントを参照するには、イベントデータを待機要素のレコード変数に渡します。次に、そのレコード変数内の該当の項目を参照します。</li>
+
+        <li><code>null</code> 項目値を 0 値として評価するには、BLANKVALUE 関数を使用します。たとえば、<samp class="parmname">NumberOfEmployees</samp> 項目の <code>null</code> 値を 0 値として評価するには、<kbd>BLANKVALUE(NumberOfEmployees, 0)</kbd> を使用します。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">同じ画面でリソースを参照する数式</h2><a name="flow_considerations_design_formulas__ul_nrg_gxp_g2c"></a><ul id="flow_considerations_design_formulas__ul_nrg_gxp_g2c">
+        <li>数式がユーザー入力の検証に使用され、数式と同じ画面要素のリソースを参照している場合、一部の数式関数はサポートされていません。例: REGEX。サポートされる数式関数のリストについては、<a title="画面フローでサポートされる数式演算子の一部では、リアクティビティがサポートされます。" href="build-4.html#flow_build_reactive_screen_flow_formula_operators">Reactive Screen Flow Formula Operators</a>を参照してください。</li>
+
+        <li>数式が同じ画面要素のリソースを数式で参照している場合、その数式はパーセントに従います。たとえば、値が 100 の場合、1.00 と評価されます。 それ以外の場合、パーセントは考慮されません。たとえば、値が 100 の場合、100 として評価されます。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">注意点</h2><ul>
+        <li>フローの数式に含めることができる文字数は最大 3,900 文字です。</li>
+
+        <li>数式を貼り付ける場合、アポストロフィーと引用符がストレート (") であり、カーリー (‘’) ではないことを確認してください。ストレートでない場合、フローを保存するときに構文エラーが発生します。</li>
+
+        <li>レコード数式項目は、Salesforce Classic での評価とまったく同様にフローで評価されます。レコード数式項目が NOT(null/blank) をチェックすると、FALSE と評価されます。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">エラー</h2><p>式の評価時に次のようなエラーが発生した場合、数式は <code>null</code> を返します。</p><ul>
+        <li>数式から返される値がそのデータ型と一致しない。</li>
+
+        <li>サポートされない関数が数式に含まれている。<p>たとえば、数式リソースのデータ型が数値である場合、出力は数値である必要があります。</p></li>
+
+      </ul>
+<p>フローに無効な数式リソースが含まれていると、フローを有効化できません。[表示テキスト] 画面コンポーネントに無効な数式リソースが含まれていると、実行時にフローに空の文字列が表示されます。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="フローでこの数式が使用された場合に値を計算します。" href="elements_ref-4.html#flow_ref_resources_formula">数式リソース</a></li><li><a title="各リソースは、フロー全体で参照できる値を表します。" href="elements_ref-4.html#flow_ref_resources">フローのリソース</a></li><li><a title="フロー数式ビルダーを使用して、数式種別のリソースやコレクション検索条件、またはレコードトリガーフローの開始要素で式を作成できます。式を作成するには、関数と演算子のリストから選択します。作業中にエラーを見つけるには、各式の数式構文を確認します。" href="#flow_formula_builder">Flow Formula Builder を使用したフロー数式の作成</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="flow_considerations_design_layout">
+<h1 class="slds-text-heading_large">2 列フローに関する考慮事項</h1>
+  <p>組織で Lightning ランタイムを有効にしている場合は、そのフローを 1 列で表示するか、2 列で表示するかを制御できます。この機能を使用する前に、フローレイアウトの現在の動作方法を把握してください。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><a title="Flow Builder をサポートするエディションとユーザーインターフェースについて説明します。一部の Flow Builder 機能は、追加ライセンスが必要な他の Salesforce 製品と統合されます。" href="elements_ref-4.html#flow_ref_supported_editions">サポートされているエディションを表示する。</a></td>
+
+      </tr>
+     </tbody></table>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Winter ’23 以降では、2 列フローレイアウトは無視されます。レイアウトオプションを改善するには、[セクション] コンポーネントをフロー画面に追加します。各 [セクション] コンポーネントでは、レコード項目と画面コンポーネントを幅が調整可能な最大 4 列に整理できます。</div></div></div>
+
+    <p>次の考慮事項は、フロー画面の [セクション] コンポーネントには適用されません。</p>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">細分性</h2><p>レイアウト設定はフローレベルで適用されます。画面レベルまたは項目レベルでレイアウトを制御することはできません。2 列を使用するようにフローを設定すると、そのフローのすべての画面は 2 列で表示されます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">項目の順序</h2><p>どの項目をどの列に表示するかを手動で制御することはできません。2 列を表示するようにフローを設定すると、項目は各列に交互に表示されます。奇数番目の項目 (第 1、第 3、第 5 など) は左列に配置されます。偶数番目の項目 (第 2、第 4、第 6 など) は右列に配置されます。</p><p>ユーザーが Tab キーで画面を移動すると、左列のすべての項目にタブで移動してから、右列のすべての項目に移動します。左から右にタブで移動するように項目を設定することはできません。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">応答性</h2><p>
+      フローレイアウトはユーザーの画面のサイズに対応しません。ユーザーの画面が幅 1 インチでも、幅 20 インチでも、同じレイアウトが使用されます。
+      </p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> ユーザーが携帯電話または小型タブレットからフローを実行する場合、2 列レイアウトをフローに適用しないでください。</div></div></div>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">[セクション] コンポーネントとの互換性</h2><p>エクスペリエンスビルダー、Lightning アプリケーションビルダー、またはユーティリティバーを使用して配布されたフローの場合、[セクション] コンポーネントを含む各フロー画面では [レイアウト] プロパティが無視されます。</p><p>URL によって配布されるフローの場合、[セクション] コンポーネントが含まれる各フロー画面では <code>flowLayout</code> URL パラメーターが無視されます。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="フローを設計、管理、および実行する場合、権限、使用制限、およびデータの問題を検討します。" href="overview-2.html#flow_considerations">フローの制限および考慮事項</a></li><li><a title="画面コンポーネントとレコード項目を整理して、ユーザーエクスペリエンスを改善します。" href="elements_ref-3.html#flow_ref_elements_screencmp_section">セクション画面出力コンポーネント</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="flow_considerations_design_multiselect">
+<h1 class="slds-text-heading_large">フローの複数選択リソースおよび画面項目に関する考慮事項</h1>
+  <p>チェックボックスグループ、複数選択リスト、選択肢ルックアップ画面コンポーネントを使用すると、フローユーザーは複数の選択肢を選択できます。これらの画面コンポーネントの使用を開始する前に、フローを設計するときおよびユーザーがフローを実行するときにフローでこれらのコンポーネントがどのように機能するかを理解しておきます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><a title="Flow Builder をサポートするエディションとユーザーインターフェースについて説明します。一部の Flow Builder 機能は、追加ライセンスが必要な他の Salesforce 製品と統合されます。" href="elements_ref-4.html#flow_ref_supported_editions">サポートされているエディションを表示する。</a></td>
+
+      </tr>
+     </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">チェックボックスグループ、複数選択リスト、または選択肢ルックアップ画面コンポーネントの設定</h2><ul>
+        <li>これらの画面コンポーネントでは 1 つのデフォルト値のみがサポートされます。複数のデフォルト値を個々に選択することはできません。ただし、デフォルト値項目に手動で値を追加し、それぞれの値をセミコロンで区切ることができます。</li>
+
+        <li>レコード選択肢セットリソースを設定して、ユーザーが選択したレコードの項目値をフローの変数に割り当てることができます。チェックボックスグループ、複数選択リスト、または選択肢参照画面コンポーネントでレコード選択肢セットを使用する<span id="flow_considerations_design_multiselect__flow_dynchoice_multiselect_assignments"><a name="flow_considerations_design_multiselect__flow_dynchoice_multiselect_assignments"></a>場合、ユーザーが選択した最後のレコードの値のみがフロー変数に保存されます。1 つの画面上の複数のチェックボックスグループコンポーネント、複数選択リストコンポーネント、または選択肢ルックアップコンポーネントで同じレコード選択肢セットを使用する場合、それらのすべてのコンポーネントから選択された最後のレコードに従って変数が割り当てられます。</span></li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">チェックボックスグループ、複数選択リスト、または選択肢ルックアップ画面コンポーネントの値の使用</h2><ul>
+        <li>実行時に、チェックボックスグループ、複数選択リスト、または選択肢ルックアップ画面コンポーネントの値は、ユーザーが選択した選択肢の値をセミコロンで区切った連結値になります。選択した選択肢の値にセミコロンが含まれる場合、そのセミコロンは削除されます。</li>
+
+        <li>チェックボックスグループ、複数選択リスト、または選択肢ルックアップ画面コンポーネントをフロー条件内で参照する場合、次の点に注意してください。<ul><li>画面コンポーネント内の各選択肢の選択肢値が設定されていることを確認します。</li>
+<li>同一画面上の複数のチェックボックスグループ画面コンポーネント、複数選択リスト画面コンポーネント、または選択肢参照画面コンポーネントで同じ選択肢を使用することはできません。</li>
+</ul>
+</li>
+
+        <li>[チェックボックスグループ]、[複数選択リスト]、または [選択肢ルックアップ] にデフォルト値が 1 つ以上ある場合、選択肢の値とデフォルト値が一致すれば、実行時に選択肢が事前に選択されます。</li>
+
+      </ul>
+</div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="選択肢リソースでは、フロー画面に選択可能なオプションが表示されます。選択肢リソースは、ラジオボタン、チェックボックス、または選択リスト項目として表示できます。選択肢リソースには、ビジネスニーズに応じていくつかのオプションがあります。選択肢リソースは、レコード選択肢セットまたは選択リスト選択肢セットを使用できない場合にのみ使用することをお勧めします。" href="build-2.html#automate_flow_build_using_choice_resources_with_flow_screen_components">画面コンポーネントで使用する選択肢リソースの選択</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="flow_considerations_design_pause">
+<h1 class="slds-text-heading_large">一時停止中のフローインタビューに関する考慮事項</h1>
+  <p>待機要素を含むフローを設計する場合は、その動作とガイドラインを理解しておく必要があります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic (<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.overview_edition_lex_only.htm&amp;language=ja&amp;type=5">使用できない組織もあります</a>) および Lightning Experience の両方</td>
+
+      </tr>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><p>時間ベースの再開イベントを使用可能なエディション: <strong>Essentials</strong> Edition、<strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition
+         </p><p style="margin-bottom:0;">プラットフォームイベントベースの再開イベントを使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</p></td>
+
+      </tr>
+     </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">一般的な考慮事項</h2><ul>
+        <li>フローバージョンを無効にした後も、その一時停止中のインタビューは、設定された再開イベントを引き続き待機します。フローバージョンがインタビューを一時停止している場合、そのフローバージョンを削除することはできません。</li>
+
+        <li>インタビューは、待機要素ごとに 1 つのコネクタのみを実行できます。その再開イベントの 1 つが処理されると、残りの再開イベントがキューから削除されます。</li>
+
+        <li>Salesforce が待機コネクタを実行しようとしたときにインタビューを開始したユーザーが無効化されている場合、インタビューの再開に失敗します。</li>
+
+        <li>フローが一時停止しており、フローインタビューが 1 MB を超えた場合、インタビューは保存に失敗し、再開できなくなります。</li>
+
+        <li>待機要素 を含むフローをコールすることはできません。</li>
+
+        <li>画面アクションの自動起動フローの待機要素は、画面フローの実行時に機能しません。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">トランザクションおよび一時停止中のインタビュー</h2><p>フローインタビューが 1 つまたは複数の再開イベントを待機するために一時停止した時点で、トランザクションは終了します。フローインタビューが再開すると、新しいトランザクションが開始します。待機要素の後にあるものはすべて、再開された他のインタビューを含む一括処理トランザクションの一部として実行されます。</p><p>インタビューは個別に再開されません。インタビューは 1 つのバッチにグループ化され、そのバッチは最初のアクションがバッチに入ってから 1 時間以内に再開されます。グループインタビューの結果として実行されるアクションも、トランザクションで実行されます。バッチには、同時に再開され、同じフロー バージョン ID を持ち、同じユーザ ID で実行される他のインタビューを含めることができます。再開されたインタビューが DML 操作または SOQL クエリを実行する場合、この動作によって Apex ガバナ制限を超える可能性があります。詳細は、<a title="Salesforce では、マルチテナント環境で回避フローが共有リソースを独占しないように、厳格に制限が適用されます。Apex で適用されるトランザクション単位の制限により、フローが制限されます。要素によってトランザクションがガバナ制限を超えた場合、システムはトランザクション全体をロールバックします。要素に障害コネクタパスが定義されていても、トランザクションはロールバックします。" href="operate-2.html#flow_considerations_limit_transaction">「トランザクション単位のフローの制限」</a>を参照してください。</p><ul>
+        <li>フロー要素 (レコードの作成、Apex アクション (従来) など)</li>
+
+        <li>Apex トリガー</li>
+
+        <li>ルール適用時のアクション</li>
+
+      </ul>
+<p>DML 操作または SOQL クエリを実行するフロー要素の前に待機要素がある場合:</p><ul>
+        <li>待機要素間で制限を超える可能性のある DML 操作または SOQL クエリを 1 人のユーザーがフローを使用して実行できないことを確認します。</li>
+
+        <li>DML 操作や SOQL クエリが複数のトランザクションで実行されるように複数の待機要素を使用することを考慮します。</li>
+
+        <li>これらの要素に障害パスを追加して、障害メッセージに「<code>Too many SOQL queries</code> (SOQL クエリが多すぎます)」または「<code>Too many DML
+            operations</code> (DML 操作が多すぎます)」が含まれている場合にフローが待機要素に戻るようにします。</li>
+
+      </ul>
+<p>再開後のインタビューが失敗した場合</p><ul>
+        <li>そのバッチのトランザクションの以前のインタビューは正常に実行されています。</li>
+
+        <li>インタビューが一時停止する前に実行した操作は成功しています。</li>
+
+        <li>失敗が障害パスによって処理されたときは、インタビューが再開されてから失敗するまでに行われた操作は正常に実行されています。インタビューの失敗の原因になった操作は正常に実行されていません。</li>
+
+        <li>障害パスで障害が処理されない場合、インタビューが再開されてから失敗するまでの間に実行された操作はロールバックされます。インタビューの失敗の原因になった操作は正常に実行されていません。</li>
+
+        <li>このバッチの残りのインタビューは試行されます。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">プラットフォームイベント</h2><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> プラットフォームイベントの<a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.platform_events.meta/platform_events/platform_events_considerations.htm">考慮事項</a>と<a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.platform_events.meta/platform_events/platform_event_limits.htm">割り当て</a>についても確認してください。</div></div></div>
+<ul>
+        <li>サポートされるプラットフォームイベント <p>フローでカスタムプラットフォームイベントと以下の標準プラットフォームイベントを登録できるようになりました。</p><ul>
+            <li>AIPredictionEvent</li>
+
+            <li>BatchApexErrorEvent</li>
+
+            <li>FlowExecutionErrorEvent</li>
+
+            <li>FOStatusChangedEvent</li>
+
+            <li>OrderSummaryCreatedEvent</li>
+
+            <li>OrderSumStatusChangedEvent</li>
+
+            <li>PlatformStatusAlertEvent</li>
+
+          </ul>
+</li>
+
+        <li>数式 — <span id="flow_considerations_design_pause__formulas_events"><a name="flow_considerations_design_pause__formulas_events"></a>数式でプラットフォームイベントを参照するには、イベントデータを待機要素のレコード変数に渡します。次に、そのレコード変数内の該当の項目を参照します。</span></li>
+
+        <li>値の切り捨て — プラットフォームイベントメッセージを絞り込む場合、条件の値が 765 文字を超えることはできません。</li>
+
+        <li>[登録] 関連リスト — プラットフォームイベントの詳細ページの [登録] 関連リストには、そのプラットフォームイベントのメッセージの受信を待機しているエンティティが表示されます。関連リストには、各登録済みプロセスへのリンクが含まれます。フローインタビューがそのプラットフォームイベントのメッセージを待機している場合、1 人の「プロセス」登録者が [登録] 関連リストに表示されます。</li>
+
+        <li>イベントのアンインストール — プラットフォームイベントを含むパッケージをアンインストールする前に、プラットフォームイベントのメッセージを待機しているインタビューを削除します。</li>
+
+        <li>Einstein 予測 — Einstein 予測結果ごとに予測イベントが送信されます。このため、特定のオブジェクトの予測でのみフローをトリガーする場合は、イベントの条件絞り込みを使用します。たとえば、フローが使用する待機要素が、リードレコードに書き込まれた予測に基づいてのみ動作する場合は、再開イベントを追加して、AIPredictionEvent.TargetId 項目が現在のレコードに等しいことを確認します。<p>Einstein 予測で使用される項目をフローが更新した場合、Einstein は、予測を再実行して、新しい結果を再び書き込みます。この新しい結果により、フローを再びトリガーできる新しい予測イベントが生成され、ループが作成されます。ループが作成されないようにするには、Einstein 予測で使用されない項目のみを更新します。</p></li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">プラットフォームキャッシュ</h2><p>フローに待機要素が含まれる場合は、フロー内のそれ以降の要素が、セッションキャッシュ値を保存または取得する Apex コードを呼び出さないことを確認します。Apex アクションと、Apex トリガーを起動させるデータベースに対してフローが行った変更には、セッションキャッシュの制限が適用されます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">時間ベースの再開イベント</h2><ul>
+        <li>時間ベースの再開イベントは、分および秒をサポートしていません。</li>
+
+        <li>インタビューが過去の時間を待機している場合、Salesforce はできるだけ早くインタビューを再開します。Salesforce がその時点で処理しているアクションの数に応じて、アクションは 1 時間以内に実行されます。<p>たとえば、完了予定日の 7 日前に商談所有者にメールを送信するフローが設定されているとします。完了予定日が今日に設定された商談についてインタビューが開始されます。Salesforce は 1 時間以内にインタビューを再開します。</p></li>
+
+        <li>組織は、時間ベースの再開イベントを 1 時間につき最大 <span>1,000</span> 件処理できます。再開イベントが処理されると、それに関連付けられているインタビューが再開され、そのインタビューの他の再開イベントがキューから削除されます。組織がこの制限を超えると、Salesforce は残りの再開イベントを次の 1 時間に処理するように延期します。<p>たとえば、午後 4 時から 5 時の間に組織に 1,200 の再開イベントの処理がスケジュールされているとします。Salesforce は、午後 4 時から午後 5 時の間に <span>1,000</span> の再開イベントを処理し、残りの 200 の再開イベントは午後 5 時から午後 6 時の間に処理します。</p></li>
+
+        <li>一時停止中のインタビューの時間ベースの再開イベントで参照されている商品または価格表はアーカイブできません。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">フローベースの時間</h2><p>特定の時間に基づく再開イベントの場合、再開時間は、フローを作成したユーザーのタイムゾーンに基づいて評価されます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">レコードベースの時間</h2><ul>
+        <li>レコードの項目値に基づく再開イベントの場合、再開時間は、組織のタイムゾーンに基づいて評価されます。</li>
+
+        <li>再開イベントで次の項目は参照できません。<ul>
+            <li><kbd>TODAY</kbd> や <kbd>NOW</kbd> など、自動的に派生する関数を含む <samp class="parmname">DATE</samp> または <samp class="parmname">DATETIME</samp> 項目。</li>
+
+            <li>関連オブジェクトの差し込み項目が含まれる数式項目。</li>
+
+          </ul>
+</li>
+
+        <li>再開イベントによって参照され、一時停止中のインタビュー内でまだ実行されていない日付項目を変更すると、Salesforce はインタビューに関連付けられた再開イベントを再計算します。<p>たとえば、完了予定日の 7 日前に商談所有者にメールを送信するフローが設定され、完了予定日が 2014 年 2 月 20 日に設定されているとします。 この場合、次の動作が発生する可能性があります。</p><ul>
+            <li>インタビューが再開される前に完了予定日が更新されない。結果: Salesforce は 2014 年 2 月 13 日にインタビューを再開し、メールを送信します。</li>
+
+            <li>インタビューが再開される前に完了予定日が 2014 年 2 月 10 日に更新される。結果: Salesforce は再開イベントを再スケジュールし、2014 年 2 月 3 日にインタビューを再開します。</li>
+
+            <li>完了予定日が過去の日付に更新される。結果: Salesforce は再開イベントを再計算し、レコードが保存された直後にインタビューを再開します。</li>
+
+          </ul>
+</li>
+
+        <li>インタビューが待機要素を実行したときに再開イベントで null の日付項目が参照された場合、Salesforce はできるだけ早くインタビューを再開します。Salesforce がその時点で処理しているアクションの数に応じて、アクションは 1 時間以内に実行されます。</li>
+
+        <li>フローインタビューが待機要素を実行したときに再開イベントで null 以外の値の日付項目が参照され、再開イベントが処理される前に日付項目が <code>null</code> に更新された場合、Salesforce は日付項目の更新後 1 時間以内にインタビューを再開します。</li>
+
+        <li>再開イベントで参照されているレコードまたはオブジェクトが削除された場合、最回イベントはキューから削除されます。インタビューに待機する再開イベントが他にない場合は、そのインタビューが削除されます。</li>
+
+        <li>リードの取引開始の制限<ul>
+            <li>一時停止中のインタビューの再開イベントで参照されているリードの取引を開始することはできません。</li>
+
+            <li>[リード変換からの検証とトリガー] が有効になっている場合は、リードの取引開始時に、待機要素後のリードに対する既存の操作が実行されません。</li>
+
+            <li>リードに基づくキャンペーンメンバーの取引が、そのレコードに関連付けられている一時停止中のインタビューが終了する前に開始されても、Salesforce はインタビューを実行します。</li>
+
+          </ul>
+</li>
+
+      </ul>
+</div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.platform_events.meta/platform_events/platform_events_considerations.htm"> プラットフォームイベント開発者ガイド: プラットフォームイベントの定義および公開に関する考慮事項</a></li><li><a title="フローを設計、管理、および実行する場合、権限、使用制限、およびデータの問題を検討します。" href="overview-2.html#flow_considerations">フローの制限および考慮事項</a></li><li><a title="選択したリソースの値を検証するには、条件の演算子を使用します。決定要素、待機要素、コレクション検索条件要素で条件を使用します。" href="elements_ref-4.html#flow_ref_operators_condition">決定、待機、コレクション検索条件要素のフロー演算子</a></li><li><a title="特定の条件が満たされると、フローインタビューを再開します。フローに定義する各待機設定には、省略可能な待機条件があります。実行時に、これらの条件によって、フローが関連付けられた再開イベントを待機するかどうかが決まります。" href="elements_ref-4.html#flow_ref_elements_wait_for_conditions">条件要素の待機</a></li><li><a title="一定時間だけ待機してからフローインタビューを再開します。" href="elements_ref-4.html#flow_ref_elements_wait_for_amount_of_time">待機時間要素</a></li><li><a title="特定の日時にフローを再開します。" href="elements_ref-4.html#flow_ref_elements_wait_until_date">日付要素まで待機</a></li><li><a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.platform_events.meta/platform_events/platform_events_subscribe_flow.htm"> プラットフォームイベント開発者ガイド: フローによるプラットフォームイベントメッセージの登録</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="flow_considerations_design_stages">
+<h1 class="slds-text-heading_large">フローステージと標準の進行状況インジケーターに関する考慮事項</h1>
+  <p>フローにフェーズを追加して標準の進行状況インジケーターを使用する前に、次の考慮事項に留意してください。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><a title="Flow Builder をサポートするエディションとユーザーインターフェースについて説明します。一部の Flow Builder 機能は、追加ライセンスが必要な他の Salesforce 製品と統合されます。" href="elements_ref-4.html#flow_ref_supported_editions">サポートされているエディションを表示する。</a></td>
+
+      </tr>
+     </tbody></table>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div id="flow_considerations_design_stages__note_nmv_ght_mdc" style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><a name="flow_considerations_design_stages__note_nmv_ght_mdc"></a><span class="slds-text-title_caps">メモ</span> 
+        <p>標準の進行状況インジケーターには Lightning ランタイムが必要です。</p>
+      </div></div></div>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">フェーズの参照</h2><a name="flow_considerations_design_stages__ul_tty_psy_4dc"></a><ul id="flow_considerations_design_stages__ul_tty_psy_4dc">
+        <li>表示テキストコンポーネント値で、またはチェックボックス、チェックボックスグループ、選択肢ルックアップ、通貨、日付、日時、ロングテキストエリア、複数選択リスト、数値、パスワード、選択リスト、ラジオボタン、テキスト画面コンポーネントのいずれかのラベルでステージの差し込み項目が使用されている場合、ステージの差し込み項目はステージのラベルに解決されます。その他の場所では、フェーズの差し込み項目はフェーズの完全修飾名 (<var>namespace</var>.<var>flowName</var>:<var>stageName</var> または <var>flowName</var>:<var>stageName</var>) に解決されます。</li>
+
+        <li>できる限り、<code>{!myStage}</code> などのフェーズの差し込み項目を使用してフェーズを参照してください。</li>
+
+        <li>サブフローのフェーズを参照する場合は、完全修飾名を使用します。</li>
+
+        <li>フローのデバッグ時に、表示テキストコンポーネント値で、またはチェックボックス、チェックボックスグループ、選択肢ルックアップ、通貨、日付、日時、ロングテキストエリア、複数選択リスト、数値、パスワード、選択リスト、ラジオボタン、テキスト画面コンポーネントのいずれかのラベルでステージの差し込み項目を使用する場合、デバッガーで差し込み項目値は更新されません。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">デフォルトで有効なフェーズ</h2><p>ステージリソースを[デフォルトでアクティブ]としてマークすると、フローでグローバル変数の値が自動的に設定されます。この設定は、ステージがフローのすべてのパスに適用される場合に使用してください。</p><p>実行時に、デフォルトで有効なフェーズが昇順で並び替えられます。フローでデフォルトのアクティブなステージを使用して <code>$Flow.ActiveStages</code> および <code>$Flow.CurrentStage</code> を更新する方法は、フローが上位フローか参照されるフローかによって異なります。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">上位フローのステージ</h2><p>デフォルトのアクティブなステージは昇順で<code>$Flow.ActiveStages</code>に追加されます。<code>$Flow.CurrentStage</code> は、順序が最も小さいデフォルトのアクティブなステージに設定されます。</p><p>フローがステージのあるフローとステージのないフローの 2 つを参照する場合、フローの最後に <code>$Flow.ActiveStage</code> の値が null に設定されるようにステージのあるフローを設定します。次に、フローの開始時に <code>$Flow.CurrentStage</code> の値をステージ 1 に設定します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">参照されるフローのステージ</h2><p>デフォルトのアクティブなステージは昇順で<code>$Flow.ActiveStages</code>に挿入されます。<code>$Flow.CurrentStage</code>は自動的に更新されません。</p><ul>
+        <li><code>$Flow.CurrentStage</code> が <code>$Flow.ActiveStages</code> に含まれる場合、デフォルトのアクティブなステージは、<code>$Flow.ActiveStages</code> で <code>$Flow.CurrentStage</code> の後に挿入されます。<p>たとえば、Flow1 は <code>$Flow.ActiveStages</code> を「1、2、3、4」、<code>$Flow.CurrentStage</code> を「3」に設定します。次に、サブフロー要素を使用して Flow2 をコールします。Flow2 のデフォルトのアクティブなステージは「A、B、C」です。Flow2 が開始されると、<code>$Flow.ActiveStages</code> は「1、2、3、A、B、C、4」になります。<code>$Flow.CurrentStage</code> は「3」のままです。</p></li>
+
+        <li><code>$Flow.CurrentStage</code> が <code>$Flow.ActiveStages</code> に含まれない場合、デフォルトのアクティブなステージは <code>$Flow.ActiveStages</code> の最後に追加されます。<p>たとえば、Flow1 で <code>$Flow.ActiveStages</code> を「1、2、3、4」に設定し、<code>$Flow.CurrentStage</code> は設定しないとします。サブフロー要素を使用して、フロー 2 をコールします。 フロー 2 のデフォルトで有効なフェーズは「A、B、C」です。フロー 2 が開始されると、<code>$Flow.ActiveStages</code> は「1、2、3、4、A、B、C」になります。<code>$Flow.CurrentStage</code> は未設定のままです。</p></li>
+
+        <li><code>$Flow.ActiveStages</code> で <code>$Flow.CurrentStage</code> が重複している場合、デフォルトのアクティブなステージは最初の出現の後に付加されます。<p>たとえば、Flow1 は <code>$Flow.ActiveStages</code> を「1、2、2、3、4」、<code>$Flow.CurrentStage</code> を「2」に設定します。次に、サブフロー要素を使用して Flow2 を /call します。Flow2 のデフォルトのアクティブなステージは「A、B、C」です。フロー2 が開始されると、<code>$Flow.ActiveStages</code> は「1、2、A、B、C、2、3、4」になります。<code>$Flow.CurrentStage</code> は「2」のままです。</p></li>
+
+      </ul>
+</div>
+    <div id="flow_considerations_design_stages__troubleshooting_stages"><a name="flow_considerations_design_stages__troubleshooting_stages"></a><h2 class="slds-text-heading_medium slds-p-top_small">その他のステージに関する考慮事項</h2><a name="flow_considerations_design_stages__ul_mbl_zsy_4dc"></a><ul id="flow_considerations_design_stages__ul_mbl_zsy_4dc">
+        <li>画面要素が読み込まれるときに、ステージが関連付けられている場合、フローは <code>$Flow.ActiveStages</code> グローバル変数をチェックして、関連付けられたステージが存在するかどうかを確認します。含まれていない場合、フローは関連付けられたステージを <code>$Flow.ActiveStages</code> グローバル変数の最後に追加します。</li>
+
+        <li>フローエラーメールでは、インタビューの開始時に <code>$Flow.ActiveStages</code> と <code>$Flow.CurrentStage</code> の値は指定されません。初期値を確認するには、一時的な要素を追加して、表示テキスト画面コンポーネントを含む画面要素などに初期値を表示します。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">標準の進行状況インジケーターに関する考慮事項</h2><a name="flow_considerations_design_stages__ul_uqw_fty_4dc"></a><ul id="flow_considerations_design_stages__ul_uqw_fty_4dc">
+        <li>新しいフローでは、標準の進行状況インジケーターがデフォルトで有効になっています。既存のフローの場合、標準の進行状況インジケーターを有効にします。</li>
+
+        <li>標準の進行状況インジケーターが有効になっていてもフローにフェーズがない場合、進行状況インジケーターは実行時に画面に表示されません。</li>
+
+        <li>画面要素の編集ウィンドウで、進行状況インジケーターのプレビューに表示されるフェーズはサンプルフェーズであり、フローの実際のフェーズではありません。</li>
+
+        <li>標準の進行状況インジケーターは Field Service Mobile フローまたは Salesforce Scheduler フローではサポートされません。</li>
+
+        <li>フローがアクション &amp; レコメンデーション Lightning ページコンポーネントに実装されている場合は、標準の進行状況インジケーターはサポートされません。</li>
+
+        <li>フッターの進行状況インジケーターは、624 ピクセル未満の画面ではサポートされません。モバイルデバイスなどの小さい画面で進行状況インジケーターを使用するには、進行状況インジケーターを画面の上部に追加します。</li>
+
+        <li>パススタイルの進行状況インジケーターは、小さい画面または Lightning ページの小さい列にシンプルなスタイルとして表示されます。</li>
+
+        <li>標準の進行状況インジケーターには、最大 20 個のステージを表示できます。最適なユーザーエクスペリエンスを得るには、7 個以下のステージにすることをお勧めします。</li>
+
+      </ul>
+</div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="本ユーザが画面フローの現在のステージと進行状況を常に把握できるようにします。フローのステップを指定するフェーズを作成し、進行状況インジケーターを使用してすべてのフェーズを表示し、ユーザーの現在のフェーズを強調表示します。" href="build-4.html#flow_build_stages">画面フローでのユーザーの進行状況の表示</a></li><li><a title="フェーズは、フローのステップを表します。ユーザーがフローのどのフェーズにいて、どこまで進んでいるかを常に把握するために、フェーズリソースを作成し、進行状況インジケーターを使用できます。" href="elements_ref-4.html#flow_ref_resources_stage">フェーズリソース</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="flow_considerations_feature">
+<h1 class="slds-text-heading_large">フローの機能に関する考慮事項</h1>
+  <p>フローを設計するときは、フローの機能に関する次の事項を考慮してください。また、一部のリソース、要素、画面コンポーネントには追加の考慮事項があります。詳細は、各リファレンストピックを参照してください。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><a title="Flow Builder をサポートするエディションとユーザーインターフェースについて説明します。一部の Flow Builder 機能は、追加ライセンスが必要な他の Salesforce 製品と統合されます。" href="elements_ref-4.html#flow_ref_supported_editions">サポートされているエディションを表示する。</a></td>
+
+      </tr>
+     </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="overview-2.html#flow_considerations_design_conditional_visibility">フローの条件付き表示に関する考慮事項</a></strong><br>画面コンポーネントの表示を設定する前に、フローの条件付き表示の動作を理解してください。</li><li class="slds-p-bottom_small"><strong><a href="overview-2.html#flow_considerations_default_values">デフォルト値を含むフロー選択肢コンポーネントの考慮事項</a></strong><br>画面フローで選択肢コンポーネントのデフォルト値を設定するときに理解すべき重要な動作と制限事項。</li><li class="slds-p-bottom_small"><strong><a href="#flow_considerations_feature_variable">フロー変数に関する考慮事項</a></strong><br>変数リソースを作成する前に、フローでの変数の動作を理解しておく必要があります。</li><li class="slds-p-bottom_small"><strong><a href="#flow_considerations_design_multiselect">フローの複数選択リソースおよび画面項目に関する考慮事項</a></strong><br>チェックボックスグループ、複数選択リスト、選択肢ルックアップ画面コンポーネントを使用すると、フローユーザーは複数の選択肢を選択できます。これらの画面コンポーネントの使用を開始する前に、フローを設計するときおよびユーザーがフローを実行するときにフローでこれらのコンポーネントがどのように機能するかを理解しておきます。</li><li class="slds-p-bottom_small"><strong><a href="#flow_considerations_design_pause">一時停止中のフローインタビューに関する考慮事項</a></strong><br>待機要素を含むフローを設計する場合は、その動作とガイドラインを理解しておく必要があります。</li><li class="slds-p-bottom_small"><strong><a href="#flow_considerations_design_layout">2 列フローに関する考慮事項</a></strong><br>組織で Lightning ランタイムを有効にしている場合は、そのフローを 1 列で表示するか、2 列で表示するかを制御できます。この機能を使用する前に、フローレイアウトの現在の動作方法を把握してください。</li><li class="slds-p-bottom_small"><strong><a href="overview-1.html#automate_flow_considerations_applying_style_properties_to_screen_components">画面コンポーネントのスタイル設定に関する考慮事項</a></strong><br>画面コンポーネントの幅と縦方向の配置を変更する前に、スタイル設定が画面サイズに反応しないように注意してください。また、異なる高さのコンポーネントをレイアウトする方法や、セクションコンポーネントと空白の表示テキストコンポーネントを使用するケースについても理解します。</li><li class="slds-p-bottom_small"><strong><a href="#flow_considerations_trigger_schedule">スケジュールトリガーフローの制限および考慮事項</a></strong><br>スケジュールトリガーフローは、指定された時間に開始し、指定された頻度で実行され、レコードのバッチを処理します。スケジュールトリガーフローを作成または有効化する前に、次の考慮事項、制限、および特殊な動作を確認してください。</li><li class="slds-p-bottom_small"><strong><a href="#flow_considerations_trigger_record">レコードトリガーフローに関する考慮事項</a></strong><br>レコードトリガー自動起動フローでは、追加の更新をトリガーレコードに加える前または加えた後に、トリガーレコードをデータベースに保存します。保存前および保存後の更新を実行するフローに関する考慮事項とその特定の動作を把握します。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="各リソースは、フロー全体で参照できる値を表します。" href="elements_ref-4.html#flow_ref_resources">フローのリソース</a></li><li><a title="要素は、フローで実行できるアクションを表します。たとえば、Salesforce データの読み取りまたは書き込み、情報の表示、フローユーザーからのデータの収集、ビジネスロジックの実行、データの操作などがあります。" href="elements_ref-2.html#flow_ref_elements">フロー要素</a></li><li><a title="Salesforce では、画面で使用できる入力項目の種別を拡張するいくつかの標準画面コンポーネントを提供しています。" href="elements_ref-2.html#flow_ref_elements_screencmp">標準フロー画面コンポーネント</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="flow_considerations_feature_variable">
+<h1 class="slds-text-heading_large">フロー変数に関する考慮事項</h1>
+  <p>変数リソースを作成する前に、フローでの変数の動作を理解しておく必要があります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><a title="Flow Builder をサポートするエディションとユーザーインターフェースについて説明します。一部の Flow Builder 機能は、追加ライセンスが必要な他の Salesforce 製品と統合されます。" href="elements_ref-4.html#flow_ref_supported_editions">サポートされているエディションを表示する。</a></td>
+
+      </tr>
+     </tbody></table>
+    <div><p>この動画では、変数とは何か、およびフローで変数を使用してデータを保持する方法について説明します。</p><p>
+      <iframe width="640" height="360" src="https://play.vidyard.com/MppqcKZd36p1YYX8iUruXi" class="doc_embedded_video"><!-- --></iframe>
+      </p><p>この<a target="_blank" href="https://play.vidyard.com/MppqcKZd36p1YYX8iUruXi.html">動画は</a>別のタブでご覧ください。</p><p>このビデオでは、一般的な型、Boolean型、Apexで定義された変数、コレクション変数などの変数の型について説明します。</p><p>
+      <iframe width="640" height="360" src="https://play.vidyard.com/Arao1M9qodyVTgW8myyU2J?" class="doc_embedded_video"><!-- --></iframe>
+      </p><p>この<a target="_blank" href="https://play.vidyard.com/Arao1M9qodyVTgW8myyU2J?">動画は</a>別のタブでご覧ください。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">空白の項目またはリソースの参照</h2><ul>
+        <li>項目またはリソースの値を空白のままにすると、実行時にその値は <code>null</code> になります。テキスト値を <code>null</code> ではなく空の文字列として処理するには、その値を <code>{!$GlobalConstant.EmptyString}</code> に設定します。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Boolean 変数</h2><ul>
+        <li>Boolean 型では <code>null</code> の処理が <code>false</code> とは異なります。</li>
+
+        <li><span id="flow_considerations_feature_variable__null_boolean"><a name="flow_considerations_feature_variable__null_boolean"></a>フローでは、<code>null</code> を <code>false</code> とは異なる値として扱います。</span>たとえば、チェックボックス項目が <code>null</code> に設定されているレコードを見つけようとすると、返されるレコードはありません。この場合は、チェックボックス項目が <code>false</code> に設定されているレコードを探します。変数 (<code>myCheckbox = {!varBoolean}</code> など) を使用している場合、変数をレコード検索条件または条件で参照する前に、その変数が <code>null</code> に設定されていないことを確認します。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">数値変数</h2><ul>
+        <li> 数値変数はデフォルトで整数として処理されます。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">パーセント変数</h2><ul>
+        <li>フローでレコード変数を使用してパーセント値を操作する場合、フローを慎重にテストしてください。レコード変数のパーセント項目に値を挿入し、数式内でその項目を参照すると、その値は 100 で割った値になります。<p>たとえば、商談の [確度] 項目が 100 に設定されているとします。 その値を<code>{!Opportunity.Probability}</code>レコード変数に割り当てても、値は 100 のままです。 ただし、式が <code>{!Opportunity.Probability}</code> の数式を作成すると、値は 1 になります。</p></li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">レコード変数</h2><ul>
+        <li>レコードおよびレコードコレクション変数では、Salesforce オブジェクトのみがサポートされます。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">入力/出力で使用可能 </h2><ul>
+        <li> 既存の変数の入力または出力アクセスを無効にすると、フローをコールして変数にアクセスするアプリケーションやページの機能が停止する可能性があります。たとえば、URL パラメーター、サブフロー、プロセスから変数にアクセスできます。</li>
+
+        <li>新しい入力変数または出力変数をフロー上書きに追加することはできません。既存の変数を削除できますが、Lightning コンポーネントなどのコール元コンポーネントが削除済みの入力変数を使用しようとすると、入力変数を削除すると実行時エラーが発生します。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">入力変数の設定 </h2><ul>
+        <li>プロセスビルダー: <span>プロセスまたはフローで別のフローを起動する場合、起動時にそのフローの入力変数に値を割り当てることができます。</span><span>ただし、コレクションでないテキスト変数、選択リスト変数、複数選択リスト変数では、<code>null</code> の値が空の文字列に変換されます。</span><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> プロセスビルダーのサポートと更新は、2025 年 12 月 31 日に終了する予定です。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">Workflow Rules &amp;</a> Process Builder End of Support (ワークフロールールとプロセスビルダーのサポート終了)」を参照してください。<p>2025 年 12 月 31 日以降は、既存のプロセスを引き続き有効化、無効化、編集できます。既存のプロセスを移行するには、<a title="Flow Builder は、ワークフロールールとプロセスビルダーの機能を統合したポイント &amp; クリックツールであり、トリガープロセスの作成が簡単になります。ワークフロールールまたはプロセスビルダーを使用して作成されたトリガープロセスがある場合、[フローに移行] ツールを使用して Flow Builder に移動できます。新しいフローを本番に移行する前に、まず Sandbox 環境で移行してテストしてください。" href="operate-3.html#flow_migrate_to_flow_learning_map">Flow Builder へ</a>の切り替えを計画し、<a title="[フローに移行] ツールを使用して、プロセスビルダープロセスとワークフロールール (スケジュール済みアクションを含む) を Flow Builder に変換します。このツールでは、ほとんどのアクションについてプロセスの部分的な移行もサポートされています。" href="operate-3.html#flow_migrate_to_flow">Migrate to Flow</a> ツールを使用します。新しい自動化の場合は、<a title="自動化により、反復作業が減り、チームがより迅速かつ正確に ToDo を完了できるようになります。Flow Builder では、コードなしで簡単な自動化や複雑な自動化、フォーム、ガイド付き環境を作成できます。Salesforce ページとエクスペリエンスサイトにフォームを追加し、ボタン、レコードトリガー、またはスケジュールを使用してフローを起動できます。" href="overview-2.html#flow">Flow Builder</a> でフローを作成します。</p></div></div></div>
+</li>
+
+        <li>アクション: フローアクションでは、レコードの ID 項目の値をフローに渡すことができますが、それだけです。フローに recordId というテキスト入力変数があれば、アクションの実行時にレコードの ID がその変数に渡されます。ない場合は、レコード ID は渡されず、フローはそのまま実行されます。</li>
+
+        <li>Lightning アプリケーションビルダー: コレクション変数、レコード変数、レコードコレクション変数はサポートされません。フローコンポーネントの入力変数には、手動で入力された値のみがサポートされます。テキスト入力変数に使用できるのは最大 4,000 文字です。</li>
+
+        <li>サブフロー要素: サブフロー入力に変数を渡す場合、変数の API 参照名は最大 40 文字です。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">フローの配布</h2><ul>
+        <li>
+          <span>フローを配布するとき、URL パラメーターを使用して Salesforce レコードから通貨項目値をフローの通貨変数に渡さないでください。通貨項目が差し込み項目 (<code>{!Account.AnnualRevenue}</code> など) を介して参照される場合、値には通貨単位の記号 ($ など) が含まれます。フローの通貨変数で受け入れられるのは数値のみであるため、フローは実行時にエラーになります。</span><span>代わりに、URL パラメーターを使用してレコードの ID をテキスト変数に渡します。フローでは、その ID を使用して該当するレコードの通貨項目の値を検索してください。</span>
+        </li>
+
+      </ul>
+</div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="flow_considerations_lex_runtime">
+<h1 class="slds-text-heading_large">フロー Lightning ランタイムに関する考慮事項</h1>
+  <p>フローを実行するときは、次の点を考慮してください。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><a title="Flow Builder をサポートするエディションとユーザーインターフェースについて説明します。一部の Flow Builder 機能は、追加ライセンスが必要な他の Salesforce 製品と統合されます。" href="elements_ref-4.html#flow_ref_supported_editions">サポートされているエディションを表示する。</a></td>
+
+      </tr>
+     </tbody></table>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 
+      Lightning ランタイムでは、フローユーザーは常にアクティブなフローバージョンを実行します。「フローの管理」権限を持つフロー管理者は最新のフローを実行するため、フローユーザー向けに有効化しなくても最新のフローバージョンをテストできます。フロー管理者は、サブフロー要素経由で参照される最新のフローも実行します。</div></div></div>
+
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">フローインタビュー</h2><p><dfn>フローインタビュー</dfn>はフローのインスタンスです。これはレコードがオブジェクトのインスタンスであることとよく似ています。フローインタビューでは、Salesforce データの検索と処理など、多くのことを行うことができます。インタビューで、データを変数や他のリソースに渡すことができます。データは、さまざまなソース (フローで照会した Salesforce レコード、ユーザーが画面の入力項目に入力する情報、手動で入力する情報など) から取得します。</p><p>インタビューは、関連付けられているトランザクションが完了するまで、アクション (メールの送信、レコードの作成、編集、削除など) を実行しません。<span>インタビューが完了または実行されたときに、画面、ローカルアクション、または待機要素がトランザクションに反映されます。</span>データ要素の他に、Chatter に投稿、承認申請、およびクイックアクションの各コアアクション要素でもレコードが作成または更新されます。</p><p>処理中のインタビューのデータは Salesforce データベースに保存されません。フローでレコードを作成または更新する要素 ([レコードを更新] や [Chatter に投稿] など) を実行すると、その要素で設定された情報のみが Salesforce データベースに保存されます。</p><p><span id="flow_considerations_lex_runtime__interviews_database"><a name="flow_considerations_lex_runtime__interviews_database"></a>インタビューが待機要素を実行したり、ユーザーがインタビューを一時停止したりすると、すべてのインタビューデータが逐次化され、一時停止中のフローインタビューレコードとしてデータベースに保存されます。インタビューが再開されると、一時停止中のフローインタビューレコードが削除されます。</span></p></div>
+    <div id="flow_considerations_lex_runtime__lightningruntime"><a name="flow_considerations_lex_runtime__lightningruntime"></a><h2 class="slds-text-heading_medium slds-p-top_small">フローの Lightning ランタイムの制限</h2><p>Salesforce 組織で Lightning ランタイムを有効にしているとき、Lightning Experience のフローは次のものに読み込まれません。</p><ul>
+        <li>Web タブ </li>
+
+        <li>サイドバー付きまたはサイドバーなしで現在のウィンドウを表示するように設定されているリストボタン </li>
+
+      </ul>
+<p>組織で Lightning ランタイムを有効にしている場合、サイドバー付きまたはサイドバーなしの既存のウィンドウに表示されるように設定されているカスタムボタンまたはカスタムリンクに Salesforce Classic のフローは読み込まれません。</p><p>数値入力項目には、小数点以上と小数点以下の桁も含めて 17 桁までの数値を入力できます。</p><p>実行時、ユーザーがエラーを修正しても、検証エラーメッセージは画面フローコンポーネントで表示されたままになります。ユーザーはメッセージがあってもフローインタビューを完了できます。</p></div>
+  
+<div id="flow_considerations_accessibility" lang="ja-jp" aria-labelledby="ariaid-title2" class="nested1"><a name="flow_considerations_accessibility"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">フローランタイムのアクセシビリティに関する考慮事項</h2>
+  <p>Salesforce では、画面フロー実行時の環境をリハビリテーション法セクション 508 および Web Content Accessibility Guidelines (WCAG) 2.0 レベル AA で定められているベストプラクティスに準拠させるように努めています。ただし、いくつかの例外があります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><a title="Flow Builder をサポートするエディションとユーザーインターフェースについて説明します。一部の Flow Builder 機能は、追加ライセンスが必要な他の Salesforce 製品と統合されます。" href="elements_ref-4.html#flow_ref_supported_editions">サポートされているエディションを表示する。</a></td>
+
+      </tr>
+     </tbody></table>
+    <div><p>画面フローの実行中にスクリーンリーダーや他の支援技術を使用している場合は、次の既知の問題を考慮してください。</p><ul>
+        <li>[次へ] または [前へ] をクリックしても画面のタイトルは変わらないため、異なるページに切り替えたことが明白ではない場合もあります。</li>
+
+        <li>表示ラベルが定義されていないフロー画面コンポーネントは、支援技術で適切に読み取ることができません。</li>
+
+        <li>支援技術でエラーを識別するために ARIA アラートロールや他の方法を使用していない限り、これらのカスタムエラーメッセージは支援技術では検出できません。<ul><li>条件付き表示が設定されたテキストコンポーネントのエラーメッセージ</li>
+<li>関連付けられた [入力を検証] 数式が false に評価されたときにコンポーネントに表示されるエラーメッセージ</li>
+</ul>
+</li>
+
+        <li>スクリーンリーダーは言語設定に基づいて発音します。言語設定がフローの言語と異なると、スクリーンリーダーはフロー画面を正しく読み上げることができません。この制限は、次の場所からのフローの実行に影響します。<ul><li>Flow Builder の [実行] および [デバッグ] ボタン</li>
+<li>URL</li>
+<li>カスタムボタンとカスタムリンク</li>
+<li>Web タブ</li>
+</ul>
+</li>
+
+        <li>Salesforce で用意されているコンポーネントの一部のエラーメッセージは、対応する入力項目には関連付けられていません。この制限により、関連付けられているエラーメッセージをスクリーンリーダーが読み上げることができません。影響を受ける Salesforce 提供のコンポーネント:<ul><li>連動選択リスト</li>
+<li>メール</li>
+<li>参照</li>
+<li>電話</li>
+<li>切り替え</li>
+<li>URL</li>
+</ul>
+</li>
+
+        <li>ユーザーが連動選択リストコンポーネントの必須項目を入力しなかった場合に表示されるエラーメッセージは、スクリーンリーダーや他の支援技術で読み上げられません。エラーメッセージが一度読み上げられる場合もありますが、後でその項目にフォーカスしても、エラーメッセージが再度読み上げられることはありません。</li>
+
+        <li>ユーザーがデスクトップ (LEX) の一時停止中のフローインタビュー Lightning コンポーネントの [再開] ウィンドウで [完了] をクリックすると、フォーカスは [更新] アイコンボタンに設定されません。</li>
+
+        <li>フロー画面が最初に表示されるときに、フォーカスは最初の表示画面項目に設定されます。例外:<ul><li>フロー画面にエラーがある場合には、フォーカスはエラーがある最初の項目に設定されます。</li>
+<li>フロー画面に表示テキストコンポーネントのみが含まれる場合、フォーカスはフローの本文に設定されます。</li>
+</ul>
+</li>
+
+        <li>画面が最初に表示された後に画面のコンポーネントやその一部が表示された場合は、それらにフォーカスを設定することはできません。たとえば、コンポーネントが非同期で ToDo リストを取得して表示した場合は、フォーカスをどの ToDo にも設定できません。画面コンポーネントで条件付き表示が使用されていて、ユーザー入力の後でなければ表示されない場合、その画面コンポーネントのどの部分にもフォーカスを設定することはできません。</li>
+
+      </ul>
+</div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="フローを設計、管理、および実行する場合、権限、使用制限、およびデータの問題を検討します。" href="overview-2.html#flow_considerations">フローの制限および考慮事項</a></li><li><a title="フローの配布方法に応じて、ユーザーには、フローの実行時に Classic ランタイムか Lightning ランタイムの UI が表示されます。名前からわかるように、Lightning ランタイムの外観や動作は Lightning Experience に類似しています。" href="operate-2.html#flow_distribute_runtime">フローの Lightning ランタイムと Classic ランタイムの比較</a></li><li><a title="組織で使用可能な別の有効なフローを起動します。別のフローによって起動されるフローは、参照されるフローと呼ばれます。" href="elements_ref-4.html#flow_ref_elements_subflow">サブフロー要素</a></li><li><a title="フロー画面に簡単に画像を挿入します。画像を静的リソースとして Salesforce にアップロードすると、コンポーネントの設定時にそれらを参照できます。" href="elements_ref-3.html#flow_ref_elements_screencmp_display_image">表示画像画面入力コンポーネント</a></li></ul></div>
+</div>
+</div>
+
+
+  
+</div></div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="flow_considerations_manage">
+<h1 class="slds-text-heading_large">フローの管理に関する考慮事項</h1>
+  <p>フローを管理する場合、管理および有効化の制限を考慮します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><a title="Flow Builder をサポートするエディションとユーザーインターフェースについて説明します。一部の Flow Builder 機能は、追加ライセンスが必要な他の Salesforce 製品と統合されます。" href="elements_ref-4.html#flow_ref_supported_editions">サポートされているエディションを表示する。</a></td>
+
+      </tr>
+     </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">フローの表示</h2><p>Lightning Experience では、ユーザが ［すべてのフロー］ リスト ビューの ［共有設定］ を ［このリスト ビューを表示できるのは私のみです］ に設定した場合、［設定］ の ［フロー］ ページにフローは表示されません。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">フローの有効化</h2><p>フローの新バージョンを有効化すると、以前に有効化されたバージョン (存在する場合) は自動的に無効になります。実行中のフローインタビューは、起動されたときのバージョンを使用して実行を続行します。</p><p>フローを有効化したユーザーが無効化されると、フローは機能しなくなります。これは、フォームトリガーフローやセグメントトリガーフローなど、すべてのフロー種別に適用されます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">フローの削除</h2><p>有効なフローバージョンを削除するには、まず無効化する必要があります。フローに一時停止中のインタビューがある場合は、これらのインタビューが終了または削除されるまで削除できません。どの時点でも有効化されなかったフローは削除できます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">フロー種別</h2><p>フローに異なる種別のバージョンがある場合、そのフロー種別は、有効な (または最新の) バージョンによって決定されます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">フローのリリース</h2><p>本番組織では、変更セットまたはメタデータ API を使用して、プロセスまたはフローの新しい有効なバージョンをリリースする設定を有効にできます。スクラッチ組織、Sandbox 組織、開発者組織などの非本番組織では、新しい有効なバージョンを常にデプロイできるため、この設定は表示されません。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="デフォルトでは、Sandbox 組織または本番以外の組織で有効なプロセスとフローは、本番組織に無効としてリリースされます。リリース後、新しいバージョンを手動で再有効化します。本番組織では、変更セットまたはメタデータ API を使用して、プロセスまたはフローの新しい有効なバージョンをリリースする設定を有効にできます。継続的インテグレーションおよび継続的リリースモデルを使用してメタデータの変更をリリースする場合、プロセスとフローを有効としてリリースするオプションを有効にします。" href="operate-2.html#flow_distribute_deploy_active">有効としてのプロセスとフローのリリース</a></li><li><a title="フローを設計、管理、および実行する場合、権限、使用制限、およびデータの問題を検討します。" href="overview-2.html#flow_considerations">フローの制限および考慮事項</a></li></ul></div>
+</div>
+
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="flow_considerations_manage_install">
+<h1 class="slds-text-heading_large">パッケージからインストールされたフローの考慮事項</h1>
+  <p>パッケージからインストールしたフローを配布、アップグレード、または削除する場合は、次の制限を考慮してください。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><a title="Flow Builder をサポートするエディションとユーザーインターフェースについて説明します。一部の Flow Builder 機能は、追加ライセンスが必要な他の Salesforce 製品と統合されます。" href="elements_ref-4.html#flow_ref_supported_editions">サポートされているエディションを表示する。</a></td>
+
+      </tr>
+     </tbody></table>
+    <div><ul>
+        <li>
+          <span>管理パッケージからインストールされたフローがテンプレートでも上書き可能でもない場合、Flow Builder は、そのフローを開くことはできません。</span>
+        </li>
+
+        <li>
+          新規の対象組織に複数のバージョンのフローを含む管理パッケージをインストールすると、最新バージョンのフローのみがリリースされます。</li>
+
+        <li>
+          <span>非テンプレートフローを管理パッケージからインストールした場合は、そのフローのインタビューのエラーメールに個別のフロー要素に関する詳細が記載されません。メールはフローをインストールしたユーザーまたは Apex 例外メールの受信者に送信されます。</span>
+        </li>
+
+        <li>
+          組織に存在するフローと同じ名前で、異なるバージョン番号を持つ未管理のパッケージからフローをインストールする場合、新たにインストールされたフローは、既存のフローの最新バージョンになります。ただし、パッケージ化されたフローの名前とバージョン番号が組織のフローのものと同じである場合、パッケージのインストールは失敗します。フローを上書きすることはできません。
+        </li>
+
+        <li>組織に存在するフローと同じ名前のロック解除済みパッケージからフローをインストールすると、新たにインストールされたフローで既存のフローが上書きされます。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">状況</h2><p>
+        パッケージの有効なフローは、インストール後は有効です。新しくインストールされたバージョンが優先され、対象組織のフローの以前の有効なバージョンは無効になります。現在無効になっているバージョンに基づく進行中のフローがある場合は、引き続き無停止で実行できますが、前のバージョンのフローが反映されます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">インストールされたフローの配布</h2><ul>
+        <li>管理パッケージからインストールされたフローにカスタムボタン、リンク、Web タブを作成する場合は、URL に名前空間を含めます。URL の形式は <samp class="filepath">/flow/namespace/flowuniquename</samp> です。</li>
+
+        <li>Visualforceページに管理パッケージからインストールされたフローを埋め込む場合は、name属性をこの形式 <code>namespace.flowuniquename</code> に設定します。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">インストールされたフローのアップグレード</h2><p>
+        組織で管理パッケージのアップグレードを行うと、開発者からより新しいフローバージョンがリリースされている場合に限り、新しいフローバージョンがインストールされます。複数回アップグレードを行うと、フローバージョンが複数になることがあります。
+      </p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">インストールされたフローの削除</h2><ul>
+        <li>
+          インストール済みのパッケージからフローを削除することはできません。パッケージ化されたフローを組織から削除するには、無効にしてからパッケージをアンインストールします。</li>
+
+        <li>パッケージング組織では、リリース済みまたはベータ版の第一世代管理パッケージにアップロードしたフローを削除することはできません。リリース済みまたはベータ版の第一世代管理パッケージにアップロードしたフローバージョンをパッケージング組織から削除できるのは、次の条件をすべて満たしている場合です。<ul>
+            <li>Salesforce カスタマーサポートが管理コンポーネントの削除権限を有効化した。</li>
+
+            <li>フローバージョンが、フローの最新のパッケージバージョンではない。</li>
+
+            <li>フローバージョンが有効ではない。</li>
+
+            <li>フローバージョンは唯一のバージョンではありません。</li>
+
+          </ul>
+</li>
+
+        <li>
+          複数の未管理パッケージからインストールされた複数のバージョンのあるフローがある場合は、そのパッケージをアンインストールすると 1 つのバージョンのみを削除できます。フローの単一のバージョンを含むパッケージ (管理または未管理) のアンインストールを行うと、すべてのバージョンを含むフロー全体が削除されます。</li>
+
+        <li>ロック解除済みパッケージからはフローを手動で削除します。ロック解除済みパッケージから削除することでそれらを削除することはできません。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">インストールされたフローの翻訳</h2><p>フロー定義名の翻訳は、[翻訳] ページのみで行えます。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.packagingGuide.meta/packagingGuide/managed_packaging_intro.htm">管理パッケージを使用した AppExchange ソリューションの開発</a></li><li><a title="プロセスやフローインタビューが失敗すると、そのプロセスまたはフローを最後に変更したシステム管理者に詳細なメールが送信されます。ただし、実行内容と問題の詳細についてアクションを実行するのにシステム管理者が適していない場合があります。その場合は、Apex 例外メールの受信者にエラーメールを送信できます。" href="operate-3.html#flow_troubleshoot_error_email">フローやプロセスのエラーメール受信者の選択</a></li><li><a title="フローは、管理パッケージまたは未管理パッケージでパッケージ化できます。フローを含むパッケージを作成、更新、またはリリースする前に、パッケージの制限と動作を理解しておく必要があります。" href="#flow_considerations_packaging">フローをパッケージ化する際の考慮事項</a></li><li><a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.sfdx_dev.meta/sfdx_dev/packaging_packageable_components.htm">Salesforce DX 開発者ガイド: 管理パッケージで使用可能なコンポーネント</a></li><li><a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.pkg1_dev.meta/pkg1_dev/packaging_install.htm">
+                            First-Generation Managed Packaging Developer Guide (第一世代管理パッケージ開発者ガイド): Install a Managed Package (管理パッケージのインストール) </a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="flow_considerations_packaging">
+<h1 class="slds-text-heading_large">フローをパッケージ化する際の考慮事項</h1>
+  <p>フローは、管理パッケージまたは未管理パッケージでパッケージ化できます。フローを含むパッケージを作成、更新、またはリリースする前に、パッケージの制限と動作を理解しておく必要があります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><a title="Flow Builder をサポートするエディションとユーザーインターフェースについて説明します。一部の Flow Builder 機能は、追加ライセンスが必要な他の Salesforce 製品と統合されます。" href="elements_ref-4.html#flow_ref_supported_editions">サポートされているエディションを表示する。</a></td>
+
+      </tr>
+     </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">パッケージの作成</h2><ul>
+        <li>変更セットを使用してフローをリリースする場合、変更セットにはフローが参照するすべてのコンポーネントが含まれている必要があります。</li>
+
+        <li>フローをパッケージ化する場合は、フローが参照するすべてのコンポーネントと項目が同じパッケージまたは連動パッケージで使用可能である必要があります。</li>
+
+        <li>次の要素をフロー内で使用する場合、要素が参照するパッケージ化可能なコンポーネントは自動的にはパッケージに追加されません。パッケージを正常にリリースするには、参照するこれらのコンポーネントをパッケージに手動で追加します。<ul><li>Chatter に投稿</li>
+<li>メールを送信</li>
+<li>承認申請</li>
+</ul>
+たとえば、特定の Chatter グループに投稿するフローをリリースする場合、参照される Chatter グループをパッケージに手動で追加します。</li>
+
+        <li>フローで CSP 信頼済みサイトに依存する Lightning コンポーネントを参照している場合、その信頼済みサイトはパッケージに自動的に含まれません。</li>
+
+        <li>パッケージまたはパッケージバージョンをアップロードすると、有効なフローバージョンが含まれます。フローに有効なバージョンがない場合は、最新バージョンがパッケージ化されます。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">パッケージの更新</h2><ul>
+        <li>異なるバージョンのフローで管理パッケージを更新するには、そのバージョンを有効化して、そのパッケージをアップロードします。または、フローのすべてのバージョンを無効化して、フローの最新バージョンが配布するバージョンであることを確認し、パッケージをアップロードします。誤ってフローバージョンを有効化し、パッケージをアップロードすると、そのフローバージョンが全ユーザーに配布されます。</li>
+
+        <li>同じ API 参照名のフローをロック解除済みパッケージからインストールした場合、新しいフローで対象組織の既存のフローが上書きされます。</li>
+
+        <li>フローをパッケージパッチに含めることはできません。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">その他の考慮事項</h2></div>
+    <div><ul>
+        <li>
+          関連付けられたメソッドが global としてマークされている場合にのみ、Flow Builder で管理パッケージからの Apex アクションが表示されます。</li>
+
+        <li>
+          <span>メールアラートが保護されていない場合にのみ、Flow Builder で管理パッケージからのメールアラートが表示されます。</span>
+        </li>
+
+        <li>Visualforce ページまたは Apex コードでフローを参照した後に名前空間を登録する場合、パッケージをインストールする前にフロー名に名前空間を追加してください。</li>
+
+        <li>フローが管理パッケージからインストールされている場合は、そのフローのインタビューのエラーメールに個別のフロー要素に関する詳細が記載されません。メールはフローをインストールしたユーザーまたは Apex 例外メールの受信者に送信されます。</li>
+
+        <li>フロートリガーをパッケージ化することはできません。</li>
+
+        <li>パッケージング組織では、リリース済みまたはベータ版の第一世代管理パッケージにアップロードしたフローを削除することはできません。リリース済みまたはベータ版の第一世代管理パッケージにアップロードしたフローバージョンをパッケージング組織から削除できるのは、次の条件をすべて満たしている場合です。<ul>
+            <li>Salesforce カスタマーサポートが管理コンポーネントの削除権限を有効化した。</li>
+
+            <li>フローバージョンが、フローの最新のパッケージバージョンではない。</li>
+
+            <li>フローバージョンが有効ではない。</li>
+
+            <li>フローバージョンは唯一のバージョンではありません。</li>
+
+          </ul>
+</li>
+
+        <li>
+          <span id="flow_considerations_packaging__flow_rte_images_not_supported_in_packages"><a name="flow_considerations_packaging__flow_rte_images_not_supported_in_packages"></a>パッケージでは、画面のリッチテキスト内の画像はサポートされません。</span>
+        </li>
+
+      </ul>
+</div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="flow_considerations_readonlyfields">
+<h1 class="slds-text-heading_large">フローレコード処理の参照のみの項目制限</h1>
+  <p>実行ユーザーが編集できない項目は、レコードの作成および更新時にフローにアクセスできません。これは、ユーザーに項目レベル権限がない場合、または項目がシステム項目の場合に発生します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><a title="Flow Builder をサポートするエディションとユーザーインターフェースについて説明します。一部の Flow Builder 機能は、追加ライセンスが必要な他の Salesforce 製品と統合されます。" href="elements_ref-4.html#flow_ref_supported_editions">サポートされているエディションを表示する。</a></td>
+
+      </tr>
+     </tbody></table><p>どの項目がシステム項目であるかを判断するには、<cite>『Salesforce および Lightning プラットフォームのオブジェクトリファレンス』</cite>を参照してください。その他の項目のうちどれが編集可能でないかを判断するには、実行ユーザーの権限を確認します。</p><p>参照のみの項目の私のレコード変数への入り方</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:31.545741324921135%"><col style="width:68.45425867507886%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d35115e67" style="vertical-align:top;" class="slds-cell-wrap" scope="col">変数に代入する要素</th>
+              <th id="d35115e70" style="vertical-align:top;" class="slds-cell-wrap" scope="col">変数に含まれる項目</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d35115e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="変数に代入する要素">レコードを取得要素。項目値を同時に保存する</td>
+
+              <td headers="d35115e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="変数に含まれる項目">含めることを選択した <samp class="parmname">Id</samp> およびその他の参照のみの項目。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d35115e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="変数に代入する要素">割り当て要素またはレコードを取得要素。項目値を別の変数に保存する</td>
+
+              <td headers="d35115e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="変数に含まれる項目">含めることを選択した、参照のみの項目。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d35115e67" style="vertical-align:top;" class="slds-cell-wrap" data-label="変数に代入する要素">プロセス、ワークフロールール、または開始要素</td>
+
+              <td headers="d35115e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="変数に含まれる項目">すべてのオブジェクトのシステム項目、および実行ユーザーに編集権限がない項目。変数には、オブジェクトのすべての項目がデフォルトで含まれます。</td>
+
+            </tr>
+          </tbody></table><p>私のレコード変数に参照のみの項目が含まれるときの対処法</p><p>レコード変数に保存されている参照のみの項目ごとに、次のように対処します。</p><ul>
+        <li>フローでその項目を使用しているかどうかを判断します。使用していない場合は、その項目の値を保存しないようにフローを更新します。この提案事項が当てはまるのは、[レコードを取得] などのフロー内の要素によって変数が入力される場合のみです。<p>たとえば、レコードを取得要素で <samp class="parmname">CreatedByDate</samp> を保存していますが、その項目を参照する要素が他にありません。<samp class="parmname">CreatedByDate</samp> を保存しないように、レコードを取得要素を更新してください。</p></li>
+
+        <li>参照のみの項目がフローで参照されている場合は、フローでその操作を実行するために必要となる権限を実行ユーザーに与えます。</li>
+
+        <li>その項目で必要となる権限を実行ユーザーに与えられない場合は、その項目を更新しないようにフローを更新します。</li>
+
+      </ul>
+<p>次に例を示します。フローでは、レコード更新要素を使用して取引先のいくつかの項目が更新されます。ユーザーは <samp class="parmname">[説明]</samp> および <samp class="parmname">[取引先 評価]</samp> を編集できますが、<samp class="parmname">[所有者 ID]</samp> または <samp class="parmname">LastModifiedDate</samp> を編集できません。フローが実行時にエラーになることを防止するには、次のように操作します。</p><ul>
+        <li>ユーザーに <samp class="parmname">[所有者 ID]</samp> の「編集」権限を与えます。</li>
+
+        <li>元のレコード変数から新しいレコード変数に、書き込み可能な項目値 (<samp class="parmname">[説明]</samp>、<samp class="parmname">[取引先 評価]</samp>、<samp class="parmname">[所有者 ID]</samp>) のみをコピーします。レコードを更新要素で新しいレコード変数を参照します。<p>書き込み可能な項目値のみをコピーすると、フローは実行時に <samp class="parmname">LastModifiedDate</samp> の値を設定しようとしなくなります。</p></li>
+
+      </ul>
+</div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="実行ユーザーに編集権限がない項目を更新しようとするフローをトラブルシューティングします。" href="#flow_considerations_readonlyfields_fix">フローの参照のみの項目エラーの修正</a></li><li><a title="フローでレコードの作成や更新などのアクションを実行する場合、フローはフロー要求を使用して特定の項目の値を設定します。実行ユーザーにこのような項目の編集アクセス権がない場合は、どのようになるのでしょうか。レコードの作成要素やレコードを更新要素でレコード変数またはレコードコレクション変数を使用する場合、ユーザーが制御できます。動作を制御するには、[フロー要求のアクセスできない項目を絞り込む] 設定をオンまたはオフします。" href="#flow_considerations_readonlyfields_behavior">フローが参照のみの項目の値を設定しているときに発生することの制御</a></li><li><a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.object_reference.meta/object_reference/system_fields.htm"> Salesforce および Lightning プラットフォームのオブジェクトリファレンス: システム項目</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="flow_considerations_readonlyfields_behavior">
+<h1 class="slds-text-heading_large">フローが参照のみの項目の値を設定しているときに発生することの制御</h1>
+  <p>フローでレコードの作成や更新などのアクションを実行する場合、フローはフロー要求を使用して特定の項目の値を設定します。実行ユーザーにこのような項目の編集アクセス権がない場合は、どのようになるのでしょうか。レコードの作成要素やレコードを更新要素でレコード変数またはレコードコレクション変数を使用する場合、ユーザーが制御できます。動作を制御するには、[フロー要求のアクセスでき<samp class="parmname">ない項目を</samp>絞り込む] 設定をオンまたはオフします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><a title="Flow Builder をサポートするエディションとユーザーインターフェースについて説明します。一部の Flow Builder 機能は、追加ライセンスが必要な他の Salesforce 製品と統合されます。" href="elements_ref-4.html#flow_ref_supported_editions">サポートされているエディションを表示する。</a></td>
+
+      </tr>
+     </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d154688e61" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d154688e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロセスの自動化設定を編集する</td>
+
+              <td headers="d154688e61" style="vertical-align:top;" class="slds-cell-wrap">「アプリケーションのカスタマイズ」</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d154688e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">フローリストビューを作成、更新、および削除する</td>
+
+              <td headers="d154688e61" style="vertical-align:top;" class="slds-cell-wrap">「フローの管理」</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"><col style="width:33.33333333333333%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d154688e106" style="vertical-align:top;" class="slds-cell-wrap" scope="col">&nbsp;</th>
+              <th id="d154688e108" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup"><samp class="parmname">[フロー要求のアクセスできない項目を絞り込む]</samp> の状態</th>
+            </tr>
+            <tr class="">
+              <th id="d154688e116" style="vertical-align:top;" class="slds-cell-wrap" scope="col">&nbsp;</th>
+              <th id="d154688e118" style="text-align:center;vertical-align:top;" class="slds-cell-wrap" scope="col">選択済み</th>
+              <th id="d154688e121" style="text-align:center;vertical-align:top;" class="slds-cell-wrap" scope="col">オフ (推奨)</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d154688e106 d154688e116" style="vertical-align:top;" class="slds-cell-wrap" data-label="">
+                <strong>実行ユーザーにすべての項目への編集アクセス権がない場合の結果</strong>
+              </td>
+
+              <td headers="d154688e108 d154688e118" style="vertical-align:top;" class="slds-cell-wrap" data-label="選択済み"><p>処理は部分的に成功します。</p><p style="margin-bottom:0;">フローで参照のみ項目が処理から除外されます。ユーザーが編集できる項目は更新されます。ユーザーが編集できない項目は更新されません。フローは障害パスを実行しません。</p></td>
+
+              <td headers="d154688e108 d154688e121" style="vertical-align:top;" class="slds-cell-wrap" data-label="オフ (推奨)"><p>処理は失敗します。</p><p style="margin-bottom:0;">処理の項目は更新されません。障害パスがある場合、フローで実行されます。</p></td>
+
+            </tr>
+            <tr class="">
+              <td headers="d154688e106 d154688e116" style="vertical-align:top;" class="slds-cell-wrap" data-label="">
+                <strong>1 つ以上の項目が更新されていない場合の通知</strong>
+              </td>
+
+              <td headers="d154688e108 d154688e118" style="vertical-align:top;" class="slds-cell-wrap" data-label="選択済み">一部の項目が更新されなかったことを示す通知はユーザーまたはシステム管理者に送信されません。</td>
+
+              <td headers="d154688e108 d154688e121" style="vertical-align:top;" class="slds-cell-wrap" data-label="オフ (推奨)">システム管理者には、すべての詳細が記載されたフローのエラーメールが送信されます。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d154688e106 d154688e116" style="vertical-align:top;" class="slds-cell-wrap" data-label="">
+                <strong>個別の変数、リソース、およびリテラル値を使用するように選択したレコードの作成要素との比較。</strong>
+              </td>
+
+              <td headers="d154688e108 d154688e118" style="vertical-align:top;" class="slds-cell-wrap" data-label="選択済み">整合性なし</td>
+
+              <td headers="d154688e108 d154688e121" style="vertical-align:top;" class="slds-cell-wrap" data-label="オフ (推奨)">整合性あり</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d154688e106 d154688e116" style="vertical-align:top;" class="slds-cell-wrap" data-label="">
+                <strong>項目を個別に設定するように選択したレコードを更新要素との比較</strong>
+              </td>
+
+              <td headers="d154688e108 d154688e118" style="vertical-align:top;" class="slds-cell-wrap" data-label="選択済み">整合性なし</td>
+
+              <td headers="d154688e108 d154688e121" style="vertical-align:top;" class="slds-cell-wrap" data-label="オフ (推奨)">整合性あり</td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> この設定を無効にして、期待されるすべての項目値をフローが設定しないのはいつなのかを常に把握することをお勧めします。</div></div></div>
+</div>
+    <ol><li>
+        <span>[設定] から、<samp class="parmname">[クイック検索]</samp> ボックスに<kbd>「自動」</kbd>と入力し、<strong class="uicontrol">[プロセスの自動化設定]</strong> を選択します。</span>
+      </li><li>
+        <span>[フロー要求のアクセスでき<strong class="uicontrol">ない項目を</strong>絞り込む] を選択またはオフにします。</span>
+        <div>組織が Winter ’17 以前で作成されている場合、この設定はデフォルトで有効になります。その他の場合、この設定はデフォルトで無効です。</div>
+      </li></ol>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_example.png" style="margin-bottom:0;"></span></div><div id="flow_considerations_readonlyfields_behavior__example" style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><a name="flow_considerations_readonlyfields_behavior__example"></a><span class="slds-text-title_caps">例</span> 
+      <p>フローは、レコードを更新要素のレコード変数を使用して商談のいくつかの横目を更新します。実行時に、フローはユーザーの代わりに Acme 取引先の更新を試みます。ユーザーは <samp class="parmname">[フェーズ]</samp> と <samp class="parmname">[完了予定日]</samp> を編集できますが、<samp class="parmname">[金額]</samp> は編集できません。そのため、フローには <samp class="parmname">[金額]</samp> を更新する権限がありません。</p>
+      <ul>
+        <li><samp class="parmname">[フロー要求のアクセスできない項目を絞り込む]</samp> がオンの場合、フローで取引先が正常に更新されますが、<samp class="parmname">[フェーズ]</samp> と <samp class="parmname">[完了予定日]</samp> のみが更新されます。<samp class="parmname">[金額]</samp> が更新されなかったことはフローで通知されません。</li>
+
+        <li><samp class="parmname">[フロー要求のアクセスできない項目を絞り込む]</samp> がオフの場合、フローで取引先を更新できません。システム管理者にフローのエラーメールが送信されます。メールには次のエラーが記載されています。<p><samp id="flow_considerations_readonlyfields_behavior__prefdisabled_error"><a name="flow_considerations_readonlyfields_behavior__prefdisabled_error"></a>INVALID_FIELD_FOR_INSERT_UPDATE: Unable to create/update fields: Amount</samp></p><p id="flow_considerations_readonlyfields_behavior__prefdisabled_translation"><a name="flow_considerations_readonlyfields_behavior__prefdisabled_translation"></a>これは、「実行ユーザーに [金額] 項目を編集する権限がない」ことを示す API からのメッセージです。</p></li>
+
+      </ul>
+
+    </div></div></div>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-error"><img alt="警告" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_warning.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">警告</span> この設定の組織の選択内容を変更する場合は、Sandbox を使用して変更によるフローへの影響をテストします。重要な更新の場合と同じプロセスに従うことを検討してください。</div></div></div>
+</div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="実行ユーザーが編集できない項目は、レコードの作成および更新時にフローにアクセスできません。これは、ユーザーに項目レベル権限がない場合、または項目がシステム項目の場合に発生します。" href="#flow_considerations_readonlyfields">フローレコード処理の参照のみの項目制限</a></li><li><a title="Salesforce には、ビジネスプロセスのカスタマイズと合理化に役立つプラットフォーム自動化のさまざまな設定が用意されています。" href="overview-2.html#automation_about_settings">プロセスの自動化設定</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="flow_considerations_readonlyfields_fix">
+<h1 class="slds-text-heading_large">フローの参照のみの項目エラーの修正</h1>
+  <p>実行ユーザーに編集権限がない項目を更新しようとするフローをトラブルシューティングします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><a title="Flow Builder をサポートするエディションとユーザーインターフェースについて説明します。一部の Flow Builder 機能は、追加ライセンスが必要な他の Salesforce 製品と統合されます。" href="elements_ref-4.html#flow_ref_supported_editions">サポートされているエディションを表示する。</a></td>
+
+      </tr>
+     </tbody></table>
+    <p>実行ユーザーが編集できない項目をフローが更新しようとして、<samp class="parmname">[フロー要求のアクセスできない項目を絞り込む]</samp> が組織で有効でない場合、フローはエラーになります。レコード変数に参照のみの項目が含まれており、その項目の「編集」権限を実行ユーザーに与えることができない場合は、その項目をレコード変数から削除します。レコードの作成要素またはレコードを更新要素で項目値を個別に設定するか、書き込み可能な項目値を新しいレコード変数にコピーします。</p>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> レコードを取得要素や割り当て要素でレコード変数の参照のみの項目に値を入力する場合は、その項目に値を入力しないようにこれらの要素を更新することを検討してください。</div></div></div>
+
+  
+<div id="flow_considerations_readonlyfields_clone" lang="ja-jp" aria-labelledby="ariaid-title2" class="nested1"><a name="flow_considerations_readonlyfields_clone"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">あるレコード変数から別のレコード変数への項目値のコピー</h2>
+  <p>レコード変数とレコードコレクション変数に、実行ユーザーが編集できない項目の値が設定されている場合があります。ただし、ユーザーは書き込み可能な値を使用して、レコードを作成またはレコードを更新要素でレコードの作成や更新ができます。これを行うには、元のレコード変数から新しいレコード変数に、書き込み可能な値を対応付けます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><a title="Flow Builder をサポートするエディションとユーザーインターフェースについて説明します。一部の Flow Builder 機能は、追加ライセンスが必要な他の Salesforce 製品と統合されます。" href="elements_ref-4.html#flow_ref_supported_editions">サポートされているエディションを表示する。</a></td>
+
+      </tr>
+     </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d232145e109" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class=""> 
+              <td headers="d232145e109" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Einstein for Flow や Agentforce for Flow など、Flow Builder で使用できるすべてのフロー タイプ、要素、機能を使用してフローを開く、編集、作成、有効化、または無効化する</td>
+
+              <td headers="d232145e109" style="vertical-align:top;" class="slds-cell-wrap">「フローの管理」</td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 「フローの管理」権限を持つ管理者である必要はありません。プロファイルまたは権限セットに追加するようにシステム管理者に依頼してください。</div></div></div>
+<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> レコードコレクション変数では、ループを使用して、新しいコレクションに項目値を対応付けます。
+      </div></div></div>
+</div>
+    <ol><li>
+        <span>割り当て要素をフローに追加します。元のレコード変数が入力された後で、[作成] 要素または [更新] 要素の前にフローでこの要素が実行されるようにします。</span>
+      </li><li>
+        <span>元のレコード変数の書き込み可能な項目ごとに、行を追加します。</span>
+        <div>
+          <p>変数 — {!<var>recordVar2</var>.<var>field</var> を選択します。<var>recordVar2</var> は新しい変数の名前であり、<var>field</var> はその変数の項目です。</p>
+          <p>演算子 — <strong class="uicontrol">[次の文字列と一致する]</strong> を選択します。</p>
+          <p>値 — {!<var>recordVar1</var>.<var>field</var> を選択します。<var>recordVar1</var> は元の変数の名前であり、<var>field</var> はその変数の項目です。</p>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> レコードを更新要素でこの変数を参照する場合は、レコードの ID を新しいレコード変数に含めます。<samp class="parmname">Id</samp> は参照のみですが、フローはこの値を使用して、どのレコードを更新するかを判断します。</div></div></div>
+
+        </div>
+      </li></ol>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> 
+      <p><samp class="parmname">{!myCaseVar_all}</samp> というケースレコード変数があるとします。一部の参照のみの項目に値が保存されており、レコードを更新要素でこれを使用することはできません。更新する項目を新しいレコード変数の <samp class="parmname">IsEscalated</samp> および <samp class="parmname">Status</samp> にコピーします。<samp class="parmname">Id</samp> も更新操作に必要であるため、コピーします。割り当てルールは次のようになります。</p>
+      <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:27.76057791537668%"><col style="width:10.319917440660475%"><col style="width:61.91950464396285%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d232145e225" style="vertical-align:top;" class="slds-cell-wrap" scope="col">変数</th>
+              <th id="d232145e228" style="vertical-align:top;" class="slds-cell-wrap" scope="col">演算子</th>
+              <th id="d232145e231" style="vertical-align:top;" class="slds-cell-wrap" scope="col">値</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d232145e225" style="vertical-align:top;" class="slds-cell-wrap" data-label="変数">{!myCaseVar_final.Id}</td>
+
+              <td headers="d232145e228" style="vertical-align:top;" class="slds-cell-wrap" data-label="演算子">次の値と一致する</td>
+
+              <td headers="d232145e231" style="vertical-align:top;" class="slds-cell-wrap" data-label="値">{!myCaseVar_original.Id}</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d232145e225" style="vertical-align:top;" class="slds-cell-wrap" data-label="変数">{!myCaseVar_final.IsEscalated}</td>
+
+              <td headers="d232145e228" style="vertical-align:top;" class="slds-cell-wrap" data-label="演算子">次の値と一致する</td>
+
+              <td headers="d232145e231" style="vertical-align:top;" class="slds-cell-wrap" data-label="値">{!myCaseVar_original.IsEscalated}</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d232145e225" style="vertical-align:top;" class="slds-cell-wrap" data-label="変数">{!myCaseVar_final.Status}</td>
+
+              <td headers="d232145e228" style="vertical-align:top;" class="slds-cell-wrap" data-label="演算子">次の値と一致する</td>
+
+              <td headers="d232145e231" style="vertical-align:top;" class="slds-cell-wrap" data-label="値">{!myCaseVar_original.Status}</td>
+
+            </tr>
+          </tbody></table>
+      <p>同じ例はレコードコレクション変数にも当てはまります。ただし、コレクション変数の値を直接変更することはできないため、ループを使用します。元のコレクションのすべての項目でフローが繰り返されると、ループは終了します。</p>
+      <div>
+        <img alt="2 つの割り当てがあるループのスクリーンショット" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/platform_automation/images/flow/flow_sobjclone_coll.png" style="height:300px;">
+      </div>
+      <ul>
+        <li>ループ要素を使用し、フローで各項目の値をループ変数 (<samp class="parmname">{!myCaseLoopVar_original}</samp>) に渡します。</li>
+
+        <li>反復するたびに、割り当て要素は、<samp class="parmname">Id</samp>、<samp class="parmname">IsEscalated</samp>、<samp class="parmname">Status</samp> の項目をループ変数から別のレコード変数 (<samp class="parmname">{!myCaseLoopVar_final}</samp>) にコピーします。</li>
+
+        <li>次に、フローは<samp class="parmname">{!myCaseLoopVar_final}</samp>変数の値を新しいコレクションに追加します。2 番目の割り当て要素には次の割り当てルールが含まれます。<table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:28.69910625620655%"><col style="width:9.930486593843098%"><col style="width:61.370407149950346%"></colgroup><thead class="slds-text-title_caps">
+                <tr class="">
+                  <th id="d232145e331" style="vertical-align:top;" class="slds-cell-wrap" scope="col">変数</th>
+                  <th id="d232145e334" style="vertical-align:top;" class="slds-cell-wrap" scope="col">演算子</th>
+                  <th id="d232145e337" style="vertical-align:top;" class="slds-cell-wrap" scope="col">値</th>
+                </tr>
+              </thead><tbody>
+                <tr class="">
+                  <td headers="d232145e331" style="vertical-align:top;" class="slds-cell-wrap" data-label="変数">{!myCaseColl_updated}</td>
+
+                  <td headers="d232145e334" style="vertical-align:top;" class="slds-cell-wrap" data-label="演算子">加算</td>
+
+                  <td headers="d232145e337" style="vertical-align:top;" class="slds-cell-wrap" data-label="値">{!myCaseLoopVar_final}</td>
+
+                </tr>
+              </tbody></table></li>
+
+      </ul>
+
+    </div></div></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="レコードコレクション変数を使用して、複数の Salesforce またはマーケティングオブジェクトレコードを作成または更新します。レコード変数またはフローの他の値を使用して、Salesforce またはマーケティングオブジェクトのレコードを 1 つだけ作成または更新します。" href="elements_ref-2.html#flow_ref_elements_data_create">レコードの作成要素</a></li><li><a title="更新する Salesforce またはマーケティングオブジェクトのレコードを特定し、それらのレコードの値を変更します。これを行うには、レコード変数またはレコードコレクション変数に保存されている ID と項目値を使用するか、条件を指定してレコードを特定し、項目値を個別に設定します。" href="elements_ref-2.html#flow_ref_elements_data_update">レコードの更新要素</a></li></ul></div>
+</div>
+</div>
+
+
+  
+</div></div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="flow_considerations_readonlyfields_parent">
+<h1 class="slds-text-heading_large">フローの操作と参照のみの項目</h1>
+  <p>フローが項目値に対して持つアクセス権が参照のみになるのはいつかを把握してください。フローが参照のみの項目の更新を試行するときの動作を制御して、参照のみの項目値をフローの操作から削除できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><a title="Flow Builder をサポートするエディションとユーザーインターフェースについて説明します。一部の Flow Builder 機能は、追加ライセンスが必要な他の Salesforce 製品と統合されます。" href="elements_ref-4.html#flow_ref_supported_editions">サポートされているエディションを表示する。</a></td>
+
+      </tr>
+     </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#flow_considerations_readonlyfields">フローレコード処理の参照のみの項目制限</a></strong><br>実行ユーザーが編集できない項目は、レコードの作成および更新時にフローにアクセスできません。これは、ユーザーに項目レベル権限がない場合、または項目がシステム項目の場合に発生します。</li><li class="slds-p-bottom_small"><strong><a href="#flow_considerations_readonlyfields_behavior">フローが参照のみの項目の値を設定しているときに発生することの制御</a></strong><br>フローでレコードの作成や更新などのアクションを実行する場合、フローはフロー要求を使用して特定の項目の値を設定します。実行ユーザーにこのような項目の編集アクセス権がない場合は、どのようになるのでしょうか。レコードの作成要素やレコードを更新要素でレコード変数またはレコードコレクション変数を使用する場合、ユーザーが制御できます。動作を制御するには、[フロー要求のアクセスでき<samp class="parmname">ない項目を</samp>絞り込む] 設定をオンまたはオフします。</li><li class="slds-p-bottom_small"><strong><a href="#flow_considerations_readonlyfields_fix">フローの参照のみの項目エラーの修正</a></strong><br>実行ユーザーに編集権限がない項目を更新しようとするフローをトラブルシューティングします。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="flow_considerations_salesforce_data">
+<h1 class="slds-text-heading_large">フローに関する Salesforce データの考慮事項</h1>
+  <p>フローを設計するときは、次の Salesforce データに関する事項を考慮してください。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><a title="Flow Builder をサポートするエディションとユーザーインターフェースについて説明します。一部の Flow Builder 機能は、追加ライセンスが必要な他の Salesforce 製品と統合されます。" href="elements_ref-4.html#flow_ref_supported_editions">サポートされているエディションを表示する。</a></td>
+
+      </tr>
+     </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">レコードタイプの設定</h2><p>たとえば、レコードを取得要素を使用して、名前が「Reduction Order」であるレコードタイプレコードを検索します。次に、そのレコードタイプの ID を変数に保存します。その後、この変数を使用して、注文レコードに <samp class="parmname">[注文レコード種別]</samp> 項目を設定できます。</p><p>レコードタイプを設定するには、レコードタイプの ID を使用します。 フローで、レコード名を使用してレコードタイプを検索し、その ID を保存します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">個人取引先の使用</h2><p>組織で個人取引先を使用する場合は、<samp class="parmname">Account.Salutation</samp> ではなく <samp class="parmname">Contact.Salutation</samp> を参照します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">null 値</h2><p>レコードを取得要素またはレコードを更新要素の検索条件で null 値を参照すると、フローが失敗します。検索条件で値を参照する前に、決定要素を追加して値が null かどうかを確認してください。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">差し込み項目</h2><p>フローリソースに値が保存されている場合のみ、実行時にフローで差し込み項目の値を参照できます。たとえば、フローはメッセージングテンプレートに含まれる差し込み項目を参照できません。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">データ型</h2><a name="flow_considerations_salesforce_data__ul_eb3_c52_l2c"></a><ul id="flow_considerations_salesforce_data__ul_eb3_c52_l2c">
+        <li>フローは JunctionIdList データ型にアクセスできません。</li>
+
+        <li>時間データ型のカスタム項目は、フローではサポートされません。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">パッケージ</h2><p>フローでは、ToDo オブジェクトの [関連先 ID] 項目でパッケージ内のオブジェクトを参照できます。パッケージのアンインストール中にコンポーネント参照エラーが発生した場合は、次のフローを確認してください。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="フローが項目値に対して持つアクセス権が参照のみになるのはいつかを把握してください。フローが参照のみの項目の更新を試行するときの動作を制御して、参照のみの項目値をフローの操作から削除できます。" href="#flow_considerations_readonlyfields_parent">フローの操作と参照のみの項目</a></li><li><a title="Apex で定義されたデータ型を含むフローを作成するときは、次の考慮事項を理解してください。" href="overview-2.html#flow_considerations_apex_data_type">Apex で定義されたデータ型の考慮事項</a></li><li><a title="外部オブジェクトを含むフローを作成するときは、次の点を考慮してください。" href="#flow_considerations_salesforce_features_external_object">フローの外部オブジェクトに関する考慮事項</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="flow_considerations_salesforce_features">
+<h1 class="slds-text-heading_large">フローの Salesforce 機能に関する考慮事項</h1>
+  <p>フローを設計するときは、次の Salesforce 機能を考慮してください。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><a title="Flow Builder をサポートするエディションとユーザーインターフェースについて説明します。一部の Flow Builder 機能は、追加ライセンスが必要な他の Salesforce 製品と統合されます。" href="elements_ref-4.html#flow_ref_supported_editions">サポートされているエディションを表示する。</a></td>
+
+      </tr>
+     </tbody></table>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#flow_considerations_salesforce_features_security">フローのセキュリティに関する考慮事項</a></strong><br>フローを設計するときは、次のセキュリティに関する事項を考慮してください。</li><li class="slds-p-bottom_small"><strong><a href="#flow_considerations_salesforce_features_external_object">フローの外部オブジェクトに関する考慮事項</a></strong><br>外部オブジェクトを含むフローを作成するときは、次の点を考慮してください。</li><li class="slds-p-bottom_small"><strong><a href="#flow_considerations_salesforce_features_lc">フローの Lightning コンポーネントに関する考慮事項</a></strong><br>Lightning コンポーネントを含むフローを作成するときは、次の考慮事項に留意してください。</li><li class="slds-p-bottom_small"><strong><a href="build-4.html#flow_build_reactive_set">画面フローのリアクティビティに関する考慮事項</a></strong><br>画面フローのリアクティビティを設定する前に、次の考慮事項を確認してください。リアクティビティは API バージョン 57.0 以降でサポートされています。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="flow_considerations_salesforce_features_external_object">
+<h1 class="slds-text-heading_large">フローの外部オブジェクトに関する考慮事項</h1>
+  <p>外部オブジェクトを含むフローを作成するときは、次の点を考慮してください。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><a title="Flow Builder をサポートするエディションとユーザーインターフェースについて説明します。一部の Flow Builder 機能は、追加ライセンスが必要な他の Salesforce 製品と統合されます。" href="elements_ref-4.html#flow_ref_supported_editions">サポートされているエディションを表示する。</a></td>
+
+      </tr>
+     </tbody></table>
+    <div><ul>
+        <li>
+          <span>外部オブジェクトレコードを作成または更新する場合、外部システムの異なるデータ型に対応付けられている間接参照関係の値を設定しないでください。たとえば、外部システムの日付値に対応付けられているテキスト間接参照関係の値を設定しないでください。</span>
+        </li>
+
+        <li>間接参照関係により外部オブジェクトにリンクされている Salesforce レコードを見つけるには、親オブジェクトの <samp class="parmname">Id</samp> 項目を、間接参照関係項目内の ID と照合します。間接参照関係を選択し、閉じ中括弧の前に <kbd>.Id</kbd> を追加します。たとえば、間接参照関係で取引先責任者 (親の標準オブジェクト) をソーシャルメディア投稿 (子の外部オブジェクト) に接続するとします。フローでは、レコード変数 <samp class="parmname">{!socialMediaPost}</samp> にソーシャルメディア投稿の項目値が含まれます。親の取引先責任者レコードを見つけるには、レコードを取得要素内で次のように検索条件を設定します。<pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>Id Equals {!socialMediaPost.indirectLookupRelationship_c__c.Id}</code></pre></li>
+
+        <li>外部参照関係によりリンクされた親の外部オブジェクトレコードを見つけるには、親レコードの外部 ID を子レコードの外部参照関係と照合します。たとえば、外部参照関係で商品カタログ項目 (親の外部オブジェクト) をケース (子の標準オブジェクト) に接続するとします。フローでは、レコード変数 <samp class="parmname">{!case}</samp> にサポートケースの項目値が含まれます。親の商品カタログ項目レコードを見つけるには、レコードを取得要素内で次のように検索条件を設定します。<pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>ExternalId Equals {!case.externalLookupRelationship_c__c}</code></pre></li>
+
+        <li>
+          <span>Salesforce が組織のデータを作成、更新、または削除した後、同じトランザクション内で外部データにアクセスした場合、エラーが発生します。フローでは、個別のトランザクションを使用して外部システムのデータにアクセスすることをお勧めします。これを行うには、画面またはローカルアクションを画面フローに追加するか、待機要素を自動起動フローに追加して、前のトランザクションを終了します。待機要素を使用する場合は、レコードベースの再開時間を使用しないでください。</span>
+          <p>
+            <span>たとえば、画面フローで取引先責任者を作成し、確認画面を表示します。次に、フローで外部システムの取引先責任者を更新します。フローは個別のトランザクションを使用して外部データにアクセスするため失敗しません。</span>
+          </p>
+        </li>
+
+      </ul>
+</div>
+    <div><ul>
+        <li id="flow_considerations_salesforce_features_external_object__external_object_flow_process_ID_URL_dont_update"><a name="flow_considerations_salesforce_features_external_object__external_object_flow_process_ID_URL_dont_update"></a>プロセスまたはフローの [外部 ID] および [表示 URL] 項目を更新しないでください。</li>
+
+        <li id="flow_considerations_salesforce_features_external_object__external_object_flow_process_record_change_process_unsupported"><a name="flow_considerations_salesforce_features_external_object__external_object_flow_process_record_change_process_unsupported"></a>レコード変更プロセスはサポートされていません。</li>
+
+        <li id="flow_considerations_salesforce_features_external_object__external_object_flow_process_dirty_transaction_solutions"><a name="flow_considerations_salesforce_features_external_object__external_object_flow_process_dirty_transaction_solutions"></a>同じトランザクション内で外部オブジェクトを変更する前に、標準オブジェクトまたはカスタムオブジェクトへの変更を保存または確定するには、プロセスまたはフローが必要です。標準またはカスタムオブジェクトに変更をコミットするオプションは、ツールによって異なります。標準またはカスタムオブジェクトレコードを変更するアクションの後、次のように処理します。<ul>
+            <li>Flow Builder では、フローベースの時間が発生するまで一時停止する画面、ローカルアクション、または待機要素を追加します。</li>
+
+            <li>プロセスビルダーでは、スケジュール済みアクションを追加します。</li>
+
+          </ul>
+</li>
+
+      </ul>
+</div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="flow_considerations_salesforce_features_lc">
+<h1 class="slds-text-heading_large">フローの Lightning コンポーネントに関する考慮事項</h1>
+  <p>Lightning コンポーネントを含むフローを作成するときは、次の考慮事項に留意してください。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><a title="Flow Builder をサポートするエディションとユーザーインターフェースについて説明します。一部の Flow Builder 機能は、追加ライセンスが必要な他の Salesforce 製品と統合されます。" href="elements_ref-4.html#flow_ref_supported_editions">サポートされているエディションを表示する。</a></td>
+
+      </tr>
+     </tbody></table>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> これらのトピックは、Lightning コンポーネントを構築する開発者向けです。</div></div></div>
+</div>
+    <div><ul>
+        <li>
+          フローの Lightning コンポーネントは、<a target="_blank" href="https://developer.salesforce.com/docs/platform/lightning-components-security/guide/locker-intro.html">Lightning Locker</a> の制限に準拠する必要があります。</li>
+
+        <li>
+          Lightning コンポーネントを含むフローは、<a target="_blank" href="https://help.salesforce.com/s/articleView?id=sf.flow_distribute_runtime.htm&amp;language=ja&amp;type=5">Lightning ランタイム</a>でのみサポートされます。</li>
+
+      </ul>
+</div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#flow_considerations_salesforce_features_lc_aura">フローでサポートされる Lightning コンポーネントの属性種別</a></strong><br>Lightning コンポーネントは、フローの特定のデータ型をサポートします。サポートされる種別とそのコレクションのみをフローと Lightning コンポーネント間で対応付けます。</li><li class="slds-p-bottom_small"><strong><a href="#flow_considerations_salesforce_features_lc_attribute">フロー画面コンポーネントとアクションコンポーネントの設計属性に関する考慮事項</a></strong><br>Flow Builder で属性を公開するには、コンポーネントバンドルのデザインリソースに対応する <code>design:attribute</code> を定義します。フローの設計属性を定義するときには、次のガイドラインを参考にしてください。</li><li class="slds-p-bottom_small"><strong><a href="#flow_considerations_salesforce_features_lc_runtime">フローの Aura コンポーネントランタイムに関する考慮事項</a></strong><br>実行中のフローの Aura コンポーネントの動作が想定と異なることがあります。リリース前に、配布方法別の Aura コンポーネントの動作を確認します。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="flow_considerations_salesforce_features_lc_attribute">
+<h1 class="slds-text-heading_large">フロー画面コンポーネントとアクションコンポーネントの設計属性に関する考慮事項</h1>
+  <p>Flow Builder で属性を公開するには、コンポーネントバンドルのデザインリソースに対応する <code>design:attribute</code> を定義します。フローの設計属性を定義するときには、次のガイドラインを参考にしてください。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><a title="Flow Builder をサポートするエディションとユーザーインターフェースについて説明します。一部の Flow Builder 機能は、追加ライセンスが必要な他の Salesforce 製品と統合されます。" href="elements_ref-4.html#flow_ref_supported_editions">サポートされているエディションを表示する。</a></td>
+
+      </tr>
+     </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small"><code>design:attribute</code> ノードでサポートされる属性</h2><p><code>design:attribute</code> ノードでは、Flow Builder で <code>name</code>、<code>label</code>、<code>description</code>、および <code>default</code> 属性のみがサポートされます。<code>min</code> や <code>max</code> などの他の属性は無視されます。</p><p>たとえば、この設計属性の定義では、Flow Builder は <code>required</code> と <code>placeholder.</code> を無視します。</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>&lt;design:attribute name="greeting" label="Greeting" placeholder="Hello" required="true"/&gt;</code></pre></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">属性の最小値と最大値の計算</h2><p>コンポーネント属性の最小長と最大長を検証するには、フロー数式またはコンポーネントのクライアント側コントローラーを使用します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small"><code>design:attribute</code> ノードの変更または削除</h2><p>コンポーネントの属性がフローで参照される場合、属性型を変更したり、デザインリソースから削除したりすることできません。この制限は、有効なフローバージョンだけではなく、すべてのフローバージョンに適用されます。すべてのフローバージョンで属性への参照を削除し、デザインリソースで属性を編集または削除します。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="flow_considerations_salesforce_features_lc_aura">
+<h1 class="slds-text-heading_large">フローでサポートされる Lightning コンポーネントの属性種別 </h1>
+  <p>Lightning コンポーネントは、フローの特定のデータ型をサポートします。サポートされる種別とそのコレクションのみをフローと Lightning コンポーネント間で対応付けます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><a title="Flow Builder をサポートするエディションとユーザーインターフェースについて説明します。一部の Flow Builder 機能は、追加ライセンスが必要な他の Salesforce 製品と統合されます。" href="elements_ref-4.html#flow_ref_supported_editions">サポートされているエディションを表示する。</a></td>
+
+      </tr>
+     </tbody></table>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:16.666666666666664%"><col style="width:16.666666666666664%"><col style="width:66.66666666666666%"></colgroup><thead class="slds-text-title_caps">
+          <tr class="">
+            <th id="d27370e58" style="vertical-align:top;" class="slds-cell-wrap" scope="col">フローデータ型</th>
+            <th id="d27370e61" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Lightning コンポーネントの属性型</th>
+            <th id="d27370e64" style="vertical-align:top;" class="slds-cell-wrap" scope="col">有効な値</th>
+          </tr>
+        </thead><tbody>
+          <tr class="">
+            <td headers="d27370e58" style="vertical-align:top;" class="slds-cell-wrap" data-label="フローデータ型">Apex</td>
+
+            <td headers="d27370e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="Lightning コンポーネントの属性型">カスタム Apex クラス</td>
+
+            <td headers="d27370e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="有効な値"><code>@AuraEnabled</code> 項目を定義する Apex クラス。Apex クラスでサポートされているデータ型は、Boolean、Integer、Long、Decimal、Double、Date、DateTime、String です。各データ型で単一値およびリストがサポートされています。</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d27370e58" style="vertical-align:top;" class="slds-cell-wrap" data-label="フローデータ型">Boolean</td>
+
+            <td headers="d27370e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="Lightning コンポーネントの属性型">Boolean</td>
+
+            <td headers="d27370e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="有効な値"><ul>
+                <li>True 値: <kbd>true</kbd>、<kbd>1</kbd>、または同等の式</li>
+
+                <li>False 値: <kbd>false</kbd>、<kbd>0</kbd>、または同等の式</li>
+
+              </ul>
+</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d27370e58" style="vertical-align:top;" class="slds-cell-wrap" data-label="フローデータ型">Currency</td>
+
+            <td headers="d27370e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="Lightning コンポーネントの属性型">Number</td>
+
+            <td headers="d27370e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="有効な値">数値または同等の式</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d27370e58" style="vertical-align:top;" class="slds-cell-wrap" data-label="フローデータ型">Date</td>
+
+            <td headers="d27370e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="Lightning コンポーネントの属性型">Date</td>
+
+            <td headers="d27370e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="有効な値"><kbd>"YYYY-MM-DD"</kbd> または同等の式</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d27370e58" style="vertical-align:top;" class="slds-cell-wrap" data-label="フローデータ型">Date/Time (API 参照名は DateTime)</td>
+
+            <td headers="d27370e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="Lightning コンポーネントの属性型">DateTime</td>
+
+            <td headers="d27370e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="有効な値"><kbd>"YYYY-MM-DDThh:mm:ssZ"</kbd> または同等の式</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d27370e58" style="vertical-align:top;" class="slds-cell-wrap" data-label="フローデータ型">Number</td>
+
+            <td headers="d27370e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="Lightning コンポーネントの属性型">Number</td>
+
+            <td headers="d27370e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="有効な値">数値または同等の式</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d27370e58" style="vertical-align:top;" class="slds-cell-wrap" data-label="フローデータ型"><p>Multi-Select Picklist</p><p style="margin-bottom:0;">(API 参照名は Multi-Select Picklist)。</p></td>
+
+            <td headers="d27370e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="Lightning コンポーネントの属性型">String</td>
+
+            <td headers="d27370e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="有効な値"><p>次の形式を使用する文字列値または同等の式:</p><p style="margin-bottom:0;"><kbd>"Blue; Green; Yellow"</kbd></p></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d27370e58" style="vertical-align:top;" class="slds-cell-wrap" data-label="フローデータ型">Picklist</td>
+
+            <td headers="d27370e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="Lightning コンポーネントの属性型">String</td>
+
+            <td headers="d27370e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="有効な値">文字列値または同等の式</td>
+
+          </tr>
+          <tr class="">
+            <td headers="d27370e58" style="vertical-align:top;" class="slds-cell-wrap" data-label="フローデータ型"><p>Record (指定されたオブジェクトを含む)</p><p style="margin-bottom:0;">(API 参照名は SObject)。</p></td>
+
+            <td headers="d27370e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="Lightning コンポーネントの属性型">指定されたオブジェクトの API 参照名 (Account、Case など)。</td>
+
+            <td headers="d27370e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="有効な値"><p>キー - 値ペアの対応付けまたは同等の式。</p><p style="margin-bottom:0;">フローレコードの値は、特定のオブジェクトを型とする属性にのみ対応付けられます。たとえば、取引先レコードの変数は、型が Account の属性にのみ対応付けられます。フローのデータ型は、型が Object の属性とは互換性がありません。</p></td>
+
+          </tr>
+          <tr class="">
+            <td headers="d27370e58" style="vertical-align:top;" class="slds-cell-wrap" data-label="フローデータ型"><p>Text</p><p style="margin-bottom:0;">(API 参照名は Text)。</p></td>
+
+            <td headers="d27370e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="Lightning コンポーネントの属性型">String</td>
+
+            <td headers="d27370e64" style="vertical-align:top;" class="slds-cell-wrap" data-label="有効な値">文字列値または同等の式</td>
+
+          </tr>
+        </tbody></table>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="flow_considerations_salesforce_features_lc_runtime">
+<h1 class="slds-text-heading_large">フローの Aura コンポーネントランタイムに関する考慮事項</h1>
+  <p>実行中のフローの Aura コンポーネントの動作が想定と異なることがあります。リリース前に、配布方法別の Aura コンポーネントの動作を確認します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><a title="Flow Builder をサポートするエディションとユーザーインターフェースについて説明します。一部の Flow Builder 機能は、追加ライセンスが必要な他の Salesforce 製品と統合されます。" href="elements_ref-4.html#flow_ref_supported_editions">サポートされているエディションを表示する。</a></td>
+
+      </tr>
+     </tbody></table>
+    <div><p>一部の配布方法で使用されるフローランタイムアプリケーションには、Lightning コンポーネントフレームワークからの一部の必要なリソースが含まれません。Flow Builder または直接フロー URL(https://<em>yourDomain</em>.my.salesforce.com/flow/<em>MyFlowName</em>)からフローが実行される場合、<code>force</code>および<code>lightning</code>イベントは処理されません。</p><p>Aura コンポーネントの動作を検証するには、<code>force</code> および <code>lightning</code> イベントを処理する方法（例：<code>force:showToast</code>）でフローをテストしてください。また、適切なイベントハンドラーをコンポーネントに直接追加することもできます。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:66.66666666666666%"><col style="width:33.33333333333333%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d216793e85" style="vertical-align:top;" class="slds-cell-wrap" scope="col">配布方法</th>
+              <th id="d216793e88" style="vertical-align:top;" class="slds-cell-wrap" scope="col"><code>force</code> および <code>lightning</code> イベントの処理</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d216793e85" style="vertical-align:top;" class="slds-cell-wrap" data-label="配布方法">直接フロー URL </td>
+
+              <td headers="d216793e88" style="text-align:center;vertical-align:top;" class="slds-cell-wrap" data-label="force および lightning イベントの処理"> いいえ </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d216793e85" style="vertical-align:top;" class="slds-cell-wrap" data-label="配布方法">Flow Builder の [実行] および [デバッグ] ボタン</td>
+
+              <td headers="d216793e88" style="text-align:center;vertical-align:top;" class="slds-cell-wrap" data-label="force および lightning イベントの処理"> いいえ </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d216793e85" style="vertical-align:top;" class="slds-cell-wrap" data-label="配布方法">フローの詳細ページとリストビューの [実行] リンク</td>
+
+              <td headers="d216793e88" style="text-align:center;vertical-align:top;" class="slds-cell-wrap" data-label="force および lightning イベントの処理"> いいえ </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d216793e85" style="vertical-align:top;" class="slds-cell-wrap" data-label="配布方法">Web タブ</td>
+
+              <td headers="d216793e88" style="text-align:center;vertical-align:top;" class="slds-cell-wrap" data-label="force および lightning イベントの処理"> いいえ </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d216793e85" style="vertical-align:top;" class="slds-cell-wrap" data-label="配布方法">カスタムボタンまたはカスタムリンク</td>
+
+              <td headers="d216793e88" style="text-align:center;vertical-align:top;" class="slds-cell-wrap" data-label="force および lightning イベントの処理"> いいえ </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d216793e85" style="vertical-align:top;" class="slds-cell-wrap" data-label="配布方法">Lightning ページ</td>
+
+              <td headers="d216793e88" style="text-align:center;vertical-align:top;" class="slds-cell-wrap" data-label="force および lightning イベントの処理"> はい </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d216793e85" style="vertical-align:top;" class="slds-cell-wrap" data-label="配布方法">エクスペリエンスビルダーサイトページ</td>
+
+              <td headers="d216793e88" style="vertical-align:top;" class="slds-cell-wrap" data-label="force および lightning イベントの処理">サイトによって異なります。Aura サイトではすべてのフローを処理できます。LWR サイトには、Aura コンポーネントを使用するフローを実行できないなどの制限事項があります。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d216793e85" style="vertical-align:top;" class="slds-cell-wrap" data-label="配布方法">フローアクション</td>
+
+              <td headers="d216793e88" style="text-align:center;vertical-align:top;" class="slds-cell-wrap" data-label="force および lightning イベントの処理"> はい </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d216793e85" style="vertical-align:top;" class="slds-cell-wrap" data-label="配布方法">ユーティリティバー</td>
+
+              <td headers="d216793e88" style="text-align:center;vertical-align:top;" class="slds-cell-wrap" data-label="force および lightning イベントの処理"> はい </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d216793e85" style="vertical-align:top;" class="slds-cell-wrap" data-label="配布方法"><code>flow:interview</code> Visualforce コンポーネント</td>
+
+              <td headers="d216793e88" style="text-align:center;vertical-align:top;" class="slds-cell-wrap" data-label="force および lightning イベントの処理"> いいえ </td>
+
+            </tr>
+            <tr class="">
+              <td headers="d216793e85" style="vertical-align:top;" class="slds-cell-wrap" data-label="配布方法"><code>lightning:flow</code> Aura コンポーネント</td>
+
+              <td headers="d216793e88" style="vertical-align:top;" class="slds-cell-wrap" data-label="force および lightning イベントの処理">コンポーネントを埋め込む場所、またはコンポーネントに適切なイベントハンドラーが含まれるかどうかによって異なる</td>
+
+            </tr>
+          </tbody></table></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="flow_considerations_salesforce_features_security">
+<h1 class="slds-text-heading_large">フローのセキュリティに関する考慮事項</h1>
+  <p>フローを設計するときは、次のセキュリティに関する事項を考慮してください。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><a title="Flow Builder をサポートするエディションとユーザーインターフェースについて説明します。一部の Flow Builder 機能は、追加ライセンスが必要な他の Salesforce 製品と統合されます。" href="elements_ref-4.html#flow_ref_supported_editions">サポートされているエディションを表示する。</a></td>
+
+      </tr>
+     </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">フローインタビュー</h2><p>ユーザーセッションの期限が切れると、Salesforce によって進行中のフローインタビューが中断され、ユーザーは再開できなくなります。フローでアクション ([レコードを作成] 要素や [Chatter に投稿] 要素など) が実行された場合、Salesforce はそれらのアクションをロールバックしません。ただし、ユーザーが画面で入力した内容など、他の進行状況は失われます。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> 
+        <ul>
+          <li>適切な期間後にユーザーをログアウトするようにセッションタイムアウト設定を行う。</li>
+
+          <li>インタビュー中に、セッションがまもなく期限切れになるというアラートに注意を払うようにユーザーに促す。</li>
+
+          <li>リリースアップグレード中にフローを実行しないようにユーザーに促す。通常、アップグレードにかかる時間は約 5 分です。</li>
+
+        </ul>
+
+      </div></div></div>
+<p>期限切れのユーザーセッションは、一時停止中または待機中のフローインタビューには影響しません。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Shield Platform Encryption</h2><p>以下の要素とリソースについては、暗号化項目によるレコードの絞り込みや並び替えができません。</p><ul>
+        <li>レコード更新要素</li>
+
+        <li>レコードの削除要素</li>
+
+        <li>レコードを取得要素</li>
+
+        <li>レコード選択肢セットリソース</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">画面フロー入力</h2><p>セキュリティ強化のために、画面フローで公開されている入力項目からすべての HTML を削除します。たとえば、公開されている画面フローの入力項目を Salesforce のリッチテキスト項目に対応付けます。不正な URL によってリッチテキスト項目にアクセスされるのを防ぐには、オブジェクトに個別のフローを作成して HTML を削除します。項目を迅速に更新するために新しいフローを最適化して、入力項目が空白でないときは実行するように設定します。公開されている入力項目にはいくつかのソースから書き込むことができるため、画面レベルではなく項目レベルで HTML を確認してください。</p><p>HTML を削除するために、オブジェクトで既存の Apex トリガーを使用することもできます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">カスタムメタデータ型とカスタム設定</h2><p>フローは、フローがユーザーコンテキストで実行されているかシステムコンテキストで実行されているかに関係なく、実行ユーザーの権限に関係なく、公開カスタムメタデータ型とカスタム設定を参照できます。</p><p>API バージョン 64.0 以降で実行されるフローでは、[レコードを取得] 要素で取得されるカスタムメタデータ型レコードおよびカスタム設定レコードの項目が画面に表示されることがあります。実行ユーザーがこれらの項目へのアクセス権を持っていない場合でも、画面にはこれらの項目が表示されます。API バージョン 63.0 以前で実行されるフローでは、実行ユーザーがこれらの項目へのアクセス権を持っていない場合、画面にエラーが返されます。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> 画面フローで取得する公開カスタムメタデータ型またはカスタム設定に機密情報を保存しないでください。</div></div></div>
+</div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.admin_sessions.htm&amp;language=ja&amp;type=5">セッションセキュリティ設定の変更</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="flow_considerations_salesforce_features_translation">
+<h1 class="slds-text-heading_large">フロー翻訳のベストプラクティス</h1>
+  <p>トランスレーションワークベンチを使用してフローを翻訳する場合、次のベストプラクティスに留意してください。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><a title="Flow Builder をサポートするエディションとユーザーインターフェースについて説明します。一部の Flow Builder 機能は、追加ライセンスが必要な他の Salesforce 製品と統合されます。" href="elements_ref-4.html#flow_ref_supported_editions">サポートされているエディションを表示する。</a></td>
+
+      </tr>
+     </tbody></table>
+    <ul>
+      <li>
+        <p>表示ラベルはできる限り短くします。翻訳された表示ラベルは 1,000 文字 (定義名とバージョン名の場合は 255 文字) を超えることはできません。表示テキスト項目の長い表示ラベルがある場合、複数の項目に分割することを検討します。</p>
+        <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 表示ラベルで差し込み項目を使用するたびに、1,000 文字の制限が 66 文字減ります。たとえば、<code>{!Account.Name}</code> は 15 文字しかありませんが、制限の 66 文字とみなされます。</div></div></div>
+
+      </li>
+
+      <li>主表示ラベルを変更する場合は、その翻訳の有無を確認し、必要に応じて更新します。</li>
+
+      <li>メール本文またはその他の形式のブロックテキストを翻訳する場合、テキストテンプレートの使用は避けます。</li>
+
+      <li>翻訳された値を参照するロジックの使用は避けます。</li>
+
+    </ul>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.workbench_flow_considerations.htm&amp;language=ja&amp;type=5">
+                            Salesforce ヘルプ: フローの翻訳に関する考慮事項 </a></li><li><a title="ほとんどのフロー画面コンポーネントでマルチ言語表示ラベルを使用する場合は、トランスレーションワークベンチを使用します。ベータのフロー画面コンポーネントと一部の正式リリースのフロー画面コンポーネントでは、この機能はサポートされません。一般に使用可能なフロー画面コンポーネントの場合は、$Label グローバル変数を使用してカスタムラベルを指定します。フローで参照する前にカスタム表示ラベルを作成します。" href="overview-4.html#flow_translate">フロー画面コンポーネントの翻訳</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="flow_considerations_trigger_record">
+<h1 class="slds-text-heading_large">レコードトリガーフローに関する考慮事項</h1>
+  <p>レコードトリガー自動起動フローでは、追加の更新をトリガーレコードに加える前または加えた後に、トリガーレコードをデータベースに保存します。保存前および保存後の更新を実行するフローに関する考慮事項とその特定の動作を把握します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><a title="Flow Builder をサポートするエディションとユーザーインターフェースについて説明します。一部の Flow Builder 機能は、追加ライセンスが必要な他の Salesforce 製品と統合されます。" href="elements_ref-4.html#flow_ref_supported_editions">サポートされているエディションを表示する。</a></td>
+
+      </tr>
+     </tbody></table>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">一般的な考慮事項</h2><p>次の考慮事項は、すべてのレコードトリガーフローに適用されます。</p><ul>
+        <li>レコードトリガーフローでカスタム入力規則を実行します。</li>
+
+        <li>自動起動フローから画面フローを参照することはできません。</li>
+
+        <li>実行順序の位置により、レコードトリガーフローの動作は同様のワークフロールールとは異なる場合があります。</li>
+
+        <li>Case.AccountId 項目が実行ユーザーの参照のみの場合、フローはユーザーがその取引先からケースを作成するときにその取引先を検索できません。たとえば、ユーザーが取引先詳細ページからケースを作成すると、Case.AccountId 項目は null のままになります。ケースは取引先に自動的にリンクされないため、フローで未入力の Case.AccountId 項目を使用して取引先レコードを検索することはできません。</li>
+
+        <li>同期実行パス中に Data Cloud オブジェクトなどの外部データにアクセスしようとすると、レコードトリガーフローは失敗します。レコードの保存中は外部サービスへのコールアウトを実行できないため、失敗します。外部データソースを照会するフローロジックを実行するには、非同期パスを使用します。フローの開始要素で、[アクションと関連レコード] の [非 <strong class="uicontrol">同期パスを追加</strong>] 切り替えをオンにして、このパスを作成します。非同期パスは、元のレコードの保存が正常に確定された後、バックグラウンドで実行され、外部コールアウトが有効になります。</li>
+
+        <li>非同期パスでは、決定要素などで <code>ISCHANGED</code> 演算子はサポートされません。</li>
+
+        <li>
+          <p>特定のオブジェクトで実行するように設定されているフローは、そのオブジェクトに別のオブジェクトを参照する数式項目があり、その項目が別のオブジェクトで更新されている場合は実行されません。</p>
+          <p>たとえば、更新された取引先に対して実行されるレコードトリガーフローについて考えてみます。Account オブジェクトには、次の 2 つのカスタム数式項目が含まれます。</p>
+          <ul>
+            <li>パートナー住所: 別の取引先レコードの [住所] 項目を参照する数式項目。</li>
+
+            <li>取引先責任者電話: 取引先責任者レコードの [電話] 項目を参照する数式項目。</li>
+
+          </ul>
+
+          <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+                <tr class="">
+                  <th id="d219675e111" style="vertical-align:top;" class="slds-cell-wrap" scope="col">シナリオ</th>
+                  <th id="d219675e114" style="vertical-align:top;" class="slds-cell-wrap" scope="col">結果</th>
+                </tr>
+              </thead><tbody>
+                <tr class="">
+                  <td headers="d219675e111" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオ">2 番目の取引先レコードの [住所] 項目が更新されます。</td>
+
+                  <td headers="d219675e114" style="vertical-align:top;" class="slds-cell-wrap" data-label="結果">フローは、2 番目の取引先レコードと [住所] 項目を参照する取引先レコードの両方でトリガーされます。</td>
+
+                </tr>
+                <tr class="">
+                  <td headers="d219675e111" style="vertical-align:top;" class="slds-cell-wrap" data-label="シナリオ">取引先責任者レコードの [電話] 項目が更新されます。</td>
+
+                  <td headers="d219675e114" style="vertical-align:top;" class="slds-cell-wrap" data-label="結果">[電話] 項目を参照する取引先レコードに更新されたデータが表示されても、フローはトリガーされません。</td>
+
+                </tr>
+              </tbody></table>
+        </li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">高速項目更新に関する考慮事項</h2><p>項目をすばやく (保存前) 更新できるように最適化されたレコードトリガーフローに関する考慮事項は次のとおりです。</p><ul>
+        <li>フローでは、トリガーレコードの項目値の更新以外のアクションを実行できません。</li>
+
+        <li>フローでは、トリガーレコードに関連するレコードの値を更新できません。</li>
+
+        <li>
+          <span>サポートされる要素は、割り当て要素、決定要素、レコードを取得要素、ループ要素のみです。</span>
+        </li>
+
+        <li>
+          トリガーを持つ自動起動フローを有効化するには、「すべてのデータの参照」権限が必要です。</li>
+
+      </ul>
+<p>次の動画では、項目 (保存前) の高速更新を使用する状況と関連レコードを更新する状況について説明します。</p><p>
+      <iframe width="640" height="360" src="https://play.vidyard.com/xxvrx6bZu6rSVwUYLdbANB?" class="doc_embedded_video"><!-- --></iframe>
+      </p><p>この<a target="_blank" href="https://play.vidyard.com/xxvrx6bZu6rSVwUYLdbANB?">動画は</a>別のタブでご覧ください。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">デバッグモードに関する考慮事項</h2><ul>
+        <li>デバッグモードの場合、 <code>ISCLONE()</code> 数式関数は常に <code>FALSE</code> と評価されます 。たとえば、レコードトリガーフローのエントリ条件または決定要素に<code>ISCLONE()</code>数式関数が含まれている場合、コピーしたレコードを使用してデバッグしているときでも、<code>ISCLONE()</code>は<code>FALSE</code>と評価されます。</li>
+
+      </ul>
+</div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="レコードを作成または更新すると、レコードがデータベースに保存される前に、そのレコードに追加の更新を行うレコードトリガーフローがトリガーされる場合があります。レコードトリガーフローでは、レコード変更プロセスよりも 10 倍速く Salesforce レコードを更新できます。レコードトリガーは、レコードトリガーフローの開始要素で設定します。" href="build-4.html#flow_concepts_trigger_record">保存前レコードトリガーフロー</a></li><li><a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.apexcode.meta/apexcode/apex_triggers_order_of_execution.htm"> Apex 開発者ガイド: トリガーと実行順序</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="flow_considerations_trigger_schedule">
+<h1 class="slds-text-heading_large">スケジュールトリガーフローの制限および考慮事項</h1>
+  <p>スケジュールトリガーフローは、指定された時間に開始し、指定された頻度で実行され、レコードのバッチを処理します。スケジュールトリガーフローを作成または有効化する前に、次の考慮事項、制限、および特殊な動作を確認してください。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><a title="Flow Builder をサポートするエディションとユーザーインターフェースについて説明します。一部の Flow Builder 機能は、追加ライセンスが必要な他の Salesforce 製品と統合されます。" href="elements_ref-4.html#flow_ref_supported_editions">サポートされているエディションを表示する。</a></td>
+
+      </tr>
+     </tbody></table>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> スケジュールトリガーフローはスケジュールに従って実行され、多くのレコードを処理できるため、作成する前に制限、セキュリティ、コールアウト、再試行の処理方法を確認することが重要です。</div></div></div>
+<p>スケジュールトリガーフローに関する次の考慮事項を確認してください。</p><p>権限とセキュリティ:</p><ul>
+        <li>「<samp class="parmname">データエクスポートの管理</samp>」権限が [<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.admin_sessions.htm&amp;language=ja&amp;type=5">セッションセキュリティレベルポリシー</a>] で [<samp class="parmname">セッションを高保証</samp>に上げる] に設定されている場合、Flow Builder でスケジュールトリガーフローを有効化または無効化することはできません。<ul>
+            <li>スケジュールトリガーフローでは、フローでスケジュール済みデータエクスポートが使用されているかどうかに関係なく、有効化または無効化されたときに「データエクスポート」権限が確認されます。</li>
+
+            <li>この権限が高保証セッションを必要とする場合、高保証要件を満たさない限り、フローを有効化または無効化できません。</li>
+
+          </ul>
+<p>フローを有効化または無効化するには、次のいずれかを実行します。</p><ul>
+            <li>[セッションセキュリティレベルポリシー] で [<samp class="parmname">データエクスポートを管理</samp>] を [<samp class="parmname">なし]</samp> に設定します。</li>
+
+            <li>ユーザーのプロファイルで [<samp class="parmname">Session Security Level Required at Login</samp> (ログイン時に必要なセッションセキュリティレベル)] を [<samp class="parmname">High Assurance (高保証</samp>)] に設定します。</li>
+
+          </ul>
+</li>
+
+        <li>トリガーを持つ自動起動フローを有効化するには、「すべてのデータの参照」権限が必要です。</li>
+
+        <li>$Record グローバル変数の ID とすべての項目値を使用するようにレコードの更新要素を設定する場合、組織のプロセスの自動化設定で [<samp class="parmname">Filter inaccessible fields from flow requests</samp> (フロー要求からのアクセスできない項目の絞り込み)] を有効にします。有効にしない場合、システム項目と他の参照のみの項目の値がレコードを更新要素により設定されるため、フローは失敗します。</li>
+
+      </ul>
+<p>フロー実行ユーザー:</p><p>[プロセスの自動化設定] で設定された [デフォルトのワークフローユーザー] は、スケジュールトリガーフローの実行ユーザーです。</p><p>開始動作:</p><ul>
+        <li>スケジュールトリガーフローには、指定された時間と頻度で開始されます。スケジュールトリガーフローを他の方法で開始することはできません。</li>
+
+        <li>[開始時刻] 項目値は、Salesforce 組織のデフォルトのタイムゾーンに基づきます。</li>
+
+        <li>フローを 1 回実行するようにスケジュールされた日時がすでに経過している場合、フローは実行されません。</li>
+
+      </ul>
+<p>Sandbox:</p><ul>
+        <li>Sandbox の更新が完了すると、Sandbox で有効だったスケジュール済みフローを、更新された Sandbox ですぐに実行できます。</li>
+
+      </ul>
+<p>制限とバッチ処理:</p><p>1 つのフローのスケジュールトリガーフローインタビューの最大数は 25 万件です。 24 時間あたりのスケジュールトリガーフローインタビューの最大数は 25 万件か、組織のユーザーライセンス数に 200 を掛けた数のいずれか大きい方です。スケジュールトリガーフローのクエリで取得されたレコードごとに 1 つのインタビューが作成されます。</p><ul>
+        <li>フローがレコードのバッチに対して実行されるようにオブジェクトを指定する場合、制限に達しないように時間、頻度、レコード条件を設定します。デフォルトでは、スケジュールトリガーフローのクエリは 200 件のバッチでレコードを取得しますが、バッチサイズは 1 ～ 200 の範囲で設定できます。 最大バッチサイズを低く設定すると、バッチサイズと実行するレコードの合計数に応じて処理時間が長くなる可能性があります。</li>
+
+        <li>スケジュールトリガーフローで実行されるレコード数を確認するには、デバッグログを使用して、SCHEDULED_FLOW_DETAIL イベントがあるレコード数を追跡します。</li>
+
+        <li>組織が制限に達した場合、フローエラーメールが送信されます。</li>
+
+      </ul>
+<p>スケジュールトリガーフローの削除:</p><p>[設定] の [スケジュール済みジョブ] ページからスケジュールトリガーフローを削除すると、そのフローの今後の繰り返しもすべてキャンセルされます。今後の実行を有効化するには、フローを無効化して再度有効化します。</p><p>コールアウトと Apex:</p><ul>
+        <li>Apex コードを実行するスケジュール トリガー フローが必要な場合は、[フローで呼び出される Apex クラスへのユーザー アクセスが必要] 更新を有効にしないでください。リリース更新を有効にすると、スケジュール トリガー フローは Apex の実行時に失敗します。</li>
+
+        <li>スケジュールトリガーフローが次の条件を満たす場合、待機要素なしのコールアウトがサポートされます。<ul>
+            <li>レコードのバッチを処理する</li>
+
+            <li>API バージョン 63.0 以降で実行</li>
+
+          </ul>
+</li>
+
+        <li>条件を満たしていない場合、スケジュールトリガーフローは待機要素を実行した後にのみコールアウトを実行できます。たとえば、待機要素がない場合、フローは外部オブジェクトにアクセスしたり、コールアウトを実行する Apex アクションを実行したり、外部サービスの登録から生成されたアクションを実行したりできません。<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> 少しの間だけフローを一時停止する待機要素を挿入できます。時間取得元として特定の時間を使用して、指定の時間まで一時停止するように再開イベントを設定します。基準時刻には、<code>$Flow.CurrentDateTime</code> グローバル変数を指定します。次に、オフセットを 0 時間に設定します。実行時に、このように設定された待機要素により、フローが一時停止します (通常は 1 分未満)。</div></div></div>
+</li>
+
+        <li>非同期フローから呼び出される同期 Apex トランザクションは、トランザクションあたりの同期 Apex の制限に影響します。非同期フローには、スケジュール済みフローと、スケジュール済みパスまたは非同期パスを持つフローがあります。</li>
+
+      </ul>
+<p>エラー処理:</p><ul>
+        <li>実行時に、スケジュールトリガーフローに複数のレコードを処理する [レコードを作成]、[レコードを削除]、[レコードを取得]、または [レコードを更新] 要素があり、一部のレコードが失敗した場合、すべてのレコードがロールバックされます。成功したレコードが再試行されます。フローの後半で同じ失敗レコードを処理する別のレコード作成要素、レコード削除要素、レコード取得要素、またはレコード更新要素がある場合、すべての変更がロールバックされ、フロートランザクションは失敗します。</li>
+
+      </ul>
+</div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="スケジュールトリガーフローは、レコードのバッチに対して、指定された時間と頻度で開始されます。スケジュールトリガーは、自動起動フローの開始要素で設定します。" href="build-4.html#flow_concepts_trigger_schedule">スケジュールトリガーフロー</a></li><li><a title="有効化後に発生するフローのエラーや予期しない動作をトラブルシューティングして解決する方法について説明します。エラーメールを解釈し、ベストプラクティスを使用して問題をすばやく特定して解決します。" href="operate-3.html#flow_troubleshoot_email">フロー実行時エラーのトラブルシューティング</a></li><li><a title="フローが項目値に対して持つアクセス権が参照のみになるのはいつかを把握してください。フローが参照のみの項目の更新を試行するときの動作を制御して、参照のみの項目値をフローの操作から削除できます。" href="#flow_considerations_readonlyfields_parent">フローの操作と参照のみの項目</a></li><li><a title="Flow Builder でフローをデバッグするときは、次の考慮事項に従ってください。" href="operate-2.html#flow_considerations_troubleshooting">Flow Builder デバッガの考慮事項</a></li><li><a title="Salesforce には、ビジネスプロセスのカスタマイズと合理化に役立つプラットフォーム自動化のさまざまな設定が用意されています。" href="overview-2.html#automation_about_settings">プロセスの自動化設定</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="flow_considerations_usage_entitlements">
+<h1 class="slds-text-heading_large">フローの使用量ベースのエンタイトルメント</h1>
+  <p>機能ライセンスと同様に、使用量ベースのエンタイトルメントによって Salesforce で実行できる内容は制限されません。使用量ベースのエンタイトルメントは、実用性に対して付加される要素です。使用量が許容量を超えると、契約への追加事項について話し合うために Salesforce から連絡があります。それまでの間、フローインタビューは通常どおり実行されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><a title="Flow Builder をサポートするエディションとユーザーインターフェースについて説明します。一部の Flow Builder 機能は、追加ライセンスが必要な他の Salesforce 製品と統合されます。" href="elements_ref-4.html#flow_ref_supported_editions">サポートされているエディションを表示する。</a></td>
+
+      </tr>
+     </tbody></table>
+    <div><p>
+        <span>1 か月あたりのエンタイトルメントの場合、月の開始と終了は、契約により決定されます。組織の使用量ベースのエンタイトルメントの開始日と終了日は [設定] の [組織情報] ページで表示できます。</span>
+      </p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 
+        <ul>
+          <li>サブフロー要素を使用して別のフローにより起動されるフローは、フローインタビューの割り当てには含まれません。</li>
+
+          <li>
+            <span>プロセスビルダーで構築されたプロセスがフローを起動した場合、プロセスとフローの両方がフローインタビューの割り当てに含まれます。</span>
+          </li>
+
+          <li>
+            <span>プロセスビルダーで構築されたプロセスの再帰を有効にしている場合、プロセスがレコードを評価するたびに個別のフローインタビューが開始されます。各フローインタビューはフローインタビューの割り当てに含まれます。</span>
+          </li>
+
+        </ul>
+
+      </div></div></div>
+<p>
+        <span>次の表に、組織のエディションに基づいて付与される無料の割り当てを示します。</span>
+      </p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:18.181818181818183%"><col style="width:27.27272727272727%"><col style="width:18.181818181818183%"><col style="width:18.181818181818183%"><col style="width:18.181818181818183%"></colgroup><thead class="slds-text-title_caps">
+      <tr class="">
+       <th id="d96723e101" style="vertical-align:top;" class="slds-cell-wrap" scope="col">組織単位の使用量ベースのエンタイトルメント</th>
+       <th id="d96723e104" style="vertical-align:top;" class="slds-cell-wrap" scope="col">計数の対象</th>
+       <th id="d96723e107" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Essentials Edition および Professional Edition</th>
+       <th id="d96723e110" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Performance Edition および Developer Edition</th>
+       <th id="d96723e113" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Enterprise Edition および Unlimited Edition</th>
+      </tr>
+     </thead><tbody>
+      <tr class="">
+       <td headers="d96723e101" style="vertical-align:top;" class="slds-cell-wrap" data-label="組織単位の使用量ベースのエンタイトルメント">1 か月あたりの UI を使用するフローインタビューの最大数</td>
+
+       <td headers="d96723e104" style="vertical-align:top;" class="slds-cell-wrap" data-label="計数の対象">
+        <span id="flow_considerations_usage_entitlements__d3095e111"><a name="flow_considerations_usage_entitlements__d3095e111"></a>画面フロー、ユーザープロビジョニングフロー、Field Service フロー、連絡要求フロー、アンケートビルダーで作成されたアンケートなどの画面要素を含むことができるフロー種別のインタビュー</span>
+       </td>
+
+       <td headers="d96723e107" style="vertical-align:top;" class="slds-cell-wrap" data-label="Essentials Edition および Professional Edition">
+        <span id="flow_considerations_usage_entitlements__d3095e117"><a name="flow_considerations_usage_entitlements__d3095e117"></a>2,000</span>
+       </td>
+
+       <td headers="d96723e110" style="vertical-align:top;" class="slds-cell-wrap" data-label="Performance Edition および Developer Edition">20,000,000</td>
+
+       <td headers="d96723e113" style="vertical-align:top;" class="slds-cell-wrap" data-label="Enterprise Edition および Unlimited Edition">
+        <span id="flow_considerations_usage_entitlements__d3095e126"><a name="flow_considerations_usage_entitlements__d3095e126"></a>20,000,000</span>
+       </td>
+
+      </tr>
+      <tr class="">
+       <td headers="d96723e101" style="vertical-align:top;" class="slds-cell-wrap" data-label="組織単位の使用量ベースのエンタイトルメント">
+        <span id="flow_considerations_usage_entitlements__d3095e135"><a name="flow_considerations_usage_entitlements__d3095e135"></a>1 か月あたりの UI を使用しないフローインタビューの最大数</span>
+       </td>
+
+       <td headers="d96723e104" style="vertical-align:top;" class="slds-cell-wrap" data-label="計数の対象">
+        <span id="flow_considerations_usage_entitlements__d3095e141"><a name="flow_considerations_usage_entitlements__d3095e141"></a>自動起動フロー、トランザクションセキュリティフロー、プロセスビルダーで作成されたプロセスなどの画面要素を含むことができないフロー種別のインタビュー</span>
+       </td>
+
+       <td headers="d96723e107" style="vertical-align:top;" class="slds-cell-wrap" data-label="Essentials Edition および Professional Edition">
+        <span id="flow_considerations_usage_entitlements__d3095e147"><a name="flow_considerations_usage_entitlements__d3095e147"></a>10,000,000</span>
+       </td>
+
+       <td headers="d96723e110" style="vertical-align:top;" class="slds-cell-wrap" data-label="Performance Edition および Developer Edition">
+        <span id="flow_considerations_usage_entitlements__d3095e153"><a name="flow_considerations_usage_entitlements__d3095e153"></a>10,000,000,000</span>
+       </td>
+
+       <td headers="d96723e113" style="vertical-align:top;" class="slds-cell-wrap" data-label="Enterprise Edition および Unlimited Edition">
+        <span id="flow_considerations_usage_entitlements__d3095e159"><a name="flow_considerations_usage_entitlements__d3095e159"></a>10,000,000,000</span>
+       </td>
+
+      </tr>
+     </tbody></table><p>次の表に、購入済みのユーザーライセンスに基づいて付与される追加の割り当てを示します。これらの割り当ては、組織に適用されます。どのユーザーがフローを実行するかは関係ありません。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:22.22222222222222%"><col style="width:33.33333333333333%"><col style="width:22.22222222222222%"><col style="width:22.22222222222222%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d96723e203" style="vertical-align:top;" class="slds-cell-wrap" scope="col">組織単位の使用量ベースのエンタイトルメント</th>
+              <th id="d96723e206" style="vertical-align:top;" class="slds-cell-wrap" scope="col">計数の対象</th>
+              <th id="d96723e209" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Enterprise Edition</th>
+              <th id="d96723e212" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Unlimited Edition</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d96723e203" style="vertical-align:top;" class="slds-cell-wrap" data-label="組織単位の使用量ベースのエンタイトルメント">1 か月あたりの UI を使用する追加のフローインタビュー数</td>
+
+              <td headers="d96723e206" style="vertical-align:top;" class="slds-cell-wrap" data-label="計数の対象">
+                <span>画面フロー、ユーザープロビジョニングフロー、Field Service フロー、連絡要求フロー、アンケートビルダーで作成されたアンケートなどの画面要素を含むことができるフロー種別のインタビュー</span>
+              </td>
+
+              <td headers="d96723e209" style="vertical-align:top;" class="slds-cell-wrap" data-label="Enterprise Edition"><p>Service Cloud ユーザーライセンスごとに 50</p><p style="margin-bottom:0;">Salesforce CRM Content ユーザーライセンスごとに +50</p></td>
+
+              <td headers="d96723e212" style="vertical-align:top;" class="slds-cell-wrap" data-label="Unlimited Edition"><p>+ Service ユーザーライセンスごとに 100</p><p style="margin-bottom:0;">Salesforce CRM Content ユーザーライセンスごとに 100</p></td>
+
+            </tr>
+          </tbody></table><p>割り当ての増加について質問がある場合は、Salesforce のアカウントエグゼクティブにお問い合わせください。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.users_understanding_tenant_usage_entitlements.htm&amp;language=ja&amp;type=5">使用量ベースのエンタイトルメント</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.users_usagebased_entitlements_viewing.htm&amp;language=ja&amp;type=5">Salesforce 組織の使用量ベースのエンタイトルメントの表示</a></li><li><a title="フローの種別によって、フローに追加できる要素とリソース、およびフローの配布方法が決まります。たとえば、訪問者から情報を収集するためにページに画面フローを埋め込んだり、バックグラウンドでフローを実行するためにユーザーがクリックするカスタムボタンを使用して自動起動フローを配布したりします。同様に、カスタムエラー要素はレコードトリガーフローでのみ追加できますが、選択肢リソース種別は画面フローでのみ追加できます。" href="overview-2.html#flow_concepts_type">フロー種別</a></li><li><a title="オブジェクトをプロセスに追加するとき、1 つの保存操作でレコードを複数回評価するかどうかを選択できます。" href="process_builder-2.html#process_advanced_reevaluate">プロセスビルダーでのレコードの再評価</a></li><li><a title="スケジュール済みアクションの処理する場合、関連付けられているスケジュールの種別、項目が変更されたかどうか、およびプロセスが無効化されたかどうかに基づいて想定される動作を理解しておく必要があります。" href="process_builder-3.html#process_limits_scheduled_processing">Salesforce によるスケジュール済みアクションの処理方法</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="flow_edit_history">
+<h1 class="slds-text-heading_large">フローバージョンの編集履歴の表示と復元</h1>
+ <p>現在のフローバージョンの保存履歴を確認し、フローを以前の保存に復元します。フローを保存するたびに、保存インスタンスがバージョン編集履歴に追加されます。保存インスタンスには、日付、フローを保存したユーザー、追加、編集、削除された要素の概要が表示されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+  <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+      </tr>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><a title="Flow Builder をサポートするエディションとユーザーインターフェースについて説明します。一部の Flow Builder 機能は、追加ライセンスが必要な他の Salesforce 製品と統合されます。" href="elements_ref-4.html#flow_ref_supported_editions">サポートされているエディションを表示する。</a></td>
+
+      </tr>
+     </tbody></table><p>保存インスタンスを作成するには、フローを少なくとも 1 回は保存します。</p></div>
+  <div><p>[履歴を編集] は、オートメーションイベントトリガーフロー、利用者 (セグメント、リスト、レコードクエリ、キャンペーン)、有効化トリガーフロー、オンデマンドフローで使用できます。画面フロー、レコードトリガーフロー、オーケストレーションでは使用できません。</p></div>
+  <ol><li>
+    <span>Flow Builder で、ツールバーの <strong class="uicontrol">［Edit History</strong> <span style="vertical-align:text-bottom;display:inline-block;"><img alt="履歴の編集アイコン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/platform_automation/images/flow/automate_flow_edit_history_icon.png" style="width:26px;margin-bottom:0;"></span> をクリックします。</span>
+    <div>
+     <p>フローに変更が保存されていない場合は、<span class="wintitle">［This Flow Has Unsaved Changes</span>］ モーダルが表示されます。[保存 &amp; <strong class="uicontrol">参照] [編集履歴</strong>] をクリックしてフローを保存し、編集履歴パネルを開きます。または、<strong class="uicontrol">[キャンセル]</strong> をクリックしてフローに戻り、最初に変更を確認します。</p>
+    </div>
+    <div>［<span class="wintitle">Flow Version Edit History</span>］ パネルが開きます。キャンバスが参照のみモードに切り替わります。</div>
+   </li><li>
+    <span>[<span class="wintitle">フローバージョン編集履歴</span>] パネルで、保存インスタンスのリストを確認します。</span>
+    <div>各インスタンスには、作成日とフローを保存したユーザーの名前が表示されます。</div>
+   </li><li>
+    <span>保存インスタンスをクリックすると、その時点でのフローの状態をプレビューできます。</span>
+    <div>
+     <ul>
+      <li>フローは、保存が行われたときと同じように表示されます。</li>
+
+      <li>保存インスタンスカードには、以前の保存インスタンスと比較した追加、編集、削除された要素の概要が表示されます。</li>
+
+      <li>変更された要素を確認するには、[<strong class="uicontrol">詳細] を</strong>展開します。要素名をクリックすると、その変更の詳細が表示されます。</li>
+
+     </ul>
+
+    </div>
+   </li><li>
+    <span>フローを保存インスタンスに復元するには、保存インスタンスカードの [<strong class="uicontrol">復元]</strong> をクリックします。</span>
+    <div>
+     <ul>
+      <li>復元すると、選択した保存インスタンスの状態を使用してフローが編集モードに戻ります。</li>
+
+      <li>その後、復元された状態から編集を続行できます。</li>
+
+      <li>復元された状態を保持するには、[保存] をクリックします。</li>
+
+     </ul>
+
+     <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 編集履歴は、現在のフローバージョンに固有です。新しいバージョンを作成した場合、編集履歴は継承されません。</div></div></div>
+
+    </div>
+   </li><li>
+    <span>保存インスタンスから新しいフローバージョンまたはフローを作成するには、保存インスタンスカードで [<strong class="uicontrol">新しいバージョン</strong>として保存] または [<strong class="uicontrol">新規フロー</strong>として保存] を選択します。</span>
+    <div>
+     <ul>
+      <li><strong class="uicontrol">[新しいバージョン</strong>として保存] を選択すると、保存インスタンスが現在のフローの新しいバージョンとして復元されます。</li>
+
+      <li>[<strong class="uicontrol">Save as New Flow</strong> (新規フローとして保存)] を選択すると、保存インスタンスのロジックが新規フローにコピーされます。</li>
+
+     </ul>
+
+    </div>
+   </li><li>
+    <span>アクションを実行せずに [編集履歴] を終了するには、[編集履歴を<strong class="uicontrol">終了] を</strong>クリックします。</span>
+    <div>
+     <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 編集履歴の表示中はフローを編集できません。</div></div></div>
+
+    </div>
+   </li></ol>
+
+  <div><p>特定のロジックを保持するには、[<strong class="uicontrol">新しいバージョン</strong>として保存] を使用してフローバージョンとして保持します。フローロジックを他の場所で再利用するには、[<strong class="uicontrol">新規フロー</strong>として保存] を使用してコピーを作成します。</p></div>
+ 
+<ul><li class="slds-p-bottom_small"><strong><a href="#flow_edit_history">フローの編集履歴: インスタンスの保持と制限の保存</a></strong><br>フローバージョンで [編集履歴] が保持する保存インスタンスの数と保持する期間について説明します。</li></ul>
+<div id="flow_edit_history_limits" lang="ja-jp" aria-labelledby="ariaid-title2" class="nested1"><a name="flow_edit_history_limits"></a>
+ <h2 class="slds-text-heading_medium slds-p-top_small">フローの編集履歴: インスタンスの保持と制限の保存</h2>
+ <p>フローバージョンで [編集履歴] が保持する保存インスタンスの数と保持する期間について説明します。</p>
+
+  <div><h3 class="slds-text-heading_small slds-p-top_small">保存制限</h3><p>[履歴を編集] では、フローバージョンごとに過去 5 回以上、最大 100 回の保存が保持されます。</p></div>
+  <div><h3 class="slds-text-heading_small slds-p-top_small">保持期間</h3><p>保存期間は 1 年間です。その後、保存を削除してストレージを管理できます。</p></div>
+  <div><h3 class="slds-text-heading_small slds-p-top_small">有効なフローバージョン</h3><p>過去 180 日以内のフローバージョンを保存すると、そのバージョンのすべての保存が保持されます (それより古いバージョンも保持されます)。作成中の保存履歴は失われません。</p></div>
+  <div><h3 class="slds-text-heading_small slds-p-top_small">自動クリーンアップ</h3><p>1 週間に 1 回、保存後 1 年を超えている保存や、180 日以上保存していないフローバージョンの保存が自動的に削除されます。このクリーンアップは自動的に実行されます。何もする必要はありません。</p></div>
+ 
+</div>
+</div>
+
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="flow_formula_builder">
+<h1 class="slds-text-heading_large">Flow Formula Builder を使用したフロー数式の作成</h1>
+  <p>フロー数式ビルダーを使用して、数式種別のリソースやコレクション検索条件、またはレコードトリガーフローの開始要素で式を作成できます。式を作成するには、関数と演算子のリストから選択します。作業中にエラーを見つけるには、各式の数式構文を確認します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><a title="Flow Builder をサポートするエディションとユーザーインターフェースについて説明します。一部の Flow Builder 機能は、追加ライセンスが必要な他の Salesforce 製品と統合されます。" href="elements_ref-4.html#flow_ref_supported_editions">サポートされているエディションを表示する。</a></td>
+
+      </tr>
+     </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d201575e61" style="text-align:left;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class=""> 
+              <td headers="d201575e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">Einstein for Flow や Agentforce for Flow など、Flow Builder で使用できるすべてのフロー タイプ、要素、機能を使用してフローを開く、編集、作成、有効化、または無効化する</td>
+
+              <td headers="d201575e61" style="vertical-align:top;" class="slds-cell-wrap">「フローの管理」</td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 「フローの管理」権限を持つ管理者である必要はありません。プロファイルまたは権限セットに追加するようにシステム管理者に依頼してください。</div></div></div>
+</div>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> 
+      <ul>
+        <li>100 名を超える従業員を抱える米国を拠点とする取引先の完了日が変更されたレコードの処理を自動化する。</li>
+
+        <li>収益が 100 万ドルを超える北米およびヨーロッパのプレミアサポート取引先の新規ケースレコードの処理を自動化する。</li>
+
+      </ul>
+
+    </div></div></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/modules/flow-build-logic">Trailhead: Flow Builder ロジック</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.useful_advanced_formulas.htm&amp;language=ja&amp;type=5">高度な数式項目の例</a></li></ul></div>
+<div id="flow_formula_builder_start" lang="ja-jp" aria-labelledby="ariaid-title2" class="nested1"><a name="flow_formula_builder_start"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">数式ビルダーを使用したフロー開始要素での数式の作成</h2>
+  <p>フロー数式ビルダーを使用して、レコードトリガーフローの開始要素で式を作成できます。式を作成するには、関数と演算子のリストから選択します。作業中にエラーを見つけるには、各式の数式構文を確認します。</p>
+
+    <ol><li>
+        <span>レコードトリガーフローで開始要素を編集します。</span>
+      </li><li>
+        <span>フローをトリガーするレコードのオブジェクトを選択します。</span>
+      </li><li>
+        <span>フローをトリガーするタイミングを選択します。</span>
+      </li><li>
+        <span>[エントリ条件を設定] セクションで [条件の要件] を <strong class="uicontrol">[数式の評価が true になる]</strong> に設定します。</span>
+      </li><li>
+        <span>グローバル変数のリストからリソースを挿入します。</span>
+        <ul>
+          <li> 1 つの式には複数のリソースを追加できます。</li>
+
+        </ul>
+
+      </li><li>
+        <span>関数を挿入します。</span>
+        <ul>
+          <li> 関数のリストを表示するには、<strong class="uicontrol">[関数を挿入]</strong> をクリックします。</li>
+
+          <li> カテゴリで関数を絞り込むには、<strong class="uicontrol">[すべての関数]</strong> ドロップダウンを選択してカテゴリを選択します。</li>
+
+        </ul>
+
+      </li><li>
+        <span>ドロップダウンから演算子を選択します。</span>
+      </li><li>
+        <span>式を完成させます。</span>
+      </li><li>
+        <span>各式を作成したら、<strong class="uicontrol">[構文を確認]</strong> をクリックします。数式ビルダーでは一度に 1 つのエラーが表示されます。</span>
+      </li><li>
+        <span>開始要素の設定を完了します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[完了]</strong> をクリックします。</span>
+      </li><li>
+        <span>作業内容を保存します。<div><img alt="開始要素の設定画面" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/platform_automation/images/flow/flow_formula_builder_start.png"></div></span>
+      </li></ol>
+
+  
+</div>
+<div id="flow_formula_builder_collection_filter" lang="ja-jp" aria-labelledby="ariaid-title3" class="nested1"><a name="flow_formula_builder_collection_filter"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">数式ビルダーを使用したフローコレクション検索条件での数式の作成</h2>
+  <p>フロー数式ビルダーを使用して、フローのコレクション検索条件要素で式を作成できます。式を作成するには、関数と演算子のリストから選択します。作業中にエラーを見つけるには、各式の数式構文を確認します。</p>
+
+    <ol><li>
+        <span>要素をフローに追加します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[コレクション検索条件]</strong> を選択します。</span>
+      </li><li>
+        <span>必要に応じて、生成された<strong class="uicontrol">表示ラベル</strong>を編集します。Flow Builder で要素の設定に基づいて生成され、表示ラベルに基づいて <strong class="uicontrol">API 参照名</strong>が入力されます。</span>
+      </li><li>
+        <span>コレクションを選択します。</span>
+      </li><li>
+        <span>[検索条件を適用] セクションで [条件の要件] を <strong class="uicontrol">[数式の評価が true になる]</strong> に設定します。</span>
+      </li><li>
+        <span>グローバル変数のリストからリソースを挿入します。</span>
+        <ul>
+          <li> 1 つの式には複数のリソースを追加できます。</li>
+
+        </ul>
+
+      </li><li>
+        <span>関数を挿入します。</span>
+        <ul>
+          <li> 関数のリストを表示するには、<strong class="uicontrol">[関数を挿入]</strong> をクリックします。</li>
+
+          <li> カテゴリで関数を絞り込むには、<strong class="uicontrol">[すべての関数]</strong> ドロップダウンを選択してカテゴリを選択します。</li>
+
+        </ul>
+
+      </li><li>
+        <span>ドロップダウンから演算子を選択します。</span>
+      </li><li>
+        <span>式を完成させます。</span>
+      </li><li>
+        <span>各式を作成したら、<strong class="uicontrol">[構文を確認]</strong> をクリックします。数式ビルダーでは一度に 1 つのエラーが表示されます。</span>
+      </li><li>
+        <span><strong class="uicontrol">[完了]</strong> をクリックします。</span>
+      </li><li>
+        <span>作業内容を保存します。<div><img alt="コレクション検索条件の画面" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/platform_automation/images/flow/flow_formula_builder_collection_filter.png"></div></span>
+      </li></ol>
+
+  
+</div>
+<div id="flow_formula_builder_formula_resource" lang="ja-jp" aria-labelledby="ariaid-title4" class="nested1"><a name="flow_formula_builder_formula_resource"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">数式ビルダーを使用したフロー数式種別のリソースでの数式の作成</h2>
+  <p>フロー数式ビルダーを使用して、フロー数式種別のリソースで式を作成できます。式を作成するには、関数と演算子のリストから選択します。作業中にエラーを見つけるには、各式の数式構文を確認します。</p>
+
+    <ol><li>
+        <span>[フロー] の [ツールボックス] の [マネージャー] タブで、<strong class="uicontrol">[新規リソース]</strong> をクリックします。</span>
+      </li><li>
+        <span>[リソース種別] ドロップダウンから <strong class="uicontrol">[数式]</strong> を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[API 参照名]</strong> を入力します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[データ型]</strong> を選択します。</span>
+      </li><li>
+        <span>グローバル変数のリストからリソースを挿入します。</span>
+        <ul>
+          <li> 1 つの式には複数のリソースを追加できます。</li>
+
+        </ul>
+
+      </li><li>
+        <span>関数を挿入します。</span>
+        <ul>
+          <li> 関数のリストを表示するには、<strong class="uicontrol">[関数を挿入]</strong> をクリックします。</li>
+
+          <li> カテゴリで関数を絞り込むには、<strong class="uicontrol">[すべての関数]</strong> ドロップダウンを選択してカテゴリを選択します。</li>
+
+        </ul>
+
+      </li><li>
+        <span>ドロップダウンから演算子を選択します。</span>
+      </li><li>
+        <span>式を完成させます。</span>
+      </li><li>
+        <span>各式を作成したら、<strong class="uicontrol">[構文を確認]</strong> をクリックします。数式ビルダーでは一度に 1 つのエラーが表示されます。</span>
+      </li><li>
+        <span><strong class="uicontrol">[完了]</strong> をクリックします。</span>
+      </li><li>
+        <span>作業内容を保存します。<div><img alt="数式種別のリソース設定画面" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/platform_automation/images/flow/flow_formula_builder_formula_resource.png"></div></span>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="実行時に最初に実行するフロー要素に開始要素を接続します。自動起動フローでは、開始要素を開いて、フローを起動するトリガーを追加できます。トリガーを使用しない場合は、カスタムボタン、プロセス、Apex クラス、Einstein ボットなど、自動起動フローを呼び出すための他のものを設定する必要があります。" href="elements_ref-4.html#flow_ref_elements_start">開始要素</a></li><li><a title="条件をコレクションに適用し、条件を満たす項目のみを含む新しいコレクションを出力します。" href="elements_ref-2.html#flow_ref_elements_filter">コレクション検索条件要素</a></li><li><a title="フローでこの数式が使用された場合に値を計算します。" href="elements_ref-4.html#flow_ref_resources_formula">数式リソース</a></li><li><a title="数式リソースを作成するか、画面入力コンポーネントに入力規則を追加する場合は、フローでの数式の動作を理解しておく必要があります。" href="#flow_considerations_design_formulas">フローの数式に関する考慮事項</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.customize_functions.htm&amp;language=ja&amp;type=5">コンテキストごとの数式の演算子と関数</a></li></ul></div>
+</div>
+</div>
+
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="flow_get_started_learning_map">
+<h1 class="slds-text-heading_large">Flow Builder 学習マップの使用開始</h1>
+  <p>自動化を初めて使用する場合でも、経験豊富なエキスパートでも、自動化プロジェクトを作成する場合、解決すべきビジネス上の問題があります。解決したら、成功を測定してソリューションを維持します。Salesforce 組織でオートメーションを作成する場合、Salesforce フロー製品に焦点を絞ったこの学習マップは、情報、リソース、製品および機能コンテンツの使用を開始するのに役立ちます。</p>
+
+    <p>各セクションでは、作業のカテゴリに焦点を絞り、関連タスクを参照用にリストします。各セクション内には、自動化ソリューションの構築に役立つ記事および Trailhead モジュールへのリンクがあります。目標は、情報を 1 か所に集約して、ガイダンスが必要なときにすばやくアクセスできるようにすることです。</p>
+    <p>小さいものを最初に作りたいですか?<a title="実行する一般的なジョブ別に整理された Flow Builder の例を参照します。各例には、完全なトピックへのリンクと簡単な説明が含まれています。一部の例は複数のカテゴリに表示されますが、カテゴリごとに 1 回しか表示されません。" href="overview-2.html#automate_flow_get_started_examples_library">Flow Builder サンプルライブラリ</a>の基本的な例に進んでください。</p>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">概念と計画</h2><ul>
+        <li>自動化の機会を利用して、主要なビジネス上の問題を特定します。</li>
+
+        <li>自動化のビジネス要件を評価します。</li>
+
+        <li>自動化の実現可能性と価値を評価します。</li>
+
+        <li>ビジネス目標に関連する機能要件を定義します。</li>
+
+        <li>概要レベルの実行計画を定義します。</li>
+
+      </ul>
+<table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:100%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><p>
+                  <a title="Flow Builder を使用して、フォローアップタスクの作成、リマインダーメールの送信、レコードの更新などの日常業務を自動化すると、仕事の効率と生産性が向上し、従業員はより戦略的な仕事に集中できます。" href="overview-1.html#automate_flow_about">フローと Flow Builder</a> について - Flow Builder を使用した日常業務の自動化。</p><p>
+                  <a title="ソリューションを成功に導くには、自動化を慎重に計画してください。従来のフローを作成するか、AI エージェントを使用するかに関係なく、開始する前に明確な目標と具体的な手順を定義します。ビジネスの課題とその根本原因を特定し、どの自動化アプローチがプロセスの問題を最も適切に解決するかを判断します。" href="overview-1.html#automate_flow_get_started">Get Started Automating</a> a Business Task with a Flow (フローを使用したビジネスタスクの自動化の開始) - 自動化を慎重に計画して、ソリューションを確実に成功させます。</p><p><em>Trailhead</em>: <a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/modules/flow-concepts-quick-look">Flow Builder の概念</a> - Flow Builder の主要な概念 (データ要素、変数、ループ、デバッグ) について説明します。</p><p><em>Trailhead</em>: <a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/superbadges/superbadge_flow_optimization_sbu">Flow Optimization Superbadge Unit</a> (フロー最適化スーパーバッジユニット) - 既存のフローを合理化して拡張性をサポートし、ユーザーエクスペリエンスを向上させます。</p><p style="margin-bottom:0;">
+                  <a title="フローを設計、管理、および実行する場合、権限、使用制限、およびデータの問題を検討します。" href="overview-2.html#flow_considerations">フローの制限</a>と考慮事項 - フローを設計、管理、および実行するときは、権限、使用制限、データの問題を考慮します。</p></td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">設計</h2><ul>
+        <li>自動化ソリューションを設計します。</li>
+
+        <li>オートメーションを保護します。</li>
+
+        <li>自動化の概要ドキュメントを作成します。</li>
+
+        <li>関係者と詳細を共有します。</li>
+
+        <li>インフラストラクチャおよびプラットフォームリソースが設定され、割り当てられていることを確認します。</li>
+
+      </ul>
+<table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:100%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><p>
+                  <a title="ToDo の自動化で解決しようとしているビジネス上の問題がわかり、フローの機能要件が特定され、配布計画が作成されたら、Flow Builder を使用して構築できるようにソリューションを設計します。" href="overview-1.html#automate_flow_design">フローの設計</a> - Flow Builder を使用して ToDo 自動化ソリューションを設計します。</p><p>
+                  <a title="フローを作成して配布する前に、アプローチを計画します。エラーと手戻りを最小限に抑えるには、Flow Builder の次のガイドラインに従ってください。" href="overview-4.html#flow_prep_bestpractices">Flow Best Practices</a> (フローのベストプラクティス) - エラーと再作業を最小限に抑えるアプローチを計画します。</p><p>
+                  <a title="フローを設計するときは、次のセキュリティに関する事項を考慮してください。" href="#flow_considerations_salesforce_features_security">フローのセキュリティ</a>に関する考慮事項 - フローを設計するときは、次のセキュリティに関する考慮事項に留意してください。</p><p>
+                  <a title="ユーザーレコード、プロファイル、または権限セットに基づいて、フローを実行できるユーザーを制限します。より詳細なセキュリティを個々のフローに適用するには、デフォルトの動作を上書きし、ユーザープロファイルまたは権限セットに基づいて特定のフローへのアクセスを許可します。" href="operate-3.html#flow_distribute_security">Limit User Access to Run Flows</a> (フローを実行するためのユーザーアクセスの制限) - ユーザーレコード、プロファイル、または権限セットに基づいて、フローを実行できるユーザーを制限します。</p><p>
+                  <a title="フローが複数のレコードに対して同時に実行される場合、Salesforce はレコードごとに 1 つのフローインタビューを作成します。一括処理では、同じフローのインタビューが同じ要素に到達したときに類似する操作がグループ化されるため、トランザクションで使用するクエリやステートメントが少なくて済みます。" href="overview-2.html#flow_concepts_bulkification">フローの一括化</a> - 一括化では、インタビュー間で同様の操作をグループ化し、トランザクションがガバナ制限に達することなく効率的に完了できるようにします。</p><p>
+                  <em>Salesforce Admins ブログ</em>: <a target="_blank" href="https://admin.salesforce.com/blog/2021/the-ultimate-guide-to-flow-best-practices-and-standards">The Ultimate Guide</a> to Flow Best Practices and Standards - Best Practices, 'gotchas', and design tips to ensure your flows with organization. (フローのベストプラクティスと標準 - ベストプラクティス、「問題点」、および組織に合わせてフローを拡張できるようにするための設計のヒント。)</p><p style="margin-bottom:0;">
+                  <em>Salesforce Admins YouTube チャンネル</em>: <a target="_blank" href="https://www.youtube.com/playlist?list=PLrC_ei2_Pv0HJuyuQAJu_XloofxGAMCa6">Automate This!</a>シリーズ — 自動化ソリューションに焦点を当てた一連の動画。</p></td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">構築</h2><ul>
+        <li>自動化ワークフローの手順を作成します。</li>
+
+        <li>データとシステムへの接続を確立します。</li>
+
+        <li>自動化機能を検証します。</li>
+
+        <li>自動化の監視を設定します。</li>
+
+      </ul>
+<table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:100%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><p>
+                  <a title="自動化するプロセスをモデル化したら、Flow Builder でフローを設計し、作成します。" href="build-3.html#flow_build">フローの作成</a> - 自動化するプロセスをモデル化したら、Flow Builder でフローを設計および作成します。</p><p>
+                  <a title="フロー要素、リソース、イベントなどの情報にすばやくアクセスできるように、このページをブックマークしてください。" href="overview-4.html#flow_ref">フローリファレンス</a> - このページをブックマークすると、フロー要素、リソース、イベントなどの情報にすばやくアクセスできます。</p><p><em>Trailhead</em>: <a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/trails/build-flows-with-flow-builder">Flow Builder でフロー</a>を作成 - フローを作成して配布し、ビジネスプロセスを自動化します。</p><p><em>Trailhead</em>: <a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/projects/build-a-simple-flow">簡単なフロー</a>の作成 - Flow Builder を使用して、フローで連絡先情報を取得および更新します。</p><p><em>Trailhead</em>: <a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/modules/loops-in-flow-builder">Learn to Use Loops</a> in Flow Builder (Flow Builder でのループの使用方法) - Flow Builder の一連の要素でコレクションをループします。</p><p><em>Trailhead</em>: <a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/projects/build-a-discount-approval-process">割引承認プロセス</a>の作成 - 営業担当が割引オファーに必要な承認を簡単に取得できるようにするフローを作成します。</p><p><em>Trailhead</em>: <a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/projects/flow_calculate">割引計算機能</a> - 商談の割引を計算して更新するフローを作成します。</p><p><em>Trailhead</em>: <a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/projects/build-an-email-flow-for-program-management-module">Build an Email Flow for Program Management Module</a> (プログラム管理モジュールのメールフローの作成) - 一度に多くのクライアントまたはプログラム関係者にメールを送信するフローを作成します。</p><p><em>Trailhead</em>: <a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/projects/quick-start-einstein-copilot">クイックスタート: エージェントアクション</a> - Agentforceアクションを使用してフローの自動化を対話型のAIに取り込みます。</p><p><em>Trailhead</em>: <a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/projects/use-external-services-with-a-flow">Use External Services with a Flow</a> (フローでの外部サービスの使用) - 外部サービスを使用するフローを作成します。</p><p><em>Trailhead</em>: <a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/projects/quick-start-create-http-callouts-with-flow-builder">クイックスタート: Flow Builder</a> を使用した HTTP コールアウトの作成 - HTTP コールアウトアクションを使用して外部データにアクセスするフローを作成します。</p><p style="margin-bottom:0;"><em>Trailhead</em>: <a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/modules/mulesoft-composer-flow">MuleSoft Composer フロー</a> - MuleSoft Composer を使用してシステム間のデータ同期を自動化する方法について説明します。</p></td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">テスト</h2><ul>
+        <li>エンドツーエンドのテストを実施します。</li>
+
+        <li>デバッグの問題。</li>
+
+      </ul>
+<table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:100%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><p>
+                  <a title="有効化する前にフローをテストして、エラーを検出し、すべてのパスを検証し、データの問題を回避します。フロー種別に応じて、テストモードまたは Flow Builder デバッガーを使用して、サンプルデータでさまざまなシナリオをテストします。" href="operate-2.html#flow_concepts_testing">フローのテスト</a> - 有効化前にフローをテストして、フローが期待どおりに動作し、考えられるすべてのシナリオに対応できることを確認することが重要です。</p><p>
+                  <a title="有効化後に発生するフローのエラーや予期しない動作をトラブルシューティングして解決する方法について説明します。エラーメールを解釈し、ベストプラクティスを使用して問題をすばやく特定して解決します。" href="operate-3.html#flow_troubleshoot_email">Troubleshoot Flow Errors</a> (フローエラーのトラブルシューティング) - 有効化後に発生するフローエラーやフローの予期しない動作をトラブルシューティングして解決する方法について説明します。</p><p>
+                  <a title="テストモードを使用しないフローの場合、[デバッグ] オプションを使用してフローをテストまたはトラブルシューティングします。フローの実行方法に関するステップごとの詳細とフローがたどるパスを確認します。" href="operate-3.html#flow_test_debug">Flow Builder での</a>フローのデバッグ - Flow Builder のデバッグ機能の利点と効果的に使用するためのヒントについて説明します。</p><p><em>動画</em>: <a target="_blank" href="https://play.vidyard.com/uHUTXfYKRke49dMu4d67uz.html?v=3.1.1">Troubleshooting Flow Errors Using the Debug Button (デバッグボタンを使用したフローエラーのトラブルシューティング)</a></p><p><em>Trailhead</em>: <a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/trails/distribute-and-implement-flows">Distribute and Implement Flows</a> (フローの配布と実装) - フローのテスト、デバッグ、配布を行い、ビジネスプロセスを自動化します。</p><p><em>Trailhead</em>: <a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/superbadges/superbadge_flow_debugging_sbu">Flow Debugging Superbadge Unit</a> (フローデバッグスーパーバッジユニット) - ユーザーが報告したフローの問題をトラブルシューティングする能力をデモンストレーションします。</p><p style="margin-bottom:0;"><em>Trailhead</em>: <a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/superbadges/superbadge_flow_error_handling_sbu">フロー エラー処理 Superbadge Unit</a> - フローの自動化にエラー管理を組み込む機能を紹介します。</p></td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">リリース</h2><ul>
+        <li>リリース前の承認を取得します。</li>
+
+        <li>オートメーションを有効化してリリースします。</li>
+
+        <li>オートメーションを使用および再利用できるようにします。</li>
+
+      </ul>
+<table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:100%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><p>
+                  <a title="フローを実行できるユーザー、フローがアクセスできるデータ、およびフローが Classic および Lightning Experience でどのように表示されているかについて理解します。" href="operate-2.html#flow_distribute_concepts">フロー配布の概念</a> - フローを実行できるユーザー、フローがアクセスできるデータ、Classic および Lightning Experience でのフローの表示方法を把握します。</p><p>
+                  <a title="フローの設計とテストが完了したら、フローを実行しましょう!フローは、フローの設計対象に応じていくつかの方法で実行できます。内部ユーザー、外部ユーザー、またはシステムがフローを実行できます。また、フローを別の組織にリリースすることもできます。" href="operate-2.html#flow_distribute">フローの配布</a> - フローは、設計対象ユーザーに応じていくつかの方法で実行できます。</p><p>
+                  <a title="フローは、オートメーションアプリケーションの [フロー] タブまたは Flow Builder キャンバスから有効化または無効化できます。" href="operate-2.html#flow_distribute_activate">Activate or Deactivate a Flow Version</a> (フローバージョンの有効化または無効化) - 自動化アプリケーションの [フロー] タブまたは Flow Builder キャンバスからフローを有効化または無効化できます。</p><p><em>Trailhead</em>: <a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/superbadges/superbadge_screen_distribution_sbu">画面フロー配信 Superbadge Unit</a> - 要件に応じて、ユーザーインターフェース間で画面フローを最適化して配信します。</p><p style="margin-bottom:0;"><em>Trailhead</em>: <a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/superbadges/superbadge_collections_optimization_sbu">Flow Data Collections Optimization Superbadge Unit</a> (フローデータ収集の最適化スーパーバッジユニット) - データ収集のトラブルシューティングと最適化を行う能力をデモンストレーションします。</p></td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">管理とメンテナンス</h2><ul>
+        <li>自動化を監視します。</li>
+
+        <li>分析データを表示します。</li>
+
+        <li>問題を特定してトラブルシューティングします。</li>
+
+        <li>ユーザーおよび権限を管理する。</li>
+
+        <li>変更管理戦略を作成します。</li>
+
+        <li>継続的な改善を実施します。</li>
+
+      </ul>
+<table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:100%"></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap"><p>
+                  <a title="フローとプロセスを組織がどのように使用しているかを監視します。プロセスからの一時停止中のインタビューおよびスケジュール済みアクションのリストを参照してください。フローとプロセスの監視情報をどのユーザーがどのような方法で確認するかを制御します。" href="operate-3.html#flow_monitor">Manage and Monitor Flows</a> (フローの管理と監視) - 組織のフローとプロセスの使用状況を監視します。</p><p>
+                  <a title="リストビューを使用して承認申請と承認作業項目を管理します。進行中の承認申請を取り消します。割り当てられているが未完了の承認作業項目を再割り当てします。" href="approvals-3.html#automate_automated_approvals_manage">Manage Approval Submissions and Approval Work Items</a> (承認申請と承認作業項目の管理) - リストビューを使用して承認申請と承認作業項目を管理します。</p><p style="margin-bottom:0;"><em>Trailhead</em>: <a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/superbadges/superbadge_flow_administration_sbu">フロー管理 Superbadge Unit</a> - フローの調整と機能強化によりパフォーマンスを向上。</p></td>
+
+            </tr>
+          </tbody></table></div>
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="flow_interviews">
+<h1 class="slds-text-heading_large">フローインタビュー</h1>
+  <p><dfn>フローインタビュー</dfn>は、フローの実行中のインスタンスです。<dfn>フロー</dfn>は、システム管理者が作成するアプリケーションです。ユーザーに入力を求め、その入力に基づいて Salesforce で処理を行います。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><a title="Flow Builder をサポートするエディションとユーザーインターフェースについて説明します。一部の Flow Builder 機能は、追加ライセンスが必要な他の Salesforce 製品と統合されます。" href="elements_ref-4.html#flow_ref_supported_editions">サポートされているエディションを表示する。</a></td>
+
+      </tr>
+     </tbody></table>
+    <p>たとえば、フローではカスタマーサポートコールの通話スクリプトを提供したり、ユーザーが指定した情報を使用してケースを作成したりできます。入力した情報に基づいてフローが実行する処理は、システム管理者が決定します。</p>
+    <p>リンク、ボタン、タブのいずれからフローインタビューを実行しても、実行されるのはフローの 1 つのインスタンスです。用語がわかりづらい場合は、レコードとオブジェクトの違いを考えてみてください。取引先<dfn>レコード</dfn>を作成する場合、そのレコードはシステム管理者がカスタマイズした取引先<dfn>オブジェクト</dfn>の 1 つのインスタンスです。</p>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> フローを実行するときには、次のヒントに留意してください。<ul><li id="flow_interviews__vpm_runtime_browserbutton"><a name="flow_interviews__vpm_runtime_browserbutton"></a>フローを移動するときに、ブラウザーの [戻る] ボタンや [進む] ボタンを使用しないでください。これを行うと、フローと Salesforce の間でデータの矛盾が生じる場合があります。</li>
+<li id="flow_interviews__vpm_runtime_num_versions"><a name="flow_interviews__vpm_runtime_num_versions"></a>1 つのフローには、最大 <span>50</span> 個のバージョンを作成できます。フローを実行すると、有効なバージョンが表示されますが、さらに新しいバージョンが存在する可能性があります。</li>
+</ul>
+</div></div></div>
+
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#flow_interviews_delete">フローインタビューの削除</a></strong><br>フローインタビューを一時停止した後、再開しない場合は削除します。不要なフローインタビューを削除することで、保留リストにまだ対応する予定があるフローインタビューのみが含まれるようにすることができます。</li><li class="slds-p-bottom_small"><strong><a href="#flow_interviews_pause">フローインタビューの一時停止</a></strong><br>システム管理者がフローに設定していれば、そのインタビューを一時停止できます。一時停止は、顧客との電話が意図せず切れた場合や、顧客が取引先番号を見つけられず、折り返し電話をかけてくる予定がある場合などに便利です。</li><li class="slds-p-bottom_small"><strong><a href="#flow_interviews_resume">フローインタビューの再開</a></strong><br>フローインタビューを一時停止した場合は、必要なすべての情報が揃った後に再開します。フローインタビューを一時停止し、関連付けられたフローが再開前に更新された場合、再開したフローインタビューでは更新されたフローは使用されません。代わりに、一時停止したときに有効だったバージョンのフローが使用されます。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="自動化により、反復作業が減り、チームがより迅速かつ正確に ToDo を完了できるようになります。Flow Builder では、コードなしで簡単な自動化や複雑な自動化、フォーム、ガイド付き環境を作成できます。Salesforce ページとエクスペリエンスサイトにフォームを追加し、ボタン、レコードトリガー、またはスケジュールを使用してフローを起動できます。" href="overview-2.html#flow">フローを使用した ToDo の自動化</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="flow_interviews_delete">
+<h1 class="slds-text-heading_large">フローインタビューの削除</h1>
+  <p>フローインタビューを一時停止した後、再開しない場合は削除します。不要なフローインタビューを削除することで、保留リストにまだ対応する予定があるフローインタビューのみが含まれるようにすることができます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><a title="Flow Builder をサポートするエディションとユーザーインターフェースについて説明します。一部の Flow Builder 機能は、追加ライセンスが必要な他の Salesforce 製品と統合されます。" href="elements_ref-4.html#flow_ref_supported_editions">サポートされているエディションを表示する。</a></td>
+
+      </tr>
+     </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d251043e61" style="vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d251043e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">フローインタビューを削除する</td>
+
+              <td headers="d251043e61" style="vertical-align:top;" class="slds-cell-wrap"><p>「フローの実行」</p><p>または</p><p style="margin-bottom:0;"><samp class="parmname">[フローユーザー]</samp> 項目がユーザーの詳細ページで選択されている</p></td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>一時停止中のフローインタビューを見つけます。見つける場所は、システム管理者の設定によって決まります。</span>
+        <ol>
+          <li>
+            <span>Salesforce Classic で一時停止中のフローインタビューを見つけるには、[ホーム] タブで [一時停止中のフローインタビュー] 関連リストに移動します。</span>
+          </li>
+
+          <li>
+            <span>Salesforce モバイルアプリで一時停止中のフローインタビューを見つけるには、メニューアイコンから <strong class="uicontrol">一時停止中のフロー</strong> を見つけて選択します。</span>
+          </li>
+
+          <li>
+            <span>自動化アプリケーションで一時停止中のフローインタビューを検索するには、アプリケーションランチャーから、[<strong class="uicontrol">自動化]</strong> を見つけて選択し、[監視] タブに移動します。</span>
+          </li>
+
+        </ol>
+        <div>フローインタビューを一時停止し、それをどこから再開すればよいかわからない場合は、システム管理者に問い合わせてください。</div>
+      </li><li>
+        <span>不要になったフローインタビューを削除します。</span>
+      </li></ol>
+
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="フローインタビューは、フローの実行中のインスタンスです。フローは、システム管理者が作成するアプリケーションです。ユーザーに入力を求め、その入力に基づいて Salesforce で処理を行います。" href="#flow_interviews">フローインタビュー</a></li><li><a title="フローインタビューを一時停止した場合は、必要なすべての情報が揃った後に再開します。フローインタビューを一時停止し、関連付けられたフローが再開前に更新された場合、再開したフローインタビューでは更新されたフローは使用されません。代わりに、一時停止したときに有効だったバージョンのフローが使用されます。" href="#flow_interviews_resume">フローインタビューの再開</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="flow_interviews_pause">
+<h1 class="slds-text-heading_large">フローインタビューの一時停止</h1>
+  <p>システム管理者がフローに設定していれば、そのインタビューを一時停止できます。一時停止は、顧客との電話が意図せず切れた場合や、顧客が取引先番号を見つけられず、折り返し電話をかけてくる予定がある場合などに便利です。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><a title="Flow Builder をサポートするエディションとユーザーインターフェースについて説明します。一部の Flow Builder 機能は、追加ライセンスが必要な他の Salesforce 製品と統合されます。" href="elements_ref-4.html#flow_ref_supported_editions">サポートされているエディションを表示する。</a></td>
+
+      </tr>
+     </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d349500e61" style="vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d349500e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">フローインタビューを一時停止する</td>
+
+              <td headers="d349500e61" style="vertical-align:top;" class="slds-cell-wrap"><p>「フローの実行」</p><p>または</p><p style="margin-bottom:0;">「<samp class="parmname">[フローユーザー]</samp> 項目をユーザー詳細ページで有効化」</p></td>
+
+            </tr>
+          </tbody></table></div>
+    <ol><li>
+        <span>開いたフローインタビューで、<strong class="uicontrol">[一時停止]</strong> をクリックします。</span>
+      </li><li>
+        <span>フローの一時停止が必要な理由を説明します。</span>
+        <div>このステップは省略可能ですが、特に同じフローの複数のインタビューを一時停止した場合など、一時停止した複数のフローインタビューを区別しやすくなります。この説明は、255 文字以下で入力します。</div>
+      </li><li>
+        <span><strong class="uicontrol">[OK]</strong> をクリックします。</span>
+      </li></ol>
+
+    <div><p>フローインタビューは、後で再開または削除するまで保存されます。一時停止する前に入力した有効な値はインタビューにすべて保存されるため、再開するときにその情報を再入力する必要はありません。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="フローインタビューは、フローの実行中のインスタンスです。フローは、システム管理者が作成するアプリケーションです。ユーザーに入力を求め、その入力に基づいて Salesforce で処理を行います。" href="#flow_interviews">フローインタビュー</a></li><li><a title="フローインタビューを一時停止した場合は、必要なすべての情報が揃った後に再開します。フローインタビューを一時停止し、関連付けられたフローが再開前に更新された場合、再開したフローインタビューでは更新されたフローは使用されません。代わりに、一時停止したときに有効だったバージョンのフローが使用されます。" href="#flow_interviews_resume">フローインタビューの再開</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="flow_interviews_resume">
+<h1 class="slds-text-heading_large">フローインタビューの再開</h1>
+  <p>フローインタビューを一時停止した場合は、必要なすべての情報が揃った後に再開します。フローインタビューを一時停止し、関連付けられたフローが再開前に更新された場合、再開したフローインタビューでは更新されたフローは使用されません。代わりに、一時停止したときに有効だったバージョンのフローが使用されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap"><a title="Flow Builder をサポートするエディションとユーザーインターフェースについて説明します。一部の Flow Builder 機能は、追加ライセンスが必要な他の Salesforce 製品と統合されます。" href="elements_ref-4.html#flow_ref_supported_editions">サポートされているエディションを表示する。</a></td>
+
+      </tr>
+     </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d65945e61" style="vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d65945e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">フローインタビューを再開する</td>
+
+              <td headers="d65945e61" style="vertical-align:top;" class="slds-cell-wrap"><p>「フローの実行」</p><p>または</p><p style="margin-bottom:0;"><samp class="parmname">[フローユーザー]</samp> 項目がユーザーの詳細ページで選択されている</p></td>
+
+            </tr>
+          </tbody></table></div>
+    <div><p>一時停止する前に値を入力した場合、再開すると、有効な値はすべて該当する項目に復元されます。一時停止する前に入力した値が表示されない場合、その値は無効であったためフローで保存されていません。たとえば、数値のみを受け入れる項目に「Acme, Inc.」と入力して一時停止した場合、フローインタビューを再開するとその項目は空白になります。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-error"><img alt="警告" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_warning.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">警告</span> フローインタビューを再開すると、そのフローインタビューは [一時停止中のフローインタビュー] リストから削除されます。フローインタビューを再開した後、再開を取りやめるには <strong class="uicontrol">[一時停止]</strong> をクリックします。一時停止する前にフローインタビューを閉じた場合、そのフローインタビューを後で再開することはできません。</div></div></div>
+</div>
+    <ol><li>
+        <span>一時停止中のフローインタビューを見つけます。見つける場所は、システム管理者の設定によって決まります。</span>
+        <ol>
+          <li>
+            <span>エクスペリエンスビルダーサイトページで一時停止中のフローインタビューを見つけるには、コンポーネントパネルから一時停止中のフロー コンポーネントをページにドラッグします。</span>
+          </li>
+
+          <li>
+            <span>Salesforce Classic で一時停止中のフローインタビューを見つけるには、ホームタブで一時停止中のフローインタビューリストに移動します。</span>
+          </li>
+
+          <li>
+            <span>Salesforce モバイルアプリで一時停止中のフローインタビューを見つけるには、メニューアイコンから <strong class="uicontrol">一時停止中のフロー</strong> を見つけて選択します。</span>
+          </li>
+
+          <li>
+            <span>自動化アプリケーションで一時停止中のフローインタビューを検索するには、アプリケーションランチャーから、[<strong class="uicontrol">自動化]</strong> を見つけて選択し、[監視] タブに移動します。</span>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>一時停止中のフローインタビューを再開します。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="overview-2.html">&larr; 概要・考慮事項・はじめに（2/4）</a><a href="overview-4.html">概要・考慮事項・はじめに（4/4） &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=platform.automate_with_salesforce_flow.htm&type=5&language=ja">help.salesforce.com — Salesforce Flow（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>

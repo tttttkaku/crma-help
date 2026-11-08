@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>プロセスビルダー（レガシー）・プロセスアクション（2/3） | Salesforce Flow ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（31）</h2>
+    <ol>
+      <li><a href="#process_action_quip_lock_edits">プロセスからの文書の編集のロック</a></li>
+      <li><a href="#process_action_quip_lock_section">プロセスからのセクションの編集のロック</a></li>
+      <li><a href="#process_action_quip_remove">プロセスからの文書メンバーの削除</a></li>
+      <li><a href="#process_action_quip_remove_doc">プロセスからの文書の削除</a></li>
+      <li><a href="#process_action_quip_send_message_doc">プロセスからのメッセージの送信</a></li>
+      <li><a href="#process_action_schedule">スケジュールによるアクションの実行時期の指定</a></li>
+      <li><a href="#process_action_send_survey_invite">プロセスからのアンケートへの招待の送信</a></li>
+      <li><a href="#process_action_submit">プロセスからのレコードの承認申請</a></li>
+      <li><a href="#process_action_update">プロセスからのレコードの更新</a></li>
+      <li><a href="#process_activate">プロセスの有効化</a></li>
+      <li><a href="#process_advanced">プロセスビルダーでの詳細オプションの設定</a></li>
+      <li><a href="#process_advanced_considerations">プロセスビルダーの詳細なオプションに関する考慮事項</a></li>
+      <li><a href="#process_advanced_invocable">プロセスビルダーのネストプロセス</a></li>
+      <li><a href="#process_advanced_previously_met">プロセスでの不要なアクションの回避</a></li>
+      <li><a href="#process_advanced_reevaluate">プロセスビルダーでのレコードの再評価</a></li>
+      <li><a href="#process_changesets_packaging">プロセスのリリースに関する考慮事項</a></li>
+      <li><a href="#process_clone">プロセスのコピー</a></li>
+      <li><a href="#process_considerations">プロセスの制限および考慮事項</a></li>
+      <li><a href="#process_considerations_activation">プロセスの管理に関する考慮事項</a></li>
+      <li><a href="#process_considerations_chatter">Chatter に投稿するプロセスに関する考慮事項</a></li>
+      <li><a href="#process_considerations_design">プロセスの設計に関する考慮事項</a></li>
+      <li><a href="#process_considerations_design_bestpractices">プログラム設計のベストプラクティス</a></li>
+      <li><a href="#process_considerations_design_compatibility">プロセスの互換性に関する考慮事項</a></li>
+      <li><a href="#process_considerations_design_event">イベントプロセスに関する考慮事項</a></li>
+      <li><a href="#process_considerations_design_update">レコードを更新するプロセスに関する考慮事項</a></li>
+      <li><a href="#process_considerations_transactions">トランザクション内のプロセスに関する考慮事項</a></li>
+      <li><a href="#process_considerations_works">プロセスでレコードの変更が評価されるタイミング</a></li>
+      <li><a href="#process_create">プロセスの作成</a></li>
+      <li><a href="#process_criteria">プロセス条件の追加</a></li>
+      <li><a href="#process_criteria_formula">プロセス数式の制限</a></li>
+      <li><a href="#process_delete">プロセスバージョンの削除</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>プロセスビルダー（レガシー）・プロセスアクション（2/3）</h1>
+      <div class="meta">Salesforce Flow ヘルプ · 31 記事 · 生成 2026-11-08</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="process_builder-1.html">&larr; プロセスビルダー（レガシー）・プロセスアクション（1/3）</a><a href="process_builder-3.html">プロセスビルダー（レガシー）・プロセスアクション（3/3） &rarr;</a></div>
+<section class="article" id="process_action_quip_lock_edits">
+<h1 class="slds-text-heading_large">プロセスからの文書の編集のロック</h1>
+  <p>編集をロックして文書を完了としてマークします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d159352e53" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr id="process_action_quip_lock_edits__d3844e977" class="">
+              <td headers="d159352e53" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロセスを作成、編集、参照する</td>
+
+              <td headers="d159352e53" style="vertical-align:top;" class="slds-cell-wrap"><p>「フローの管理」</p><p>および</p><p style="margin-bottom:0;">「すべてのデータの参照」</p></td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> プロセスビルダーのサポートと更新は 2025 年 12 月 31 日で終了します。 つまり、プロセスのサポートは提供されず、プロセスビルダー製品のバグは修正されません。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">Workflow Rules &amp; Process Builder End of Support</a> (ワークフロールールとプロセスビルダーのサポート終了)」を参照してください。<p>2025 年 12 月 31 日以降も既存のプロセスは引き続き実行され、有効化、無効化、編集ができますが、Flow Builder を使用することをお勧めします。既存のプロセスを移行するには、<a title="Flow Builder は、ワークフロールールとプロセスビルダーの機能を統合したポイント &amp; クリックツールであり、トリガープロセスの作成が簡単になります。ワークフロールールまたはプロセスビルダーを使用して作成されたトリガープロセスがある場合、[フローに移行] ツールを使用して Flow Builder に移動できます。新しいフローを本番に移行する前に、まず Sandbox 環境で移行してテストしてください。" href="operate-3.html#flow_migrate_to_flow_learning_map">Flow Builder へ</a>の切り替えを計画し、<a title="[フローに移行] ツールを使用して、プロセスビルダープロセスとワークフロールール (スケジュール済みアクションを含む) を Flow Builder に変換します。このツールでは、ほとんどのアクションについてプロセスの部分的な移行もサポートされています。" href="operate-3.html#flow_migrate_to_flow">Migrate to Flow</a> ツールを使用します。新しい自動化の場合は、<a title="自動化により、反復作業が減り、チームがより迅速かつ正確に ToDo を完了できるようになります。Flow Builder では、コードなしで簡単な自動化や複雑な自動化、フォーム、ガイド付き環境を作成できます。Salesforce ページとエクスペリエンスサイトにフォームを追加し、ボタン、レコードトリガー、またはスケジュールを使用してフローを起動できます。" href="overview-2.html#flow">Flow Builder</a> でフローを作成します。</p></div></div></div>
+</div>
+    <div><p>Quip アクションを作成し、<strong class="uicontrol">[文書の編集をロック]</strong> を選択したら、関連する項目を入力してアクションをプロセスに追加します。</p><p>
+      <span style="vertical-align:text-bottom;display:inline-block;"><img alt="[Quip アクション] 項目で選択された [文書の編集をロック]" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/platform_automation/images/process_builder/process_quip_lock_edits.png" style="margin-bottom:0;"></span>
+    </p></div>
+    <ol><li>
+        <span>このアクションに名前を入力します。</span>
+        <div>このテキストはキャンバスに表示され、このアクションをプロセス内の他のアクションから区別するのに役立ちます。名前は、キャンバスのサイズに合わせて切り捨てられます。</div>
+      </li><li>
+        <span>ロックする文書の URL を入力します。</span>
+      </li><li>
+        <span>ドキュメントの編集をロックするには、<strong class="uicontrol">[ロック]</strong> を選択します。ドキュメントの編集をロック解除するには、<strong class="uicontrol">[ロック解除]</strong> を選択します。</span>
+        <div>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 編集をロックまたはロック解除できるのは文書へのフルアクセス権限を持つユーザーのみです。</div></div></div>
+
+        </div>
+      </li><li>
+        <span>アクションを保存します。</span>
+      </li></ol>
+
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span>  プロセスビルダーとワークフロールール<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">のサポート終了</a>前に既存のプロセスビルダーのプロセスとワークフロールールをフローに置き換えるには、「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.quip_automation_flow.htm&amp;language=ja&amp;type=5">Flow Builder の Quip アクション</a>」を参照してください。</div></div></div>
+</div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="process_action_quip_lock_section">
+<h1 class="slds-text-heading_large">プロセスからのセクションの編集のロック</h1>
+  <p>文書またはテンプレートのセクションを編集できないように保護するには、ロックします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d84652e53" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr id="process_action_quip_lock_section__d2950e977" class="">
+              <td headers="d84652e53" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロセスを作成、編集、参照する</td>
+
+              <td headers="d84652e53" style="vertical-align:top;" class="slds-cell-wrap"><p>「フローの管理」</p><p>および</p><p style="margin-bottom:0;">「すべてのデータの参照」</p></td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> プロセスビルダーのサポートと更新は 2025 年 12 月 31 日で終了します。 つまり、プロセスのサポートは提供されず、プロセスビルダー製品のバグは修正されません。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">Workflow Rules &amp; Process Builder End of Support</a> (ワークフロールールとプロセスビルダーのサポート終了)」を参照してください。<p>2025 年 12 月 31 日以降も既存のプロセスは引き続き実行され、有効化、無効化、編集ができますが、Flow Builder を使用することをお勧めします。既存のプロセスを移行するには、<a title="Flow Builder は、ワークフロールールとプロセスビルダーの機能を統合したポイント &amp; クリックツールであり、トリガープロセスの作成が簡単になります。ワークフロールールまたはプロセスビルダーを使用して作成されたトリガープロセスがある場合、[フローに移行] ツールを使用して Flow Builder に移動できます。新しいフローを本番に移行する前に、まず Sandbox 環境で移行してテストしてください。" href="operate-3.html#flow_migrate_to_flow_learning_map">Flow Builder へ</a>の切り替えを計画し、<a title="[フローに移行] ツールを使用して、プロセスビルダープロセスとワークフロールール (スケジュール済みアクションを含む) を Flow Builder に変換します。このツールでは、ほとんどのアクションについてプロセスの部分的な移行もサポートされています。" href="operate-3.html#flow_migrate_to_flow">Migrate to Flow</a> ツールを使用します。新しい自動化の場合は、<a title="自動化により、反復作業が減り、チームがより迅速かつ正確に ToDo を完了できるようになります。Flow Builder では、コードなしで簡単な自動化や複雑な自動化、フォーム、ガイド付き環境を作成できます。Salesforce ページとエクスペリエンスサイトにフォームを追加し、ボタン、レコードトリガー、またはスケジュールを使用してフローを起動できます。" href="overview-2.html#flow">Flow Builder</a> でフローを作成します。</p></div></div></div>
+</div>
+    <div><p>Quip アクションを作成し、<strong class="uicontrol">[文書セクションの編集をロック]</strong> を選択したら、関連する項目を入力してアクションをプロセスに追加します。</p></div>
+    <ol><li>
+        <span>このアクションに名前を入力します。</span>
+        <div>このテキストはキャンバスに表示され、このアクションをプロセス内の他のアクションから区別するのに役立ちます。名前は、キャンバスのサイズに合わせて切り捨てられます。</div>
+      </li><li>
+        <span>ロックするセクションのアンカーリンク URL を入力します。</span>
+      </li><li>
+        <span>セクションの編集をロックするには、<strong class="uicontrol">[ロック]</strong> を選択します。セクションの編集をロック解除するには、<strong class="uicontrol">[ロック解除]</strong> を選択します。</span>
+        <div>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> セクションの編集をロックまたはロック解除できるのは文書へのフルアクセス権限を持つユーザーのみです。</div></div></div>
+
+        </div>
+      </li><li>
+        <span>アクションを保存します。</span>
+      </li></ol>
+
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span>  プロセスビルダーとワークフロールール<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">のサポート終了</a>前に既存のプロセスビルダーのプロセスとワークフロールールをフローに置き換えるには、「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.quip_automation_flow.htm&amp;language=ja&amp;type=5">Flow Builder の Quip アクション</a>」を参照してください。</div></div></div>
+</div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="process_action_quip_remove">
+<h1 class="slds-text-heading_large">プロセスからの文書メンバーの削除</h1>
+  <p>コラボレーションの終了時に文書からユーザーを自動削除するようにプロセスをトリガーします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d125634e53" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr id="process_action_quip_remove__d3466e977" class="">
+              <td headers="d125634e53" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロセスを作成、編集、参照する</td>
+
+              <td headers="d125634e53" style="vertical-align:top;" class="slds-cell-wrap"><p>「フローの管理」</p><p>および</p><p style="margin-bottom:0;">「すべてのデータの参照」</p></td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> プロセスビルダーのサポートと更新は 2025 年 12 月 31 日で終了します。 つまり、プロセスのサポートは提供されず、プロセスビルダー製品のバグは修正されません。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">Workflow Rules &amp; Process Builder End of Support</a> (ワークフロールールとプロセスビルダーのサポート終了)」を参照してください。<p>2025 年 12 月 31 日以降も既存のプロセスは引き続き実行され、有効化、無効化、編集ができますが、Flow Builder を使用することをお勧めします。既存のプロセスを移行するには、<a title="Flow Builder は、ワークフロールールとプロセスビルダーの機能を統合したポイント &amp; クリックツールであり、トリガープロセスの作成が簡単になります。ワークフロールールまたはプロセスビルダーを使用して作成されたトリガープロセスがある場合、[フローに移行] ツールを使用して Flow Builder に移動できます。新しいフローを本番に移行する前に、まず Sandbox 環境で移行してテストしてください。" href="operate-3.html#flow_migrate_to_flow_learning_map">Flow Builder へ</a>の切り替えを計画し、<a title="[フローに移行] ツールを使用して、プロセスビルダープロセスとワークフロールール (スケジュール済みアクションを含む) を Flow Builder に変換します。このツールでは、ほとんどのアクションについてプロセスの部分的な移行もサポートされています。" href="operate-3.html#flow_migrate_to_flow">Migrate to Flow</a> ツールを使用します。新しい自動化の場合は、<a title="自動化により、反復作業が減り、チームがより迅速かつ正確に ToDo を完了できるようになります。Flow Builder では、コードなしで簡単な自動化や複雑な自動化、フォーム、ガイド付き環境を作成できます。Salesforce ページとエクスペリエンスサイトにフォームを追加し、ボタン、レコードトリガー、またはスケジュールを使用してフローを起動できます。" href="overview-2.html#flow">Flow Builder</a> でフローを作成します。</p></div></div></div>
+</div>
+    <div><p>Quip アクションを作成し、<strong class="uicontrol">[文書からメンバーを削除]</strong> を選択したら、関連する項目を入力してアクションをプロセスに追加します。</p></div>
+    <ol><li>
+        <span>このアクションに名前を入力します。</span>
+        <div>このテキストはキャンバスに表示され、このアクションをプロセス内の他のアクションから区別するのに役立ちます。名前は、キャンバスのサイズに合わせて切り捨てられます。</div>
+      </li><li>
+        <span>アクセス管理の対象の文書の URL を入力します。</span>
+      </li><li>
+        <span>文書から削除するメンバーのメールアドレスを入力します。</span>
+        <div>最大 50 件のメールアドレスを追加できます。メールは、アクション中のメンバーと同じ Quip サイトの Quip メンバーに属している必要があります。</div>
+      </li><li>
+        <span>アクションを保存します。</span>
+      </li></ol>
+
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span>  プロセスビルダーとワークフロールール<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">のサポート終了</a>前に既存のプロセスビルダーのプロセスとワークフロールールをフローに置き換えるには、「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.quip_automation_flow.htm&amp;language=ja&amp;type=5">Flow Builder の Quip アクション</a>」を参照してください。</div></div></div>
+</div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="process_action_quip_remove_doc">
+<h1 class="slds-text-heading_large">プロセスからの文書の削除</h1>
+  <p>フォルダーから文書を削除します。共有文書を再度非公開にします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Lightning Experience</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d89211e53" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr id="process_action_quip_remove_doc__d3012e977" class="">
+              <td headers="d89211e53" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロセスを作成、編集、参照する</td>
+
+              <td headers="d89211e53" style="vertical-align:top;" class="slds-cell-wrap"><p>「フローの管理」</p><p>および</p><p style="margin-bottom:0;">「すべてのデータの参照」</p></td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> プロセスビルダーのサポートと更新は 2025 年 12 月 31 日で終了します。 つまり、プロセスのサポートは提供されず、プロセスビルダー製品のバグは修正されません。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">Workflow Rules &amp; Process Builder End of Support</a> (ワークフロールールとプロセスビルダーのサポート終了)」を参照してください。<p>2025 年 12 月 31 日以降も既存のプロセスは引き続き実行され、有効化、無効化、編集ができますが、Flow Builder を使用することをお勧めします。既存のプロセスを移行するには、<a title="Flow Builder は、ワークフロールールとプロセスビルダーの機能を統合したポイント &amp; クリックツールであり、トリガープロセスの作成が簡単になります。ワークフロールールまたはプロセスビルダーを使用して作成されたトリガープロセスがある場合、[フローに移行] ツールを使用して Flow Builder に移動できます。新しいフローを本番に移行する前に、まず Sandbox 環境で移行してテストしてください。" href="operate-3.html#flow_migrate_to_flow_learning_map">Flow Builder へ</a>の切り替えを計画し、<a title="[フローに移行] ツールを使用して、プロセスビルダープロセスとワークフロールール (スケジュール済みアクションを含む) を Flow Builder に変換します。このツールでは、ほとんどのアクションについてプロセスの部分的な移行もサポートされています。" href="operate-3.html#flow_migrate_to_flow">Migrate to Flow</a> ツールを使用します。新しい自動化の場合は、<a title="自動化により、反復作業が減り、チームがより迅速かつ正確に ToDo を完了できるようになります。Flow Builder では、コードなしで簡単な自動化や複雑な自動化、フォーム、ガイド付き環境を作成できます。Salesforce ページとエクスペリエンスサイトにフォームを追加し、ボタン、レコードトリガー、またはスケジュールを使用してフローを起動できます。" href="overview-2.html#flow">Flow Builder</a> でフローを作成します。</p></div></div></div>
+</div>
+    <div><p>Quip アクションを作成し、<strong class="uicontrol">[フォルダーから文書を削除]</strong> を選択したら、関連する項目を入力してアクションをプロセスに追加します。</p></div>
+    <ol><li>
+        <span>このアクションに名前を入力します。</span>
+        <div>このテキストはキャンバスに表示され、このアクションをプロセス内の他のアクションから区別するのに役立ちます。名前は、キャンバスのサイズに合わせて切り捨てられます。</div>
+      </li><li>
+        <span>移動する文書の URL を入力します。</span>
+      </li><li>
+        <span>文書が含まれているフォルダーの URL を入力します。</span>
+        <div>複数のフォルダーから文書を削除するには、フォルダーの URL をカンマで区切ります。<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 非公開フォルダーから文書を削除すると、その文書へのアクセス権が削除されます。</div></div></div>
+</div>
+      </li><li>
+        <span>アクションを保存します。</span>
+      </li></ol>
+
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span>  プロセスビルダーとワークフロールール<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">のサポート終了</a>前に既存のプロセスビルダーのプロセスとワークフロールールをフローに置き換えるには、「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.quip_automation_flow.htm&amp;language=ja&amp;type=5">Flow Builder の Quip アクション</a>」を参照してください。</div></div></div>
+</div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="process_action_quip_send_message_doc">
+<h1 class="slds-text-heading_large">プロセスからのメッセージの送信</h1>
+  <p>チャットルームまたは文書でメッセージを送信します。文書で送信されたメッセージは、インラインコメントとして、または文書の本文内に表示されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic (<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.overview_edition_lex_only.htm&amp;language=ja&amp;type=5">使用できない組織もあります</a>) および Lightning Experience の両方</td>
+
+            </tr>
+            <tr id="process_action_quip_send_message_doc__d4970e343" class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span id="process_action_quip_send_message_doc__d4970e347"><a name="process_action_quip_send_message_doc__d4970e347"></a><strong>Essentials</strong> Edition、<strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</span></td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d262252e82" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr id="process_action_quip_send_message_doc__d4970e977" class="">
+              <td headers="d262252e82" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロセスを作成、編集、参照する</td>
+
+              <td headers="d262252e82" style="vertical-align:top;" class="slds-cell-wrap"><p>「フローの管理」</p><p>および</p><p style="margin-bottom:0;">「すべてのデータの参照」</p></td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> プロセスビルダーのサポートと更新は 2025 年 12 月 31 日で終了します。 つまり、プロセスのサポートは提供されず、プロセスビルダー製品のバグは修正されません。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">Workflow Rules &amp; Process Builder End of Support</a> (ワークフロールールとプロセスビルダーのサポート終了)」を参照してください。<p>2025 年 12 月 31 日以降も既存のプロセスは引き続き実行され、有効化、無効化、編集ができますが、Flow Builder を使用することをお勧めします。既存のプロセスを移行するには、<a title="Flow Builder は、ワークフロールールとプロセスビルダーの機能を統合したポイント &amp; クリックツールであり、トリガープロセスの作成が簡単になります。ワークフロールールまたはプロセスビルダーを使用して作成されたトリガープロセスがある場合、[フローに移行] ツールを使用して Flow Builder に移動できます。新しいフローを本番に移行する前に、まず Sandbox 環境で移行してテストしてください。" href="operate-3.html#flow_migrate_to_flow_learning_map">Flow Builder へ</a>の切り替えを計画し、<a title="[フローに移行] ツールを使用して、プロセスビルダープロセスとワークフロールール (スケジュール済みアクションを含む) を Flow Builder に変換します。このツールでは、ほとんどのアクションについてプロセスの部分的な移行もサポートされています。" href="operate-3.html#flow_migrate_to_flow">Migrate to Flow</a> ツールを使用します。新しい自動化の場合は、<a title="自動化により、反復作業が減り、チームがより迅速かつ正確に ToDo を完了できるようになります。Flow Builder では、コードなしで簡単な自動化や複雑な自動化、フォーム、ガイド付き環境を作成できます。Salesforce ページとエクスペリエンスサイトにフォームを追加し、ボタン、レコードトリガー、またはスケジュールを使用してフローを起動できます。" href="overview-2.html#flow">Flow Builder</a> でフローを作成します。</p></div></div></div>
+</div>
+    <div><p>Quip アクションを作成し、<strong class="uicontrol">[文書でメッセージを送信]</strong> または <strong class="uicontrol">[チャットでメッセージを送信]</strong> を選択したら、関連する項目を入力してアクションをプロセスに追加します。</p></div>
+    <ol><li>
+        <span>このアクションに名前を入力します。</span>
+        <div>このテキストはキャンバスに表示され、このアクションをプロセス内の他のアクションから区別するのに役立ちます。名前は、キャンバスのサイズに合わせて切り捨てられます。</div>
+      </li><li>
+        <span>メッセージを送信するする文書またはチャットの URL を入力します。</span>
+      </li><li>
+        <span>文書の本文の特定のセクションでメッセージを送信するには、「文書セクションアンカーリンク」と入力します。</span>
+      </li><li>
+        <span>送信するメッセージを入力します。</span>
+      </li><li>
+        <span>アクションを保存します。</span>
+      </li></ol>
+
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span>  プロセスビルダーとワークフロールール<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">のサポート終了</a>前に既存のプロセスビルダーのプロセスとワークフロールールをフローに置き換えるには、「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.quip_automation_flow.htm&amp;language=ja&amp;type=5">Flow Builder の Quip アクション</a>」を参照してください。</div></div></div>
+</div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="process_action_schedule">
+<h1 class="slds-text-heading_large">スケジュールによるアクションの実行時期の指定</h1>
+  <p>レコード変更プロセスおよびイベントプロセスでは、アクションが特定の時間に実行されるようにスケジュールできます。スケジュール済みアクションをサポートする各アクショングループには、複数のスケジュールを設定できます。たとえば、一部のアクションを今から 1 日後に実行し、他のアクションを今から 3 日後に実行するようなスケジュールを設定できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic (<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.overview_edition_lex_only.htm&amp;language=ja&amp;type=5">使用できない組織もあります</a>) および Lightning Experience の両方</td>
+
+            </tr>
+            <tr id="process_action_schedule__d3235e343" class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span id="process_action_schedule__d3235e347"><a name="process_action_schedule__d3235e347"></a><strong>Essentials</strong> Edition、<strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</span></td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d107750e82" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr id="process_action_schedule__d3235e977" class="">
+              <td headers="d107750e82" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロセスを作成、編集、参照する</td>
+
+              <td headers="d107750e82" style="vertical-align:top;" class="slds-cell-wrap"><p>「フローの管理」</p><p>および</p><p style="margin-bottom:0;">「すべてのデータの参照」</p></td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> プロセスビルダーのサポートと更新は 2025 年 12 月 31 日で終了します。 つまり、プロセスのサポートは提供されず、プロセスビルダー製品のバグは修正されません。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">Workflow Rules &amp; Process Builder End of Support</a> (ワークフロールールとプロセスビルダーのサポート終了)」を参照してください。<p>2025 年 12 月 31 日以降も既存のプロセスは引き続き実行され、有効化、無効化、編集ができますが、Flow Builder を使用することをお勧めします。既存のプロセスを移行するには、<a title="Flow Builder は、ワークフロールールとプロセスビルダーの機能を統合したポイント &amp; クリックツールであり、トリガープロセスの作成が簡単になります。ワークフロールールまたはプロセスビルダーを使用して作成されたトリガープロセスがある場合、[フローに移行] ツールを使用して Flow Builder に移動できます。新しいフローを本番に移行する前に、まず Sandbox 環境で移行してテストしてください。" href="operate-3.html#flow_migrate_to_flow_learning_map">Flow Builder へ</a>の切り替えを計画し、<a title="[フローに移行] ツールを使用して、プロセスビルダープロセスとワークフロールール (スケジュール済みアクションを含む) を Flow Builder に変換します。このツールでは、ほとんどのアクションについてプロセスの部分的な移行もサポートされています。" href="operate-3.html#flow_migrate_to_flow">Migrate to Flow</a> ツールを使用します。新しい自動化の場合は、<a title="自動化により、反復作業が減り、チームがより迅速かつ正確に ToDo を完了できるようになります。Flow Builder では、コードなしで簡単な自動化や複雑な自動化、フォーム、ガイド付き環境を作成できます。Salesforce ページとエクスペリエンスサイトにフォームを追加し、ボタン、レコードトリガー、またはスケジュールを使用してフローを起動できます。" href="overview-2.html#flow">Flow Builder</a> でフローを作成します。</p></div></div></div>
+<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> プロセスにスケジュール済みアクションを追加する前に、そのしくみを理解します。<a title="スケジュール済みアクションは、レコード変更プロセスとイベントプロセスでのみサポートされています。スケジュール時間は、スケジュールの種別、項目が変更されたかどうか、およびプロセスが無効化されたかどうかによって異なります。" href="process_builder-3.html#process_limits_scheduled">スケジュール済みアクションに関する考慮事項</a>を確認します。</div></div></div>
+<p>レコード変更プロセスのアクションをスケジュールするには、アクショングループが次のいずれかのオプションに該当することを確認します。</p><ul>
+        <li>レコードが作成されたときにのみプロセスが開始する (1)。</li>
+
+        <li>レコードが作成または編集されたときにプロセスが開始し (2)、指定された変更が行われると、関連付けられた条件ノードでのみアクションが実行される (3)。</li>
+
+      </ul>
+<div>
+        <img alt="アクションをスケジュールするためのオプション" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/platform_automation/images/process_builder/pb_scheduled_node.png">
+      </div></div>
+    <ol><li>
+        <span>スケジュール済みアクションをサポートするアクショングループで、<strong class="uicontrol">[スケジュールを設定]</strong> をクリックします。</span>
+      </li><li>
+        <span>プロセスを開始するレコードの日付/時間項目に基づいてアクションをスケジュールする必要がある場合は、次の操作を実行します。</span>
+        <ol>
+          <li>
+            <span>最初のラジオボタンを選択したままにします。</span>
+          </li>
+
+          <li>
+            <span>パネルの右側にあるドロップダウンリストから、アクションをスケジュールする日付を選択します。</span>
+            <div>たとえば、プロセスが取引先レコードに基づいている場合、取引先の <strong class="uicontrol">[作成日]</strong> を選択します。</div>
+          </li>
+
+          <li>
+            <span>項目の前後に日数または時間数を指定します。</span>
+            <div>レコード変更プロセスの場合、この時間になったときに、このアクショングループの条件がまだ満たされていれば、スケジュール済みアクションが実行されます。イベントプロセスの場合、この時間になったときに、条件はチェックされません。プロセスの開始時に条件が満たされていれば、スケジュール済みアクションが実行されます。</div>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>プロセスの実行時期から特定の日数または時間数が経過した時点でアクションをスケジュールする必要がある場合は、次の操作を実行します。</span>
+        <ol>
+          <li>
+            <span>2 番目のラジオボタンを選択します。</span>
+          </li>
+
+          <li>
+            <span>プロセスの実行時期からの日数または時間数を指定します。</span>
+            <div>この時間になったときに、このアクショングループの条件がまだ満たされていれば、スケジュール済みアクションが実行されます。</div>
+          </li>
+
+        </ol>
+      </li><li>
+        <span>スケジュールを保存します。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="process_action_send_survey_invite">
+<h1 class="slds-text-heading_large">プロセスからのアンケートへの招待の送信</h1>
+  <p>特定のアンケートの質問へのリンク、またはアンケートを開始するためのリンクを含む招待メールを送信します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic と Lightning Experience の両方</td>
+
+            </tr>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Developer</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、および <strong>Unlimited</strong> Edition。</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d19677e71" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d19677e71" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロセスを作成、編集、参照する</td>
+
+              <td headers="d19677e71" style="vertical-align:top;" class="slds-cell-wrap"><p>「フローの管理」</p><p>および</p><p style="margin-bottom:0;">「すべてのデータの参照」</p></td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> プロセスビルダーのサポートと更新は 2025 年 12 月 31 日で終了します。 つまり、プロセスのサポートは提供されず、プロセスビルダー製品のバグは修正されません。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">Workflow Rules &amp; Process Builder End of Support</a> (ワークフロールールとプロセスビルダーのサポート終了)」を参照してください。<p>2025 年 12 月 31 日以降も既存のプロセスは引き続き実行され、有効化、無効化、編集ができますが、Flow Builder を使用することをお勧めします。既存のプロセスを移行するには、<a title="Flow Builder は、ワークフロールールとプロセスビルダーの機能を統合したポイント &amp; クリックツールであり、トリガープロセスの作成が簡単になります。ワークフロールールまたはプロセスビルダーを使用して作成されたトリガープロセスがある場合、[フローに移行] ツールを使用して Flow Builder に移動できます。新しいフローを本番に移行する前に、まず Sandbox 環境で移行してテストしてください。" href="operate-3.html#flow_migrate_to_flow_learning_map">Flow Builder へ</a>の切り替えを計画し、<a title="[フローに移行] ツールを使用して、プロセスビルダープロセスとワークフロールール (スケジュール済みアクションを含む) を Flow Builder に変換します。このツールでは、ほとんどのアクションについてプロセスの部分的な移行もサポートされています。" href="operate-3.html#flow_migrate_to_flow">Migrate to Flow</a> ツールを使用します。新しい自動化の場合は、<a title="自動化により、反復作業が減り、チームがより迅速かつ正確に ToDo を完了できるようになります。Flow Builder では、コードなしで簡単な自動化や複雑な自動化、フォーム、ガイド付き環境を作成できます。Salesforce ページとエクスペリエンスサイトにフォームを追加し、ボタン、レコードトリガー、またはスケジュールを使用してフローを起動できます。" href="overview-2.html#flow">Flow Builder</a> でフローを作成します。</p></div></div></div>
+</div>
+    <div><p>アクションとして <strong class="uicontrol">[アンケートへの招待を送信]</strong> を選択したら、関連する項目を入力します。</p></div>
+    <ol><li>
+        <span>このアクションに名前を入力します。</span>
+        <div>このテキストはキャンバスに表示され、このアクションをプロセス内の他のアクションから区別するのに役立ちます。名前は、キャンバスのサイズに合わせて切り捨てられます。</div>
+      </li><li>
+        <span>有効なアンケートを選択します。</span>
+      </li><li>
+        <span>質問またはアンケートリンクを選択します。</span>
+        <div>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 良いまたは悪い、ネットプロモータースコア (NPS)、評価、およびスコアの種別の質問に関して、招待メールを送信できます。</div></div></div>
+
+        </div>
+      </li><li>
+        <span>招待の送信に使用されるメールテンプレートを選択します。</span>
+        <div>
+          <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> 使用可能なテンプレートは、質問とアンケートリンクのいずれを送信するかによって異なります。</div></div></div>
+
+        </div>
+      </li><li>
+        <span>受信者種別を選択します。</span>
+        <div>アンケートへの招待はリード、取引先責任者、および組織のユーザーに送信できます。</div>
+      </li><li>
+        <span>プロセスに関連付けられているオブジェクトに基づいて受信者を選択します。</span>
+      </li><li>
+        <span>招待の設定を選択します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+      </li></ol>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> 
+      <p>ケースの取引先責任者に招待を送信する場合は、プロセスのオブジェクトとして [ケース]、受信者種別として [取引先責任者]、受信者として [取引先責任者 ID] を選択します。</p>
+    </div></div></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.concept_send_email_template.htm&amp;language=ja&amp;type=5">アンケートへの招待メールテンプレートのカスタマイズ</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="process_action_submit">
+<h1 class="slds-text-heading_large">プロセスからのレコードの承認申請</h1>
+  <p>プロセスを開始したレコードを承認申請します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic および Lightning Experience の両方</td>
+
+            </tr>
+            <tr id="process_action_submit__d4417e54" class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d212748e71" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr id="process_action_submit__d4418e977" class="">
+              <td headers="d212748e71" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロセスを作成、編集、参照する</td>
+
+              <td headers="d212748e71" style="vertical-align:top;" class="slds-cell-wrap"><p>「フローの管理」</p><p>および</p><p style="margin-bottom:0;">「すべてのデータの参照」</p></td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> プロセスビルダーのサポートと更新は 2025 年 12 月 31 日で終了します。 つまり、プロセスのサポートは提供されず、プロセスビルダー製品のバグは修正されません。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">Workflow Rules &amp; Process Builder End of Support</a> (ワークフロールールとプロセスビルダーのサポート終了)」を参照してください。<p>2025 年 12 月 31 日以降も既存のプロセスは引き続き実行され、有効化、無効化、編集ができますが、Flow Builder を使用することをお勧めします。既存のプロセスを移行するには、<a title="Flow Builder は、ワークフロールールとプロセスビルダーの機能を統合したポイント &amp; クリックツールであり、トリガープロセスの作成が簡単になります。ワークフロールールまたはプロセスビルダーを使用して作成されたトリガープロセスがある場合、[フローに移行] ツールを使用して Flow Builder に移動できます。新しいフローを本番に移行する前に、まず Sandbox 環境で移行してテストしてください。" href="operate-3.html#flow_migrate_to_flow_learning_map">Flow Builder へ</a>の切り替えを計画し、<a title="[フローに移行] ツールを使用して、プロセスビルダープロセスとワークフロールール (スケジュール済みアクションを含む) を Flow Builder に変換します。このツールでは、ほとんどのアクションについてプロセスの部分的な移行もサポートされています。" href="operate-3.html#flow_migrate_to_flow">Migrate to Flow</a> ツールを使用します。新しい自動化の場合は、<a title="自動化により、反復作業が減り、チームがより迅速かつ正確に ToDo を完了できるようになります。Flow Builder では、コードなしで簡単な自動化や複雑な自動化、フォーム、ガイド付き環境を作成できます。Salesforce ページとエクスペリエンスサイトにフォームを追加し、ボタン、レコードトリガー、またはスケジュールを使用してフローを起動できます。" href="overview-2.html#flow">Flow Builder</a> でフローを作成します。</p></div></div></div>
+<p>アクションを作成し、種別に [承認申請] を選択したら、関係する項目を入力してアクションをプロセスに追加します。</p></div>
+    <div><p>承認申請できるのは、プロセスを開始したレコードのみです。関連レコードを承認申請することはできません。</p><ol>
+        <li>このアクションに名前を入力します。このテキストはキャンバスに表示され、このアクションをプロセス内の他のアクションから区別するのに役立ちます。名前は、キャンバスのサイズに合わせて切り捨てられます。</li>
+
+        <li><samp class="parmname">[承認プロセス]</samp> では、デフォルトの承認プロセスまたは特定の承認プロセスのどちらを使用してレコードを承認申請するのかを指定します。<p>次の場合、プロセスは失敗します。</p><ul><li>レコードがデフォルトの承認プロセスに申請され、レコードのオブジェクト種別に有効な承認プロセスが存在しない。</li>
+<li>レコードがデフォルトの承認プロセスに申請され、レコードのオブジェクト種別のどの承認プロセスの条件も満たしていない。</li>
+<li>レコードが特定の承認プロセスに申請され、開始条件を満たしていない。</li>
+</ul>
+</li>
+
+        <li>レコードを特定の承認プロセスに申請するには、次の操作を実行します。
+        <ol><li>承認プロセスを検索し、選択します。</li>
+<li>承認プロセスの開始条件をスキップする必要があるかどうかを指定します。</li>
+</ol>
+       </li>
+
+        <li><samp class="parmname">[申請者]</samp> では、承認申請に関する通知を受信するユーザーを特定します。<table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:21.008403361344538%"><col style="width:78.99159663865547%"></colgroup><thead class="slds-text-title_caps">
+                <tr class="">
+                  <th id="d212748e177" style="vertical-align:top;" class="slds-cell-wrap" scope="col">値</th>
+                  <th id="d212748e180" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+                </tr>
+              </thead><tbody>
+                <tr class="">
+                  <td headers="d212748e177" style="vertical-align:top;" class="slds-cell-wrap" data-label="値">現在のユーザー</td>
+
+                  <td headers="d212748e180" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">レコードを作成または編集して、プロセスをトリガーしたユーザー。</td>
+
+                </tr>
+                <tr class="">
+                  <td headers="d212748e177" style="vertical-align:top;" class="slds-cell-wrap" data-label="値">レコードのユーザー項目</td>
+
+                  <td headers="d212748e180" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">承認申請しているレコードまたは他のレコードの項目値に保存されているユーザー ID。</td>
+
+                </tr>
+                <tr class="">
+                  <td headers="d212748e177" style="vertical-align:top;" class="slds-cell-wrap" data-label="値">その他のユーザー</td>
+
+                  <td headers="d212748e180" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">組織内の特定のユーザー。</td>
+
+                </tr>
+              </tbody></table><p>申請者が、実行される承認プロセスの有効な初期申請者でない場合は、プロセスが失敗します。このオブジェクトに関連する承認プロセスの初期申請者に、このプロセスをトリガーした可能性のあるすべてユーザーが含まれていることを確認します。承認プロセスの初期申請者の設定の詳細については、<a title="従来の承認プロセスがより複雑で、特定のステップを定義する必要がある場合は、標準ウィザードを使用します。" href="approvals-1.html#approvals_creating_approval_processes">Classic 承認プロセスの作成</a>（標準ウィザード使用）を参照してください。</p><p>オブジェクトに対して「すべてのレコードの編集」権限を有するユーザーであれば、レコードを承認申請できます。これらのユーザーは、初期申請者である必要はありません。</p></li>
+
+        <li>必要に応じて、申請コメントを入力します。差し込み項目または数式を参照しないでください。
+         <p>申請コメントは、指定したレコードの承認履歴に表示されます。テンプレートで <code>{!ApprovalRequest.Comments}</code> 差し込み項目を使用する場合は、最初の承認申請メールにもこのテキストが表示されます。</p></li>
+
+        <li>アクションを保存します。</li>
+
+      </ol></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="process_action_update">
+<h1 class="slds-text-heading_large">プロセスからのレコードの更新</h1>
+  <p>値を手動で入力するか、関連レコードの値を使用して、プロセスを開始したレコードに関係する 1 つ以上のレコードを更新します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic (<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.overview_edition_lex_only.htm&amp;language=ja&amp;type=5">使用できない組織もあります</a>) および Lightning Experience の両方</td>
+
+            </tr>
+            <tr id="process_action_update__d3753e343" class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span id="process_action_update__d3753e347"><a name="process_action_update__d3753e347"></a><strong>Essentials</strong> Edition、<strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</span></td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d150983e82" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr id="process_action_update__d3753e977" class="">
+              <td headers="d150983e82" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロセスを作成、編集、参照する</td>
+
+              <td headers="d150983e82" style="vertical-align:top;" class="slds-cell-wrap"><p>「フローの管理」</p><p>および</p><p style="margin-bottom:0;">「すべてのデータの参照」</p></td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> プロセスビルダーのサポートと更新は 2025 年 12 月 31 日で終了します。 つまり、プロセスのサポートは提供されず、プロセスビルダー製品のバグは修正されません。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">Workflow Rules &amp; Process Builder End of Support</a> (ワークフロールールとプロセスビルダーのサポート終了)」を参照してください。<p>2025 年 12 月 31 日以降も既存のプロセスは引き続き実行され、有効化、無効化、編集ができますが、Flow Builder を使用することをお勧めします。既存のプロセスを移行するには、<a title="Flow Builder は、ワークフロールールとプロセスビルダーの機能を統合したポイント &amp; クリックツールであり、トリガープロセスの作成が簡単になります。ワークフロールールまたはプロセスビルダーを使用して作成されたトリガープロセスがある場合、[フローに移行] ツールを使用して Flow Builder に移動できます。新しいフローを本番に移行する前に、まず Sandbox 環境で移行してテストしてください。" href="operate-3.html#flow_migrate_to_flow_learning_map">Flow Builder へ</a>の切り替えを計画し、<a title="[フローに移行] ツールを使用して、プロセスビルダープロセスとワークフロールール (スケジュール済みアクションを含む) を Flow Builder に変換します。このツールでは、ほとんどのアクションについてプロセスの部分的な移行もサポートされています。" href="operate-3.html#flow_migrate_to_flow">Migrate to Flow</a> ツールを使用します。新しい自動化の場合は、<a title="自動化により、反復作業が減り、チームがより迅速かつ正確に ToDo を完了できるようになります。Flow Builder では、コードなしで簡単な自動化や複雑な自動化、フォーム、ガイド付き環境を作成できます。Salesforce ページとエクスペリエンスサイトにフォームを追加し、ボタン、レコードトリガー、またはスケジュールを使用してフローを起動できます。" href="overview-2.html#flow">Flow Builder</a> でフローを作成します。</p></div></div></div>
+</div>
+    <div><p>アクションを作成し、アクション種別に [レコードを更新] を選択したら、関係する項目を入力してアクションをプロセスに追加します。レコードの <samp class="parmname">[最終更新者]</samp> 項目は、レコードを作成または編集することでプロセスを開始したユーザーに設定されます。
+   </p><ol><li>このアクションに名前を入力します。このテキストはキャンバスに表示され、このアクションをプロセス内の他のアクションから区別するのに役立ちます。名前は、キャンバスのサイズに合わせて切り捨てられます。</li>
+<li><samp class="parmname">[レコードタイプ]</samp> では、更新する必要があるレコードを選択し、<strong class="uicontrol">[選択]</strong> をクリックします。<p>更新できるのは、プロセスを開始したレコードまたはそれに関連するレコードのみです。たとえば、<kbd>[Case].ContactId</kbd> は参照できますが、<kbd>[Case].Contact.AccountId</kbd> は参照できません。</p><ul><li>プロセスを開始したレコードを更新するには、該当するラジオボタンをクリックします。たとえば、プロセスがケースレコードに基づいている場合、[<strong class="uicontrol">プロセスを開始</strong>したケースレコードを選択] の横にある をクリックします。<div><img alt="プロセスを開始したレコードの選択" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/platform_automation/images/process_builder/pb_update_records_this_record.png"></div></li>
+<li>プロセスを開始したレコードに関連するレコードを更新するには、該当するラジオボタンをクリックし、ドロップダウンリストでいずれかの項目名を選択します。<p>「ID」で終わる項目を選択すると、1 つのレコードを選択することになります。この項目名は、元のレコードの参照項目に対応します。参照項目についての詳細は、<a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.custom_field_types.htm&amp;language=ja&amp;type=5">「カスタム項目のデータ型」</a>を参照してください。</p><p>たとえば、ケースレコードによってプロセスが開始し、<samp class="parmname">[取引先 ID]</samp> を選択すると、ケースに関連付けられた取引先がこのアクションで更新されます。</p><div><img alt="プロセスを開始したレコードに関連するレコードの選択" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/platform_automation/images/process_builder/pb_update_records_lookup.png"></div><p>「ID」で終わらない複数項目を選択すると、プロセスを開始したレコードに関連するオブジェクト種別のすべてのレコードを更新することになります。この複数項目は、元のレコードの子レコードに対応します。子レコードは、元のレコードの関連リストに表示できます。</p><p>たとえば、[CaseComments] を選択すると、ケースに関連付けられたすべてのケースコメントがこのアクションで更新されます。</p><div><img alt="関連項目の選択" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/platform_automation/images/process_builder/pb_update_records_related_list.png"></div></li>
+<li>関連レコードの項目を更新するには、横に <span style="vertical-align:text-bottom;display:inline-block;"><img alt="[関連レコード] アイコン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/platform_automation/images/process_builder/traverse.png" style="margin-bottom:0;"></span> が表示された項目 (「ID」で終わる) をクリックして、そのレコードの項目にアクセスします。<p>たとえば、ケースレコード (1) を評価するプロセスで、ケースの親取引先に関連するすべての取引先責任者を更新してみましょう。これには、<strong class="uicontrol">[取引先 ID]</strong> <span style="vertical-align:text-bottom;display:inline-block;"><img alt="[関連レコード] アイコン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/platform_automation/images/process_builder/traverse.png" style="margin-bottom:0;"></span> (2) をクリックし、<strong class="uicontrol">[取引先責任者]</strong> (3) をクリックしてから、<strong class="uicontrol">[選択]</strong> をクリックします。</p>
+       <div><img alt="関連レコードの項目の選択" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/platform_automation/images/process_builder/pb_update_records_two_objects.png"></div>
+      </li>
+</ul>
+</li>
+<li>必要に応じて、更新するレコードを絞り込む条件を指定します。たとえば、プロセスが親ケースの状況を更新する場合、状況が [保留中] に設定されている親ケースは更新しないように条件を指定します。<p>レコードの更新条件を定義する場合、次の参照はできません。</p><ul><li>ロングテキストエリア項目の参照</li>
+<li>リッチテキスト項目の参照</li>
+<li>子レコードの関連項目の参照。<p>たとえば、<kbd>[Case].ContactId</kbd> は参照できますが、<kbd>[Case].Contact.AccountId</kbd> は参照できません。</p><p>複数の検索条件を定義する場合、検索条件ロジックは通常 <code>AND</code> にデフォルト設定されます。ただし、複数の検索条件で同じフィールドが選択され、等しい演算子が使用されている場合、検索条件は <code>OR</code> で結合されます。たとえば、検索条件でケースの種別が問題（1）、種別が機能要求（2）、エスカレーション済みが <code>true</code>（3）に等しいかどうかをチェックします。実行時に、検索条件は <code>(1 OR 2) AND 3</code> のように結合されます。</p><p>プロセスを開始したレコードを更新する場合、プロセスビルダーは暗黙的な検索条件 <code>[<var>Object</var>].Id equals
+         myCurrentVariable.Id</code> をバックグラウンドで追加します。等しい演算子を使用してレコードのIDを値に設定する検索条件を追加する場合、実行時に <code>[<var>Object</var>].Id equals</code> 検索条件は <code>OR</code> 検索条件ロジックを使用して結合されます。たとえば、プロセスを開始したケースを更新し、検索条件 <code>[Case].Id equals
+         500D00000044XgV</code> を追加します。実行時に、この検索条件は暗黙的な検索条件 (<code>[Case].Id equals myCurrentVariable.Id</code>) と <code>OR</code> で結合されます。</p></li>
+</ul>
+<ol><li><strong class="uicontrol">[更新されるレコードがすべての条件を満たす]</strong> を選択します。</li>
+<li>更新されるレコードの絞り込みに使用する条件を設定します。<table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:11.49425287356322%"><col style="width:88.5057471264368%"></colgroup><tbody><tr class=""><td style="vertical-align:top;" class="slds-cell-wrap"><samp class="parmname">項目</samp></td>
+<td style="vertical-align:top;" class="slds-cell-wrap">値を評価する項目を選択します。</td>
+</tr><tr class=""><td style="vertical-align:top;" class="slds-cell-wrap"><samp class="parmname">演算子</samp></td>
+<td style="vertical-align:top;" class="slds-cell-wrap">使用可能な演算子は、項目のデータ型によって異なります。</td>
+</tr><tr class=""><td style="vertical-align:top;" class="slds-cell-wrap"><samp class="parmname">型</samp></td>
+<td style="vertical-align:top;" class="slds-cell-wrap">使用可能な値の型は、項目のデータ型によって異なります。詳細は、<a title="プロセスを開始したレコードや関連レコードなどの項目に値を設定するとき、選択できる値の種別は、選択した項目に基づいて絞り込まれます。" href="process_builder-3.html#process_userinterface_values_types">「プロセスビルダーの値の種別」</a>を参照してください。</td>
+</tr><tr class=""><td style="vertical-align:top;" class="slds-cell-wrap"><samp class="parmname">値</samp></td>
+<td style="vertical-align:top;" class="slds-cell-wrap">項目を評価する値を特定します。</td>
+</tr></tbody></table><p>たとえば、プロセスが取引先レコードを更新する場合、年間収益 (1) が 1,000,000 ドル (3) より大きい (2) 取引先のみを更新するように選択できます。</p>
+       <div><img alt="レコードの更新条件" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/platform_automation/images/process_builder/pb_record_update_conditions.png"></div></li>
+</ol></li>
+<li>新しい項目値を指定します。
+     <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:8.503401360544217%"><col style="width:91.49659863945578%"></colgroup><tbody><tr class=""><td style="vertical-align:top;" class="slds-cell-wrap"><samp class="parmname">項目</samp></td>
+<td style="vertical-align:top;" class="slds-cell-wrap"><p>値を設定する項目を選択します。ドロップダウンリストを絞り込むには、項目の名前を入力します。</p><p style="margin-bottom:0;">項目に値を割り当てることができるのは、<samp class="parmname">[オブジェクト]</samp> 項目で特定したレコードのみです。関連レコードの項目を更新するには、別の [レコードを更新] アクションを使用します。</p></td>
+</tr><tr class=""><td style="vertical-align:top;" class="slds-cell-wrap"><samp class="parmname">種類</samp></td>
+<td style="vertical-align:top;" class="slds-cell-wrap">使用する値の型を選択します。使用可能な型は選択した項目によって異なります。</td>
+</tr><tr class=""><td style="vertical-align:top;" class="slds-cell-wrap"><samp class="parmname">値</samp></td>
+<td style="vertical-align:top;" class="slds-cell-wrap">項目の値を設定します。たとえば、値の型として Formula を選択した場合、<strong class="uicontrol">[数式を構築...]</strong> をクリックして項目の数式の値を作成します。</td>
+</tr></tbody></table></li>
+<li>アクションを保存します。</li>
+</ol></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="process_activate">
+<h1 class="slds-text-heading_large">プロセスの有効化</h1>
+  <p>新しいまたは改訂されたプロセスは、有効化されるまでレコードを評価するために使用されることはありません。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic (<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.overview_edition_lex_only.htm&amp;language=ja&amp;type=5">使用できない組織もあります</a>) および Lightning Experience の両方</td>
+
+            </tr>
+            <tr id="process_activate__d3398e343" class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span id="process_activate__d3398e347"><a name="process_activate__d3398e347"></a><strong>Essentials</strong> Edition、<strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</span></td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d120688e82" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d120688e82" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロセスを有効化または無効化する</td>
+
+              <td headers="d120688e82" style="vertical-align:top;" class="slds-cell-wrap"><p>「フローの管理」</p><p>および</p><p>「すべてのデータの参照」</p><p>および</p><p style="margin-bottom:0;">「アプリケーションのカスタマイズ」</p></td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> プロセスビルダーのサポートと更新は 2025 年 12 月 31 日で終了します。 つまり、プロセスのサポートは提供されず、プロセスビルダー製品のバグは修正されません。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">Workflow Rules &amp; Process Builder End of Support</a> (ワークフロールールとプロセスビルダーのサポート終了)」を参照してください。<p>2025 年 12 月 31 日以降も既存のプロセスは引き続き実行され、有効化、無効化、編集ができますが、Flow Builder を使用することをお勧めします。既存のプロセスを移行するには、<a title="Flow Builder は、ワークフロールールとプロセスビルダーの機能を統合したポイント &amp; クリックツールであり、トリガープロセスの作成が簡単になります。ワークフロールールまたはプロセスビルダーを使用して作成されたトリガープロセスがある場合、[フローに移行] ツールを使用して Flow Builder に移動できます。新しいフローを本番に移行する前に、まず Sandbox 環境で移行してテストしてください。" href="operate-3.html#flow_migrate_to_flow_learning_map">Flow Builder へ</a>の切り替えを計画し、<a title="[フローに移行] ツールを使用して、プロセスビルダープロセスとワークフロールール (スケジュール済みアクションを含む) を Flow Builder に変換します。このツールでは、ほとんどのアクションについてプロセスの部分的な移行もサポートされています。" href="operate-3.html#flow_migrate_to_flow">Migrate to Flow</a> ツールを使用します。新しい自動化の場合は、<a title="自動化により、反復作業が減り、チームがより迅速かつ正確に ToDo を完了できるようになります。Flow Builder では、コードなしで簡単な自動化や複雑な自動化、フォーム、ガイド付き環境を作成できます。Salesforce ページとエクスペリエンスサイトにフォームを追加し、ボタン、レコードトリガー、またはスケジュールを使用してフローを起動できます。" href="overview-2.html#flow">Flow Builder</a> でフローを作成します。</p></div></div></div>
+</div>
+    <div><p>プロセスの有効化後は、そのプロセスを編集できなくなります。ただし、<strong class="uicontrol">[コピー]</strong> をクリックして、プロセスを新しい無効なプロセスとして保存することはできます。</p><p>次の場合は、プロセスを有効化できません。</p><ul>
+        <li>定義済みの条件ノードが 1 つも存在しない。</li>
+
+        <li>定義済みのルール適用時のアクションまたはスケジュール済みアクションが 1 つも存在しない。</li>
+
+      </ul>
+</div>
+    <ol><li>
+        <span>[設定] から、<samp class="parmname">[クイック検索]</samp> ボックスに<kbd>「ビルダー」</kbd>と入力し、<strong class="uicontrol">[プロセスビルダー]</strong> を選択します。</span>
+      </li><li>
+        <span>有効化するプロセスのバージョンを開きます。</span>
+      </li><li>
+        <span><strong class="uicontrol">[有効化]</strong> をクリックします。</span>
+        <div>有効なバージョンがすでに存在するプロセスのバージョンを有効化すると、以前に有効化されたバージョンが自動的に無効化されます。そのバージョンを後で表示するには、プロセスのバージョン履歴を参照します。</div>
+      </li></ol>
+
+    <div><p>プロセスを有効化したら、プロセスを開始するテストレコードを作成または編集して、正常に動作することを確認します。その場合、プロセスが設計どおりに動作することを確認できたら、テストレコードを削除するか以前の値に戻すことを忘れないでください。</p><p>レコードを作成または編集したときにレコードを評価するプロセスの使用を後から Salesforce で停止する場合は、有効なプロセスを開き、<strong class="uicontrol">[無効化]</strong> をクリックします。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="process_advanced">
+<h1 class="slds-text-heading_large">プロセスビルダーでの詳細オプションの設定</h1>
+  <p>プロセスビルダーでは、プロセスでアクションを実行するための詳細なオプションを選択できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic (<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.overview_edition_lex_only.htm&amp;language=ja&amp;type=5">使用できない組織もあります</a>) および Lightning Experience の両方</td>
+
+            </tr>
+            <tr id="process_advanced__d3605e343" class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span id="process_advanced__d3605e347"><a name="process_advanced__d3605e347"></a><strong>Essentials</strong> Edition、<strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</span></td>
+
+            </tr>
+          </tbody></table>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> プロセスビルダーのサポートと更新は 2025 年 12 月 31 日で終了します。 つまり、プロセスのサポートは提供されず、プロセスビルダー製品のバグは修正されません。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">Workflow Rules &amp; Process Builder End of Support</a> (ワークフロールールとプロセスビルダーのサポート終了)」を参照してください。<p>2025 年 12 月 31 日以降も既存のプロセスは引き続き実行され、有効化、無効化、編集ができますが、Flow Builder を使用することをお勧めします。既存のプロセスを移行するには、<a title="Flow Builder は、ワークフロールールとプロセスビルダーの機能を統合したポイント &amp; クリックツールであり、トリガープロセスの作成が簡単になります。ワークフロールールまたはプロセスビルダーを使用して作成されたトリガープロセスがある場合、[フローに移行] ツールを使用して Flow Builder に移動できます。新しいフローを本番に移行する前に、まず Sandbox 環境で移行してテストしてください。" href="operate-3.html#flow_migrate_to_flow_learning_map">Flow Builder へ</a>の切り替えを計画し、<a title="[フローに移行] ツールを使用して、プロセスビルダープロセスとワークフロールール (スケジュール済みアクションを含む) を Flow Builder に変換します。このツールでは、ほとんどのアクションについてプロセスの部分的な移行もサポートされています。" href="operate-3.html#flow_migrate_to_flow">Migrate to Flow</a> ツールを使用します。新しい自動化の場合は、<a title="自動化により、反復作業が減り、チームがより迅速かつ正確に ToDo を完了できるようになります。Flow Builder では、コードなしで簡単な自動化や複雑な自動化、フォーム、ガイド付き環境を作成できます。Salesforce ページとエクスペリエンスサイトにフォームを追加し、ボタン、レコードトリガー、またはスケジュールを使用してフローを起動できます。" href="overview-2.html#flow">Flow Builder</a> でフローを作成します。</p></div></div></div>
+</div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#process_advanced_considerations">プロセスビルダーの詳細なオプションに関する考慮事項</a></strong><br>詳細なオプションを選択するときの考慮事項は、次のとおりです。</li><li class="slds-p-bottom_small"><strong><a href="#process_advanced_reevaluate">プロセスビルダーでのレコードの再評価</a></strong><br>オブジェクトをプロセスに追加するとき、1 つの保存操作でレコードを複数回評価するかどうかを選択できます。</li><li class="slds-p-bottom_small"><strong><a href="#process_advanced_invocable">プロセスビルダーのネストプロセス</a></strong><br><dfn>呼び出し可能なプロセス</dfn>を使用すると、プロセスのセクションをモジュール化し、ロジックを追加できます。<dfn>呼び出し可能なプロセス</dfn>は、このプロセスを別のプロセスが呼び出すと開始されるプロセスです。プロセスのプロパティの <samp class="parmname">[プロセスを開始するタイミング]</samp> は、プロセスを呼び出すことができるかどうかを制御します。</li><li class="slds-p-bottom_small"><strong><a href="#process_advanced_previously_met">プロセスでの不要なアクションの回避</a></strong><br>プロセスに条件を追加するとき、指定された条件が変化した場合にアクションを実行するように選択できます。</li></ul>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="process_advanced_considerations">
+<h1 class="slds-text-heading_large">プロセスビルダーの詳細なオプションに関する考慮事項</h1>
+  <p>詳細なオプションを選択するときの考慮事項は、次のとおりです。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic (<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.overview_edition_lex_only.htm&amp;language=ja&amp;type=5">使用できない組織もあります</a>) および Lightning Experience の両方</td>
+
+            </tr>
+            <tr id="process_advanced_considerations__d4103e343" class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span id="process_advanced_considerations__d4103e347"><a name="process_advanced_considerations__d4103e347"></a><strong>Essentials</strong> Edition、<strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</span></td>
+
+            </tr>
+          </tbody></table>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> プロセスビルダーのサポートと更新は 2025 年 12 月 31 日で終了します。 つまり、プロセスのサポートは提供されず、プロセスビルダー製品のバグは修正されません。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">Workflow Rules &amp; Process Builder End of Support</a> (ワークフロールールとプロセスビルダーのサポート終了)」を参照してください。<p>2025 年 12 月 31 日以降も既存のプロセスは引き続き実行され、有効化、無効化、編集ができますが、Flow Builder を使用することをお勧めします。既存のプロセスを移行するには、<a title="Flow Builder は、ワークフロールールとプロセスビルダーの機能を統合したポイント &amp; クリックツールであり、トリガープロセスの作成が簡単になります。ワークフロールールまたはプロセスビルダーを使用して作成されたトリガープロセスがある場合、[フローに移行] ツールを使用して Flow Builder に移動できます。新しいフローを本番に移行する前に、まず Sandbox 環境で移行してテストしてください。" href="operate-3.html#flow_migrate_to_flow_learning_map">Flow Builder へ</a>の切り替えを計画し、<a title="[フローに移行] ツールを使用して、プロセスビルダープロセスとワークフロールール (スケジュール済みアクションを含む) を Flow Builder に変換します。このツールでは、ほとんどのアクションについてプロセスの部分的な移行もサポートされています。" href="operate-3.html#flow_migrate_to_flow">Migrate to Flow</a> ツールを使用します。新しい自動化の場合は、<a title="自動化により、反復作業が減り、チームがより迅速かつ正確に ToDo を完了できるようになります。Flow Builder では、コードなしで簡単な自動化や複雑な自動化、フォーム、ガイド付き環境を作成できます。Salesforce ページとエクスペリエンスサイトにフォームを追加し、ボタン、レコードトリガー、またはスケジュールを使用してフローを起動できます。" href="overview-2.html#flow">Flow Builder</a> でフローを作成します。</p></div></div></div>
+<ul>
+        <li>プロセスにレコードの再評価を許可する場合は、無限ループにならないようにします。たとえば、プロセスで、取引先の説明が変更されたかどうかをチェックし、取引先の説明を更新して、取引先レコードが作成または編集されるたびに Chatter 投稿を作成する場合、プロセスはアクションを評価およびトリガーして、最終的に 6 回 Chatter 投稿を行います。</li>
+
+        <li>プロセスにオブジェクトを指定するときに 1 つの保存操作でレコードを複数回評価するように選択した場合は、どの条件も [No criteria—simply execute the actions! (条件がありません — 単純にアクションが実行されます)] に設定しないことをお勧めします。</li>
+
+        <li>プロセスが ISCHANGED、ISNEW、または PRIORVALUE 数式関数を使用する場合は、詳細オプションは使用しないことをお勧めします。詳細オプションを使用する場合は、次の考慮事項に留意してください。<ul><li>レコードが最初に作成されたとき、ISNEW は true と評価されます。プロセスが ISNEW 数式関数を使用し、1 つの保存操作で複数回レコードを再評価する場合、プロセスがアクションを複数回実行します。<p>たとえば、取引先が作成または更新されたかどうかをプロセスがチェックするとします。条件が評価されると、毎回 ISNEW は true と評価されます。その結果、6 回 Chatter 投稿が行われます。この例は、取引先レコードが作成されたためにプロセスがトリガーされた場合にのみ当てはまります。</p>
+              <ul><li>ISNEW が true と評価されると、プロセスは取引先の年間収益を更新し、Chatter に投稿します。</li>
+<li>プロセスが取引先の年間収益を更新すると、レコードが変更されたため、プロセスはレコードを再評価します (追加回数は 5 回まで)。</li>
+</ul>
+</li>
+<li>レコードが作成されると、PRIORVALUE は現在の値を前の値として返します。レコードが更新されると、PRIORVALUE は保存操作が開始される直前に設定されていた項目値を返します。プロセスが PRIORVALUE 数式関数を使用し、1 つの操作で複数回レコードを再評価する場合、プロセスがアクションを複数回実行します。プロセスが 1 つの保存操作で複数回レコードを再評価し、指定された条件が変化した場合にのみアクションを実行する場合、PRIORVALUE は、レコードが保存される前に存在した値を返します。<p>たとえば、取引先が作成または更新されたかどうかをプロセスがチェックするとします。レコードが再評価されるたびに、取引先の種別の前の値は「見込み客」になります。その結果、6 回 Chatter 投稿が行われます。</p>
+              <ul><li><kbd>PRIORVALUE([Account].Type) = '見込み客'</kbd> が true と評価されると、プロセスは取引先の年間収益を更新し、Chatter に投稿します。</li>
+<li>取引先種別「<kbd>見込み客</kbd>」で取引先が作成されると、プロセストランザクションの終了まで条件は常に true になります。</li>
+<li>条件が true のときに、プロセスが変更されて取引先種別が「<kbd>その他</kbd>」に更新された場合、取引先種別「<kbd>見込み客</kbd>」で作成された取引先に対し、数式 <kbd>PRIORVALUE([Account].Type) = '見込み客'</kbd> はプロセストランザクションの終了まで true になります。</li>
+</ul>
+</li>
+<li>ISCHANGED は、レコードが最初に作成されたときは常に false と評価されます。<p>たとえば、取引先の説明が変更されたかどうかをプロセスがチェックし (<kbd>ISCHANGED([Account].Description)</kbd>)、さらに 1 つの保存操作でレコードを複数回再評価するとします。取引先は最初に空白の説明値で作成され、別のプロセスが同じ保存操作内で取引先の説明を更新した場合、ISCHANGED では、レコードが最初に作成されたときの取引先の説明値 (空白値) を現在の値の設定と比較するため、レコードが再評価されると毎回 true と評価されます。
+                </p><p>ISCHANGED([Account].Description) が true と評価されるたびに、この同じプロセスで Chatter 投稿を作成するとします。保存操作全体を通して ISCHANGED は true と評価されるため、このプロセスは再帰的なループを作成し、6 回 Chatter 投稿が行われます。</p></li>
+</ul>
+</li>
+
+      </ul>
+</div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="process_advanced_invocable">
+<h1 class="slds-text-heading_large">プロセスビルダーのネストプロセス </h1>
+  <p><dfn>呼び出し可能なプロセス</dfn>を使用すると、プロセスのセクションをモジュール化し、ロジックを追加できます。<dfn>呼び出し可能なプロセス</dfn>は、このプロセスを別のプロセスが呼び出すと開始されるプロセスです。プロセスのプロパティの <samp class="parmname">[プロセスを開始するタイミング]</samp> は、プロセスを呼び出すことができるかどうかを制御します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic (<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.overview_edition_lex_only.htm&amp;language=ja&amp;type=5">使用できない組織もあります</a>) および Lightning Experience の両方</td>
+
+            </tr>
+            <tr id="process_advanced_invocable__d2723e343" class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span id="process_advanced_invocable__d2723e347"><a name="process_advanced_invocable__d2723e347"></a><strong>Essentials</strong> Edition、<strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</span></td>
+
+            </tr>
+          </tbody></table>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> プロセスビルダーのサポートと更新は 2025 年 12 月 31 日で終了します。 つまり、プロセスのサポートは提供されず、プロセスビルダー製品のバグは修正されません。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">Workflow Rules &amp; Process Builder End of Support</a> (ワークフロールールとプロセスビルダーのサポート終了)」を参照してください。<p>2025 年 12 月 31 日以降も既存のプロセスは引き続き実行され、有効化、無効化、編集ができますが、Flow Builder を使用することをお勧めします。既存のプロセスを移行するには、<a title="Flow Builder は、ワークフロールールとプロセスビルダーの機能を統合したポイント &amp; クリックツールであり、トリガープロセスの作成が簡単になります。ワークフロールールまたはプロセスビルダーを使用して作成されたトリガープロセスがある場合、[フローに移行] ツールを使用して Flow Builder に移動できます。新しいフローを本番に移行する前に、まず Sandbox 環境で移行してテストしてください。" href="operate-3.html#flow_migrate_to_flow_learning_map">Flow Builder へ</a>の切り替えを計画し、<a title="[フローに移行] ツールを使用して、プロセスビルダープロセスとワークフロールール (スケジュール済みアクションを含む) を Flow Builder に変換します。このツールでは、ほとんどのアクションについてプロセスの部分的な移行もサポートされています。" href="operate-3.html#flow_migrate_to_flow">Migrate to Flow</a> ツールを使用します。新しい自動化の場合は、<a title="自動化により、反復作業が減り、チームがより迅速かつ正確に ToDo を完了できるようになります。Flow Builder では、コードなしで簡単な自動化や複雑な自動化、フォーム、ガイド付き環境を作成できます。Salesforce ページとエクスペリエンスサイトにフォームを追加し、ボタン、レコードトリガー、またはスケジュールを使用してフローを起動できます。" href="overview-2.html#flow">Flow Builder</a> でフローを作成します。</p></div></div></div>
+<p>プロセスを別のプロセスから呼び出すには、プロセスアクションを設定します。この設定には、どのレコードから開始するかを判断する呼び出し可能なプロセスにレコードを渡すことも含まれます。レコードがあるプロセスから別のプロセスに渡されるため、呼び出し可能なプロセスはそのレコードの特定バージョンを受信します。このバージョンは、プロセスアクションが実行される時期によって異なります。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">ルール適用時のアクション</h2><p>ルール適用時のアクションを使用してプロセスを呼び出すと、最上位プロセスの開始時にレコードに含まれていた値がプロセスによって受信されます。</p><p>例: プロセス 1 は取引先を更新し、その取引先に基づいてプロセス 2 を呼び出します。プロセス 2 は、プロセス 1 が開始されると取引先のバージョンを受信します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">スケジュール済みアクション</h2><p>スケジュール済みアクションを使用してプロセスを呼び出すと、レコードの最新の値がプロセスによって受信されます。</p><p>例: プロセス 1 は取引先を更新し、15 分後にその取引先に基づいてプロセス 2 を呼び出します。プロセス 2 は、データベースから取引先の最新バージョンを受信します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">呼び出し可能なプロセスを作成する必要がある状況は?</h2><p>複数のアクショングループにまったく同じアクションを作成していることに気が付きましたか。これらのアクションを呼び出し可能なプロセスに一度設定し、関連するすべてのアクショングループからそのプロセスを呼び出します。その後、これらのアクションを更新するには、1 つの呼び出し可能なプロセスを更新します。これにより、更新したアクションがその他すべてのプロセスで使用されます。</p><p>呼び出し可能なプロセスのもう 1 つの便利なシナリオとして、単純なロジックのネストがあります。プロセスは単純な「if/then」ステートメントを処理します。ただし、これらのステートメントの一部をネストする必要がある場合はどうすればよいでしょうか。フロー作成またはコード記述ではなく、第 2 レベルのロジックを別のプロセスに組み込みます。最初のプロセスから 2 番目のプロセスを呼び出せば完了です。</p></div>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> 
+      <p>1 つのプロセスですべてのケース管理を処理するとします。ただし、通常の取引先用にエスカレーションされたケースとは異なり、高収益の取引先用にエスカレーションされたケースを処理する必要があります。更新日が 1 か月以内の取引先によってケースがエスカレーションされた場合、取引先所有者、地域マネージャー、およびその地域の統括責任者に通知します。更新日が 1 か月より先の取引先によってケースがエスカレーションされた場合は、取引先所有者および地域マネージャーにのみ通知します。</p>
+      <p>これを行うには、呼び出し可能なプロセスを作成します。このプロセスの名前を「Escalated Cases」 (エスカレーション済みケース) とします。このプロセスはケースオブジェクトで動作し、2 つの条件ノードがあります。</p>
+      <ul>
+        <li>最初の条件ノードは、関連付けられた取引先の更新日が 1 か月以内かどうかを評価します。条件をケースが満たすと、プロセスはケースへのリンクを使用して取引先のフィードに投稿し、取引先所有者、地域マネージャー、および地域統括責任者にメンションします。</li>
+
+        <li>2 番目の条件ノードには条件がありません。ケースが最初のノードの条件満たさない場合も、プロセスは地域統括責任者にメンションしないことを除いて同じアクションを実行します。</li>
+
+      </ul>
+
+      <p>では、ケース管理を自動化するプロセスに話しを戻しましょう。ケースがエスカレーションされたかどうかをチェックする条件ノードはすでに用意されています。その条件のアクショングループにプロセスアクションを追加し、「Escalated Cases」プロセスを呼び出すようにアクションを設定します。</p>
+    </div></div></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="process_advanced_previously_met">
+<h1 class="slds-text-heading_large">プロセスでの不要なアクションの回避</h1>
+  <p>プロセスに条件を追加するとき、指定された条件が変化した場合にアクションを実行するように選択できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic (<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.overview_edition_lex_only.htm&amp;language=ja&amp;type=5">使用できない組織もあります</a>) および Lightning Experience の両方</td>
+
+            </tr>
+            <tr id="process_advanced_previously_met__d2538e343" class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span id="process_advanced_previously_met__d2538e347"><a name="process_advanced_previously_met__d2538e347"></a><strong>Essentials</strong> Edition、<strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</span></td>
+
+            </tr>
+          </tbody></table>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> プロセスビルダーのサポートと更新は 2025 年 12 月 31 日で終了します。 つまり、プロセスのサポートは提供されず、プロセスビルダー製品のバグは修正されません。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">Workflow Rules &amp; Process Builder End of Support</a> (ワークフロールールとプロセスビルダーのサポート終了)」を参照してください。<p>2025 年 12 月 31 日以降も既存のプロセスは引き続き実行され、有効化、無効化、編集ができますが、Flow Builder を使用することをお勧めします。既存のプロセスを移行するには、<a title="Flow Builder は、ワークフロールールとプロセスビルダーの機能を統合したポイント &amp; クリックツールであり、トリガープロセスの作成が簡単になります。ワークフロールールまたはプロセスビルダーを使用して作成されたトリガープロセスがある場合、[フローに移行] ツールを使用して Flow Builder に移動できます。新しいフローを本番に移行する前に、まず Sandbox 環境で移行してテストしてください。" href="operate-3.html#flow_migrate_to_flow_learning_map">Flow Builder へ</a>の切り替えを計画し、<a title="[フローに移行] ツールを使用して、プロセスビルダープロセスとワークフロールール (スケジュール済みアクションを含む) を Flow Builder に変換します。このツールでは、ほとんどのアクションについてプロセスの部分的な移行もサポートされています。" href="operate-3.html#flow_migrate_to_flow">Migrate to Flow</a> ツールを使用します。新しい自動化の場合は、<a title="自動化により、反復作業が減り、チームがより迅速かつ正確に ToDo を完了できるようになります。Flow Builder では、コードなしで簡単な自動化や複雑な自動化、フォーム、ガイド付き環境を作成できます。Salesforce ページとエクスペリエンスサイトにフォームを追加し、ボタン、レコードトリガー、またはスケジュールを使用してフローを起動できます。" href="overview-2.html#flow">Flow Builder</a> でフローを作成します。</p></div></div></div>
+<p>たとえば、プロセスで、ケースが [エスカレーション済み] 状況になったら常にメールアラートを送信します。サポートチームが、新しい情報でケースの説明を繰り返し更新しているとします。新しい説明と一緒にケースが保存されたときは常に、プロセスは、繰り返しメールアラートを送信するのではなく、特に [エスカレーション済み] 状況が変わったかどうかをチェックできます。このように、プロセスは、最新の更新で状況が [エスカレーション済み] に変更された場合にのみアクションを実行します。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> このオプションについての詳細は、こちら短い動画<span style="vertical-align:text-bottom;display:inline-block;"><img alt="デモビデオを見る" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/resources-global/_corporate/images/play_btn.png" style="margin-bottom:0;" class="doc_video_play_button"></span><a target="_blank" href="https://salesforce.vidyard.com/watch/1sbznRSzxtxhzRi3Hn_9ag">「プロセスでの不要なアクションの回避」</a>を参照してください。</div></div></div>
+<p>この設定は、次の場合にはサポートされません。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:10.666666666666668%"><col style="width:44.66666666666667%"><col style="width:44.66666666666667%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d46373e130" style="vertical-align:top;" class="slds-cell-wrap" scope="col">[はい] の状態</th>
+              <th id="d46373e133" style="vertical-align:top;" class="slds-cell-wrap" scope="col">アクションが実行される場合</th>
+              <th id="d46373e136" style="vertical-align:top;" class="slds-cell-wrap" scope="col">アクションが実行されない場合</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d46373e130" style="vertical-align:top;" class="slds-cell-wrap" data-label="[はい] の状態">選択済み</td>
+
+              <td headers="d46373e133" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクションが実行される場合"><ul>
+                  <li>レコードが作成された。</li>
+
+                  <li>レコードが更新された。現在の値は条件を満たしており、直前の値は条件を満たしていない。</li>
+
+                </ul>
+</td>
+
+              <td headers="d46373e136" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクションが実行されない場合"><ul>
+                  <li>レコードの現在の値は条件を満たしており、レコードの直前の値も条件を満たしている。</li>
+
+                  <li>レコードの現在の値が条件を満たしていない。</li>
+
+                </ul>
+</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d46373e130" style="vertical-align:top;" class="slds-cell-wrap" data-label="[はい] の状態">選択解除済み</td>
+
+              <td headers="d46373e133" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクションが実行される場合"><ul>
+                  <li>レコードが作成された。</li>
+
+                  <li>レコードが更新され、現在の値が条件を満たしている。</li>
+
+                </ul>
+</td>
+
+              <td headers="d46373e136" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクションが実行されない場合">レコードの現在の値が条件を満たしていない。</td>
+
+            </tr>
+          </tbody></table><ul>
+        <li>レコードが作成されたときにのみプロセスが開始する。</li>
+
+        <li>レコードが作成または編集されたときにプロセスが開始し、条件ノードで条件を評価しない。</li>
+
+        <li>条件ノードで数式は評価するが、プロセスを開始したレコードへの参照が数式に含まれていない。</li>
+
+        <li>プロセスの絞り込み条件で [変更済み] 演算子が使用されている。</li>
+
+      </ul>
+</div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="詳細なオプションを選択するときの考慮事項は、次のとおりです。" href="#process_advanced_considerations">プロセスビルダーの詳細なオプションに関する考慮事項</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="process_advanced_reevaluate">
+<h1 class="slds-text-heading_large">プロセスビルダーでのレコードの再評価</h1>
+  <p>オブジェクトをプロセスに追加するとき、1 つの保存操作でレコードを複数回評価するかどうかを選択できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic (<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.overview_edition_lex_only.htm&amp;language=ja&amp;type=5">使用できない組織もあります</a>) および Lightning Experience の両方</td>
+
+            </tr>
+            <tr id="process_advanced_reevaluate__d2636e343" class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span id="process_advanced_reevaluate__d2636e347"><a name="process_advanced_reevaluate__d2636e347"></a><strong>Essentials</strong> Edition、<strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</span></td>
+
+            </tr>
+          </tbody></table>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> プロセスビルダーのサポートと更新は 2025 年 12 月 31 日で終了します。 つまり、プロセスのサポートは提供されず、プロセスビルダー製品のバグは修正されません。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">Workflow Rules &amp; Process Builder End of Support</a> (ワークフロールールとプロセスビルダーのサポート終了)」を参照してください。<p>2025 年 12 月 31 日以降も既存のプロセスは引き続き実行され、有効化、無効化、編集ができますが、Flow Builder を使用することをお勧めします。既存のプロセスを移行するには、<a title="Flow Builder は、ワークフロールールとプロセスビルダーの機能を統合したポイント &amp; クリックツールであり、トリガープロセスの作成が簡単になります。ワークフロールールまたはプロセスビルダーを使用して作成されたトリガープロセスがある場合、[フローに移行] ツールを使用して Flow Builder に移動できます。新しいフローを本番に移行する前に、まず Sandbox 環境で移行してテストしてください。" href="operate-3.html#flow_migrate_to_flow_learning_map">Flow Builder へ</a>の切り替えを計画し、<a title="[フローに移行] ツールを使用して、プロセスビルダープロセスとワークフロールール (スケジュール済みアクションを含む) を Flow Builder に変換します。このツールでは、ほとんどのアクションについてプロセスの部分的な移行もサポートされています。" href="operate-3.html#flow_migrate_to_flow">Migrate to Flow</a> ツールを使用します。新しい自動化の場合は、<a title="自動化により、反復作業が減り、チームがより迅速かつ正確に ToDo を完了できるようになります。Flow Builder では、コードなしで簡単な自動化や複雑な自動化、フォーム、ガイド付き環境を作成できます。Salesforce ページとエクスペリエンスサイトにフォームを追加し、ボタン、レコードトリガー、またはスケジュールを使用してフローを起動できます。" href="overview-2.html#flow">Flow Builder</a> でフローを作成します。</p></div></div></div>
+<p>これは、全方向一時停止の十字路ではなくラウンドアバウトを使用してプロセストラフィックを制御するようなものです。レコードの再評価では、停止して別個の保存操作を待機するのではなく、ビジネストラフィックがもう少し自由に流れます。</p><p>このオプションを選択すると、1 つの保存操作で同じレコードを最大 5 回まで追加評価できます。プロセス、ワークフロールール、フローでは同じ保存操作でレコードが更新されるため、レコードが再評価されることがあります。レコードが再評価されると、プロセスはそのレコードの最新値を使用します。</p><p>たとえば、セールスレビュープロセスに、更新する必要があるステップ、承認、通知、項目が複数含まれているとします。いくつかの変更は、プロセスの一部であったり、組織の他のワークフロールールやフローで管理されたりすることがあります。1 つの保存操作でレコードを複数回再評価することをプロセスに許可すると、これらのすべての変更 (他のプロセスによる変更も含む) をプロセスの 1 回の保存操作で管理および評価できます。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="詳細なオプションを選択するときの考慮事項は、次のとおりです。" href="#process_advanced_considerations">プロセスビルダーの詳細なオプションに関する考慮事項</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="process_changesets_packaging">
+<h1 class="slds-text-heading_large">プロセスのリリースに関する考慮事項</h1>
+  <p>パッケージまたは変更セットを使用する場合など、プロセスをリリースするときには、次の考慮事項に留意します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic (<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.overview_edition_lex_only.htm&amp;language=ja&amp;type=5">使用できない組織もあります</a>) および Lightning Experience の両方</td>
+
+          </tr>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap"><p>変更セットを使用可能なエディション: <strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</p><p style="margin-bottom:0;">パッケージを使用可能なエディション: <strong>Essentials</strong> Edition、<strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</p></td>
+
+          </tr>
+        </tbody></table>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> プロセスビルダーのサポートと更新は 2025 年 12 月 31 日で終了します。 つまり、プロセスのサポートは提供されず、プロセスビルダー製品のバグは修正されません。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">Workflow Rules &amp; Process Builder End of Support</a> (ワークフロールールとプロセスビルダーのサポート終了)」を参照してください。<p>2025 年 12 月 31 日以降も既存のプロセスは引き続き実行され、有効化、無効化、編集ができますが、Flow Builder を使用することをお勧めします。既存のプロセスを移行するには、<a title="Flow Builder は、ワークフロールールとプロセスビルダーの機能を統合したポイント &amp; クリックツールであり、トリガープロセスの作成が簡単になります。ワークフロールールまたはプロセスビルダーを使用して作成されたトリガープロセスがある場合、[フローに移行] ツールを使用して Flow Builder に移動できます。新しいフローを本番に移行する前に、まず Sandbox 環境で移行してテストしてください。" href="operate-3.html#flow_migrate_to_flow_learning_map">Flow Builder へ</a>の切り替えを計画し、<a title="[フローに移行] ツールを使用して、プロセスビルダープロセスとワークフロールール (スケジュール済みアクションを含む) を Flow Builder に変換します。このツールでは、ほとんどのアクションについてプロセスの部分的な移行もサポートされています。" href="operate-3.html#flow_migrate_to_flow">Migrate to Flow</a> ツールを使用します。新しい自動化の場合は、<a title="自動化により、反復作業が減り、チームがより迅速かつ正確に ToDo を完了できるようになります。Flow Builder では、コードなしで簡単な自動化や複雑な自動化、フォーム、ガイド付き環境を作成できます。Salesforce ページとエクスペリエンスサイトにフォームを追加し、ボタン、レコードトリガー、またはスケジュールを使用してフローを起動できます。" href="overview-2.html#flow">Flow Builder</a> でフローを作成します。</p></div></div></div>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">他のコンポーネントを参照するプロセス</h2><p>次のいずれかのアクションが含まれるプロセスをリリースする場合、対応するコンポーネントが自動的にパッケージまたは変更セットに含まれることはありません。正常にリリースするには、参照されるコンポーネントをパッケージまたは変更セットに手動で追加します。</p><a name="process_changesets_packaging__packaging_invocableactions_list"></a><ul id="process_changesets_packaging__packaging_invocableactions_list">
+        <li>Apex</li>
+
+        <li>メールアラート</li>
+
+        <li>フローの起動</li>
+
+        <li>Chatter への投稿</li>
+
+        <li>クイックアクション</li>
+
+        <li>承認申請</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">テンプレート</h2><p>パッケージからプロセステンプレートをインストールする場合、プロセスを組織で実行する必要がない限り、プロセスが無効になっていることを確認します。</p><p>パッケージにプロセステンプレートを追加する場合、インストールするユーザーが組織でプロセスを有効化することが明確でない限り、最初にプロセスを無効にします。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Chatter に投稿するプロセスのリリース</h2><p>プロセスが特定のユーザーまたはグループの Chatter フィードに投稿する場合、そのプロセスはソース組織でのみ実行されます。[Chatter に投稿] アクションで参照される ID は対象組織には存在しません。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="デフォルトでは、Sandbox 組織または本番以外の組織で有効なプロセスとフローは、本番組織に無効としてリリースされます。リリース後、新しいバージョンを手動で再有効化します。本番組織では、変更セットまたはメタデータ API を使用して、プロセスまたはフローの新しい有効なバージョンをリリースする設定を有効にできます。継続的インテグレーションおよび継続的リリースモデルを使用してメタデータの変更をリリースする場合、プロセスとフローを有効としてリリースするオプションを有効にします。" href="operate-2.html#flow_distribute_deploy_active">有効としてのプロセスとフローのリリース</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="process_clone">
+<h1 class="slds-text-heading_large">プロセスのコピー</h1>
+  <p>既存のプロセスを変更する場合は、そのプロセスのコピーを保存します。コピーは、独自のバージョン履歴を持つ新しい無効なプロセス、または既存のプロセスの新しい無効なバージョンとして保存できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic (<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.overview_edition_lex_only.htm&amp;language=ja&amp;type=5">使用できない組織もあります</a>) および Lightning Experience の両方</td>
+
+            </tr>
+            <tr id="process_clone__d3282e343" class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span id="process_clone__d3282e347"><a name="process_clone__d3282e347"></a><strong>Essentials</strong> Edition、<strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</span></td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d111328e82" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr id="process_clone__d3282e977" class="">
+              <td headers="d111328e82" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロセスを作成、編集、参照する</td>
+
+              <td headers="d111328e82" style="vertical-align:top;" class="slds-cell-wrap"><p>「フローの管理」</p><p>および</p><p style="margin-bottom:0;">「すべてのデータの参照」</p></td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> プロセスビルダーのサポートと更新は 2025 年 12 月 31 日で終了します。 つまり、プロセスのサポートは提供されず、プロセスビルダー製品のバグは修正されません。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">Workflow Rules &amp; Process Builder End of Support</a> (ワークフロールールとプロセスビルダーのサポート終了)」を参照してください。<p>2025 年 12 月 31 日以降も既存のプロセスは引き続き実行され、有効化、無効化、編集ができますが、Flow Builder を使用することをお勧めします。既存のプロセスを移行するには、<a title="Flow Builder は、ワークフロールールとプロセスビルダーの機能を統合したポイント &amp; クリックツールであり、トリガープロセスの作成が簡単になります。ワークフロールールまたはプロセスビルダーを使用して作成されたトリガープロセスがある場合、[フローに移行] ツールを使用して Flow Builder に移動できます。新しいフローを本番に移行する前に、まず Sandbox 環境で移行してテストしてください。" href="operate-3.html#flow_migrate_to_flow_learning_map">Flow Builder へ</a>の切り替えを計画し、<a title="[フローに移行] ツールを使用して、プロセスビルダープロセスとワークフロールール (スケジュール済みアクションを含む) を Flow Builder に変換します。このツールでは、ほとんどのアクションについてプロセスの部分的な移行もサポートされています。" href="operate-3.html#flow_migrate_to_flow">Migrate to Flow</a> ツールを使用します。新しい自動化の場合は、<a title="自動化により、反復作業が減り、チームがより迅速かつ正確に ToDo を完了できるようになります。Flow Builder では、コードなしで簡単な自動化や複雑な自動化、フォーム、ガイド付き環境を作成できます。Salesforce ページとエクスペリエンスサイトにフォームを追加し、ボタン、レコードトリガー、またはスケジュールを使用してフローを起動できます。" href="overview-2.html#flow">Flow Builder</a> でフローを作成します。</p></div></div></div>
+</div>
+    <div><p>有効なプロセスを変更する場合、いくつかのオプションがあります。</p><ul>
+        <li>プロセスを無効化し、変更を加えてから再度有効化する。</li>
+
+        <li>無効なバージョンとしてコピーし、変更を加えてから新しいバージョンを有効化する。元のバージョンは自動的に無効化されます。</li>
+
+        <li>新しい無効なプロセスとしてコピーし、変更を加えてから有効化する。元のプロセスは自動的に無効化されないため、両方のプロセスを有効にするのが適切かどうかを検討してください。</li>
+
+      </ul>
+<p>1 つのプロセスにはバージョンを最大 <span>50</span> 個まで作成できますが、有効化できるバージョンは 1 つのみです。</p></div>
+    <ol><li>
+        <span>[設定] から、<samp class="parmname">[クイック検索]</samp> ボックスに<kbd>「ビルダー」</kbd>と入力し、<strong class="uicontrol">[プロセスビルダー]</strong> を選択します。</span>
+      </li><li>
+        <span>有効化するプロセスまたはプロセスのバージョンを開きます。</span>
+      </li><li>
+        <span><strong class="uicontrol">[コピー]</strong> をクリックします。</span>
+      </li><li>
+        <span>現在のプロセスのバージョンを作成するか、独自のバージョン履歴を持つ新しいプロセスを作成できます。</span>
+      </li><li>
+        <span>名前、API 名、説明を入力します。</span>
+      </li><li>
+        <span><strong class="uicontrol">[保存]</strong> をクリックします。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="process_considerations">
+<h1 class="slds-text-heading_large">プロセスの制限および考慮事項</h1>
+  <p>プロセスを作成、管理、有効化する場合は、まずその制限や考慮事項を理解しておく必要があります。</p>
+
+    
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> プロセスビルダーのサポートと更新は 2025 年 12 月 31 日で終了します。 つまり、プロセスのサポートは提供されず、プロセスビルダー製品のバグは修正されません。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">Workflow Rules &amp; Process Builder End of Support</a> (ワークフロールールとプロセスビルダーのサポート終了)」を参照してください。<p>2025 年 12 月 31 日以降も既存のプロセスは引き続き実行され、有効化、無効化、編集ができますが、Flow Builder を使用することをお勧めします。既存のプロセスを移行するには、<a title="Flow Builder は、ワークフロールールとプロセスビルダーの機能を統合したポイント &amp; クリックツールであり、トリガープロセスの作成が簡単になります。ワークフロールールまたはプロセスビルダーを使用して作成されたトリガープロセスがある場合、[フローに移行] ツールを使用して Flow Builder に移動できます。新しいフローを本番に移行する前に、まず Sandbox 環境で移行してテストしてください。" href="operate-3.html#flow_migrate_to_flow_learning_map">Flow Builder へ</a>の切り替えを計画し、<a title="[フローに移行] ツールを使用して、プロセスビルダープロセスとワークフロールール (スケジュール済みアクションを含む) を Flow Builder に変換します。このツールでは、ほとんどのアクションについてプロセスの部分的な移行もサポートされています。" href="operate-3.html#flow_migrate_to_flow">Migrate to Flow</a> ツールを使用します。新しい自動化の場合は、<a title="自動化により、反復作業が減り、チームがより迅速かつ正確に ToDo を完了できるようになります。Flow Builder では、コードなしで簡単な自動化や複雑な自動化、フォーム、ガイド付き環境を作成できます。Salesforce ページとエクスペリエンスサイトにフォームを追加し、ボタン、レコードトリガー、またはスケジュールを使用してフローを起動できます。" href="overview-2.html#flow">Flow Builder</a> でフローを作成します。</p></div></div></div>
+</div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="process_builder-3.html#process_limits">プロセスの制限</a></strong><br>プロセスを作成するときには、共通の制限および Apex ガバナ制限に留意してください。また、プロセスの API 参照名は、Salesforce 組織内のすべてのプロセスおよびフローで一意である必要があります。</li><li class="slds-p-bottom_small"><strong><a href="process_builder-3.html#process_usage_entitlements">プロセスの使用量ベースのエンタイトルメント</a></strong><br>機能ライセンスと同様に、使用量ベースのエンタイトルメントによって Salesforce で実行できる内容は制限されません。使用量ベースのエンタイトルメントは、実用性に対して付加される要素です。使用量が許容量を超えると、契約への追加事項について話し合うために Salesforce から連絡があります。それまで、プロセスは通常どおり実行し続けます。</li><li class="slds-p-bottom_small"><strong><a href="#process_considerations_works">プロセスでレコードの変更が評価されるタイミング</a></strong><br>プロセスは自動的に開始され、ユーザーが意識することはありません。プロセスを設計または有効化する前に、どの変更によってプロセスがトリガーされるかを理解しておく必要があります。</li><li class="slds-p-bottom_small"><strong><a href="#process_considerations_design">プロセスの設計に関する考慮事項</a></strong><br>プロセスを設計する場合は、その制限やガイドラインを理解しておく必要があります。</li><li class="slds-p-bottom_small"><strong><a href="#process_considerations_activation">プロセスの管理に関する考慮事項</a></strong><br>プロセスをインストール、有効化、または削除したときにどうなるかを理解しておく必要があります。</li><li class="slds-p-bottom_small"><strong><a href="#process_changesets_packaging">プロセスのリリースに関する考慮事項</a></strong><br>パッケージまたは変更セットを使用する場合など、プロセスをリリースするときには、次の考慮事項に留意します。</li><li class="slds-p-bottom_small"><strong><a href="#process_considerations_transactions">トランザクション内のプロセスに関する考慮事項</a></strong><br>各プロセスはトランザクションのコンテキストで実行されます。トランザクションは、1 つの単位として実行される一連の操作を表します。1 つのトランザクションで複数回プロセスがトリガーされると、Salesforce によって同様のアクションが 1 つのバッチで実行されます。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="process_considerations_activation">
+<h1 class="slds-text-heading_large">プロセスの管理に関する考慮事項</h1>
+  <p>プロセスをインストール、有効化、または削除したときにどうなるかを理解しておく必要があります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic (<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.overview_edition_lex_only.htm&amp;language=ja&amp;type=5">使用できない組織もあります</a>) および Lightning Experience の両方</td>
+
+            </tr>
+            <tr id="process_considerations_activation__d2712e343" class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span id="process_considerations_activation__d2712e347"><a name="process_considerations_activation__d2712e347"></a><strong>Essentials</strong> Edition、<strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</span></td>
+
+            </tr>
+          </tbody></table>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> プロセスビルダーのサポートと更新は 2025 年 12 月 31 日で終了します。 つまり、プロセスのサポートは提供されず、プロセスビルダー製品のバグは修正されません。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">Workflow Rules &amp; Process Builder End of Support</a> (ワークフロールールとプロセスビルダーのサポート終了)」を参照してください。<p>2025 年 12 月 31 日以降も既存のプロセスは引き続き実行され、有効化、無効化、編集ができますが、Flow Builder を使用することをお勧めします。既存のプロセスを移行するには、<a title="Flow Builder は、ワークフロールールとプロセスビルダーの機能を統合したポイント &amp; クリックツールであり、トリガープロセスの作成が簡単になります。ワークフロールールまたはプロセスビルダーを使用して作成されたトリガープロセスがある場合、[フローに移行] ツールを使用して Flow Builder に移動できます。新しいフローを本番に移行する前に、まず Sandbox 環境で移行してテストしてください。" href="operate-3.html#flow_migrate_to_flow_learning_map">Flow Builder へ</a>の切り替えを計画し、<a title="[フローに移行] ツールを使用して、プロセスビルダープロセスとワークフロールール (スケジュール済みアクションを含む) を Flow Builder に変換します。このツールでは、ほとんどのアクションについてプロセスの部分的な移行もサポートされています。" href="operate-3.html#flow_migrate_to_flow">Migrate to Flow</a> ツールを使用します。新しい自動化の場合は、<a title="自動化により、反復作業が減り、チームがより迅速かつ正確に ToDo を完了できるようになります。Flow Builder では、コードなしで簡単な自動化や複雑な自動化、フォーム、ガイド付き環境を作成できます。Salesforce ページとエクスペリエンスサイトにフォームを追加し、ボタン、レコードトリガー、またはスケジュールを使用してフローを起動できます。" href="overview-2.html#flow">Flow Builder</a> でフローを作成します。</p></div></div></div>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">インストール済みプロセス</h2><p>非テンプレートプロセスを管理パッケージからインストールする場合、プロセスの有効化または無効化のみを実行できます。プロセスがテンプレートの場合、それを表示してコピーし、そのコピーを編集できます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">有効なプロセス</h2><p>プロセスの有効化後は、そのプロセスを編集できなくなります。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">プロセスの削除</h2><p>スケジュール済みアクションの未実行のグループがプロセスにある場合は、プロセスを削除できません。回避策として、<a title="プロセスのスケジュール済みアクションを実行する必要がなくなった場合は、[設定] の一時停止中のフローインタビューのリストから削除できます。" href="process_builder-3.html#process_delete_instance">スケジュール解除したアクションの未実行のグループを削除</a>します。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="process_considerations_chatter">
+<h1 class="slds-text-heading_large">Chatter に投稿するプロセスに関する考慮事項</h1>
+  <p>[Chatter に投稿] アクションでは Experience Cloud サイトがサポートされておらず、メッセージの内容について制限事項があります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic (<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.overview_edition_lex_only.htm&amp;language=ja&amp;type=5">使用できない組織もあります</a>) および Lightning Experience の両方</td>
+
+            </tr>
+            <tr id="process_considerations_chatter__d5080e343" class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span id="process_considerations_chatter__d5080e347"><a name="process_considerations_chatter__d5080e347"></a><strong>Essentials</strong> Edition、<strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</span></td>
+
+            </tr>
+          </tbody></table>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> プロセスビルダーのサポートと更新は 2025 年 12 月 31 日で終了します。 つまり、プロセスのサポートは提供されず、プロセスビルダー製品のバグは修正されません。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">Workflow Rules &amp; Process Builder End of Support</a> (ワークフロールールとプロセスビルダーのサポート終了)」を参照してください。<p>2025 年 12 月 31 日以降も既存のプロセスは引き続き実行され、有効化、無効化、編集ができますが、Flow Builder を使用することをお勧めします。既存のプロセスを移行するには、<a title="Flow Builder は、ワークフロールールとプロセスビルダーの機能を統合したポイント &amp; クリックツールであり、トリガープロセスの作成が簡単になります。ワークフロールールまたはプロセスビルダーを使用して作成されたトリガープロセスがある場合、[フローに移行] ツールを使用して Flow Builder に移動できます。新しいフローを本番に移行する前に、まず Sandbox 環境で移行してテストしてください。" href="operate-3.html#flow_migrate_to_flow_learning_map">Flow Builder へ</a>の切り替えを計画し、<a title="[フローに移行] ツールを使用して、プロセスビルダープロセスとワークフロールール (スケジュール済みアクションを含む) を Flow Builder に変換します。このツールでは、ほとんどのアクションについてプロセスの部分的な移行もサポートされています。" href="operate-3.html#flow_migrate_to_flow">Migrate to Flow</a> ツールを使用します。新しい自動化の場合は、<a title="自動化により、反復作業が減り、チームがより迅速かつ正確に ToDo を完了できるようになります。Flow Builder では、コードなしで簡単な自動化や複雑な自動化、フォーム、ガイド付き環境を作成できます。Salesforce ページとエクスペリエンスサイトにフォームを追加し、ボタン、レコードトリガー、またはスケジュールを使用してフローを起動できます。" href="overview-2.html#flow">Flow Builder</a> でフローを作成します。</p></div></div></div>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">サポートされていないフィード</h2><p>プロセスでは、Experience Cloud サイトユーザーまたはグループには投稿できません。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Chatter メッセージ</h2><ul>
+        <li>Chatter メッセージには、最大 25 個のメンションを追加できます。</li>
+
+        <li>Microsoft® Internet Explorer® バージョン 11 を使用している場合、テキストをメッセージに貼り付けることはできません。他のすべてのサポートされるブラウザーでは、コピーおよび貼り付けアクションを実行できます。</li>
+
+        <li>メッセージを項目参照 (<kbd>{![Account].Name}</kbd> など) で開始することはできません。開始すると、アクションの保存が失敗します。この問題を回避するには、メッセージの先頭にスペースを追加します。</li>
+
+      </ul>
+</div>
+    <div id="process_considerations_chatter__process_deploy_chatter"><a name="process_considerations_chatter__process_deploy_chatter"></a><h2 class="slds-text-heading_medium slds-p-top_small">Chatter に投稿するプロセスのリリース</h2><p>プロセスが特定のユーザーまたはグループの Chatter フィードに投稿する場合、そのプロセスはソース組織でのみ実行されます。[Chatter に投稿] アクションで参照される ID は対象組織には存在しません。</p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="process_considerations_design">
+<h1 class="slds-text-heading_large">プロセスの設計に関する考慮事項</h1>
+  <p>プロセスを設計する場合は、その制限やガイドラインを理解しておく必要があります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic (<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.overview_edition_lex_only.htm&amp;language=ja&amp;type=5">使用できない組織もあります</a>) および Lightning Experience の両方</td>
+
+            </tr>
+            <tr id="process_considerations_design__d5187e343" class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span id="process_considerations_design__d5187e347"><a name="process_considerations_design__d5187e347"></a><strong>Essentials</strong> Edition、<strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</span></td>
+
+            </tr>
+          </tbody></table>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> プロセスビルダーのサポートと更新は 2025 年 12 月 31 日で終了します。 つまり、プロセスのサポートは提供されず、プロセスビルダー製品のバグは修正されません。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">Workflow Rules &amp; Process Builder End of Support</a> (ワークフロールールとプロセスビルダーのサポート終了)」を参照してください。<p>2025 年 12 月 31 日以降も既存のプロセスは引き続き実行され、有効化、無効化、編集ができますが、Flow Builder を使用することをお勧めします。既存のプロセスを移行するには、<a title="Flow Builder は、ワークフロールールとプロセスビルダーの機能を統合したポイント &amp; クリックツールであり、トリガープロセスの作成が簡単になります。ワークフロールールまたはプロセスビルダーを使用して作成されたトリガープロセスがある場合、[フローに移行] ツールを使用して Flow Builder に移動できます。新しいフローを本番に移行する前に、まず Sandbox 環境で移行してテストしてください。" href="operate-3.html#flow_migrate_to_flow_learning_map">Flow Builder へ</a>の切り替えを計画し、<a title="[フローに移行] ツールを使用して、プロセスビルダープロセスとワークフロールール (スケジュール済みアクションを含む) を Flow Builder に変換します。このツールでは、ほとんどのアクションについてプロセスの部分的な移行もサポートされています。" href="operate-3.html#flow_migrate_to_flow">Migrate to Flow</a> ツールを使用します。新しい自動化の場合は、<a title="自動化により、反復作業が減り、チームがより迅速かつ正確に ToDo を完了できるようになります。Flow Builder では、コードなしで簡単な自動化や複雑な自動化、フォーム、ガイド付き環境を作成できます。Salesforce ページとエクスペリエンスサイトにフォームを追加し、ボタン、レコードトリガー、またはスケジュールを使用してフローを起動できます。" href="overview-2.html#flow">Flow Builder</a> でフローを作成します。</p></div></div></div>
+<p>Google Chrome™ の最新の安定したバージョンを使用することをお勧めします。
+      </p></div>
+  
+<ul><li class="slds-p-bottom_small"><strong><a href="#process_considerations_design_bestpractices">プログラム設計のベストプラクティス</a></strong><br>プロセスビルダーでプロセスを設計する前に、そのベストプラクティスを理解しておく必要があります。</li><li class="slds-p-bottom_small"><strong><a href="process_builder-1.html#process_accessibility">プロセスビルダーのアクセシビリティに関する考慮事項</a></strong><br>プロセスビルダーは、1 つの例外を除き、米国リハビリテーション法第 508 条に準拠しています。ウィンドウダイアログをキーボードで閉じることはできません。</li><li class="slds-p-bottom_small"><strong><a href="#process_considerations_design_event">イベントプロセスに関する考慮事項</a></strong><br>以下は、プラットフォームイベントメッセージを受信したときに開始するプロセスに固有の考慮事項です。</li><li class="slds-p-bottom_small"><strong><a href="#process_considerations_design_compatibility">プロセスの互換性に関する考慮事項</a></strong><br>プロセスを設計する前に、プロセスが他の Salesforce 機能 (カスタムオブジェクトやカスタム項目など) とどのように相互作用するかを理解しておく必要があります。</li><li class="slds-p-bottom_small"><strong><a href="#process_criteria_formula">プロセス数式の制限</a></strong><br>条件ノードで条件として使用される数式には、制限がいくつかあります。プロセスに無効な数式が含まれていると、プロセスを保存または有効化できません。</li><li class="slds-p-bottom_small"><strong><a href="process_builder-3.html#process_limits_scheduled">プロセスアクションのスケジュールに関する考慮事項</a></strong><br>スケジュール済みアクションは、レコード変更プロセスとイベントプロセスでのみサポートされています。スケジュール時間は、スケジュールの種別、項目が変更されたかどうか、およびプロセスが無効化されたかどうかによって異なります。</li><li class="slds-p-bottom_small"><strong><a href="process_builder-3.html#process_limits_customnotification">カスタム通知を送信するプロセスに関する考慮事項</a></strong><br>カスタム通知の送信を開始する前に、重要なストレージ、受信者、組織の制限について確認してください。</li><li class="slds-p-bottom_small"><strong><a href="#process_considerations_chatter">Chatter に投稿するプロセスに関する考慮事項</a></strong><br>[Chatter に投稿] アクションでは Experience Cloud サイトがサポートされておらず、メッセージの内容について制限事項があります。</li><li class="slds-p-bottom_small"><strong><a href="#process_considerations_design_update">レコードを更新するプロセスに関する考慮事項</a></strong><br>レコード所有者の変更、同じ項目に対する複数の更新、またはマルチ通貨組織のマルチ通貨項目の更新を行う場合にどうなるかを理解しておく必要があります。</li></ul>
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="プロセスビルダーでプロセスを設計する前に、そのベストプラクティスを理解しておく必要があります。" href="#process_considerations_design_bestpractices">プログラム設計のベストプラクティス</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="process_considerations_design_bestpractices">
+<h1 class="slds-text-heading_large">プログラム設計のベストプラクティス</h1>
+  <p>プロセスビルダーでプロセスを設計する前に、そのベストプラクティスを理解しておく必要があります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic (<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.overview_edition_lex_only.htm&amp;language=ja&amp;type=5">使用できない組織もあります</a>) および Lightning Experience の両方</td>
+
+            </tr>
+            <tr id="process_considerations_design_bestpractices__d4501e343" class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span id="process_considerations_design_bestpractices__d4501e347"><a name="process_considerations_design_bestpractices__d4501e347"></a><strong>Essentials</strong> Edition、<strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</span></td>
+
+            </tr>
+          </tbody></table>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> プロセスビルダーのサポートと更新は 2025 年 12 月 31 日で終了します。 つまり、プロセスのサポートは提供されず、プロセスビルダー製品のバグは修正されません。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">Workflow Rules &amp; Process Builder End of Support</a> (ワークフロールールとプロセスビルダーのサポート終了)」を参照してください。<p>2025 年 12 月 31 日以降も既存のプロセスは引き続き実行され、有効化、無効化、編集ができますが、Flow Builder を使用することをお勧めします。既存のプロセスを移行するには、<a title="Flow Builder は、ワークフロールールとプロセスビルダーの機能を統合したポイント &amp; クリックツールであり、トリガープロセスの作成が簡単になります。ワークフロールールまたはプロセスビルダーを使用して作成されたトリガープロセスがある場合、[フローに移行] ツールを使用して Flow Builder に移動できます。新しいフローを本番に移行する前に、まず Sandbox 環境で移行してテストしてください。" href="operate-3.html#flow_migrate_to_flow_learning_map">Flow Builder へ</a>の切り替えを計画し、<a title="[フローに移行] ツールを使用して、プロセスビルダープロセスとワークフロールール (スケジュール済みアクションを含む) を Flow Builder に変換します。このツールでは、ほとんどのアクションについてプロセスの部分的な移行もサポートされています。" href="operate-3.html#flow_migrate_to_flow">Migrate to Flow</a> ツールを使用します。新しい自動化の場合は、<a title="自動化により、反復作業が減り、チームがより迅速かつ正確に ToDo を完了できるようになります。Flow Builder では、コードなしで簡単な自動化や複雑な自動化、フォーム、ガイド付き環境を作成できます。Salesforce ページとエクスペリエンスサイトにフォームを追加し、ボタン、レコードトリガー、またはスケジュールを使用してフローを起動できます。" href="overview-2.html#flow">Flow Builder</a> でフローを作成します。</p></div></div></div>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">テスト環境を構築する。</h2><p>プロセスが正しく機能しているかどうかをテストするには、プロセスを有効化する必要があります。本番データに影響を与えずに問題を特定できるように、Sandbox 環境でプロセスを作成してテストします。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">オブジェクトごとに 1 つの自動化ツールを使用する。</h2><p>オブジェクトに 1 つのプロセス、1 つの Apex トリガー、3 つのワークフロールールがある場合、レコード変更の結果を確実には予測できません。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> ワークフロールールをプロセスで置き換える場合は、そのプロセスを有効化する前にワークフロールールを無効化します。さもないと、レコードの上書きやメールメッセージの重複など、予期しない結果が生じることがあります。このベストプラクティスは、Apex トリガーをプロセスで置き換える場合にも適用されます。</div></div></div>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">オブジェクトあたり 1 つのレコード変更プロセスのみにする。</h2><p>レコードが作成または更新されるたびに、そのオブジェクトのすべてのレコード変更プロセスが評価されます。組織でオブジェクトあたり 1 つのレコード変更プロセスに制限することをお勧めします。その理由は次のとおりです。</p><ul>
+        <li>オブジェクトに対して組織の自動化の統合ビューを取得するため<p>オブジェクトの 1 つの統合されたレコード変更プロセスにより、そのオブジェクトのレコードが更新されるたびに評価されるすべての条件や、条件を満たしたときに実行されるアクションを表示できます。</p></li>
+
+        <li>制限への到達を回避するため<p>1 つのオブジェクトのプロセスを 1 つのメインプロセスに統合する場合、それらのプロセスのアクションも統合します。アクションが少ないほど、組織の制限 (SOQL クエリの数など) に達する可能性が低くなります。</p></li>
+
+        <li>操作の順序を確定するため<p>オブジェクトのレコード変更プロセスを複数作成すると、Salesforce では、プロセス評価の順序が保証できなくなります。1 つのプロセスですべてを自動化すれば、順序が明示的に設定されます。最初の条件ノードは最初に評価され、2 番目の条件ノードは 2 番目に評価されるというように順序が明確になります。</p></li>
+
+      </ul>
+<p>1 つのメインプロセスへの道を平坦にする機能をいくつか紹介します。</p><ul>
+        <li>ISNEW() — 一部の自動化は、作成されたレコードにのみ適用されます。残りの自動化は、作成されたレコードおよび編集されたレコードに適用されます。そのすべてを 1 つのプロセスに組み合わせることなど、どうしたらできるのでしょうか?そこで、評価するレコードが作成されたばかりであるかどうかを判断する数式関数 <code>ISNEW()</code> のご紹介です。
+        <p>作成専用の自動化をプロセスに追加して、レコードが作成または編集されたときに開始するには、関連条件を数式に変換します。次に、<kbd>&amp;&amp; ISNEW()</kbd> を数式に追加してください。</p></li>
+
+        <li>呼び出し可能なプロセス — プロセスでフローをコールできるのと同じように、プロセスでその他のプロセスをコールできます。呼び出し可能なプロセスはモジュール形式のプロセスであり、別のプロセスから開始するように指示されたときに限って開始されます。<p>たとえば、「取引先」プロセスのいくつかの条件ノードがそれぞれある条件 (取引先が重要であるかどうかなど) を評価するとします。重要であるかどうかなどの共通する条件を使用せずに、それらの条件ノードを「主要取引先」呼び出し可能プロセスに移動します。次に、取引先が重要である場合に「主要取引先」プロセスを呼び出すように「取引先」プロセスを設定します。</p></li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">可能な場合はアクションを統合する。</h2><p>プロセスで実行するアクションが増えるほど、組織の制限 (DML ステートメントの数や合計 CPU 使用量など) に達する可能性が高くなります。1 つのアクションで間に合う場合は複数のアクションを作成しないようにします。</p><p>たとえば、プロセスで取引先の住所を更新するとします。異なるアクションを作成して個々の項目を更新するのではなく、1 つのアクションを作成してすべての住所項目を更新します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">再利用可能なプロセスを作成する。</h2><p>一部のプロセスアクション (メールアラート、クイックアクション、プロセス、フロー、Apex) は常に再利用できます。ただし、複数の条件グループや複数のプロセスの他のアクション種別はどのように再利用するのでしょうか?</p><ul>
+        <li>[レコードを作成] アクションまたは [レコードを更新] アクションを再利用するには、クイックアクションを作成します。クイックアクションは、プロセス、フロー、レコードページで使用できます。</li>
+
+        <li>他のプロセスアクションを再利用するには、呼び出し可能なプロセスでアクションを設定します。関連する条件グループで、プロセスアクションを追加して呼び出し可能なプロセスをコールします。呼び出し可能なプロセスは、プロセスでのみ使用できます。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">以前の変更を上書きするアクションに注意する。</h2><p>複数のアクショングループが同じ項目を更新するときは、このようにならないようにするか、注意して行ってしてください。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">無限ループが発生しないようにする。</h2><p>たとえば、Process1 の [レコードを更新] アクションが Process2 をトリガーし、Process2 の [レコードを作成] アクションが Process1 をトリガーするとします。 この場合、ループにより組織の上限を超える可能性があります。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">ルール適用時のアクションでスケジュール済みアクションがキャンセルされないようにする。</h2><p>関連付けられた条件が true でなくなると、待機中のスケジュール済みアクションがキャンセルされます。プロセスの後続のルール適用時のアクションで待機中のスケジュール済みアクションが誤ってキャンセルされないようにしてください。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">プロセスの順列を可能な限り多くテストする。</h2><p>Salesforce のすべてのカスタマイズと同じように、作業内容をテストすることが重要です。考え付くかぎり多くの可能性をテストしてから、プロセスを本番組織にリリースしてください。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Salesforce データの変更後に外部データにアクセスするには、スケジュール済みアクションを使用します。</h2><p>Salesforce が組織のデータを作成、更新、または削除した後、同じトランザクション内で外部データにアクセスした場合、エラーが発生します。プロセスでは、個別のトランザクションを使用して外部システムのデータにアクセスすることをお勧めします。これを行うには、スケジュール済みアクションを追加して前のトランザクションを終了します。レコード変更プロセスの場合、項目ベースのスケジュールは使用しないでください。</p><p>たとえば、カスタムプラットフォームイベント「Order Status (注文状況)」からプラットフォームイベントメッセージを受信したときイベントプロセスが開始されるとします。注文状況が [新規] の場合、プロセスによって取引先責任者が作成され、外部システムの注文状況を更新するアクションがスケジュールされます。スケジュール済みアクションで外部システムにアクセスするための個別のトランザクションが作成されるため、イベントプロセスは失敗しません。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="プロセスを設計する場合は、その制限やガイドラインを理解しておく必要があります。" href="#process_considerations_design">プロセスの設計に関する考慮事項</a></li><li><a title="詳細なオプションを選択するときの考慮事項は、次のとおりです。" href="#process_advanced_considerations">プロセスビルダーの詳細なオプションに関する考慮事項</a></li><li><a title="プロセス内のルール適用時のアクションは、プロセスがトリガーされた操作と同じトランザクションで (ユーザーがレコードを作成または編集するときになどに) 実行されます。スケジュール済みアクションは、個別のトランザクションに含まれます。" href="process_builder-3.html#process_limits_scheduled_transactions">トランザクションとスケジュール済みアクション</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="process_considerations_design_compatibility">
+<h1 class="slds-text-heading_large">プロセスの互換性に関する考慮事項</h1>
+  <p>プロセスを設計する前に、プロセスが他の Salesforce 機能 (カスタムオブジェクトやカスタム項目など) とどのように相互作用するかを理解しておく必要があります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic (<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.overview_edition_lex_only.htm&amp;language=ja&amp;type=5">使用できない組織もあります</a>) および Lightning Experience の両方</td>
+
+            </tr>
+            <tr id="process_considerations_design_compatibility__d3691e343" class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span id="process_considerations_design_compatibility__d3691e347"><a name="process_considerations_design_compatibility__d3691e347"></a><strong>Essentials</strong> Edition、<strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</span></td>
+
+            </tr>
+          </tbody></table>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> プロセスビルダーのサポートと更新は 2025 年 12 月 31 日で終了します。 つまり、プロセスのサポートは提供されず、プロセスビルダー製品のバグは修正されません。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">Workflow Rules &amp; Process Builder End of Support</a> (ワークフロールールとプロセスビルダーのサポート終了)」を参照してください。<p>2025 年 12 月 31 日以降も既存のプロセスは引き続き実行され、有効化、無効化、編集ができますが、Flow Builder を使用することをお勧めします。既存のプロセスを移行するには、<a title="Flow Builder は、ワークフロールールとプロセスビルダーの機能を統合したポイント &amp; クリックツールであり、トリガープロセスの作成が簡単になります。ワークフロールールまたはプロセスビルダーを使用して作成されたトリガープロセスがある場合、[フローに移行] ツールを使用して Flow Builder に移動できます。新しいフローを本番に移行する前に、まず Sandbox 環境で移行してテストしてください。" href="operate-3.html#flow_migrate_to_flow_learning_map">Flow Builder へ</a>の切り替えを計画し、<a title="[フローに移行] ツールを使用して、プロセスビルダープロセスとワークフロールール (スケジュール済みアクションを含む) を Flow Builder に変換します。このツールでは、ほとんどのアクションについてプロセスの部分的な移行もサポートされています。" href="operate-3.html#flow_migrate_to_flow">Migrate to Flow</a> ツールを使用します。新しい自動化の場合は、<a title="自動化により、反復作業が減り、チームがより迅速かつ正確に ToDo を完了できるようになります。Flow Builder では、コードなしで簡単な自動化や複雑な自動化、フォーム、ガイド付き環境を作成できます。Salesforce ページとエクスペリエンスサイトにフォームを追加し、ボタン、レコードトリガー、またはスケジュールを使用してフローを起動できます。" href="overview-2.html#flow">Flow Builder</a> でフローを作成します。</p></div></div></div>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">オブジェクト</h2><p>プロセスビルダーでは次の機能はサポートされません。</p><ul>
+        <li>非推奨のカスタムオブジェクト </li>
+
+        <li>サインアップ要求 — スケジュールでのみサポート対象外</li>
+
+        <li>ソーシャル投稿 </li>
+
+        <li>ソーシャル人格</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">外部オブジェクト</h2><ul>
+        <li>外部オブジェクトはレコード変更プロセスでサポートされていません。</li>
+
+        <li>
+          <span>外部オブジェクトレコードを作成または更新する場合、外部システムの異なるデータ型に対応付けられている間接参照関係の値を設定しないでください。たとえば、外部システムの日付値に対応付けられているテキスト間接参照関係の値を設定しないでください。</span>
+        </li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">カスタム項目</h2><ul>
+        <li>プロセスビルダーでは File 型のカスタム項目はサポートされません。</li>
+
+        <li>プロセスがカスタム項目を参照する場合:<ul><li>その項目を削除できません。</li>
+<li>項目の型または名前を変更する場合、プロセスは中断します。</li>
+<li>項目の表示ラベルを変更する場合、プロセスは中断しません。ただし、プロセスでは引き続き古い表示ラベルが使用されます。</li>
+</ul>
+</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">派生項目</h2><p>プロセスビルダーでは、他の項目から派生された値を持つ項目はサポートされません。派生項目の例としては、<code>Contact.Name</code>、<code>User.MediumPhotoUrl</code>、<code>EmailMessage.Name</code> などがあります。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">多態的な項目</h2><p>
+        <span>プロセス条件では、キュー表示ラベルはサポートされません。たとえば、プロセス条件では <code>[Lead].Owner:Queue.Name</code> を使用することはできません。代わりに、<code>[Lead].Owner:Queue.DeveloperName</code> を使用してキューの API 参照名を参照します。</span>
+      </p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">入力規則</h2><ul>
+        <li>レコードの更新に対するスケジュール済みアクションは入力規則をスキップします。</li>
+
+        <li>レコードの更新に対するルール適用時のアクションは入力規則に従います。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Shield Platform Encryption</h2><p>[レコードを更新] アクションでは、暗号化項目を検索条件として使用することはできません。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">重複ルール</h2><p>プロセスでレコードを作成または更新しようとしたときに重複が検出されると、プロセスは失敗します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">取引開始済みのリード</h2><p>取引開始済みのリードから作成されたレコードを評価するには、リード設定 <strong class="uicontrol">[取引開始済みのリードに入力規則が必須]</strong> を有効化します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">数式項目の値</h2><p>標準数式項目で関連オブジェクトの項目が参照されている場合、その項目の値はプロセスの開始時に常に null になります。この制限は、関連オブジェクトの項目を参照するカスタム数式項目には適用されません。同じ数式を使用するカスタム数式項目では、項目の値はプロセスの開始時に取得されます。</p><p>たとえば、Campaign Influence の RevenueShare 項目は <code>CampaignInfluence.Opportunity.Amount * CampaignInfluence.Influence</code> を計算します。数式で商談 (関連オブジェクト) の項目が参照されているため、項目の値は null になります。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">プラットフォームキャッシュ</h2><p>
+        <span>プロセスにスケジュール済みアクションが含まれる場合は、プロセス内のその後のアクションが、セッションキャッシュ値を保存または取得する Apex コードを呼び出さないことを確認します。Apex アクションと、Apex トリガーを起動させるデータベースに対してプロセスが行った変更には、セッションキャッシュの制限が適用されます。</span>
+      </p></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="process_considerations_design_event">
+<h1 class="slds-text-heading_large">イベントプロセスに関する考慮事項</h1>
+  <p>以下は、プラットフォームイベントメッセージを受信したときに開始するプロセスに固有の考慮事項です。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic および Lightning Experience の両方</td>
+
+          </tr>
+          <tr class="">
+            <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span id="process_considerations_design_event__platform_events_editions_ph"><a name="process_considerations_design_event__platform_events_editions_ph"></a><strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、<strong>Enterprise</strong> Edition、および <strong>Developer</strong> Edition</span></td>
+
+          </tr>
+        </tbody></table>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> プロセスビルダーのサポートと更新は 2025 年 12 月 31 日で終了します。 つまり、プロセスのサポートは提供されず、プロセスビルダー製品のバグは修正されません。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">Workflow Rules &amp; Process Builder End of Support</a> (ワークフロールールとプロセスビルダーのサポート終了)」を参照してください。<p>2025 年 12 月 31 日以降も既存のプロセスは引き続き実行され、有効化、無効化、編集ができますが、Flow Builder を使用することをお勧めします。既存のプロセスを移行するには、<a title="Flow Builder は、ワークフロールールとプロセスビルダーの機能を統合したポイント &amp; クリックツールであり、トリガープロセスの作成が簡単になります。ワークフロールールまたはプロセスビルダーを使用して作成されたトリガープロセスがある場合、[フローに移行] ツールを使用して Flow Builder に移動できます。新しいフローを本番に移行する前に、まず Sandbox 環境で移行してテストしてください。" href="operate-3.html#flow_migrate_to_flow_learning_map">Flow Builder へ</a>の切り替えを計画し、<a title="[フローに移行] ツールを使用して、プロセスビルダープロセスとワークフロールール (スケジュール済みアクションを含む) を Flow Builder に変換します。このツールでは、ほとんどのアクションについてプロセスの部分的な移行もサポートされています。" href="operate-3.html#flow_migrate_to_flow">Migrate to Flow</a> ツールを使用します。新しい自動化の場合は、<a title="自動化により、反復作業が減り、チームがより迅速かつ正確に ToDo を完了できるようになります。Flow Builder では、コードなしで簡単な自動化や複雑な自動化、フォーム、ガイド付き環境を作成できます。Salesforce ページとエクスペリエンスサイトにフォームを追加し、ボタン、レコードトリガー、またはスケジュールを使用してフローを起動できます。" href="overview-2.html#flow">Flow Builder</a> でフローを作成します。</p></div></div></div>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">サポートされるプラットフォームイベント</h2><p>プロセスは、カスタムプラットフォームイベントと次の標準プラットフォームイベントを登録できます。</p><ul>
+        <li>AIPredictionEvent</li>
+
+        <li>BatchApexErrorEvent</li>
+
+        <li>FlowExecutionErrorEvent</li>
+
+        <li>FOStatusChangedEvent</li>
+
+        <li>OrderSummaryCreatedEvent</li>
+
+        <li>OrderSumStatusChangedEvent</li>
+
+        <li>PlatformStatusAlertEvent</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Apex アクション</h2><p>イベント参照を使用して Apex クラスの sObject 変数を設定することはできません。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">メールアラートアクション</h2><p>メールアラートでは、プラットフォームイベントメッセージからの値を使用できません。プラットフォームイベントメッセージの値を含むメールを送信して開始されるプロセスの場合は、この回避策を使用します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">フローアクション</h2><p>プラットフォームイベントがレコード変数のオブジェクトとして指定されている場合でも、イベント参照を使用してフローのレコード変数を設定することはできません。プロセスを開始するプラットフォームイベントメッセージからのフローに値を渡すには、この回避策を使用します。</p><ul>
+        <li>フローで、プラットフォームイベントの各項目の変数を作成します。互換性のあるデータ型を使用し、変数を入力に使用できるようにしてください。</li>
+
+        <li>このプロセスでフローアクションを追加するときに、イベント参照を使用して各プラットフォームイベント項目を対応するフロー変数に割り当てます。</li>
+
+      </ul>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">レコードへの関連付け</h2><p>正確に 1 件のレコードを検索するには、プロセスの一致条件を使用します。プロセスで一致条件に基づいて 1 件のレコードを検出できない場合 (複数のレコードが検出されたか、1 件も検出されなかった)、プロセスの作成者にエラーメールが送信されます。エラーが発生した場合、プロセスのトリガーがより限定的になるように検索条件を調整します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">イベントメッセージの公開 </h2><p>イベントプロセスでは、プロセスを開始する同じイベントメッセージを公開することが禁止されていません。無限ループの発生を回避するために、新しいイベントメッセージの項目値が、関連付けられた条件ノードの検索条件と一致しないようにします。</p><p>プラットフォームイベントが直ちに公開するように設定されている場合、そのプロセスによって、イベントメッセージのそれぞれがデータベーストランザクションの外部で公開されます。トランザクションが失敗してロールバックしても、イベントメッセージは公開されていまい、ロールバックすることができません。そのため、選択したプラットフォームイベントの下に情報メッセージが表示されたら、トランザクションが正常にコミットされた後にのみイベントメッセージを公開するようにプロセスを設定するかどうかを検討します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">[登録] 関連リスト</h2><p>プラットフォームイベントの詳細ページの [登録] 関連リストには、そのプラットフォームイベントのメッセージの受信を待機しているエンティティが表示されます。関連リストには、各登録済みプロセスへのリンクが含まれます。フローインタビューがそのプラットフォームイベントのメッセージを待機している場合、1 人の「プロセス」登録者が [登録] 関連リストに表示されます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">パッケージ</h2><p>イベントプロセスをパッケージ化するとき、関連付けられたオブジェクトが自動的に含まれることはありません。登録者に、オブジェクトを作成するか、パッケージにオブジェクトを手動で追加するように助言してください。たとえば、Participants カスタムオブジェクトに関連付けられたイベントプロセスをパッケージ化する場合、そのオブジェクトをパッケージに手動で追加します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">イベントのアンインストール</h2><p>プラットフォームイベントを含むパッケージをアンインストールする前に、そのプラットフォームイベントを参照するすべてのプロセスを無効化します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">Einstein 予測</h2><p>Einstein 予測結果ごとに予測イベントが送信されます。このため、特定のオブジェクトの予測でのみプロセスをトリガーする場合は、プロセスの一致条件を使用します。たとえば、プロセスがリードレコードに書き込まれた予測に対してのみ動作する場合、一致条件を追加して、リード ID 項目が AI 予測オブジェクト ID イベント参照と同じであることを確認します。</p><p>Einstein 予測で使用される項目をプロセスが更新した場合、Einstein は、予測を再実行して、新しい結果を再び書き込みます。この新しい結果により、プロセスを再びトリガーできる新しい予測イベントが生成され、ループが作成されます。プロセスのループが作成されないようにするには、Einstein 予測で使用されない項目のみを更新します。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.platform_events.meta/platform_events/platform_events_considerations_decoupled_processes.htm">プラットフォームイベント開発者ガイド: 分離された公開と登録</a></li><li><a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.platform_events.meta/platform_events/platform_events_define_ui.htm">プラットフォームイベント開発者ガイド: プラットフォームイベント項目</a></li><li><a target="_blank" href="https://developer.salesforce.com/docs/atlas.ja-jp.platform_events.meta/platform_events/platform_events_subscribe_process.htm">プラットフォームイベント開発者ガイド: プロセスによるプラットフォームイベントメッセージの登録</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="process_considerations_design_update">
+<h1 class="slds-text-heading_large">レコードを更新するプロセスに関する考慮事項</h1>
+  <p>レコード所有者の変更、同じ項目に対する複数の更新、またはマルチ通貨組織のマルチ通貨項目の更新を行う場合にどうなるかを理解しておく必要があります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic (<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.overview_edition_lex_only.htm&amp;language=ja&amp;type=5">使用できない組織もあります</a>) および Lightning Experience の両方</td>
+
+            </tr>
+            <tr id="process_considerations_design_update__d4202e343" class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span id="process_considerations_design_update__d4202e347"><a name="process_considerations_design_update__d4202e347"></a><strong>Essentials</strong> Edition、<strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</span></td>
+
+            </tr>
+          </tbody></table>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> プロセスビルダーのサポートと更新は 2025 年 12 月 31 日で終了します。 つまり、プロセスのサポートは提供されず、プロセスビルダー製品のバグは修正されません。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">Workflow Rules &amp; Process Builder End of Support</a> (ワークフロールールとプロセスビルダーのサポート終了)」を参照してください。<p>2025 年 12 月 31 日以降も既存のプロセスは引き続き実行され、有効化、無効化、編集ができますが、Flow Builder を使用することをお勧めします。既存のプロセスを移行するには、<a title="Flow Builder は、ワークフロールールとプロセスビルダーの機能を統合したポイント &amp; クリックツールであり、トリガープロセスの作成が簡単になります。ワークフロールールまたはプロセスビルダーを使用して作成されたトリガープロセスがある場合、[フローに移行] ツールを使用して Flow Builder に移動できます。新しいフローを本番に移行する前に、まず Sandbox 環境で移行してテストしてください。" href="operate-3.html#flow_migrate_to_flow_learning_map">Flow Builder へ</a>の切り替えを計画し、<a title="[フローに移行] ツールを使用して、プロセスビルダープロセスとワークフロールール (スケジュール済みアクションを含む) を Flow Builder に変換します。このツールでは、ほとんどのアクションについてプロセスの部分的な移行もサポートされています。" href="operate-3.html#flow_migrate_to_flow">Migrate to Flow</a> ツールを使用します。新しい自動化の場合は、<a title="自動化により、反復作業が減り、チームがより迅速かつ正確に ToDo を完了できるようになります。Flow Builder では、コードなしで簡単な自動化や複雑な自動化、フォーム、ガイド付き環境を作成できます。Salesforce ページとエクスペリエンスサイトにフォームを追加し、ボタン、レコードトリガー、またはスケジュールを使用してフローを起動できます。" href="overview-2.html#flow">Flow Builder</a> でフローを作成します。</p></div></div></div>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">レコードの所有者の更新</h2><p>所有者を更新するプロセスで、関連項目が自動的に転送されることはありません。転送する子レコードタイプごとに [レコードを更新] アクションを使用します。</p><p>たとえば、取引先を新しい所有者に転送するとします。4 つの [レコードを更新] アクションをプロセスに追加します。1 つ目のアクションで取引先を更新します。2 つ目のアクションで子取引先責任者を更新します。3 つ目のアクションで子商談を更新します。4 つ目のアクションで子契約を更新します。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">同じ項目に対する複数の更新</h2><p>複数の [レコードを更新] アクションが同じ項目に対して異なる値を適用する場合、最後のアクションの値が使用されます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">マルチ通貨</h2><p>組織でマルチ通貨を使用している場合には、レコードの通貨コードを使用して通貨項目が更新されます。数式を使用して項目を更新する場合、数式の値にはレコードの通貨コードが使用されます。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">無効なユーザー</h2><p>
+        <span>プロセスは、無効なユーザーが所有するレコードを更新できません。ユーザーを無効化する場合は、プロセスの失敗を回避するためにユーザーのレコードも有効なユーザーに転送します。</span>
+      </p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.data_about_transfer.htm&amp;language=ja&amp;type=5">データの所有権の移行</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="process_considerations_transactions">
+<h1 class="slds-text-heading_large">トランザクション内のプロセスに関する考慮事項</h1>
+  <p>各プロセスはトランザクションのコンテキストで実行されます。トランザクションは、1 つの単位として実行される一連の操作を表します。1 つのトランザクションで複数回プロセスがトリガーされると、Salesforce によって同様のアクションが 1 つのバッチで実行されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic (<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.overview_edition_lex_only.htm&amp;language=ja&amp;type=5">使用できない組織もあります</a>) および Lightning Experience の両方</td>
+
+            </tr>
+            <tr id="process_considerations_transactions__d3621e343" class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span id="process_considerations_transactions__d3621e347"><a name="process_considerations_transactions__d3621e347"></a><strong>Essentials</strong> Edition、<strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</span></td>
+
+            </tr>
+          </tbody></table>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> プロセスビルダーのサポートと更新は 2025 年 12 月 31 日で終了します。 つまり、プロセスのサポートは提供されず、プロセスビルダー製品のバグは修正されません。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">Workflow Rules &amp; Process Builder End of Support</a> (ワークフロールールとプロセスビルダーのサポート終了)」を参照してください。<p>2025 年 12 月 31 日以降も既存のプロセスは引き続き実行され、有効化、無効化、編集ができますが、Flow Builder を使用することをお勧めします。既存のプロセスを移行するには、<a title="Flow Builder は、ワークフロールールとプロセスビルダーの機能を統合したポイント &amp; クリックツールであり、トリガープロセスの作成が簡単になります。ワークフロールールまたはプロセスビルダーを使用して作成されたトリガープロセスがある場合、[フローに移行] ツールを使用して Flow Builder に移動できます。新しいフローを本番に移行する前に、まず Sandbox 環境で移行してテストしてください。" href="operate-3.html#flow_migrate_to_flow_learning_map">Flow Builder へ</a>の切り替えを計画し、<a title="[フローに移行] ツールを使用して、プロセスビルダープロセスとワークフロールール (スケジュール済みアクションを含む) を Flow Builder に変換します。このツールでは、ほとんどのアクションについてプロセスの部分的な移行もサポートされています。" href="operate-3.html#flow_migrate_to_flow">Migrate to Flow</a> ツールを使用します。新しい自動化の場合は、<a title="自動化により、反復作業が減り、チームがより迅速かつ正確に ToDo を完了できるようになります。Flow Builder では、コードなしで簡単な自動化や複雑な自動化、フォーム、ガイド付き環境を作成できます。Salesforce ページとエクスペリエンスサイトにフォームを追加し、ボタン、レコードトリガー、またはスケジュールを使用してフローを起動できます。" href="overview-2.html#flow">Flow Builder</a> でフローを作成します。</p></div></div></div>
+<p>デフォルトでは、バッチの 1 つのプロセスが失敗すると、バッチのすべてのプロセスが失敗し、トランザクションがロールバックされます。次のいずれかのアクションの実行中にバッチの 1 つのプロセスが失敗した場合、Salesforce はバッチで成功したすべてのレコード変更について、保存を 3 回まで試みます。</p><ul>
+        <li>レコードを作成</li>
+
+        <li>フロー ([レコードの作成] 要素と [レコードを更新] 要素のみ)</li>
+
+        <li>プロセス ([レコードを作成] アクションと [レコードを更新] アクションのみ)</li>
+
+        <li>レコードを更新 </li>
+
+      </ul>
+</div>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> 100 件のケースをアップロードする場合、MyProcess_2 というフローがケースごとに 1 つのプロセスをトリガーします。<ul><li>50 のプロセスが、Create_Task_1 という [レコードを作成] アクションで停止します。</li>
+<li>残りの 50 のプロセスは、Create_Task_2 という [レコードを作成] アクションで停止します。</li>
+</ul>
+<p>その結果、少なくとも 2 通りの一括操作が実行されます。</p><ul><li>1 つは 50 のプロセスに対して Create_Task_1 を実行する操作です。</li>
+<li>1 つは 50 のプロセスに対して Create_Task_2 を実行する操作です。</li>
+</ul>
+</div></div></div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="process_considerations_works">
+<h1 class="slds-text-heading_large">プロセスでレコードの変更が評価されるタイミング</h1>
+  <p>プロセスは自動的に開始され、ユーザーが意識することはありません。プロセスを設計または有効化する前に、どの変更によってプロセスがトリガーされるかを理解しておく必要があります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> 可能な場合は、Equality の会社の値に一致するように、含めない用語を変更しました。顧客の実装に対する影響を回避するために、一部の用語は変更されていません。</div></div></div>
+</div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic (<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.overview_edition_lex_only.htm&amp;language=ja&amp;type=5">使用できない組織もあります</a>) および Lightning Experience の両方</td>
+
+            </tr>
+            <tr id="process_considerations_works__d5514e343" class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span id="process_considerations_works__d5514e347"><a name="process_considerations_works__d5514e347"></a><strong>Essentials</strong> Edition、<strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</span></td>
+
+            </tr>
+          </tbody></table>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> プロセスビルダーのサポートと更新は 2025 年 12 月 31 日で終了します。 つまり、プロセスのサポートは提供されず、プロセスビルダー製品のバグは修正されません。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">Workflow Rules &amp; Process Builder End of Support</a> (ワークフロールールとプロセスビルダーのサポート終了)」を参照してください。<p>2025 年 12 月 31 日以降も既存のプロセスは引き続き実行され、有効化、無効化、編集ができますが、Flow Builder を使用することをお勧めします。既存のプロセスを移行するには、<a title="Flow Builder は、ワークフロールールとプロセスビルダーの機能を統合したポイント &amp; クリックツールであり、トリガープロセスの作成が簡単になります。ワークフロールールまたはプロセスビルダーを使用して作成されたトリガープロセスがある場合、[フローに移行] ツールを使用して Flow Builder に移動できます。新しいフローを本番に移行する前に、まず Sandbox 環境で移行してテストしてください。" href="operate-3.html#flow_migrate_to_flow_learning_map">Flow Builder へ</a>の切り替えを計画し、<a title="[フローに移行] ツールを使用して、プロセスビルダープロセスとワークフロールール (スケジュール済みアクションを含む) を Flow Builder に変換します。このツールでは、ほとんどのアクションについてプロセスの部分的な移行もサポートされています。" href="operate-3.html#flow_migrate_to_flow">Migrate to Flow</a> ツールを使用します。新しい自動化の場合は、<a title="自動化により、反復作業が減り、チームがより迅速かつ正確に ToDo を完了できるようになります。Flow Builder では、コードなしで簡単な自動化や複雑な自動化、フォーム、ガイド付き環境を作成できます。Salesforce ページとエクスペリエンスサイトにフォームを追加し、ボタン、レコードトリガー、またはスケジュールを使用してフローを起動できます。" href="overview-2.html#flow">Flow Builder</a> でフローを作成します。</p></div></div></div>
+<p>レコードの変更は、プロセスに適用されるだけではない場合もあります。レコードが作成または編集されると、Salesforce では、レコードに対する入力規則など、他の設定項目を実行するかどうかを評価します。Salesforce では設定項目を次の順序で評価します。詳細は、<cite>『Apex 開発者ガイド』</cite>の「トリガーと実行の順序」を参照してください。</p><ul>
+        <li>入力規則</li>
+
+        <li>割り当てルール</li>
+
+        <li>自動レスポンスルール</li>
+
+        <li>ワークフロールールとプロセス (およびそのルール適用時のアクション)</li>
+
+        <li>エスカレーションルール</li>
+
+      </ul>
+</div>
+    <div><p>プロセスを作成するときには、プロセスを 1 つのオブジェクトにのみ関連付けます。作成されたレコードのみを評価するか、作成されたレコードと編集されたレコードの両方を評価するかも指定します。プロセスを有効化後、レコードの変更が次の設定に適合するとプロセスが開始します。</p><p>プロセスは、次のタイミングでレコードの変更を評価します。</p><ul>
+        <li>レコードが保存または作成されたとき。レコードの保存後に作成されたプロセスでは、それらのレコードが遡って評価されることはありません。</li>
+
+        <li>主従関係の標準オブジェクトの親が再設定されたとき。
+          </li>
+
+        <li>Connect Offline を使用中に変更されたレコードをユーザーが同期したとき。</li>
+
+        <li>リード設定 <strong class="uicontrol">[取引開始済みのリードに入力規則が必須]</strong> が有効化されている場合、リードが取引を開始したとき。</li>
+
+        <li>プロセスがレコードを再評価するように設定されている場合、別のプロセス、ワークフロールール、またはフローが同じ保存操作内のレコードを更新したとき。<p>プロセスは 1 つの保存操作内でレコードを 5 回まで再評価できます。一括更新では、プロセスは変更されたレコードのみを再評価します。</p></li>
+
+      </ul>
+<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> レコードの変更によって、複数のプロセスがトリガーされる可能性があります。最初に開始するプロセスを判別することはできません。</div></div></div>
+<p>プロセスは、次のタイミングではレコードの変更を評価しません。</p><ul>
+        <li>キャンペーン統計項目 (個々のキャンペーン統計やキャンペーン階層統計など) が更新されたとき。</li>
+
+        <li>選択リスト値が一括置換されたとき。</li>
+
+        <li>住所項目が一括更新されたとき。</li>
+
+        <li>ディビジョンが一括更新されたとき。</li>
+
+        <li>取引先および商談のテリトリー割り当てが変更されたとき。</li>
+
+        <li>セルフサービスポータル、カスタマーポータル、またはパートナーポータルのユーザーが無効化されたとき。</li>
+
+        <li>変換ツールで州/国/テリトリーデータが変換されたとき。</li>
+
+        <li>メタデータ API の <samp class="parmname">AddressSettings</samp> を使用して州/国/テリトリー選択リストの値が変更されたとき。</li>
+
+      </ul>
+</div>
+  
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="process_create">
+<h1 class="slds-text-heading_large">プロセスの作成</h1>
+  <p>プロセスを作成するには、そのプロパティおよび評価するレコードを定義し、条件ノードとアクションを追加します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic (<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.overview_edition_lex_only.htm&amp;language=ja&amp;type=5">使用できない組織もあります</a>) および Lightning Experience の両方</td>
+
+            </tr>
+            <tr id="process_create__d5689e343" class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span id="process_create__d5689e347"><a name="process_create__d5689e347"></a><strong>Essentials</strong> Edition、<strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</span></td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d334356e82" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr id="process_create__d5689e977" class="">
+              <td headers="d334356e82" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロセスを作成、編集、参照する</td>
+
+              <td headers="d334356e82" style="vertical-align:top;" class="slds-cell-wrap"><p>「フローの管理」</p><p>および</p><p style="margin-bottom:0;">「すべてのデータの参照」</p></td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> プロセスビルダーのサポートと更新は 2025 年 12 月 31 日で終了します。 つまり、プロセスのサポートは提供されず、プロセスビルダー製品のバグは修正されません。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">Workflow Rules &amp; Process Builder End of Support</a> (ワークフロールールとプロセスビルダーのサポート終了)」を参照してください。<p>2025 年 12 月 31 日以降も既存のプロセスは引き続き実行され、有効化、無効化、編集ができますが、Flow Builder を使用することをお勧めします。既存のプロセスを移行するには、<a title="Flow Builder は、ワークフロールールとプロセスビルダーの機能を統合したポイント &amp; クリックツールであり、トリガープロセスの作成が簡単になります。ワークフロールールまたはプロセスビルダーを使用して作成されたトリガープロセスがある場合、[フローに移行] ツールを使用して Flow Builder に移動できます。新しいフローを本番に移行する前に、まず Sandbox 環境で移行してテストしてください。" href="operate-3.html#flow_migrate_to_flow_learning_map">Flow Builder へ</a>の切り替えを計画し、<a title="[フローに移行] ツールを使用して、プロセスビルダープロセスとワークフロールール (スケジュール済みアクションを含む) を Flow Builder に変換します。このツールでは、ほとんどのアクションについてプロセスの部分的な移行もサポートされています。" href="operate-3.html#flow_migrate_to_flow">Migrate to Flow</a> ツールを使用します。新しい自動化の場合は、<a title="自動化により、反復作業が減り、チームがより迅速かつ正確に ToDo を完了できるようになります。Flow Builder では、コードなしで簡単な自動化や複雑な自動化、フォーム、ガイド付き環境を作成できます。Salesforce ページとエクスペリエンスサイトにフォームを追加し、ボタン、レコードトリガー、またはスケジュールを使用してフローを起動できます。" href="overview-2.html#flow">Flow Builder</a> でフローを作成します。</p></div></div></div>
+</div>
+    
+  
+<ol><li class="slds-p-bottom_small"><strong><a href="process_builder-3.html#process_properties">プロセスのプロパティの定義</a></strong><br>プロセスのプロパティによって、プロセスが一意に識別されます。</li><li class="slds-p-bottom_small"><strong><a href="process_builder-3.html#process_start">プロセストリガーの設定</a></strong><br>すべてのプロセスには、いつ開始するかをプロセスに指示するトリガーが含まれています。トリガーの設定方法は、作成するプロセスの種別に応じて異なります。</li><li class="slds-p-bottom_small"><strong><a href="#process_criteria">プロセス条件の追加</a></strong><br>関連付けられたアクションをプロセスで実行する前に、true となるべき条件を定義します。</li><li class="slds-p-bottom_small"><strong><a href="process_builder-1.html#process_action">プロセスへのアクションの追加</a></strong><br>条件ノードを定義したら、条件が一致したときに実行されるアクションを定義します。アクションは、プロセスビルダーに表示される順序で実行されます。</li><li class="slds-p-bottom_small"><strong><a href="process_builder-3.html#process_next_criteria">複数の条件適用時のアクションの実行</a></strong><br>特定の条件が満たされ、関連付けられたアクションを実行した後で、プロセスを停止するか継続するかを選択します。</li><li class="slds-p-bottom_small"><strong><a href="operate-3.html#flow_distribute_system_process">プロセスからのフローの起動</a></strong><br>ワークフロールールと同様に、プロセスは特定のオブジェクトのレコードが作成または編集されたときに開始されます。フローアクションを追加して、プロセスにさらに多くの機能を提供します。たとえば、新しいフィード項目が質問かどうかをチェックするプロセスを作成します。質問の場合、1 日待機してからフローを使用して、最良のコメントが選択されたかどうかをチェックします。選択されていない場合、その質問を使用してケースを作成します。</li></ol>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="process_criteria">
+<h1 class="slds-text-heading_large">プロセス条件の追加</h1>
+  <p>関連付けられたアクションをプロセスで実行する前に、true となるべき条件を定義します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic (<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.overview_edition_lex_only.htm&amp;language=ja&amp;type=5">使用できない組織もあります</a>) および Lightning Experience の両方</td>
+
+            </tr>
+            <tr id="process_criteria__d5019e343" class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span id="process_criteria__d5019e347"><a name="process_criteria__d5019e347"></a><strong>Essentials</strong> Edition、<strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</span></td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d268254e82" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr id="process_criteria__d5019e977" class="">
+              <td headers="d268254e82" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロセスを作成、編集、参照する</td>
+
+              <td headers="d268254e82" style="vertical-align:top;" class="slds-cell-wrap"><p>「フローの管理」</p><p>および</p><p style="margin-bottom:0;">「すべてのデータの参照」</p></td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> プロセスビルダーのサポートと更新は 2025 年 12 月 31 日で終了します。 つまり、プロセスのサポートは提供されず、プロセスビルダー製品のバグは修正されません。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">Workflow Rules &amp; Process Builder End of Support</a> (ワークフロールールとプロセスビルダーのサポート終了)」を参照してください。<p>2025 年 12 月 31 日以降も既存のプロセスは引き続き実行され、有効化、無効化、編集ができますが、Flow Builder を使用することをお勧めします。既存のプロセスを移行するには、<a title="Flow Builder は、ワークフロールールとプロセスビルダーの機能を統合したポイント &amp; クリックツールであり、トリガープロセスの作成が簡単になります。ワークフロールールまたはプロセスビルダーを使用して作成されたトリガープロセスがある場合、[フローに移行] ツールを使用して Flow Builder に移動できます。新しいフローを本番に移行する前に、まず Sandbox 環境で移行してテストしてください。" href="operate-3.html#flow_migrate_to_flow_learning_map">Flow Builder へ</a>の切り替えを計画し、<a title="[フローに移行] ツールを使用して、プロセスビルダープロセスとワークフロールール (スケジュール済みアクションを含む) を Flow Builder に変換します。このツールでは、ほとんどのアクションについてプロセスの部分的な移行もサポートされています。" href="operate-3.html#flow_migrate_to_flow">Migrate to Flow</a> ツールを使用します。新しい自動化の場合は、<a title="自動化により、反復作業が減り、チームがより迅速かつ正確に ToDo を完了できるようになります。Flow Builder では、コードなしで簡単な自動化や複雑な自動化、フォーム、ガイド付き環境を作成できます。Salesforce ページとエクスペリエンスサイトにフォームを追加し、ボタン、レコードトリガー、またはスケジュールを使用してフローを起動できます。" href="overview-2.html#flow">Flow Builder</a> でフローを作成します。</p></div></div></div>
+</div>
+    <div><p>条件が一致すると、関連付けられたアクショングループがプロセスで実行されます。条件が一致しないと、アクショングループがスキップされ、次のアクショングループの条件が評価されます。</p><ol><li><strong class="uicontrol">[条件を追加]</strong> をクリックします。</li>
+<li>この条件ノードに名前を入力します。<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 名前はキャンバスに表示されるため、他の条件ノードと区別しやすい名前を使用します。アクションには独自の名前があるため、この名前では条件のみを要約することをお勧めします。たとえば、ケースがエスカレーションされたかどうかを確認する条件の場合、<kbd>「Is Escalated?」</kbd> (エスカレーションの有無) を使用します。</div></div></div>
+</li>
+<li>定義する必要がある条件の種別を選択します。この選択内容によって、後でダイアログボックスに表示される項目が決まります。<table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:79.5%"><col style="width:20.5%"></colgroup><thead class="slds-text-title_caps"><tr class=""><th id="d268254e158" style="vertical-align:top;" class="slds-cell-wrap" scope="col">必要な操作</th><th id="d268254e160" style="vertical-align:top;" class="slds-cell-wrap" scope="col">選択</th></tr></thead><tbody><tr class=""><td headers="d268254e158" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要な操作"><p>レコードに特定の項目値を設定する。</p><p>たとえば、金額が $5,000 を超える商談レコードで関連するアクションを実行するには、条件を次のように設定します。</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>[Opportunity].Amount greater than $5000.00</code></pre></td>
+<td headers="d268254e160" style="vertical-align:top;" class="slds-cell-wrap" data-label="選択">条件を満たしている</td>
+</tr><tr class=""><td headers="d268254e158" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要な操作"><p>数式を使用してレコードを評価する。</p><p>たとえば、所有者以外のユーザーが取引先を変更したときに年間売上が $1,000,000 を超える取引先で関連するアクションを実行するには、次の数式を使用します。</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>AND (([Account].LastModifiedBy.Id &lt;&gt; [Account].Owner.Id) , ([Account].AnnualRevenue &gt; 1000000) )</code></pre></td>
+<td headers="d268254e160" style="vertical-align:top;" class="slds-cell-wrap" data-label="選択">数式の評価が true になる</td>
+</tr><tr class=""><td headers="d268254e158" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要な操作"><p>レコードを評価せずに関連するアクションの実行を簡略化する。</p><p style="margin-bottom:0;">プロセスでは、この条件ノードに関連付けられたすべてのアクションが実行され、別途指定がない限り、プロセス内の残りの条件ノードは評価されません。これらのアクションの実行後にプロセスを停止することを選択する場合は、プロセスの最終条件ノードにのみこのオプションを選択することをお勧めします。</p></td>
+<td headers="d268254e160" style="vertical-align:top;" class="slds-cell-wrap" data-label="選択">アクションを実行する条件がない</td>
+</tr></tbody></table></li>
+<li>[条件を満たしている] を選択した場合は、次の操作を実行します。<ol><li>プロセスで評価する必要がある項目値を特定することで、絞り込み条件を定義します。<table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:11.49425287356322%"><col style="width:88.5057471264368%"></colgroup><tbody><tr class=""><td style="vertical-align:top;" class="slds-cell-wrap"><samp class="parmname">項目</samp></td>
+<td style="vertical-align:top;" class="slds-cell-wrap"><p>値を評価する項目を選択します。また、プロセスを開始した項目に関連するレコードの値を評価することもできます。これを行うには、ID 項目の横に <span style="vertical-align:text-bottom;display:inline-block;"><img alt="[関連レコード] アイコン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/platform_automation/images/process_builder/traverse.png" style="margin-bottom:0;"></span> が表示された関連レコードをクリックします。</p><p style="margin-bottom:0;">たとえば、取引先責任者レコードがプロセスを開始した場合、取引先責任者の取引先の <samp class="parmname">[年間売上]</samp> 項目値を評価できます。その項目にアクセスするには、<samp class="parmname">[取引先 ID]</samp><span style="vertical-align:text-bottom;display:inline-block;"><img alt="[関連レコード] アイコン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/platform_automation/images/process_builder/traverse.png" style="margin-bottom:0;"></span> をクリックし、<strong class="uicontrol">[年間売上]</strong> を選択して、<strong class="uicontrol">[選択]</strong> をクリックします。</p></td>
+</tr><tr class=""><td style="vertical-align:top;" class="slds-cell-wrap"><samp class="parmname">演算子</samp></td>
+<td style="vertical-align:top;" class="slds-cell-wrap">使用可能な演算子は、項目のデータ型によって異なります。</td>
+</tr><tr class=""><td style="vertical-align:top;" class="slds-cell-wrap"><samp class="parmname">型</samp></td>
+<td style="vertical-align:top;" class="slds-cell-wrap">使用可能な値の型は、項目のデータ型によって異なります。</td>
+</tr><tr class=""><td style="vertical-align:top;" class="slds-cell-wrap"><samp class="parmname">値</samp></td>
+<td style="vertical-align:top;" class="slds-cell-wrap">項目を評価する値を特定します。詳細は、<a title="プロセスビルダー全体を通して、条件ノードの条件の設定、[レコードを作成] アクションでの新規ケースの項目の設定、参照する Apex メソッドの指定などを行うために、値を設定する必要があります。" href="process_builder-3.html#process_userinterface_values">「プロセスビルダーでの値の設定」</a>を参照してください。</td>
+</tr></tbody></table></li>
+<li><samp class="parmname">[条件]</samp> では、プロセスで関連アクションを実行するために true となるべき条件を特定します。<p>カスタムロジックの使用を選択した場合は、次を使用して最大 1000 文字を入力します。</p><ul><li>各条件を参照する数値</li>
+<li>どのような条件の組み合わせが true となる必要があるのかを識別する <kbd>AND</kbd>、<kbd>OR</kbd>、<kbd>NOT</kbd></li>
+<li>文字列の一部をグループ化するための括弧</li>
+</ul>
+<p>たとえば、<kbd>「1 AND NOT (2 OR 3)」</kbd>と入力すると、最初の条件が true で、2 つ目と 3 つ目の結果が false の場合に true と評価されます。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> あいまいなロジックでは検証エラーが発生する可能性があります。あいまいさを回避するには、カスタムロジックで括弧を使用します。次に例を示します。<ul><li><kbd>1 AND 2 OR 3</kbd> はエラーになる</li>
+<li><kbd>1 AND (2 AND 3) OR 4</kbd> はエラーにならない </li>
+</ul>
+
+              </div></div></div>
+</li>
+</ol></li>
+<li>[数式の評価が true になる] を選択した場合は、数式を定義します。</li>
+<li>必要に応じて、レコードが作成または編集されて条件を満たすようになった場合にのみアクションを実行するかどうかを指定するには、パネル下部で <strong class="uicontrol">[詳細]</strong> をクリックします。<p>詳細は、<a title="プロセスに条件を追加するとき、指定された条件が変化した場合にアクションを実行するように選択できます。" href="#process_advanced_previously_met">「プロセスでの不要なアクションの回避」</a>を参照してください。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> この設定は、レコードが作成または編集されたときにプロセスが開始し、[絞り込み条件を満たしている] または [数式の評価が true になる] を選択した場合にのみ使用できます。</div></div></div>
+
+        </li>
+<li><strong class="uicontrol">[保存]</strong> をクリックします。</li>
+</ol></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="特定の条件が満たされ、関連付けられたアクションを実行した後で、プロセスを停止するか継続するかを選択します。" href="process_builder-3.html#process_next_criteria">複数の条件適用時のアクションの実行</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="process_criteria_formula">
+<h1 class="slds-text-heading_large">プロセス数式の制限</h1>
+  <p>条件ノードで条件として使用される数式には、制限がいくつかあります。プロセスに無効な数式が含まれていると、プロセスを保存または有効化できません。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic (<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.overview_edition_lex_only.htm&amp;language=ja&amp;type=5">使用できない組織もあります</a>) および Lightning Experience の両方</td>
+
+            </tr>
+            <tr id="process_criteria_formula__d2931e343" class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span id="process_criteria_formula__d2931e347"><a name="process_criteria_formula__d2931e347"></a><strong>Essentials</strong> Edition、<strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</span></td>
+
+            </tr>
+          </tbody></table>
+    <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> プロセスビルダーのサポートと更新は 2025 年 12 月 31 日で終了します。 つまり、プロセスのサポートは提供されず、プロセスビルダー製品のバグは修正されません。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">Workflow Rules &amp; Process Builder End of Support</a> (ワークフロールールとプロセスビルダーのサポート終了)」を参照してください。<p>2025 年 12 月 31 日以降も既存のプロセスは引き続き実行され、有効化、無効化、編集ができますが、Flow Builder を使用することをお勧めします。既存のプロセスを移行するには、<a title="Flow Builder は、ワークフロールールとプロセスビルダーの機能を統合したポイント &amp; クリックツールであり、トリガープロセスの作成が簡単になります。ワークフロールールまたはプロセスビルダーを使用して作成されたトリガープロセスがある場合、[フローに移行] ツールを使用して Flow Builder に移動できます。新しいフローを本番に移行する前に、まず Sandbox 環境で移行してテストしてください。" href="operate-3.html#flow_migrate_to_flow_learning_map">Flow Builder へ</a>の切り替えを計画し、<a title="[フローに移行] ツールを使用して、プロセスビルダープロセスとワークフロールール (スケジュール済みアクションを含む) を Flow Builder に変換します。このツールでは、ほとんどのアクションについてプロセスの部分的な移行もサポートされています。" href="operate-3.html#flow_migrate_to_flow">Migrate to Flow</a> ツールを使用します。新しい自動化の場合は、<a title="自動化により、反復作業が減り、チームがより迅速かつ正確に ToDo を完了できるようになります。Flow Builder では、コードなしで簡単な自動化や複雑な自動化、フォーム、ガイド付き環境を作成できます。Salesforce ページとエクスペリエンスサイトにフォームを追加し、ボタン、レコードトリガー、またはスケジュールを使用してフローを起動できます。" href="overview-2.html#flow">Flow Builder</a> でフローを作成します。</p></div></div></div>
+<p>条件ノードで使用されるすべての数式は、次の条件を満たしている必要があります。</p><ul>
+        <li><samp>true</samp> または <samp>false</samp> を返す。数式から <samp>true</samp> が返されると、関連付けられたアクションが実行されます。</li>
+
+        <li>3,000 を超える文字が含まれていない。</li>
+
+        <li>サポートされない関数が含まれていない。</li>
+
+        <li>そのプロセスのプロセストリガーオブジェクトを参照している。</li>
+
+        <li>プロセストリガーオブジェクトを参照するときに正しい大文字/小文字を使用している。</li>
+
+      </ul>
+<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> 関数を挿入するときに括弧は自動的に追加されません。数式を作成する場合、<kbd>TODAY()</kbd> のように括弧を追加してください。</div></div></div>
+</div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">サポートされない関数</h2><p>プロセス内の数式で次のいずれかの関数が使用されていると、数式から <samp>null</samp> が返されます。</p><a name="process_criteria_formula__unsupported_formulas_process_builder"></a><ul id="process_criteria_formula__unsupported_formulas_process_builder">
+        <li>GETRECORDIDS</li>
+
+        <li>IMAGE</li>
+
+        <li>INCLUDE</li>
+
+        <li>PARENTGROUPVAL</li>
+
+        <li>PREVGROUPVAL</li>
+
+        <li>REQUIRE SCRIPT</li>
+
+        <li>VLOOKUP</li>
+
+      </ul>
+<p>Salesforce で数式を作成するための演算子と関数の完全なリストについては、<a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.customize_functions.htm&amp;language=ja&amp;type=5">「コンテキスト別の数式の演算子と関数」</a>を参照してください。
+      </p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 
+        <ul>
+          <li>プロセスの条件で数式を使用する場合、<kbd>「2 &lt; 5」</kbd>のように評価が常に true になる数式は作成しないでください。</li>
+
+          <li>ISCHANGED は、数式関数と演算子のどちらとしても使用できます。プロセスの条件で数式関数として使用した場合、子レコードの関連項目は参照できません。たとえば、ISCHANGED は <kbd>[Case].Contact.AccountId</kbd> 項目の参照ではサポートされませんが、<kbd>[Case].ContactId</kbd> の参照には使用できす。</li>
+
+        </ul>
+
+      </div></div></div>
+</div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.tips_for_using_picklist_formula_fields.htm&amp;language=ja&amp;type=5">選択リストおよび複数選択リスト数式項目の使用のヒント</a></li><li><a title="詳細なオプションを選択するときの考慮事項は、次のとおりです。" href="#process_advanced_considerations">プロセスビルダーの詳細なオプションに関する考慮事項</a></li><li><a target="_blank" href="https://help.salesforce.com/s/articleView?id=platform.custommetadatatypes_process_builder.htm&amp;language=ja&amp;type=5">カスタムメタデータ型とプロセスビルダー</a></li></ul></div>
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="process_delete">
+<h1 class="slds-text-heading_large">プロセスバージョンの削除</h1>
+  <p>定義済みのプロセスバージョンが必要なくなったら、削除できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+    <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+            <tr class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なインターフェース: Salesforce Classic (<a target="_blank" href="https://help.salesforce.com/s/articleView?id=xcloud.overview_edition_lex_only.htm&amp;language=ja&amp;type=5">使用できない組織もあります</a>) および Lightning Experience の両方</td>
+
+            </tr>
+            <tr id="process_delete__d4368e343" class="">
+              <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なエディション: <span id="process_delete__d4368e347"><a name="process_delete__d4368e347"></a><strong>Essentials</strong> Edition、<strong>Professional</strong> Edition、<strong>Enterprise</strong> Edition、<strong>Performance</strong> Edition、<strong>Unlimited</strong> Edition、および <strong>Developer</strong> Edition</span></td>
+
+            </tr>
+          </tbody></table><table class="slds-table slds-table_bordered slds-m-bottom_small permission"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d208568e82" style="text-align:center;vertical-align:top;" colspan="2" class="slds-cell-wrap" scope="colgroup">必要なユーザー権限</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d208568e82" style="vertical-align:top;" class="slds-cell-wrap" data-label="必要なユーザー権限">プロセスを削除する</td>
+
+              <td headers="d208568e82" style="vertical-align:top;" class="slds-cell-wrap"><p>「フローの管理」</p><p>および</p><p style="margin-bottom:0;">「すべてのデータの参照」</p></td>
+
+            </tr>
+          </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> プロセスビルダーのサポートと更新は 2025 年 12 月 31 日で終了します。 つまり、プロセスのサポートは提供されず、プロセスビルダー製品のバグは修正されません。「<a target="_blank" href="https://help.salesforce.com/s/articleView?id=001096524&amp;language=ja&amp;type=1">Workflow Rules &amp; Process Builder End of Support</a> (ワークフロールールとプロセスビルダーのサポート終了)」を参照してください。<p>2025 年 12 月 31 日以降も既存のプロセスは引き続き実行され、有効化、無効化、編集ができますが、Flow Builder を使用することをお勧めします。既存のプロセスを移行するには、<a title="Flow Builder は、ワークフロールールとプロセスビルダーの機能を統合したポイント &amp; クリックツールであり、トリガープロセスの作成が簡単になります。ワークフロールールまたはプロセスビルダーを使用して作成されたトリガープロセスがある場合、[フローに移行] ツールを使用して Flow Builder に移動できます。新しいフローを本番に移行する前に、まず Sandbox 環境で移行してテストしてください。" href="operate-3.html#flow_migrate_to_flow_learning_map">Flow Builder へ</a>の切り替えを計画し、<a title="[フローに移行] ツールを使用して、プロセスビルダープロセスとワークフロールール (スケジュール済みアクションを含む) を Flow Builder に変換します。このツールでは、ほとんどのアクションについてプロセスの部分的な移行もサポートされています。" href="operate-3.html#flow_migrate_to_flow">Migrate to Flow</a> ツールを使用します。新しい自動化の場合は、<a title="自動化により、反復作業が減り、チームがより迅速かつ正確に ToDo を完了できるようになります。Flow Builder では、コードなしで簡単な自動化や複雑な自動化、フォーム、ガイド付き環境を作成できます。Salesforce ページとエクスペリエンスサイトにフォームを追加し、ボタン、レコードトリガー、またはスケジュールを使用してフローを起動できます。" href="overview-2.html#flow">Flow Builder</a> でフローを作成します。</p></div></div></div>
+<p>有効化されたプロセスを削除するには、まず無効化する必要があります。[有効] 状況のプロセスバージョンは削除できません。別のプロセスが呼び出し可能なプロセスを参照している場合、その呼び出し可能なプロセスを削除できません。プロセスにスケジュール済みアクションが存在する場合は、待機中のアクションが実行または<a title="プロセスのスケジュール済みアクションを実行する必要がなくなった場合は、[設定] の一時停止中のフローインタビューのリストから削除できます。" href="process_builder-3.html#process_delete_instance">削除</a>されるまでプロセスを削除することはできません。</p></div>
+    <ol><li>
+        <span>[設定] で、[クイック検索] ボックスに<kbd>「ビルダー」</kbd>と入力し、<strong class="uicontrol">[プロセスビルダー]</strong> を選択します。</span>
+      </li><li>
+        <span>該当するプロセスの横にある <span style="vertical-align:text-bottom;display:inline-block;"><img alt="右キャレットアイコン" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-platform-platform_automation-264-0-0-production-jajp/45660dfa-7e61-4cc2-b4f3-bd4912beeaf8/platform_automation/images/process_builder/pb_expand_versions.png" style="margin-bottom:0;"></span> をクリックし、すべてのバージョンを表示します。</span>
+      </li><li>
+        <span>削除するバージョンで、<strong class="uicontrol">[削除]</strong> をクリックします。</span>
+        <div>プロセスに存在するバージョンが 1 つのみで、そのバージョンを削除すると、プロセス全体が削除されます。</div>
+      </li><li>
+        <span><strong class="uicontrol">[OK]</strong> をクリックします。</span>
+      </li></ol>
+
+  
+</div></div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="process_builder-1.html">&larr; プロセスビルダー（レガシー）・プロセスアクション（1/3）</a><a href="process_builder-3.html">プロセスビルダー（レガシー）・プロセスアクション（3/3） &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=platform.automate_with_salesforce_flow.htm&type=5&language=ja">help.salesforce.com — Salesforce Flow（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>

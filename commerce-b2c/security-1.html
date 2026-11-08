@@ -1,0 +1,2104 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>セキュリティ・WAF・アクセス制御（1/2） | B2C Commerce ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（31）</h2>
+    <ol>
+      <li><a href="#b2c_access_control_for_log_center_alerts">Log Center アラートのアクセス制御</a></li>
+      <li><a href="#b2c_access_files_webdav">B2C Commerce の WebDAV ファイルへのアクセス</a></li>
+      <li><a href="#b2c_access_prod_variant_info_in_grid_view">グリッド表示での商品バリアント情報へのアクセス</a></li>
+      <li><a href="#b2c_add_a_certificate_to_a_zone">eCDN ゾーンへの SSL 証明書の追加と DNS マッピングの構成</a></li>
+      <li><a href="#b2c_add_managed_ssl_certificates">管理 SSL 証明書の追加</a></li>
+      <li><a href="#b2c_add_self_managed_ssl_certificates">自己管理 SSL 証明書の追加</a></li>
+      <li><a href="#b2c_add_stacked_proxy_to_firewall_allowlist">スタックされたプロキシをファイアウォールの許可リストに追加</a></li>
+      <li><a href="#b2c_administrator_role">B2C Commerce の管理者の役割</a></li>
+      <li><a href="#b2c_authentication_and_authorization">B2C Commerce での認証と承認</a></li>
+      <li><a href="#b2c_certificates_and_private_keys">B2C Commerce の秘密鍵と証明書</a></li>
+      <li><a href="#b2c_commerce_security_guide">B2C Commerce セキュリティガイド</a></li>
+      <li><a href="#b2c_commerce_security_model">B2C Commerce のセキュリティモデル</a></li>
+      <li><a href="#b2c_configure_zone_firewall_settings">eCDN ゾーンのファイアウォール設定の構成</a></li>
+      <li><a href="#b2c_configure_zone_waf_settings">eCDN ゾーンの WAF 設定の構成</a></li>
+      <li><a href="#b2c_controlers">SiteGenesis コントローラー</a></li>
+      <li><a href="#b2c_create_an_ecdn_zone_and_certificate">eCDN ゾーンとホスト名の作成</a></li>
+      <li><a href="#b2c_create_eCDN_firewall_rule">eCDN ゾーンのカスタムファイアウォールルールの作成</a></li>
+      <li><a href="#b2c_creating_roles">B2C Commerce での役割の作成</a></li>
+      <li><a href="#b2c_declarative_security_via_http_headers">B2C Commerce における HTTP ヘッダーでの宣言によるセキュリティ</a></li>
+      <li><a href="#b2c_developer_authentication_and_authorization">B2C Commerce での認証と承認のベストプラクティス</a></li>
+      <li><a href="#b2c_general_security_best_practices">B2C Commerce の一般的なセキュリティのベストプラクティス</a></li>
+      <li><a href="#b2c_legacy_validate_new_certificate">新しい証明書の検証</a></li>
+      <li><a href="#b2c_make_security_usable">セキュリティ機能の使い勝手の向上</a></li>
+      <li><a href="#b2c_manually_migrate_users_to_unified_authentication">手動によるユーザーの統合認証への移動</a></li>
+      <li><a href="#b2c_network_access_restrictions">B2C Commerce でのネットワークアクセスの制限</a></li>
+      <li><a href="#b2c_ocapi_client_authentication_and_authorization">B2C Commerce での OCAPI クライアントの認証と承認</a></li>
+      <li><a href="#b2c_permissions">B2C Commerce の許可、ユーザー、および役割</a></li>
+      <li><a href="#b2c_renew_a_certificate">B2C Commerce の証明書の更新</a></li>
+      <li><a href="#b2c_roles_and_permissions">B2C Commerce の役割と許可</a></li>
+      <li><a href="#b2c_security">B2C Commerce のセキュリティ設定</a></li>
+      <li><a href="#b2c_security_best_practices_for_administrators">B2C Commerce 管理者のためのセキュリティのベストプラクティス</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>セキュリティ・WAF・アクセス制御（1/2）</h1>
+      <div class="meta">Salesforce B2C Commerce ヘルプ · 31 記事 · 生成 2026-11-03</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="site_admin-2.html">&larr; サイト管理・ロケール・組織設定（2/2）</a><a href="security-2.html">セキュリティ・WAF・アクセス制御（2/2） &rarr;</a></div>
+<section class="article" id="b2c_access_control_for_log_center_alerts">
+<h1 class="slds-text-heading_large">Log Center アラートのアクセス制御</h1>
+ 
+ <p>ロールでアラートの作成と管理が許可されていることを確認します。</p>
+
+  <table summary="アクセス制御" class="slds-table slds-table_bordered slds-m-bottom_small"><caption>アクセス制御</caption><colgroup><col style="width:25%"><col style="width:25%"><col style="width:25%"><col style="width:25%"></colgroup><thead class="slds-text-title_caps">
+     <tr class="">
+      <th id="d117852e37" style="vertical-align:top;" class="slds-cell-wrap" scope="col">役割</th>
+      <th id="d117852e40" style="vertical-align:top;" class="slds-cell-wrap" scope="col">表示</th>
+      <th id="d117852e43" style="vertical-align:top;" class="slds-cell-wrap" scope="col">作成</th>
+      <th id="d117852e46" style="vertical-align:top;" class="slds-cell-wrap" scope="col">編集/削除</th>
+     </tr>
+    </thead><tbody>
+     <tr class="">
+      <td headers="d117852e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="役割">管理</td>
+
+      <td headers="d117852e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="表示">すべて</td>
+
+      <td headers="d117852e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="作成">あり</td>
+
+      <td headers="d117852e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="編集/削除">あり</td>
+
+     </tr>
+     <tr class="">
+      <td headers="d117852e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="役割">サポート</td>
+
+      <td headers="d117852e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="表示">すべて</td>
+
+      <td headers="d117852e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="作成">あり</td>
+
+      <td headers="d117852e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="編集/削除">あり</td>
+
+     </tr>
+     <tr class="">
+      <td headers="d117852e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="役割">外部管理者</td>
+
+      <td headers="d117852e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="表示">レルムスコープ</td>
+
+      <td headers="d117852e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="作成">あり</td>
+
+      <td headers="d117852e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="編集/削除">はい (割り当てられたレルム内でのみ)</td>
+
+     </tr>
+     <tr class="">
+      <td headers="d117852e37" style="vertical-align:top;" class="slds-cell-wrap" data-label="役割">ユーザー</td>
+
+      <td headers="d117852e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="表示">レルムスコープ</td>
+
+      <td headers="d117852e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="作成">あり</td>
+
+      <td headers="d117852e46" style="vertical-align:top;" class="slds-cell-wrap" data-label="編集/削除">なし</td>
+
+     </tr>
+    </tbody></table>
+ 
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_access_files_webdav">
+<h1 class="slds-text-heading_large">B2C Commerce の WebDAV ファイルへのアクセス</h1>
+    
+    <p>Business Manager のフォルダーブラウザーを使用すると、WebDAV ファイルを簡単に表示してダウンロードできます。また、サードパーティの WebDAV クライアントを使用して、WebDAV ファイルを表示、ダウンロード、アップロード、削除できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>         <tr class="">           <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+         </tr>       </tbody></table></div>
+        <ol><li>
+                <span>Business Managerm で、アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、次に<span class="menucascade"><strong class="uicontrol">管理</strong> | <strong class="uicontrol">サイトの開発</strong> | <strong class="uicontrol">開発セットアップ</strong></span>の順に選択します。</span>
+            </li><li>
+                <span><strong class="uicontrol">フォルダーブラウザー</strong>タブをクリックします。</span>
+                <div>WebDAV の許可をもつフォルダーがフォルダーブラウザーに表示されます。</div>
+                <div>
+                    <ul>
+                        <li>フォルダーをフィルターするには、<strong class="uicontrol">名前でフィルター</strong>テキストボックスにフォルダー名を入力し、<strong class="uicontrol">フィルター</strong>をクリックします。フォルダー名では大文字と小文字は区別されません。アスタリスク (*) と疑問符 (?) をワイルドカードとして使用できます。</li>
+
+                        <li>ファイルをダウンロードするには、<strong class="uicontrol">操作</strong>の下でダウンロードアイコンをクリックします。</li>
+
+                        <li>ディレクトリの URL をローカルマシンのクリップボードにコピーするには、<strong class="uicontrol">WebDAV URL をコピー</strong>をクリックします。この URL を使用して、サードパーティの WebDAV クライアントでディレクトリにアクセスします。</li>
+
+                    </ul>
+
+                </div>
+            </li><li>
+                <span>サードパーティの WebDAV クライアントを使用してディレクトリにアクセスするには、開発セットアップウィンドウで次のように操作します。</span>
+                <ol>
+                    <li>
+                        <span><strong class="uicontrol">WebDAV アクセス</strong>セクションまでスクロールダウンします。</span>
+                    </li>
+
+                    <li>
+                        <span>ディレクトリ名の横にあるリンクアイコンをクリックして、URL をローカルマシンのクリップボードにコピーします。WebDAV クライアントに URL を貼り付けます。</span>
+                        <div>WebDAV クライアントから WebDAV ファイルにアクセスするには、WebDAV の認証情報を入力します。</div>
+                    </li>
+
+                </ol>
+                <div>フォルダーブラウザーを使用してディレクトリを表示するには、<strong class="uicontrol">WebDAV アクセス</strong>セクションでディレクトリ名の横にあるフォルダーアイコンをクリックします。</div>
+            </li></ol>
+
+    
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_access_prod_variant_info_in_grid_view">
+<h1 class="slds-text-heading_large">グリッド表示での商品バリアント情報へのアクセス</h1>
+   
+   <p>マスター商品のバリアント表示を使用して、バリアント商品の在庫レベル、属性、および価格設定を確認できます。その後、グリッド表示と商品詳細リストを切り替えることなしに、戦略的にバリアント商品を配置して販売を促進できます。このトピックは、B2C Commerce に該当します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+      <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+                  <tr class="">
+                     <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+
+                  </tr>
+               </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> バリアントの表示オプションは、マスター商品タイルでのみ使用できます。</div></div></div>
+</div>
+      <ol><li>
+            <span>アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、次に<span class="menucascade"><strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol"><var>サイト</var></strong> | <strong class="uicontrol">商品とカタログ</strong> | <strong class="uicontrol">カタログ</strong></span>の順に選択します。</span>
+         </li><li>
+            <span>編集したいカタログカテゴリを選択します。</span>
+         </li><li>
+            <span>商品リストで、グリッド表示アイコン<span style="vertical-align:text-bottom;display:inline-block;"><img alt="グリッド表示" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_products_gridview.png" style="margin-bottom:0;"></span>をクリックします。</span>
+         </li><li>
+            <span>目的のマスター商品タイルでドロップダウンをクリックし、<strong class="uicontrol">バリアントの表示</strong>を選択します。</span>
+         </li><li>
+            <span>マスター商品のバリアントの在庫レベル、属性、および価格設定を確認します。</span>
+         </li><li>
+            <span>バリアントの表示ツールを使用して結果を絞り込みます。</span>
+            <ol>
+               <li>
+                  <span>特定の商品を見つけて表示するには、商品 ID を入力します。</span>
+               </li>
+
+               <li>
+                  <span>在庫ありステータスと商品属性の組み合わせに基づいて商品バリアントを表示するには、テーブルフィルターを使用します。</span>
+               </li>
+
+               <li>
+                  <span> 販売可能在庫の降順または昇順で商品リストを並べ替えるには、<strong class="uicontrol">販売可能数量 (ATS)</strong>列をクリックします。</span>
+               </li>
+
+            </ol>
+         </li></ol>
+
+   
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_add_a_certificate_to_a_zone">
+<h1 class="slds-text-heading_large">eCDN ゾーンへの SSL 証明書の追加と DNS マッピングの構成</h1>
+   
+   <p>ゾーンのホスト名に SSL 証明書を追加し、B2C Commerce から DNS プロバイダーアカウントに DNS の値をマッピングします。eCDN 管理証明書と自己管理証明書を追加します。</p>
+
+         <p>エンドポイントをマッピングする際には、以下を念頭に置いてください。</p>
+         <ul>
+            <li>DNS Request for Comments (RFC) では、ルートドメインを B2C Commerce に直接ポイントすることはできません。ルートドメインを eCDN CNAME エイリアスにダイレクトする場合は、外部サービスを使用してルートドメインからサブドメインにリダイレクトする必要があります。</li>
+
+            <li>リダイレクトを設定する際には、必ず HTTP と HTTPS の両方に設定します。</li>
+
+            <li>トラフィックをサブドメイン (www.yourcompany.com) ではなく永久にルートドメイン (yourcompany.com) から供給するには、DNS レベルのソリューションを使用して、ルートドメインを eCDN CNAME エイリアスにダイレクトします。</li>
+
+            <li>レガシーゾーンとプロキシゾーンには、有効な SSL 証明書が必要です。
+            </li>
+
+         </ul>
+
+   
+<ul><li class="slds-p-bottom_small"><strong><a href="#b2c_add_managed_ssl_certificates">管理 SSL 証明書の追加</a></strong><br>ゾーンのホスト名に eCDN 管理 SSL 証明書を追加して、起点のエンドポイントをマッピングします。</li><li class="slds-p-bottom_small"><strong><a href="#b2c_add_self_managed_ssl_certificates">自己管理 SSL 証明書の追加</a></strong><br>ゾーンのホスト名に自己管理 SSL 証明書を追加して、起点のエンドポイントをマッピングします。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_add_managed_ssl_certificates">
+<h1 class="slds-text-heading_large">管理 SSL 証明書の追加</h1>
+   
+   <p>ゾーンのホスト名に eCDN 管理 SSL 証明書を追加して、起点のエンドポイントをマッピングします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>         <tr class="">           <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+         </tr>       </tbody></table></div>
+      <div><p>管理 SSL 証明書をホスト名に追加し、B2C Commerce から DNS プロバイダーアカウントに DNS の値をマッピングするには、次のようにします。</p><p>エンドポイントをマッピングする際には、以下を念頭に置いてください。</p><ul>
+            <li>DNS Request for Comments (RFC) では、ルートドメインを B2C Commerce に直接ポイントすることはできません。ルートドメインを eCDN CNAME エイリアスにダイレクトする場合は、外部サービスを使用してルートドメインからサブドメインにリダイレクトする必要があります。</li>
+
+            <li>リダイレクトを設定する際には、必ず HTTP と HTTPS の両方に設定してください。</li>
+
+            <li>トラフィックをサブドメイン (www.yourcompany.com) ではなく永久にルートドメイン (yourcompany.com) から供給するには、DNS レベルのソリューションを使用して、ルートドメインを eCDN CNAME エイリアスにダイレクトします。</li>
+
+         </ul>
+</div>
+      <ol><li>
+            <span>アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、<span class="menucascade"><strong class="uicontrol">管理</strong> | <strong class="uicontrol">サイト</strong> | <strong class="uicontrol">埋め込み CDN 設定</strong></span>の順に選択します。</span>
+         </li><li>
+            <span>証明書を追加するゾーンの<strong class="uicontrol">証明書または設定</strong>をクリックします。</span>
+         </li><li>
+            <span>暗号化タブで、リストからゾーンを選択します。</span>
+         </li><li>
+            <span><strong class="uicontrol">証明書の追加</strong>をクリックします。</span>
+         </li><li>
+            <span><strong class="uicontrol">eCDN 管理証明書</strong>を選択します。</span>
+            <div><p><span style="vertical-align:text-bottom;display:inline-block;"><img alt="eCDN 管理証明書のスクリーンショット" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_ecdn_managed_cert.png" style="width:600px;margin-bottom:0;"></span></p></div>
+         </li><li>
+            <span>「SSL 認証局」ドロップダウンから、<strong class="uicontrol">Lets Encrypt</strong> または <strong class="uicontrol">Google</strong> (推奨) を選択します。</span>
+         </li><li>
+            <span>「SSL 証明書検証メソッド」ドロップダウンから、<strong class="uicontrol">HTTP 検証</strong>または <strong class="uicontrol">TXT 検証</strong>を選択します。</span>               
+            <ul>
+               <li>HTTP 検証 
+                     <ul>
+                        <li>スタック構成の CDN を使用しない場合に、このオプションを使用します。 
+                        </li>
+
+                        <li>eCDN を使用してスタック構成を実装する場合、サードパーティーの CDN をスタックするときに HTTP 検証がブロックされないことに注意してください。検証プロセスを円滑に実行し続けるには、ACME (Automatic Certificate Management Environment) 準拠の認証局 (CA) のドメイン名の利用権確認 (DCV) HTTP パスを許可します。<a target="_blank" href="https://letsencrypt.org/docs/challenge-types/">Let's Encryptのドキュメント</a>によると、許可するHTTPパスは http://&lt;YOUR_DOMAIN&gt;/.well-known/acme-challenge/&lt;TOKEN&gt;です。
+                        </li>
+                           
+                     </ul>
+
+               </li>
+
+               <li>TXT 検証
+                     <ul>
+                        <li>スタック型 CDN と DCV デリゲーションを使用する場合に、このオプションを使用します。スタック型 CDN を使用する場合、DCV デリゲーションが必要です。</li>
+
+                        <li>DCV の汎用一意識別子 (UUID) が必要な場合は、サポートチームに連絡して、DNS レコードに含める DCV 委任 UUID を取得してください。
+                        </li>
+
+                        <li>DCV デリゲーションを使用しない場合:
+                           <ul>
+                              <li>証明書の自動ローテーションにより、3 か月ごとに TXT レコードを検証します。
+                              </li>
+
+                               <li>TXT 検証用に eCDN 管理証明書を構成した場合でも、証明書の更新中に HTTP 検証が試行されます。前の項目で説明した DCV 用 HTTP パスの検証を許可してください。
+                              </li>
+
+                           </ul>
+
+                        </li>
+
+                     </ul>
+
+               </li>
+      
+            </ul>
+
+         </li><li>
+            <span>SSL 証明書を割り当てたいホスト名を選択します。</span>
+         </li><li>
+            <span><strong class="uicontrol">証明書のアップロード</strong>をクリックします。</span>
+         </li><li>
+            <span>(オプション) HTTP で検証します。</span>
+            <ol>
+               <li>
+                  <span>表示される検証テキストを自分の DNS ポータルにコピーします。</span>
+                  <div><p><span style="vertical-align:text-bottom;display:inline-block;"><img alt="表示される検証テキストを自分の DNS ポータルにコピーします。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_ecdn_enter_host_name.png" style="margin-bottom:0;"></span></p></div>
+               </li>
+
+               <li>
+                  <span>ホスト名検証のステータスを確認するには、<strong class="uicontrol">ホスト名の検証</strong>をクリックします。この検証には最大で 6 時間かかります。</span>
+               </li>
+
+               <li>
+                  <span>ホスト名がアクティブになったときに、SSL for SaaS V2 経由でトラフィックを新しいゾーンに導く CNAME レコードを作成します。</span>
+               </li>
+
+               <li>
+                  <span>ゾーン用に DNS マッピングを構成します。</span>
+                  <div>
+                     <ol>
+                        <li>DNS プロバイダーアカウントにログインします。</li>
+
+                        <li>ゾーンを検索し、リストから選択します。</li>
+
+                        <li>DNS タブで、マッピングするホスト名を見つけます。</li>
+
+                        <li> “is an alias of” (は次のエイリアス: ) の後のすべてのテキストを、Business Manager からの DNS CNAME に置き換えます。</li>
+
+                        <li>ステータス列のクラウドを、ツールヒント「DNS のみ」をもつグレーのクラウドとして表示されるまでクリックします。</li>
+
+                     </ol>
+                  </div>
+               </li>
+
+               <li>
+                  <span>証明書検証のステータスを確認するには、<strong class="uicontrol">eCDN 管理証明書の検証</strong>をクリックします。検証には最大で 6 時間かかります。</span>
+               </li>
+
+            </ol>
+            
+         </li><li>
+            <span>(オプション) TXT で検証します。</span>
+            <ol>
+               <li>
+                  <span>表示される証明書とホスト名の検証テキストを自分の DNS ポータルにコピーします。</span>
+                  <div>
+                     <p><span style="vertical-align:text-bottom;display:inline-block;"><img alt="表示される証明書とホスト名の検証テキストを自分の DNS ポータルにコピーします" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_ecdn_enter_host_name_txt.png" style="margin-bottom:0;"></span></p>
+                  </div>
+               </li>
+
+               <li>
+                  <span>ホスト名検証のステータスを確認するには、<strong class="uicontrol">ホスト名の検証</strong>をクリックします。この検証には最大で 6 時間かかります。</span>
+               </li>
+
+               <li>
+                  <span>ホスト名がアクティブなときに、証明書検証のステータスを確認するには、「<strong class="uicontrol">eCDN 管理証明書の検証</strong>」をクリックします。検証には最大で 6 時間かかります。</span>
+               </li>
+
+               <li>
+                  <span>ホスト名と証明書がアクティブになったときに、SSL for SaaS V2 経由でトラフィックを新しいゾーンに導く CNAME レコードを作成します。</span>
+               </li>
+
+               <li>
+                  <span>ゾーン用に DNS マッピングを構成します。</span>
+                  <div>
+                     <ol>
+                        <li>DNS プロバイダーアカウントにログインします。</li>
+
+                        <li>ゾーンを検索し、リストから選択します。</li>
+
+                        <li>DNS タブで、マッピングするホスト名を見つけます。</li>
+
+                        <li> “is an alias of” (は次のエイリアス: ) の後のすべてのテキストを、Business Manager からの DNS CNAME に置き換えます。</li>
+
+                        <li>ステータス列のクラウドを、ツールヒント「DNS のみ」をもつグレーのクラウドとして表示されるまでクリックします。</li>
+
+                     </ol>
+                  </div>
+               </li>
+
+            </ol>
+         </li></ol>
+
+   
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_add_self_managed_ssl_certificates">
+<h1 class="slds-text-heading_large">自己管理 SSL 証明書の追加</h1>
+   
+   <p>ゾーンのホスト名に自己管理 SSL 証明書を追加して、起点のエンドポイントをマッピングします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>         <tr class="">           <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+         </tr>       </tbody></table></div>
+      <div><p>ホスト名に自己管理 SSL 証明書を追加し、B2C Commerce から DNS プロバイダーアカウントに DNS の値をマッピングするには、次のようにします。</p><p>エンドポイントをマッピングする際には、以下を念頭に置いてください。</p><ul>
+               <li>DNS Request for Comments (RFC) では、ルートドメインを B2C Commerce に直接ポイントすることはできません。ルートドメインを eCDN CNAME エイリアスにダイレクトする場合は、外部サービスを使用してルートドメインからサブドメインにリダイレクトする必要があります。</li>
+
+               <li>リダイレクトを設定する際には、必ず HTTP と HTTPS の両方に設定します。</li>
+
+               <li>トラフィックをサブドメイン (www.yourcompany.com) ではなく永久にルートドメイン (yourcompany.com) から供給するには、DNS レベルのソリューションを使用して、ルートドメインを eCDN CNAME エイリアスにダイレクトします。</li>
+
+            </ul>
+</div>
+      <ol><li>
+            <span>Business Manager で、アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、<span class="menucascade"><strong class="uicontrol">管理</strong> | <strong class="uicontrol">サイト</strong> | <strong class="uicontrol">埋め込み CDN 設定</strong></span>の順に選択します。</span>
+         </li><li>
+            <span>証明書を追加するゾーンの<strong class="uicontrol">証明書または設定</strong>をクリックします。</span>
+         </li><li>
+            <span>暗号化タブで、リストからゾーンを選択します。</span>
+         </li><li>
+            <span><strong class="uicontrol">証明書の追加</strong>をクリックします。</span>
+         </li><li>
+            <span><strong class="uicontrol">自己管理証明書</strong>を選択します。</span>
+            <div>
+               <p><span style="vertical-align:text-bottom;display:inline-block;"><img alt="自己管理証明書を選択します。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_ecdn_self_managed_cert.png" style="margin-bottom:0;"></span></p>
+            </div>
+         </li><li>
+            <span>SSL 証明書プロバイダーから受け取った証明書と秘密鍵を入力します。</span>
+         </li><li>
+            <span>SSL 証明書を割り当てたいホスト名を選択します。</span>
+            <div>
+               <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 
+                  自己管理のワイルドカード証明書では、ルートドメインとワイルドカードホスト名の両方に SAN が必要です。<a title="単一のワイルドカードカスタムホスト名 (例: *.merchantsite.com) を使用して複数のサブドメインをカバーし、Business Manager を通じた eCDN のオンボーディングと管理のオーバーヘッドを削減します。" href="general-1.html#b2c_add_wildcard_custom_hostname">ワイルドカードカスタムホスト名</a>を参照してください。
+                </div></div></div>
+
+            </div>
+         </li><li>
+            <span><strong class="uicontrol">証明書のアップロード</strong>をクリックします。</span>
+         </li><li>
+            <span>表示される検証テキストを自分の DNS ポータルにコピーします。</span>
+         </li><li>
+            <span>ホスト名検証のステータスを確認するには、<strong class="uicontrol">ホスト名の検証</strong>をクリックします。検証には最大で 6 時間かかります。</span>
+         </li><li>
+            <span>ホスト名がアクティブになった後に、SSL for SaaS V2 経由でトラフィックを新しいゾーンに導く CNAME レコードを作成します。</span>
+         </li><li>
+            <span>ゾーン用に DNS マッピングを構成します。</span>
+            <ol>
+               <li>
+                  <span>DNS プロバイダーアカウントにログインします。</span>
+               </li>
+
+               <li>
+                  <span>ゾーンを検索し、リストから選択します。</span>
+               </li>
+
+               <li>
+                  <span>DNS タブで、マッピングするホスト名を見つけます。</span>
+               </li>
+
+               <li>
+                  <span> “is an alias of” (は次のエイリアス: ) の後のすべてのテキストを、Business Manager からの DNS CNAME に置き換えます。</span>
+               </li>
+
+               <li>
+                  <span>ステータス列のクラウドを、ツールヒント「DNS のみ」をもつグレーのクラウドとして表示されるまでクリックします。</span>
+               </li>
+
+            </ol>
+            <div>
+               <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> DNS プロバイダーと同じルートドメインが別のアカウントにもある場合は、DNS を標準のゾーンやルートゾーンではなく、新しいゾーンに導くことが必要です。この目的は、トラフィックを標準のゾーンやルートゾーンではなく、新しいゾーンに導きたいという意図を証明することにあります。</div></div></div>
+
+            </div>
+         </li></ol>
+
+   
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_add_stacked_proxy_to_firewall_allowlist">
+<h1 class="slds-text-heading_large">スタックされたプロキシをファイアウォールの許可リストに追加</h1>
+   
+   <p>CDN Zones API カスタムルールを使用して、指定したサードパーティ IP アドレスの Web アプリケーションファイアウォール (WAF)、その他のカスタムルール、レート制限、またはセキュリティレベルを選択的にスキップします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+      <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+                  <tr class="">
+                     <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+
+                  </tr>
+               </tbody></table></div>
+      <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> この方法は、すべての DDoS コンポーネントと WAF コンポーネントをバイパスするため、お勧めしません。特定のサードパーティアドレスの WAF、その他のカスタムルール、またはレート制限を選択的にスキップするには、<a target="_blank" href="https://developer.salesforce.com/docs/commerce/commerce-api/guide/cdn-zones-custom-rules.html">eCDN カスタムルール</a>を使用します。</div></div></div>
+</div>
+      <ol><li>
+            <span>Business Manager で、アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、<span class="menucascade"><strong class="uicontrol">管理者</strong> | <strong class="uicontrol">サイト</strong> | <strong class="uicontrol">埋め込み CDN 設定の</strong></span>順に選択します。</span>
+         </li><li>
+            
+            <span>ゾーンで<strong class="uicontrol">設定</strong>をクリックします。</span>
+         </li><li>
+            
+            <span>ファイアウォールタブで、信頼できる IP 許可リストを追加または編集して、サードパーティのプロキシ IP アドレスを含めます。</span>
+         </li></ol>
+
+   
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_administrator_role">
+<h1 class="slds-text-heading_large">B2C Commerce の管理者の役割</h1>
+   
+   <p>管理者の役割は、組織の最上位の役割です。この役割は自動的に作成され、直接、またはインポートによって間接的に削除することはできません。このトピックは、B2C Commerce に該当します。</p>
+
+      <p class="bodytext">管理者の役割には、次のプロパティがあります:</p>
+      <ul class="listbullet">
+         <li class="listbullet">新しいインスタンスでは常に使用可能です。</li>
+
+         <li class="listbullet">B2C Commerce ツールやインポートを使用して削除できません。</li>
+
+         <li class="listbullet">組織のすべての既知のサイトにあるすべての既知のシステムモジュールへのアクセス許可をもちます。</li>
+
+         <li class="listbullet">新しく作成されたサイトのすべてのシステムモジュールへのアクセス許可を自動的に取得します。</li>
+
+         <li class="listbullet">(すべての組織とサイトについて) 新しいリリースをデプロイする場合、新しいモジュールへのアクセス許可を自動的に取得します。</li>
+
+         <li class="listbullet">機能の許可を使用して拡張できます。</li>
+
+         <li class="listbullet">カスタムモジュールのアクセス許可を使用して拡張できます。</li>
+
+         <li>すべての役割に割り当てられたすべての地域情報への許可にアクセスできます。リリース 16.9 より後に作成した地域情報では、管理者は地域情報に特定の許可を関連する役割に明示的に付与する必要があります。</li>
+
+      </ul>
+
+      <p class="bodytext">すべてのシステムモジュールへの管理者アクセスは、次のメカニズムで徹底されます:</p>
+      <ul class="listnumber">
+         <li class="listnumber">新しいサイトを作成すると、管理者の役割はすべてのサイトシステムモジュールへのアクセス許可を自動的に受け取ります。管理者の役割は、すべてのサイト内のすべてのモジュールへのフルアクセスを維持します。</li>
+
+         <li class="listnumber">サーバーの起動時には、組織レベルおよびサイトレベルの管理者の役割が、すべてのサイトのすべての既知のシステムモジュールへのアクセス許可をもっているかどうかがチェックされます。管理者の役割は、新しく導入されたシステムモジュールへのアクセス許可を自動的に取得します (たとえば、新規リリースをデプロイする場合)。</li>
+
+      </ul>
+
+      <div><h2 class="slds-text-heading_medium slds-p-top_small">パスワードの回復</h2><p>全インスタンスのパスワードに責任をもつ管理者を 1 人任命することをすべての顧客およびパートナーにお勧めします。この管理者は通常、各新規インスタンスに含まれるデフォルトの <em>Admin</em> ユーザーアカウントです。Admin ユーザーは、他のアカウントを作成して名前を付け、同様の管理者許可をもたせることができます。</p><p>デベロッパーは独自のアカウントを使用してインスタンスにアクセスし、グローバル管理者のパスワードを変更またはリセットすることはありません。dbinit を Sandox (サンドボックス) インスタンス上で実行した後、管理者は Sandox (サンドボックス) のパスワードをオリジナルのパスワードに戻す責任があります。
+         </p><p>セキュリティ設定では、管理者が Business Manager のパスワードの動作を構成できます。パスワードを忘れた場合、管理者は<em>パスワードを忘れましたか</em> 機能を使用してパスワードを取得するか、リセットできます。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Salesforce サポートでは、admin アカウントのメイン管理者パスワードのみがリセットされます。Admin ユーザーとしてログインしたユーザーのみが、管理者の許可をもつ他のアカウントをリセットできます。</div></div></div>
+</div>
+      <div><h2 class="slds-text-heading_medium slds-p-top_small">インポートとエクスポート</h2><p class="bodytext">管理者の役割を削除しようとすると (たとえば、削除モードのインポートを使用した場合)、インポートロジックによって拒否されます。システムモジュールのアクセス権限を変更しようとした場合 (たとえば、置換モードのインポートを使用) も、インポートロジックによって拒否されます。インポートログには、両方のケースが警告として記録されます。</p></div>
+   
+<div id="b2c_bm_module_permissions" lang="ja-jp" aria-labelledby="ariaid-title2" class="nested1"><a name="b2c_bm_module_permissions"></a>
+   <h2 class="slds-text-heading_medium slds-p-top_small">Business Manager のモジュールの許可</h2>
+   
+   <p>モジュールの許可を使用して、特定の Business Manager モジュールへのアクセスを付与します。ログインしているユーザーが Business Manager モジュールへのアクセス許可を持っている場合、アプリケーションが左側のナビゲーションペインに表示されます。</p>
+
+      <p>特定のモジュールと環境設定に読み取り専用許可を付与します。読み取り専用許可をもつユーザーは、環境設定とモジュールを表示できますが、編集はできません。読み取り専用許可は、顧客、商品、商品セット、グローバルカスタム環境設定、コンテンツアセット、顧客、在庫リスト、ジョブ履歴、ライブラリ、ライブラリフォルダー、注文、価格表、商品、商品セット、サイト環境設定、およびバリエーション属性の各モジュールで使用できます。書き込みアクセスを有効にすると、読み取りアクセスも有効になります。</p>
+      <p>また、すべてのサイト固有の環境設定において、Business Manager モジュールへの読み取り専用許可を付与できます。これらの環境設定には、ロック、買い物カゴ、A/B テスト、地域情報、通貨、ソースコード、ギフト券、誘導検索、シーケンス番号、注文、クーポン、プロモーション、Storefront Toolkit、ストアフロント URL、システムオブジェクトの定義、およびカスタム環境設定が含まれます。</p>
+      <p class="bodytext">Business Manager モジュールにサイト固有の機能がある場合、許可の対象は、特定のサイトのコンテキスト内、または組織全体になります。たとえば、注文はサイトの中で管理されるため、注文モジュールの許可の対象はサイトになります。</p>
+   
+</div>
+<div id="b2c_bm_locale_permissions" lang="ja-jp" aria-labelledby="ariaid-title3" class="nested1"><a name="b2c_bm_locale_permissions"></a>
+   <h2 class="slds-text-heading_medium slds-p-top_small">Business Manager の地域情報の許可</h2>
+   
+   <p>Business Manager はビジネスオブジェクトのローカライゼーションをサポートしています。地域情報のデータにアクセスできるユーザーを指定します。</p>
+
+      <p>ユーザーに地域情報へのアクセスを付与するには、まず役割と許可のページの地域情報タブを使用して役割を作成します。この役割をユーザーに割り当てます。書き込みアクセスを有効にすると、読み取りアクセスも有効になります。各役割には、少なくともデフォルトの地域情報の読み取り許可が必要なので、読み取り許可は自動的に割り当てられます。</p>
+      <p>たとえば、書き込み許可をもつユーザーは、地域情報内の商品を編集できます。これらのユーザーは、説明や名前などのローカライズ可能なフィールドと、ブランドやマーチャンダイザーなどのローカライズ不可能なフィールドを編集できます。</p>
+      <p>選択した地域情報で読み取り許可のみをもつユーザーは、ローカライズ不可能なフィールドを含め、フィールドを編集することはできません。</p>
+   
+</div>
+<div id="b2c_bm_functional_permissions" lang="ja-jp" aria-labelledby="ariaid-title4" class="nested1"><a name="b2c_bm_functional_permissions"></a>
+   <h2 class="slds-text-heading_medium slds-p-top_small">Business Manager の機能の許可</h2>
+   
+   <p>機能の許可は、B2C Commerce のツールモジュールには関連付けられていません。機能の許可により、ユーザーは B2C Commerce の特定の機能を実行できるようになります。</p>
+
+      <p>たとえば、Alice を ABC というサイトで顧客の代わりにログインできるエージェントにするには、サイト ABC の機能の許可 <code><em>Login_On_Behalf</em></code> を Alice に割り当てます。</p>
+      <p>データを編集するには、これらの許可と Business Manager モジュールの許可の両方をもっている必要があります。</p>
+      <div><h3 class="slds-text-heading_small slds-p-top_small">組織全体の機能の許可</h3><p>次の表に、組織全体に適用される機能の許可をリストします。 </p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col><col></colgroup><thead class="slds-text-title_caps">
+                  <tr class="">
+                     <th id="d168625e205" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">許可</th>
+                     <th id="d168625e208" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+                  </tr>
+               </thead><tbody>
+                  <tr class="">
+                     <td headers="d168625e205" style="vertical-align:top;" class="slds-cell-wrap" data-label="許可">Access_Customer_and_Customerlist_Impex</td>
+
+                     <td headers="d168625e208" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Business Manager のインポート &amp; エクスポートモジュールの顧客と顧客リストへのアクセスを制御します。ユーザーはインポートボタンとエクスポートボタンにアクセスでき、データをインポートおよびエクスポートできます。承認を制限すると、データのインポートとエクスポート操作をより適切に制御できます。これにより、組織はデータの整合性を維持し、セキュリティポリシーに従うことができます。ユーザーは、インポートとエクスポートのページで、関連するファイルとステータスの概要を表示できます。</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d168625e205" style="vertical-align:top;" class="slds-cell-wrap" data-label="許可">Replication_Run_For_Org</td>
+
+                     <td headers="d168625e208" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ユーザーが、グローバルレプリケーションタスク (つまり、システムオブジェクトタイプの定義) のデータのレプリケーション処理を管理し、開始できるようにします。</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d168625e205" style="vertical-align:top;" class="slds-cell-wrap" data-label="許可">Manage_All_Catalogs</td>
+
+                     <td headers="d168625e208" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>可能な操作:</p><ul>
+                           <li>組織のカタログを表示、作成、編集する</li>
+
+                           <li>カタログをサイトに割り当てる</li>
+
+                           <li>全サイトについて全言語の全カタログの全アセットを表示、作成、編集する</li>
+
+                        </ul>
+<p style="margin-bottom:0;">カタログ、カテゴリ、商品、推奨品、バリエーション属性、オプション、商品カテゴリの割り当て、カテゴリ画像へのアクセスを許可します。この許可を、商品、カタログ、商品オプション、商品セット、推奨項目、バリエーション属性の各モジュールにアクセスする必要のあるユーザーに割り当てます。</p></td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d168625e205" style="vertical-align:top;" class="slds-cell-wrap" data-label="許可">Delete_All_Catalogs</td>
+
+                     <td headers="d168625e208" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>可能な操作:</p><ul>
+                           <li>組織のカタログを削除する</li>
+
+                           <li>全サイトについて全言語の全カタログの全アセットを削除する</li>
+
+                        </ul>
+<p style="margin-bottom:0;">Manage_Site_Catalog機能許可とDelete_All_Catalogs機能許可をもっていても、カタログを削除することはできません。Manage_All_Catalogs と Delete_All_Catalogs の両方をもつユーザーのみがカタログを削除できます。リリース 16.3 の時点では、以前に _Manage\_All\_Catalogs_ の許可をもっていたユーザーは、自動的に追加の Delete_All_Catalogs 許可を割り当てられます。</p></td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d168625e205" style="vertical-align:top;" class="slds-cell-wrap" data-label="許可">Manage_All_Libraries</td>
+
+                     <td headers="d168625e208" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p style="margin-bottom:0;">すべてのサイトのすべてのライブラリとそのコンテンツアセットをユーザーが管理できるようにします。</p></td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d168625e205" style="vertical-align:top;" class="slds-cell-wrap" data-label="許可">Manage_All_PriceBooks</td>
+
+                     <td headers="d168625e208" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>可能な操作:</p><a name="b2c_bm_functional_permissions__ul_jvp_ypw_fwb"></a><ul id="b2c_bm_functional_permissions__ul_jvp_ypw_fwb">
+                           <li>組織の価格表を表示、作成、編集、作成する</li>
+
+                           <li>価格表をサイトに割り当てる</li>
+
+                           <li>全商品の全価格表の価格を表示、作成、編集、削除する</li>
+
+                           <li>商品オプションと共有オプション価格を表示、作成、編集、削除する (オプション価格は価格表に含まれない)</li>
+
+                        </ul>
+<p style="margin-bottom:0;">価格表、商品価格、およびオプション価格へのアクセスを許可します。この許可を、商品、商品オプション、または価格表にアクセスする必要のあるユーザーに割り当てます。</p></td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d168625e205" style="vertical-align:top;" class="slds-cell-wrap" data-label="許可">Manage_Inventory</td>
+
+                     <td headers="d168625e208" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>可能な操作:</p><a name="b2c_bm_functional_permissions__ul_rw1_1qw_fwb"></a><ul id="b2c_bm_functional_permissions__ul_rw1_1qw_fwb">
+                           <li>在庫リストを表示、作成、編集、削除する</li>
+
+                           <li>在庫リストをサイトに割り当てる</li>
+
+                           <li>全商品について全在庫リストの在庫レコードを表示、作成、編集、削除する</li>
+
+                        </ul>
+<p style="margin-bottom:0;">在庫リストと在庫レコードにアクセスできます。この許可を、商品と在庫の各モジュールにアクセスする必要のあるユーザーに割り当てます。</p></td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d168625e205" style="vertical-align:top;" class="slds-cell-wrap" data-label="許可">Merge_Customers</td>
+
+                     <td headers="d168625e208" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ユーザーが、ある顧客リストの顧客を別の顧客リストにマージできるようにします。</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d168625e205" style="vertical-align:top;" class="slds-cell-wrap" data-label="許可">View_Coupon_Codes</td>
+
+                     <td headers="d168625e208" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Business Manager、Open Commerce API (OCAPI)、およびエクスポート機能を通じて、完全なクーポンコードの表示をユーザーに許可します。</td>
+
+                  </tr>
+               </tbody></table></div>
+      <div><h3 class="slds-text-heading_small slds-p-top_small">サイト全体の機能の許可</h3><p>次の表に、役割を特定のサイトに制限するために使用できる機能の許可を示します。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col><col></colgroup><thead class="slds-text-title_caps">
+                  <tr class="">
+                     <th id="d168625e376" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">許可</th>
+                     <th id="d168625e379" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+                  </tr>
+               </thead><tbody>
+                  <tr class="">
+                     <td headers="d168625e376" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="許可">Login_On_Behalf</td>
+
+                     <td headers="d168625e379" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="説明">管理者が Create_Order_On_Behalf_Of 機能許可ももっている場合に、顧客の代わりにストアフロントにログインすることをその管理者に許可します。たとえば、コールセンターアプリケーションはストアフロントのデータにアクセスできますが、ストアフロントに限定されます。</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d168625e376" style="vertical-align:top;" class="slds-cell-wrap" data-label="許可">Replication_Run_For_Site</td>
+
+                     <td headers="d168625e379" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ユーザーが、サイト固有のレプリケーションタスク (つまり、検索インデックス) のデータのレプリケーション処理を管理し、開始できるようにします。</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d168625e376" style="vertical-align:top;" class="slds-cell-wrap" data-label="許可">Login_Agent</td>
+
+                     <td headers="d168625e379" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ストアフロントの顧客としてアプリケーションでログインできるようにします。<code>Login_Agent</code> の許可をもつ Business Manager ユーザーにのみアクセスを許可します。この許可によって、コールセンターアプリケーションなどのアプリケーションでストアフロントデータにアクセスできますが、特定のサイトへのアクセスは制限されます。</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d168625e376" style="vertical-align:top;" class="slds-cell-wrap" data-label="許可">Manage_Site_Catalog</td>
+
+                     <td headers="d168625e379" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>ストアフロントのカタログ商品について、ユーザーが実行可能な操作:</p><ul>
+                           <li>ローカライズされていないすべての属性を表示、作成、編集、削除する</li>
+
+                           <li>全地域情報でローカライズされた属性を表示する</li>
+
+                           <li>許可されているサイト地域情報について、ローカライズされた属性を表示、作成、編集、削除する</li>
+
+                        </ul>
+<p>別のカタログによって所有されているがストアフロントカタログに割り当てられている商品について、ユーザーが実行可能な操作: </p><ul>
+                           <li>ローカライズされていない属性を表示する</li>
+
+                           <li>全地域情報でローカライズされた属性を表示する</li>
+
+                           <li>その他のカタログすべてを閲覧し、その他のカタログから商品をストアフロントカタログに割り当てる</li>
+
+                        </ul>
+</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d168625e376" style="vertical-align:top;" class="slds-cell-wrap" data-label="許可">Manage_Site_PriceBooks</td>
+
+                     <td headers="d168625e379" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>可能な操作:</p><a name="b2c_bm_functional_permissions__ul_iz3_bqw_fwb"></a><ul id="b2c_bm_functional_permissions__ul_iz3_bqw_fwb">
+                           <li>サイトの価格表を表示する</li>
+
+                           <li>サイト商品のサイト価格表の価格を表示、作成、編集、削除する</li>
+
+                        </ul>
+<p>ユーザーに許可されない操作: </p><ul>
+                           <li>サイトの価格表の属性を編集する</li>
+
+                           <li>サイト外の価格表を表示する</li>
+
+                        </ul>
+<p>サイトの価格表は、サイトに直接割り当てられているか、またはソースコードを使用して割り当てられています。この許可をもつユーザーは、サイトやソースコードにに割り当てられていない価格表を編集することはできません。</p><p style="margin-bottom:0;">サイトの価格表、商品価格、およびオプション価格にアクセスできます。この許可を、商品、商品オプション、または価格表にアクセスする必要のあるユーザーに割り当てます。</p></td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d168625e376" style="vertical-align:top;" class="slds-cell-wrap" data-label="許可">Manage_Site_Inventory</td>
+
+                     <td headers="d168625e379" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p> 可能な操作:</p><a name="b2c_bm_functional_permissions__ul_hvc_cqw_fwb"></a><ul id="b2c_bm_functional_permissions__ul_hvc_cqw_fwb">
+                           <li>サイトの在庫リストを表示する</li>
+
+                           <li>サイトの商品について、サイトの在庫リストのレコードを表示、作成、編集、削除する</li>
+
+                        </ul>
+<p>ユーザーに許可されない操作:</p><ul>
+                           <li>サイトの在庫リストの属性を編集する</li>
+
+                           <li>サイト外の在庫リストを表示する</li>
+
+                        </ul>
+<p style="margin-bottom:0;">在庫リストと在庫レコードにアクセスできます。この許可を、商品と在庫の各モジュールにアクセスする必要のあるユーザーに割り当てます。</p></td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d168625e376" style="vertical-align:top;" class="slds-cell-wrap" data-label="許可">Manage_Site_Library</td>
+
+                     <td headers="d168625e379" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">地域情報のアセットの編集をユーザーに許可します。アクセス許可のあるサイトの 1 つでその地域情報がアクティブである必要があります。地域情報が有効になっていないと、コンテンツは編集できません。</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d168625e376" style="vertical-align:top;" class="slds-cell-wrap" data-label="許可">Adjust_Item_Price</td>
+
+                     <td headers="d168625e379" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">品目レベルにおける価格調整の追加または削除をユーザーに許可します。</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d168625e376" style="vertical-align:top;" class="slds-cell-wrap" data-label="許可">Adjust_Shipping_Price</td>
+
+                     <td headers="d168625e379" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">配送レベルにおける価格調整の追加または削除をユーザーに許可します。</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d168625e376" style="vertical-align:top;" class="slds-cell-wrap" data-label="許可">Adjust_Order_Price</td>
+
+                     <td headers="d168625e379" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">注文レベルにおける価格調整の追加または削除をユーザーに許可します。</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d168625e376" style="vertical-align:top;" class="slds-cell-wrap" data-label="許可">Delete_Order_Note</td>
+
+                     <td headers="d168625e379" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">注文レベルまたは買い物カゴレベルでのメモの削除をユーザーに許可します。</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d168625e376" style="vertical-align:top;" class="slds-cell-wrap" data-label="許可">Delete_Order</td>
+
+                     <td headers="d168625e379" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">すべての注文情報 (注文の個人データを含む) の削除をユーザーに許可します。</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d168625e376" style="vertical-align:top;" class="slds-cell-wrap" data-label="許可">Create_Order_On_Behalf_Of</td>
+
+                     <td headers="d168625e379" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">顧客の代わりにストアフロントにログインすることを管理者に許可します。また、Shop API 経由で注文を作成することをエージェントに許可します。</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d168625e376" style="vertical-align:top;" class="slds-cell-wrap" data-label="許可">Search_Orders</td>
+
+                     <td headers="d168625e379" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Shop API 経由でエージェントとして注文を検索することをユーザーに許可します。</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d168625e376" style="vertical-align:top;" class="slds-cell-wrap" data-label="許可">Handle_External_Orders</td>
+
+                     <td headers="d168625e379" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">Shop API 経由でエージェントとして外部注文を処理することをユーザーに許可します。</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d168625e376" style="vertical-align:top;" class="slds-cell-wrap" data-label="許可">Access_Protected_Storefront</td>
+
+                     <td headers="d168625e379" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">パスワードで保護されているストアフロントへのアクセスをユーザーに許可します。</td>
+
+                  </tr>
+               </tbody></table></div>
+   
+</div>
+<div id="b2c_using_web_dav_permissions" lang="ja-jp" aria-labelledby="ariaid-title5" class="nested1"><a name="b2c_using_web_dav_permissions"></a>
+   <h2 class="slds-text-heading_medium slds-p-top_small">WebDAV の許可</h2>
+   
+   <p>特定の WebDAV フォルダーへのアクセスを付与するには、WebDAV の許可を使用します。WebDAV の許可は組織全体に適用されます。</p>
+
+      <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col><col></colgroup><thead class="slds-text-title_caps">
+               <tr class="">
+                  <th id="d168625e635" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">許可</th>
+                  <th id="d168625e638" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+               </tr>
+            </thead><tbody>
+               <tr class="">
+                  <td headers="d168625e635" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="許可">
+                     <code>/cartridges</code>
+                  </td>
+
+                  <td headers="d168625e638" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="説明"><code>/cartridges</code> フォルダーとそのサブフォルダー内のファイルへの書き込みアクセス。</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d168625e635" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="許可">
+                     <code>/catalogs/*</code>
+                  </td>
+
+                  <td headers="d168625e638" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="説明">組織のカタログへの読み取りまたは書き込みのアクセス。すべてのカタログへのアクセス、または選択したカタログへのアクセスを付与できます。</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d168625e635" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="許可">
+                     <code>/dynamic/*</code>
+                  </td>
+
+                  <td headers="d168625e638" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="説明">組織の動的フォルダーへの読み取りまたは書き込みのアクセス。すべての動的フォルダー、または選択した動的フォルダーへのアクセスを許可します。</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d168625e635" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="許可">
+                     <code>/libraries/*</code>
+                  </td>
+
+                  <td headers="d168625e638" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="説明">組織のライブラリへの読み取りまたは書き込みアクセス。すべてのライブラリまたは選択したライブラリへのアクセスを許可します。</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d168625e635" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="許可">
+                     <code>/realmdata</code>
+                  </td>
+
+                  <td headers="d168625e638" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="説明"><code>/realmdata</code> フォルダーとそのサブフォルダー内のファイルへの書き込みアクセス。</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d168625e635" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="許可">
+                     <code>/securitylogs</code>
+                  </td>
+
+                  <td headers="d168625e638" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="説明"><code>/securitylogs</code> フォルダーとそのサブフォルダー内のファイルへの読み取りアクセス。</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d168625e635" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="許可">(その他のすべてのフォルダー)</td>
+
+                  <td headers="d168625e638" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="説明">その他の最上位フォルダーへの読み取りまたは書き込みのアクセス。</td>
+
+               </tr>
+            </tbody></table>
+      <div><h3 class="slds-text-heading_small slds-p-top_small">Impex フォルダーの許可</h3><p>アスタリスクがついているルートフォルダーに許可を与えると、特定のサブフォルダーに許可を付与していなくても、B2C Commerce はそのすべてのサブフォルダーに完全な許可を付与します。アスタリスクがついているサブフォルダーの場合、サブフォルダーの許可を読み取り専用に設定しない限り、B2C Commerce はそのすべてのサブフォルダーに対する読み取りと書き込みの許可も付与します。</p><p>たとえば、ルートフォルダー <code>/impex/*</code> にはアスタリスクが含まれています。ユーザーは許可が付与されていない場合でも、<code>/impex/subfolder</code> へのアクセスをもちます。</p><p>サブフォルダー<code>/impex/test/*</code>で、読み取りオプションを選択して、<code>/impex/test/subfolder</code>へのアクセスを読み取り専用に制限します。</p></div>
+   
+</div>
+<div id="b2c_assigning_price_adjustment_limits" lang="ja-jp" aria-labelledby="ariaid-title6" class="nested1"><a name="b2c_assigning_price_adjustment_limits"></a>
+   <h2 class="slds-text-heading_medium slds-p-top_small">価格調整の制限の割り当て</h2>
+   
+   <p>Business Manager で手動による価格調整の制限をユーザーごとに割り当てます。制限を適用する対象として、1 つのサイト、複数のサイト、またはすべてのサイトのコンテキストを選択できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>         <tr class="">           <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+         </tr>       </tbody></table></div>
+      <div><p>Script API <code>dw.order.LineItemCtnr.verifyPriceAdjustmentLimits()</code>を使用したプログラムによるアクセス制限。</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>POST /baskets/\{basket_id\}/price_adjustments</code></pre><p>価格調整の制限は、サイトのインポート/エクスポートを通じてインポートおよびエクスポートします。 </p></div>
+      <ol><li>
+            <span><span class="menucascade"><strong class="uicontrol">管理</strong> | <strong class="uicontrol">組織</strong> | <strong class="uicontrol">役割と許可</strong></span>の順に選択し、<var>管理者</var>を選択します。</span>
+         </li><li>
+            <span><strong class="uicontrol">価格調整の制限</strong>タブで、許可を割り当てるコンテキストを選択します。</span>
+         </li><li>
+            <span><strong class="uicontrol">適用</strong>をクリックします。</span>
+         </li><li>
+            <span>制限を追加するには、<strong class="uicontrol">追加</strong>をクリックします。</span>
+         </li><li>
+            <span>価格調整の制限の追加ウィンドウで、タイプ (商品、配送、または注文)、通貨、および金額を選択します。</span>
+            <div>価格調整の制限の検証では、価格調整の<a target="_blank" href="https://developer.salesforce.com/docs/commerce/b2c-commerce/guide/b2c-setting-permissions-for-csc.html">許可</a>が設定されているアクセスの役割のみが考慮されます。手動による価格調整を検証する場合は、特定のタイプの価格調整許可をもつアクセス役割に割り当てられている価格調整の制限のみが考慮されます。価格調整の許可のタイプ (商品、注文、または配送) は、手動による価格調整のタイプによって異なります。役割にアクセスできるすべてのユーザーが手動による商品価格の調整を無制限に作成しないように、商品、注文、または配送の価格調整の許可をもつアクセス役割に対して価格調整の制限を定義します。</div>
+         </li><li>
+            <span>コンテキストを変更するには、<strong class="uicontrol">コンテキストの選択</strong>をクリックします。</span>
+            <div>たとえば、コンテキストを 1 つのサイトから複数のサイトに変更すると、未割当の制限を表示できます。</div>
+         </li><li>
+            <span>制限を割り当てるには、制限の横にあるチェックボックスをオンにして、[ <strong class="uicontrol">更新</strong> ] をクリックします。</span>
+         </li><li>
+            <span>制限の割り当てを解除するには、制限の横にあるボックスをオフにして、[ <strong class="uicontrol">更新</strong> ] をクリックします。</span>
+         </li><li>
+            <span>変更を元に戻すには、<strong class="uicontrol">更新</strong>をクリックする前に<strong class="uicontrol">戻す</strong>をクリックします。</span>
+            <div><strong class="uicontrol">更新</strong>をクリックすると、変更を元に戻すことはできません。</div>
+         </li></ol>
+
+   
+</div>
+<div id="b2c_audit_a_permission" lang="ja-jp" aria-labelledby="ariaid-title7" class="nested1"><a name="b2c_audit_a_permission"></a>
+   <h2 class="slds-text-heading_medium slds-p-top_small">特定の許可をもつすべてのユーザーの検索</h2>
+   
+   <p>どのユーザーがモジュールへの読み取りまたは書き込みのアクセス権を持っているかを確認します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>         <tr class="">           <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+         </tr>       </tbody></table></div>
+      <ol><li>
+            <span><span class="menucascade"><strong class="uicontrol">管理</strong> | <strong class="uicontrol">組織</strong> | <strong class="uicontrol">権限の監査</strong></span>の順に選択します。</span>
+         </li><li>
+            <span>許可を選択して、オプションでアクセスレベルまたはサイトを選択します。</span>
+         </li><li>
+            <span><strong class="uicontrol">検索</strong>をクリックします。</span>
+         </li><li>
+            <span>ユーザーリストの並べ替えやフィルターを行うには、<strong class="uicontrol">CSV にエクスポート</strong>をクリックします。</span>
+            <div>CSV 形式では、並べ替えとフィルターの機能が提供されます。</div>
+         </li></ol>
+
+   
+</div>
+</div>
+</div></div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_authentication_and_authorization">
+<h1 class="slds-text-heading_large">B2C Commerce での認証と承認</h1>
+   <p>認証と承認は、重要なセキュリティの概念です。セキュリティコントロールを構成するには、Business Manager にアクセスする必要があります。</p>
+
+<ul><li class="slds-p-bottom_small"><strong><a href="get_started.html#b2c_introduction_to_roles">B2C Commerce の役割の概要</a></strong><br>Business Manager では、認証を実行してユーザーが実際に名乗っている人物かどうかを判定できます。また、ユーザーが実行しようとしている特定の操作を行う許可があるかどうかを判定するために承認を行います。 </li><li class="slds-p-bottom_small"><strong><a href="security-2.html#b2c_shopper_authentication">B2C Commerce での買い物客の認証</a></strong><br>買い物客はストアフロントで登録を行ってアカウントを作成するか、匿名のままでいることができます。たとえば、ストアフロントを閲覧するには、買い物客はアカウントにログインしたり、アカウントを作成したりする必要はありません。ただし、買い物客がアカウントを作成すると、請求先住所、クレジットカード、以前の注文などの情報を取得します。また、認証済みの買い物客は、ギフトレジストリやほしい物リストなど、匿名の買い物客は利用できない機能にアクセスできます。</li><li class="slds-p-bottom_small"><strong><a href="security-2.html#b2c_user_authentication_and_authorization">B2C Commerce でのユーザーの認証と承認</a></strong><br>管理者は、Business Manager でセキュリティコントロールを構成します。Business Manager ユーザーが実際に名乗っている人物かどうかを判定するために認証を行う必要があります。また、ユーザーが実行しようとしている特定の操作を行う許可があるかどうかを判定するために承認を行います。</li><li class="slds-p-bottom_small"><strong><a href="#b2c_ocapi_client_authentication_and_authorization">B2C Commerce での OCAPI クライアントの認証と承認</a></strong><br>Open Commerce API (OCAPI) は、OCAPI クライアントが使用する RESTful インターフェイスを提供します (カスタムコード)。ここでは、OCAPI のクライアントの認証と承認を説明します。 </li><li class="slds-p-bottom_small"><strong><a href="security-2.html#b2c_webdav_authentication_and_authorization">B2C Commerce での WebDAV の認証と承認</a></strong><br>WebDAV は、データやコードファイルのアップロードとダウンロードを可能にするプロトコルです。マーチャントは WebDAV リクエストをインスタンスの WebDAV サーバーに送信します。マーチャントの WebDAV クライアントは Business Manager ユーザー、またはマシン対マシンのインタラクションのための API クライアントとすることができます。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_certificates_and_private_keys">
+<h1 class="slds-text-heading_large">B2C Commerce の秘密鍵と証明書</h1>
+   
+   <p>さまざまなシナリオで、サードパーティの証明書と秘密鍵をインスタンスの鍵ストアにインポートする必要が生じます。鍵ストアは複数のエントリを保存できます。各エントリはタイプ <code>PrivateKeyEntry</code> または <code>TrustedCertificateEntry</code> とすることができます。これは <code>java.security.KeyStore</code> で使用される用語と同様です。</p>
+
+      <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Salesforce B2C Commerce では、内部パスワードを使用してインスタンスの鍵ストアを暗号化します。</div></div></div>
+
+      <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-tip"><img alt="ヒント" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_tip.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">ヒント</span> リリース 26.1 から 26.3 では、移行中および証明書の更新時に、証明書と秘密鍵のインポート日が誤ってリセットされていました。リリース 26.4 以降、インポート日が正しく表示されるようになりました。リリース 26.1 より前にインポートされた証明書と鍵には、元の正しいインポート日が表示されます。新しくインポートされたすべての証明書と鍵には、正確なインポート日が表示されます。</div></div></div>
+
+      <div id="b2c_certificates_and_private_keys__b2c_private_key_entry"><a name="b2c_certificates_and_private_keys__b2c_private_key_entry"></a><h2 class="slds-text-heading_medium slds-p-top_small">秘密鍵のエントリ</h2><p>インスタンスの鍵ストアの各 <code>PrivateKeyEntry</code> は、秘密鍵とそれに対応する公開鍵を保持します。この鍵のセットは、外部 Web サービスと通信し、ファイルを自分のインスタンスの WebDAV クライアントから外部の WebDAV サーバーに転送するために使用されます。<code>KeyRef</code> または <code>CertificateRef</code> パラメーターを使用するカスタムコードは、データの暗号化または復号化の際にこれらの鍵を使用します。たとえば、データの暗号化や復号化に使用されるカスタムコードなどです。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> eCDN に必要な証明書を、インスタンスの鍵ストアではなく、eCDN の鍵ストアに個別にインポートします。</div></div></div>
+</div>
+      <div id="b2c_certificates_and_private_keys__b2c_trusted_certificate_entry"><a name="b2c_certificates_and_private_keys__b2c_trusted_certificate_entry"></a><h2 class="slds-text-heading_medium slds-p-top_small">信頼できる証明書のエントリ</h2><p>インスタンスの鍵ストアの各<code>TrustedCertificateEntry</code>は、アウトバウンド SSL 接続を確立するときにサーバー証明書を検証する公開鍵証明書を保持します。デフォルトでは、B2C Commerce は Oracle の Java プラットフォームとともに出荷されるルート CA のみを認識します。ただし、CA 証明書をインスタンスの鍵ストアにインポートできます。</p></div>
+      <div id="b2c_certificates_and_private_keys__b2c_certificate_rotation"><a name="b2c_certificates_and_private_keys__b2c_certificate_rotation"></a><h2 class="slds-text-heading_medium slds-p-top_small">証明書のローテーション</h2><p>証明書とそれに対応する秘密鍵のローテーションは、有効期限の切れた証明書、無効にされた証明書、または秘密鍵の漏洩への対処など、さまざまな理由で重要です。証明書の有効期限が切れた場合、証明書のローテーションは通信を保護するために証明書を引き続き使用するために必要となります。証明書が無効になった場合や秘密鍵が漏洩した場合は、攻撃者が証明書を悪用するのを防ぐために証明書のローテーションが必要となります。</p><p>カスタムコードを使用して保管されているデータを保護するために証明書のローテーションを使用する場合は、以前の鍵で暗号化されたデータを扱わなければならないため、状況はより複雑になります。</p><p>このような状況に対応するには、次の手順に従います。</p><ol>
+            <li>
+                    新しい鍵を生成します。
+                </li>
+
+            <li>
+                    古い鍵で暗号化されたデータを特定します。
+                </li>
+
+            <li>
+                    古い鍵を使用してデータを復号化します。
+                </li>
+
+            <li>
+                    新しい鍵を使用してデータを再度暗号化します。
+                </li>
+
+            <li>
+                    古い鍵と、古い鍵で暗号化されたデータを削除します。
+                </li>
+
+         </ol><p>古い鍵で暗号化されたデータをこのプロセスで特定できなかった場合は、古い鍵は維持しておきます。</p></div>
+   
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_commerce_security_guide">
+<h1 class="slds-text-heading_large">B2C Commerce セキュリティガイド</h1>
+   
+   <p>お客様のサイトをセキュリティの脅威から保護するために、Salesforce B2C Commerce 環境を設定、管理、開発する際には当社のセキュリティのベストプラクティスに従ってください。  </p>
+
+      <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Salesforce では、『B2C Commerce セキュリティガイド』のトピックを情報提供のみを目的として提供しています。このドキュメントは法的なアドバイスではなく、このドキュメントを使用することで弁護士と依頼人の関係が成立することはありません。Salesforce は、顧客、および将来顧客となる可能性のある会社に対し、自社の弁護士に相談し、自分の会社の特定の状況に適用されるセキュリティ要件をよく理解しておくことを強くお勧めします。 <p>このガイドで説明する Salesforce の現在の製品は、このドキュメントの発行日時点におけるものであり、事前の通知なしに変更される場合があります。お客様はこのドキュメントに含まれる情報と、お客様の Salesforce との契約に基づく Salesforce の製品やサービスの使用を独自に評価する責任をもちます。このドキュメントは、Salesforce とお客様の間の契約を変更するものではありません。 </p></div></div></div>
+
+   
+<ul><li class="slds-p-bottom_small"><strong><a href="#b2c_commerce_security_model">B2C Commerce のセキュリティモデル</a></strong><br>Salesforce B2C Commerce のセキュリティは、Salesforce と当社の B2C Commerce の顧客間のパートナーシップです。いつもお伝えしているように、Salesforce では信頼が最大の価値であると認識しています。当社では、システムの可用性、パフォーマンス、セキュリティにおいて、最高の水準をお届けするために全力を注いでいます。</li><li class="slds-p-bottom_small"><strong><a href="#b2c_general_security_best_practices">B2C Commerce の一般的なセキュリティのベストプラクティス</a></strong><br>Salesforce では、データの機密性、整合性、可用性がビジネスに不可欠なものだと理解しています。当社ではお客様がセキュリティの脅威に対する最大の保護をサイトに実装することを推奨しています。また、Salesforce B2C Commerce 環境を設定する際には次の中核となるベストプラクティスに従うことをお勧めします。</li><li class="slds-p-bottom_small"><strong><a href="#b2c_security_best_practices_for_administrators">B2C Commerce 管理者のためのセキュリティのベストプラクティス</a></strong><br>Business Manager を使用してサイトを保護し、買い物客のために安全なオンラインショッピング環境を確保できます。また、こうすることで Business Manager が保護され、以前に構成したセキュリティコントロールが攻撃者によって削除されるのを防ぐことができます。</li><li class="slds-p-bottom_small"><strong><a href="security-2.html#b2c_security_best_practices_for_developers">B2C Commerce のデベロッパーのためのセキュリティのベストプラクティス</a></strong><br>B2C Commerce のデベロッパーは、これらのセキュリティのベストプラクティスを使用して安全なストアフロントを開発します。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_commerce_security_model">
+<h1 class="slds-text-heading_large">B2C Commerce のセキュリティモデル</h1>
+   <p>Salesforce B2C Commerce のセキュリティは、Salesforce と当社の B2C Commerce の顧客間のパートナーシップです。いつもお伝えしているように、Salesforce では信頼が最大の価値であると認識しています。当社では、システムの可用性、パフォーマンス、セキュリティにおいて、最高の水準をお届けするために全力を注いでいます。</p>
+
+<ul><li class="slds-p-bottom_small"><strong><a href="general-6.html#b2c_shared_responsibility_model">責任共有モデル</a></strong><br>eコマースサイトとプラットフォームは、サイバー攻撃の標的として魅力的なものです。サイバー攻撃者は、クレジットカード、個人を特定できる情報 (PII)、認証情報などの機密情報を入手できる場所を探します。また、注文ワークフローもサイバー犯罪者が利益を得るうえで標的となる攻撃面です。攻撃者は偽の注文を作成し、クーポンとプロモーションを調整して、正規の買い物客がサービスを利用できないようにします。</li><li class="slds-p-bottom_small"><strong><a href="security-2.html#b2c_security_managed_by_salesforce">Salesforce が管理するセキュリティ</a></strong><br>Salesforce では、B2C Commerce の開発においてセキュリティが焦点であることを保証し、安全な開発とプラットフォームレベルのセキュリティを提供しています。</li><li class="slds-p-bottom_small"><strong><a href="customer-3.html#b2c_security_managed_by_customer">顧客が管理するセキュリティ</a></strong><br>Salesforce では構成可能なさまざまなセキュリティコントロールを提供しており、承認を受けた管理者はこれらのコントロールを使用して Salesforce B2C Commerce プラットフォームのインスタンスを保護できます。顧客は追加のコントロールを使用して、セキュリティのフットプリントをさらにカスタマイズできます。 </li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_configure_zone_firewall_settings">
+<h1 class="slds-text-heading_large">eCDN ゾーンのファイアウォール設定の構成</h1>
+ 
+ 
+ <p>Business Manager のゾーンの構成インターフェイスを使用して、eCDN ゾーンのファイアウォール設定を構成します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+  <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+
+      </tr>
+     </tbody></table></div>
+  
+  <ol><li>
+    <span>Business Manager でアプリケーションランチャーをクリックし、<span class="menucascade"><strong class="uicontrol">管理</strong> | <strong class="uicontrol">サイト</strong> | <strong class="uicontrol">埋め込み CDN 設定</strong></span>の順に選択します。</span>
+   </li><li>
+    <span>構成するゾーンを見つけ、ドロップダウンメニューから<strong class="uicontrol">「ゾーンの構成</strong>」を選択します。</span>
+   </li><li>
+    <span>「<strong class="uicontrol">ファイアウォール</strong>」タブを選択します。</span>
+   </li></ol>
+
+ 
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_configure_zone_waf_settings">
+<h1 class="slds-text-heading_large">eCDN ゾーンの WAF 設定の構成</h1>
+ 
+ <p>Business Manager でのゾーンの構成の セキュリティルールタブを使用して、eCDN ゾーンの Web Application Firewall (WAF) 管理ルールセットを構成します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+  <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+      <tr class="">
+       <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+
+      </tr>
+     </tbody></table></div>
+ <div><p>「セキュリティ・ルール」タブには、「<strong class="uicontrol">ゾーン・セキュリティ・ルール</strong>」の下部に「<strong class="uicontrol">WAFルール</strong>」セクションがあります。このセクションを使用して、ルールセットを有効にし、一致したリクエストの処理方法を構成します。</p></div>
+  <ol><li>
+    <span>Business Manager でアプリケーションランチャーをクリックし、<span class="menucascade"><strong class="uicontrol">管理</strong> | <strong class="uicontrol">サイト</strong> | <strong class="uicontrol">埋め込み CDN 設定</strong></span>の順に選択します。</span>
+   </li><li>
+    <span>構成するゾーンを見つけ、ドロップダウンメニューから<strong class="uicontrol">「ゾーンの構成</strong>」を選択します。</span>
+   </li><li>
+    <span><strong class="uicontrol">「セキュリティ・ルール</strong>」タブを選択し、「<strong class="uicontrol">ゾーン・セキュリティ・ルール</strong>」サブタブを選択します。</span>
+    
+    <div>
+     <div>
+      <p><strong>ゾーンセキュリティルール — カスタムファイアウォールルール、レート制限、および WAF マネージドルールセット</strong></p>
+      <img alt="「ゾーンセキュリティルールの構成」タブに、「ゾーンセキュリティルール」サブタブが表示され、「カスタムファイアウォールルール」リスト、「レート制限ルールが空の状態」、および「WAF ルール」セクション(WAFv2 eCDN マネージドルールセットと WAFv2 OWASP マネージドルールセットの設定を含む )" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_ecdn_configure_zone_security_rules.png">
+     </div>
+    </div>
+   </li><li>
+    <span><strong class="uicontrol">「WAF ルール</strong>」セクションを展開します。</span>
+   </li><li>
+    <span><strong class="uicontrol">WAFv2 eCDN 管理ルールセット</strong>を構成します。</span>
+    <div>
+     <p>この eCDN キュレーションされたルールセットは、信頼性が高く、影響の大きい保護を提供し、新しい脆弱性に対応するために頻繁に更新されます。</p>
+     <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:25%"><col style="width:75%"></colgroup><thead class="slds-text-title_caps">
+        <tr class="">
+         <th id="d116971e137" style="vertical-align:top;" class="slds-cell-wrap" scope="col">フィールド</th>
+         <th id="d116971e140" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+        </tr>
+       </thead><tbody>
+        <tr class="">
+         <td headers="d116971e137" style="vertical-align:top;" class="slds-cell-wrap" data-label="フィールド">有効</td>
+
+         <td headers="d116971e140" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ルールセットをオンまたはオフにします。</td>
+
+        </tr>
+        <tr class="">
+         <td headers="d116971e137" style="vertical-align:top;" class="slds-cell-wrap" data-label="フィールド">操作</td>
+
+         <td headers="d116971e140" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">試合で何をすべきか:デフォルト、ブロック、ログ、マネージドチャレンジ、JSチャレンジ、レガシーキャプチャ。</td>
+
+        </tr>
+       </tbody></table>
+    </div>
+   </li><li>
+    <span><strong class="uicontrol">WAFv2 OWASP マネージドルールセット</strong>を構成します。</span>
+    <div>
+     <p>このルールセットは OWASP ModSecurity コアルールセットを使用し、最新のアップストリームバージョンに合わせて調整されています。</p>
+     <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:25%"><col style="width:75%"></colgroup><thead class="slds-text-title_caps">
+        <tr class="">
+         <th id="d116971e195" style="vertical-align:top;" class="slds-cell-wrap" scope="col">フィールド</th>
+         <th id="d116971e198" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+        </tr>
+       </thead><tbody>
+        <tr class="">
+         <td headers="d116971e195" style="vertical-align:top;" class="slds-cell-wrap" data-label="フィールド">有効</td>
+
+         <td headers="d116971e198" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">ルールセットをオンまたはオフにします。</td>
+
+        </tr>
+        <tr class="">
+         <td headers="d116971e195" style="vertical-align:top;" class="slds-cell-wrap" data-label="フィールド">操作</td>
+
+         <td headers="d116971e198" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">脅威スコアのしきい値を超えた場合の対処方法:ブロック、ログ、マネージドチャレンジ、JSチャレンジ、レガシーキャプチャ。</td>
+
+        </tr>
+        <tr class="">
+         <td headers="d116971e195" style="vertical-align:top;" class="slds-cell-wrap" data-label="フィールド">異常スコアのしきい値</td>
+
+         <td headers="d116971e198" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">低 (60 以上)、中 (40 以上)、または高 (25 以上)。しきい値を低くすると、より多くのリクエストがキャッチされますが、誤検知が増加する可能性があります。</td>
+
+        </tr>
+        <tr class="">
+         <td headers="d116971e195" style="vertical-align:top;" class="slds-cell-wrap" data-label="フィールド">パラノイアレベル</td>
+
+         <td headers="d116971e198" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">PL1 (デフォルト)、PL2、PL3、または PL4。レベルが高いほどルールが厳しくなり、誤検知が増える可能性があります。</td>
+
+        </tr>
+       </tbody></table>
+    </div>
+   </li><li>
+    <span><strong class="uicontrol">WAFv2 eCDN 公開認証情報チェック</strong>を構成します。</span>
+    <div>
+     <p>このチェックでは、受信認証情報を、よく知られた CMS アプリケーションの盗まれた認証情報の公開データベースと比較します。</p>
+     <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:25%"><col style="width:75%"></colgroup><thead class="slds-text-title_caps">
+        <tr class="">
+         <th id="d116971e270" style="vertical-align:top;" class="slds-cell-wrap" scope="col">フィールド</th>
+         <th id="d116971e273" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+        </tr>
+       </thead><tbody>
+        <tr class="">
+         <td headers="d116971e270" style="vertical-align:top;" class="slds-cell-wrap" data-label="フィールド">有効</td>
+
+         <td headers="d116971e273" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">チェックをオンまたはオフにします。</td>
+
+        </tr>
+        <tr class="">
+         <td headers="d116971e270" style="vertical-align:top;" class="slds-cell-wrap" data-label="フィールド">操作</td>
+
+         <td headers="d116971e273" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">試合で何をすべきか:デフォルト、ブロック、ログ、マネージドチャレンジ、JSチャレンジ、レガシーキャプチャ。</td>
+
+        </tr>
+       </tbody></table>
+     <div>
+      <p><strong>ゾーン・セキュリティ・ルールのWAFルール・セクションのフィールド</strong></p>
+      <img alt="WAFv2 eCDN 管理ルールセット、OWASP 管理ルールセット、および公開認証情報チェックの構成可能なフィールドを示す WAF ルールセクション。" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_ecdn_configure_zone_waf_rules_fields.png">
+     </div>
+    </div>
+   </li></ol>
+
+ 
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_controlers">
+<h1 class="slds-text-heading_large">SiteGenesis コントローラー</h1>
+  
+  <p>コントローラーは、ストアフロントのリクエストを処理するサーバー側スクリプトです。コントローラーはアプリケーション内のデータフローを管理し、ViewModel を作成してルートとして各ストアフロントリクエストを処理し、適切な応答を生成します。たとえば、ストアフロントアプリケーションでカテゴリメニュー項目をクリックしたり、検索用語を入力すると、ページを表示するコントローラーがトリガーされます。</p>
+
+    <p>SiteGenesis で Salesforce Payments の機能をサポートするには、以下のコントローラーを追加または編集して、注文手続き、買い物カゴ、ミニ買い物カゴ、および商品詳細ページを編集します。 </p>
+    <p><strong>コントローラーの変更</strong></p>
+    <p><code><strong>Cart.js</strong> ⁻ 買い物カゴで商品やクーポンを追加および削除するコントローラー。また、「買い物を続ける」ボタンやミニ買い物カゴの機能も提供します。</code></p>
+    <ul>
+      <li><code>plug-in_commercepayments</code> から <code>paymentHelpers</code> スクリプトを追加します。</li>
+
+      <li>支払リクエストの作成と、ミニ買い物カゴでのエクスプレスチェックアウトのためのデータをサポートするために使用します。</li>
+
+    </ul>
+
+    <p><code><strong>COBilling.js</strong> - 請求ロジックのためのコントローラー。単独の配送と複数の住所への配送の両方で使用され、支払方法の選択と請求先住所の入力を提供します。</code></p>
+    <ul>
+      <li>請求ステップ (注文手続きの 2 ページ目) からクレジットカードやその他の支払情報を削除するために使用します。</li>
+
+    </ul>
+
+    <p><code><strong>COSsummary.js</strong> - 注文手続きの最後のステップを実装するコントローラー。請求先住所と支払方法の選択が正常に処理されると、このコントローラーに到達します。最終的な注文の作成を確認する前に、買い物カゴの概要を顧客に提供します。</code></p>
+    <ul>
+      <li>請求ステップで提供されなくなった支払情報の確認を削除するために使用します。</li>
+
+      <li>概要ステップ (注文手続きの 3 ページ目) で複数ステップチェックアウトを表示するために、支払リクエストを作成するために使用します。</li>
+
+    </ul>
+
+  
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_create_an_ecdn_zone_and_certificate">
+<h1 class="slds-text-heading_large">eCDN ゾーンとホスト名の作成</h1>
+ 
+ 
+ <p>Development (開発)、Staging (ステージング)、Produation (本番) のいずれかのインスタンス POD にカスタム SSL 証明書がインストールされていない場合、または POD にインストールされているカスタム SSL 証明書にホスト名が含まれていない場合は、eCDN ゾーンを作成し、各ドメイン名の証明書をアップロードします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+  <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>         <tr class="">           <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+         </tr>       </tbody></table></div>
+  <div><p>1 つ以上のホスト名を含む Development (開発)、Staging (ステージング)、または Production (本番) のいずれかのゾーンを作成し、各ホスト名の証明書を作成してアップロードします。 </p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 複数の SAN 証明書またはワイルドカード証明書がサポートされており、作成するホスト名ごとに必要です。</div></div></div>
+</div>
+  <ol><li>
+    <span>各ドメイン名に対し、POST storefront-zones エンドポイントを使用して eCDN ゾーンを作成します。<a target="_blank" href="https://developer.salesforce.com/docs/commerce/commerce-api/references/cdn-api-process-apis?meta=createStorefrontZone">createStorefrontZone</a> を参照してください。</span>
+    <div>たとえば、ホスト名に対して 2 つのゾーンを作成するには、次のようにします。
+     <ul>
+      <li>staging1.example.com</li>
+
+      <li>staging2.example.com</li>
+
+      <li>staging.example.co.uk</li>
+
+     </ul>
+</div>
+    <ol>
+     <li>
+      <span>各ゾーンに対し <code>POST /storefront-zones</code> エンドポイントを呼び出します。
+      </span>
+      <div>
+       <div><p>i. 以下の各ペイロードに対し <code>POST storefront-zones</code> エンドポイントを呼び出します。 </p><ul>
+         <li><code>{"domainName": "mystore.com"}</code></li>
+
+         <li><code>{"domainName": "mystore.co.uk"}</code></li>
+
+        </ul>
+<p>応答にはバックエンドゾーン名とゾーン ID が含まれるので、これらを使用して各ホスト名を証明します。たとえば:  </p><ul>
+         <li>stg-abcd-mystore-com.cc-ecdn.net</li>
+
+         <li>stg-abcd-mystore-co-uk.cc-ecdn.net</li>
+
+        </ul>
+<p> バックエンドゾーン名は以下の形式を使用します。 </p><ul>
+         <li><code>stg-&lt;realm_id&gt;-&lt;dashed-domain-com&gt;.cc-ecdn.net</code></li>
+
+        </ul>
+</div>
+      </div>
+     </li>
+
+     <li>
+      <span>(オプション) <code> GET /zones/info</code> エンドポイントを使用して、ゾーンとゾーン ID をリストします。すべてのゾーンを表示するには、offset または limit のクエリパラメーターを使用できます。以下がその例です: <a target="_blank" href="https://developer.salesforce.com/docs/commerce/commerce-api/references/cdn-api-process-apis?meta=getZonesInfo">getZonesInfo</a> を参照してください。 </span>
+     </li>
+
+    </ol>
+   </li><li>
+    <span>eCDN 管理証明書を使用する場合は、<code>certificateType</code> に automatic (自動) を使用し、各ホスト名の証明書を追加します。eCDN 管理証明書の場合、フォーマットは必要ありません。ステップ 4 に進みます。</span>
+   </li><li>
+    <span>証明書と鍵は PEM 形式で書式設定します。改行は <code>\n</code> 文字で表されます。</span>
+    <div>証明書と鍵のファイルの改行をリテラルな <code>\n</code> で置換するには、オペレーションシステムの例に従ってください。
+       <p><strong>Mac/Linux</strong></p> 次のようなシェルコマンドを使用します。<ul>
+      <li>
+       <pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>cat cert.crt | perl -pe 's/\r?\n/\\n/g'</code></pre>
+      </li>
+
+     </ul>
+
+     <p><strong>Windows PowerShell</strong></p><ul>
+      <li>
+       <pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>(Get-Content -path C:\path\to\cert-file.crt -Raw ) -replace ('\r?\n','\n')</code></pre>
+      </li>
+
+     </ul>
+<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> このコマンドは、Windows (CF LF) または Unix (LF) の改行コードを処理します。</div></div></div>
+
+     <p><strong>Windows GUI</strong></p>Windows のデフォルトのメモ帳には、改行コード置換をプログラムする機能がありませんが、サードパーティ製の高機能テキストエディターを使用してこれを行うことが可能です。たとえば、<a target="_blank" href="https://notepad-plus-plus.org">Notepad++</a> を使用できます。</div>
+    <ol>
+     <li>
+      <span>Notepad++ を使用するには、それぞれの cert ファイルと key ファイルを Notepad++ で開き、改行コードを確認します。 </span>
+      <div><span style="vertical-align:text-bottom;display:inline-block;"><img alt="認証日ウィンドウ" width="NaN" height="NaN" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/ecdn_1.png" style="margin-bottom:0;"></span></div>
+     </li>
+
+     <li>
+      <span><span class="menucascade"><strong class="uicontrol">Search (検索)</strong> | <strong class="uicontrol">Replace (置換)</strong></span>を選択します。</span>
+     </li>
+
+     <li>
+      <span>Find what (検索) フィールドで次の操作を行います。</span>
+      <div><ul>
+       <li>ファイルの改行コードが Unix (LF) の場合は、「<code>\n</code>」と入力します。</li>
+
+       <li>ファイルの改行コードが Windows (CR LF) の場合は、<code>\r\n</code> を入力します。</li>
+
+      </ul>
+</div>
+     </li>
+
+     <li>
+      <span>Replace with (置換) フィールドに、「<code>\\n</code>」と入力します。</span>
+     </li>
+
+     <li>
+      <span>Search Mode (検索モード) で、「Extended <code>(\n,\r,\t,\o,\x...)</code>」を選択します。</span>
+     </li>
+
+     <li>
+      <span><strong class="uicontrol">Replace All</strong> (すべて置換) をクリックします。複数の cert/key フィールドが開いている場合は、<strong class="uicontrol">Replace All in All Opened Documents (開いているすべてのドキュメントですべて置換)</strong> をクリックできます。</span>
+      <div><span style="vertical-align:text-bottom;display:inline-block;"><img alt="Notepad++ の置換ウィンドウ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/ecdn_2.png" style="margin-bottom:0;"></span></div>
+     </li>
+
+    </ol>
+   </li><li>
+    <span>各ホスト名に対し、POST 証明書エンドポイントと、ホスト名、証明書、ペイロードのキーを使用して、証明書をアップロードします。<a target="_blank" href="https://developer.salesforce.com/docs/commerce/commerce-api/references/cdn-api-process-apis?meta=addCertificateForZone">addCertificateForZone</a> を参照してください。 </span>
+   </li></ol>
+
+  <div><p>重要: 複数のホスト名が含まれている証明書およびワイルドカード証明書の場合は、各ホスト名に対し証明書をアップロードします。同じ証明書を繰り返しアップロードできます。</p><p>
+   <span style="vertical-align:text-bottom;display:inline-block;"><img alt="ゾーン作成メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_ecdn_create_zone_hostname_1.png" style="width:600px;margin-bottom:0;"></span></p><p>
+    <span style="vertical-align:text-bottom;display:inline-block;"><img alt="埋め込み CDN 設定" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_ecdn_create_zone_hostname_2.png" style="width:600px;margin-bottom:0;"></span></p><p>
+     <span style="vertical-align:text-bottom;display:inline-block;"><img alt="埋め込み CDN 設定" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_ecdn_create_zone_hostname_3.png" style="width:600px;margin-bottom:0;"></span>
+    </p><p>
+     <span style="vertical-align:text-bottom;display:inline-block;"><img alt="埋め込み CDN 設定" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_ecdn_create_zone_hostname_4.png" style="width:600px;margin-bottom:0;"></span>
+    </p></div>
+  
+ 
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_create_eCDN_firewall_rule">
+<h1 class="slds-text-heading_large">eCDN ゾーンのカスタムファイアウォールルールの作成</h1>
+ 
+ 
+ <p>カスタムファイアウォールルールを構成し、指定したリクエストパラメーターに基づいて受信トラフィックを制御します。</p>
+
+  <ol><li>
+    <span>Business Manager でアプリケーションランチャーをクリックし、<span class="menucascade"><strong class="uicontrol">管理</strong> | <strong class="uicontrol">サイト</strong> | <strong class="uicontrol">埋め込み CDN 設定</strong></span>の順に選択します。</span>
+   </li><li>
+    <span>構成するゾーンを見つけ、ドロップダウンメニューから<strong class="uicontrol">ゾーンの構成</strong>を選択します。</span>
+    <div><span style="vertical-align:text-bottom;display:inline-block;"><img alt="Business Manager でのプロキシゾーンのゾーンの設定ドロップダウンメニュー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_configure_zone.png" style="margin-bottom:0;"></span></div>
+   </li><li>
+    <span>「セキュリティルール」タブで、<strong class="uicontrol">新規ルール</strong>をクリックします。また、このタブから別のゾーンに切り替えるには、[ゾーン] ドロップダウンから別の名前を選択します。</span>
+    <div><span style="vertical-align:text-bottom;display:inline-block;"><img alt="Business Manager の埋め込み CDN 設定のセキュリティルールタブ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_security_rules.png" style="margin-bottom:0;"></span></div>
+   </li><li><span>ルール名を入力します。たとえば、「user_agent_x からのリクエストをブロックする」などです。</span></li><li><span>(オプション) 保存時にルールをアクティブにする場合は、<strong class="uicontrol">保存時にルールを有効化</strong>を選択します。ルールをアクティブ化する準備がまだ整っていない場合は、まずルールを作成します。準備ができたら、「セキュリティルール」タブに戻り、リストからルールを有効にします。</span></li><li><span>視覚的なドロップダウンインターフェイスを使用してルール式を入力し、フィールド、演算子、値を選択します。条件付きロジックを追加するには、「<strong class="uicontrol">かつ</strong>」ボタンまたは「<strong class="uicontrol">または</strong>」ボタンを使用します。また、エクスプレッションを手動で入力するには、「<strong class="uicontrol">エクスプレッションの編集」</strong>をクリックします。</span></li><li>
+    <span>ルールのアクションを選択します。たとえば、<strong class="uicontrol">ブロック</strong>または<strong class="uicontrol">ログ記録</strong>です。詳細については、「<em>B2C Commerce API デベロッパーガイド</em>」の「<a target="_blank" href="https://developer.salesforce.com/docs/commerce/commerce-api/guide/cdn-zones-custom-rules.html#rule-actions">ルールのアクション</a>」を参照してください。</span>
+   </li><li><span>「順序を選択」ドロップダウンメニューから、ルールの優先度を選択します。</span><ol>
+    <li>
+     <span><strong class="uicontrol">[最初</strong> ] を選択すると、既存のルールよりも先にルールが評価されます。</span>
+    </li>
+
+    <li>
+     <span><strong class="uicontrol">「最後</strong>」を選択すると、既存のルールの後にルールが評価されます。</span>
+    </li>
+
+    <li>
+     <span><strong class="uicontrol">[カスタム</strong> ] を選択した場合は、別の既存のルールの後にルールを配置します。</span>
+    </li>
+
+   </ol></li><li>
+    <span><strong class="uicontrol">保存</strong>をクリックします。</span>
+    <div><span style="vertical-align:text-bottom;display:inline-block;"><img alt="Business Manager の新しいカスタムファイアウォールルール" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_security_rule_creation.png" style="margin-bottom:0;"></span></div>
+   </li></ol>
+
+  <div><p>作成したルールは、「セキュリティルール」タブの「カスタムファイアウォールルール」リストに表示されます。このリストから、ルールのオンとオフを切り替えることができます (<strong class="uicontrol">保存時にルールを有効化</strong>を選択した場合、ルールはデフォルトでオンになっています)。「カスタムファイアウォールルール」リストには、過去 24 時間に各ルールに一致したリクエストの数も表示されます。この番号をクリックすると、詳細なトラフィック分析が表示されます。<a title="HTTP トラフィックとセキュリティデータに関するインサイトを得るには、Business Manager の eCDN 分析タブを使用します。[分析] タブには、トラフィック分析タイムライン グラフ、複数のディメンションにわたる上位のトラフィック統計、およびルールごとのアクティビティが表示されます。HTTP ビューとセキュリティ ビューを切り替えて、同じゾーンと時間範囲の要求トラフィックまたはファイアウォール イベントを表示します。" href="#b2c_analyze_eCDN_traffic">eCDN ゾーンの HTTP トラフィックとセキュリティトラフィックの分析</a>を参照してください</p></div>
+ 
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_creating_roles">
+<h1 class="slds-text-heading_large">B2C Commerce での役割の作成</h1>
+   
+   <p>役割とは、名前の付いた許可のグループです。たとえば、カタログ管理に関連するすべての許可をカタログマネージャーという 1 つの役割にグループ化します。次に、カタログの管理を担当するユーザーにこの役割を割り当てます。このトピックは、B2C Commerce に該当します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>         <tr class="">           <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+         </tr>       </tbody></table></div>
+      <div><p>SiteGenesis アプリケーションには、管理者役割など、あらかじめ定義された便利な役割がいくつか用意されています。これらの役割をインポートおよびエクスポートできます。これらの役割はそのまま使用したり、自社のアプリケーションのニーズに見合うようにカスタマイズしたりすることができます。必要に応じて、役割を削除し、独自の役割のセットを作成します。少なくとも 1 人のユーザーに、必ず「役割 &amp; 許可」モジュールへのアクセスを付与してください。</p><p>役割と許可を管理するには、役割 &amp; 許可モジュールの許可が必要です。ユーザーを追加してユーザーログインと認証情報を管理するには、ユーザーモジュールの許可が必要です。役割をユーザーに割り当てる、または割り当てを解除するには、ユーザーモジュールと役割 &amp; 許可モジュールの両方の許可が必要です。</p><p>「役割と許可」モジュールへのアクセスをもつユーザーがいない場合は、B2C Commerce サポートに連絡してこのモジュールへのアクセスを回復してください。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 割り当てられた役割のリストは、ユーザ定義の役割ページにも表示されます。</div></div></div>
+</div>
+      <ol><li>
+            <span><span class="menucascade"><strong class="uicontrol">管理</strong> | <strong class="uicontrol">組織</strong> | <strong class="uicontrol">役割 &amp; 許可</strong></span>の順に選択します。</span>
+            <div>黄色の三角形でマークされた役割は、セキュリティに影響する役割です。これらの役割には、ユーザーまたはアクセスの役割、あるいはその両方を管理する許可が与えられます。この役割を変更する場合は、間違ったユーザーにアクセス権限を与えないよう注意してください。</div>
+         </li><li>
+            <span><strong class="uicontrol">新規</strong>をクリックします。</span>
+         </li><li>
+            <span>全般タグで、全般情報を定義または編集して、<strong class="uicontrol">適用</strong>をクリックします。
+            </span>
+            <div>
+               <p>役割の ID に使用できるのは次の文字のみです。</p>
+               <ul>
+                  <li>文字 (ラテン文字以外の文字を含む)</li>
+
+                  <li>数字</li>
+
+                  <li>空白</li>
+
+                  <li>特殊文字: <code>_ ! " &amp; \ ' ( ) + - . , / : &lt; &gt; ? @ [ ]</code>
+                  </li>
+
+               </ul>
+
+               <p>B2C Commerce では、許可されていない文字を含む ID は拒否されます。アクセスロールを作成またはインポートすることはできません。</p>
+            </div>
+         </li><li>
+            <span>ユーザータブで、ユーザーを選択して<strong class="uicontrol">割り当てる</strong>をクリックします。</span>
+            <div>ユーザータブを使用してユーザーに役割を割り当てるには、ユーザーモジュールへのアクセス許可も必要です。</div>
+         </li></ol>
+
+   
+<div id="b2c_assign_business_manage_module_permissions" lang="ja-jp" aria-labelledby="ariaid-title2" class="nested1"><a name="b2c_assign_business_manage_module_permissions"></a>
+   <h2 class="slds-text-heading_medium slds-p-top_small">Business Manager モジュールの許可の割り当て</h2>
+   
+   <p>各役割に Business Manager モジュールへのアクセスを割り当てます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>         <tr class="">           <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+         </tr>       </tbody></table></div>
+      <ol><li>
+            <span><span class="menucascade"><strong class="uicontrol">管理</strong> | <strong class="uicontrol">組織</strong> | <strong class="uicontrol">役割 &amp; 許可</strong></span> の順に選択します。
+            </span>
+         </li><li>
+            <span>役割を選択します。</span>
+         </li><li>
+            <span><strong class="uicontrol">Business Manager モジュール</strong>タブで、許可を割り当てるコンテキストを選択します。</span>
+            <div>すでにコンテキストを指定していて、それを変更する場合は、「<strong class="uicontrol">コンテキストを選択」(Select Context</strong> ) をクリックします。個々のサイトから<code>組織</code>に戻すには、<strong class="uicontrol">組織</strong>をチェックする前に<strong class="uicontrol">すべてのサイト</strong>のチェックを外します。</div>
+         </li><li>
+            <span><strong class="uicontrol">適用</strong>をクリックします。</span>
+         </li><li>
+            <span>モジュールごとに<strong class="uicontrol">読み取り</strong> または<strong class="uicontrol">書き込み</strong> を選択して、許可を有効または無効にします。</span>
+            <div>ユーザーが読み取り専用許可をもっている場合、対応するモジュールを表示できますが、このモジュールの設定を作成、編集、または構成することはできません。これは、B2C Commerce API 呼び出しを経由するアクセスにも該当します。</div>
+         </li><li>
+            <span><strong class="uicontrol">更新</strong>をクリックします。
+            </span>
+         </li></ol>
+
+   
+</div>
+<div id="b2c_assign_functional_permissions" lang="ja-jp" aria-labelledby="ariaid-title3" class="nested1"><a name="b2c_assign_functional_permissions"></a>
+   <h2 class="slds-text-heading_medium slds-p-top_small">機能の許可の割り当て</h2>
+   
+   <p>機能の許可によって、役割が操作を実行できるようになります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>         <tr class="">           <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+         </tr>       </tbody></table></div>
+      <ol><li>
+            <span><span class="menucascade"><strong class="uicontrol">管理</strong> | <strong class="uicontrol">組織</strong> | <strong class="uicontrol">役割 &amp; 許可</strong></span>の順に選択します。 </span>
+         </li><li>
+            <span>役割を選択します。</span>
+         </li><li>
+            <span>機能の許可で、許可を割り当てるコンテキストを選択します。</span>
+            <div>すでにコンテキストを指定していて、それを変更する場合は、「<strong class="uicontrol">コンテキストを選択」(Select Context</strong> ) をクリックします。個々のサイトから組織に戻すには、<strong class="uicontrol">組織</strong>をチェックする前に<strong class="uicontrol">すべてのサイト</strong>のチェックを外します。</div>
+         </li><li>
+            <span>機能の許可を役割に割り当てます。</span>
+            <div>すべてのサイトがリストされます。ユーザーは誰でも許可なしにサイトを選択できます。ただし、そのサイト内の Business Manager モジュールにアクセスする許可がないユーザーの場合は、ナビゲーションバーに何も表示されません。</div>
+         </li><li>
+            <span><strong class="uicontrol">更新</strong>をクリックします。</span>
+            <div>許可はすべて累積されます。</div>
+         </li></ol>
+
+   
+</div>
+<div id="b2c_assign_web_dav_permissions" lang="ja-jp" aria-labelledby="ariaid-title4" class="nested1"><a name="b2c_assign_web_dav_permissions"></a>
+   <h2 class="slds-text-heading_medium slds-p-top_small">WebDAV の許可の割り当て</h2>
+   
+   <p>アスタリスクで終わる WebDAV 許可 ('/catalogs/*'、'/libraries/*'、または '/dynamic/*') あるいは '(その他のすべてのフォルダー)' を選択した場合は、その許可は今後作成されるすべてのサブフォルダーに自動的に付与されます。自動的に付与されないようにするには、サブ許可に手動でチェックを入れます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>         <tr class="">           <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+         </tr>       </tbody></table></div>
+      <ol><li>
+            <span><span class="menucascade"><strong class="uicontrol">管理</strong> | <strong class="uicontrol">組織</strong> | <strong class="uicontrol">役割 &amp; 許可</strong></span>の順に選択します。 </span>
+         </li><li>
+            <span>役割を選択します。</span>
+         </li><li>
+            <span>WebDAV の許可タブで、特定のフォルダーに読み取りまたは書き込みの許可を付与します。</span>
+            <div><a title="特定の WebDAV フォルダーへのアクセスを付与するには、WebDAV の許可を使用します。WebDAV の許可は組織全体に適用されます。" href="#b2c_administrator_role">WebDAV の許可</a>を参照してください。</div>
+         </li><li>
+            <span><strong class="uicontrol">更新</strong>をクリックします。</span>
+         </li></ol>
+
+   
+</div>
+<div id="b2c_assign_locale_permissions" lang="ja-jp" aria-labelledby="ariaid-title5" class="nested1"><a name="b2c_assign_locale_permissions"></a>
+   <h2 class="slds-text-heading_medium slds-p-top_small">地域情報の許可の割り当て</h2>
+   
+   <p>個々の地域情報の許可を役割に割り当てます。地域情報に対する許可をもたないユーザーは、その地域情報でローカライズされた属性を表示または編集することはできません。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>         <tr class="">           <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+         </tr>       </tbody></table></div>
+      <ol><li>
+            <span><span class="menucascade"><strong class="uicontrol">管理</strong> | <strong class="uicontrol">組織</strong> | <strong class="uicontrol">役割 &amp; 許可</strong></span>の順に選択します。 </span>
+         </li><li>
+            <span>役割を選択します。</span>
+         </li><li>
+            <span>地域情報の許可のページで、地域情報のリンクをクリックします。たとえば、<strong class="uicontrol">de</strong> です。</span>
+         </li><li>
+            <span>チェックボックスを使用して、特定の地域情報に読み取りまたは書き込みのアクセスを付与し、<strong class="uicontrol">更新</strong>をクリックします。</span>
+         </li><li>
+            <span><var>[ローカル</var> - 全般] タブで、地域情報に関する全般的な読み取り専用情報を表示します。</span>
+         </li><li>
+            <span>フォールバック地域情報を設定します。</span>
+            <div>たとえば、デフォルトまたは無効に設定します。</div>
+         </li><li>
+            <span><strong class="uicontrol">地域設定</strong>タブで、数字と通貨の設定を指定します。</span>
+         </li><li>
+            <span><strong class="uicontrol">適用</strong>をクリックして、設定を保存します。</span>
+         </li></ol>
+
+   
+</div>
+<div id="b2c_assigning_price_adjustment_limits" lang="ja-jp" aria-labelledby="ariaid-title6" class="nested1"><a name="b2c_assigning_price_adjustment_limits"></a>
+   <h2 class="slds-text-heading_medium slds-p-top_small">価格調整の制限の割り当て</h2>
+   
+   <p>Business Manager で手動による価格調整の制限をユーザーごとに割り当てます。制限を適用する対象として、1 つのサイト、複数のサイト、またはすべてのサイトのコンテキストを選択できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>         <tr class="">           <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+         </tr>       </tbody></table></div>
+      <div><p>Script API <code>dw.order.LineItemCtnr.verifyPriceAdjustmentLimits()</code>を使用したプログラムによるアクセス制限。</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>POST /baskets/\{basket_id\}/price_adjustments</code></pre><p>価格調整の制限は、サイトのインポート/エクスポートを通じてインポートおよびエクスポートします。 </p></div>
+      <ol><li>
+            <span><span class="menucascade"><strong class="uicontrol">管理</strong> | <strong class="uicontrol">組織</strong> | <strong class="uicontrol">役割と許可</strong></span>の順に選択し、<var>管理者</var>を選択します。</span>
+         </li><li>
+            <span><strong class="uicontrol">価格調整の制限</strong>タブで、許可を割り当てるコンテキストを選択します。</span>
+         </li><li>
+            <span><strong class="uicontrol">適用</strong>をクリックします。</span>
+         </li><li>
+            <span>制限を追加するには、<strong class="uicontrol">追加</strong>をクリックします。</span>
+         </li><li>
+            <span>価格調整の制限の追加ウィンドウで、タイプ (商品、配送、または注文)、通貨、および金額を選択します。</span>
+            <div>価格調整の制限の検証では、価格調整の<a target="_blank" href="https://developer.salesforce.com/docs/commerce/b2c-commerce/guide/b2c-setting-permissions-for-csc.html">許可</a>が設定されているアクセスの役割のみが考慮されます。手動による価格調整を検証する場合は、特定のタイプの価格調整許可をもつアクセス役割に割り当てられている価格調整の制限のみが考慮されます。価格調整の許可のタイプ (商品、注文、または配送) は、手動による価格調整のタイプによって異なります。役割にアクセスできるすべてのユーザーが手動による商品価格の調整を無制限に作成しないように、商品、注文、または配送の価格調整の許可をもつアクセス役割に対して価格調整の制限を定義します。</div>
+         </li><li>
+            <span>コンテキストを変更するには、<strong class="uicontrol">コンテキストの選択</strong>をクリックします。</span>
+            <div>たとえば、コンテキストを 1 つのサイトから複数のサイトに変更すると、未割当の制限を表示できます。</div>
+         </li><li>
+            <span>制限を割り当てるには、制限の横にあるチェックボックスをオンにして、[ <strong class="uicontrol">更新</strong> ] をクリックします。</span>
+         </li><li>
+            <span>制限の割り当てを解除するには、制限の横にあるボックスをオフにして、[ <strong class="uicontrol">更新</strong> ] をクリックします。</span>
+         </li><li>
+            <span>変更を元に戻すには、<strong class="uicontrol">更新</strong>をクリックする前に<strong class="uicontrol">戻す</strong>をクリックします。</span>
+            <div><strong class="uicontrol">更新</strong>をクリックすると、変更を元に戻すことはできません。</div>
+         </li></ol>
+
+   
+</div>
+</div>
+</div></div></div></div></div></div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_declarative_security_via_http_headers">
+<h1 class="slds-text-heading_large">B2C Commerce における HTTP ヘッダーでの宣言によるセキュリティ</h1>
+   
+   <p>宣言によるセキュリティコントロールを、クリックジャックなどのクライアントのブラウザーをベースとする攻撃に対する強力な防御手段として使用し、クロスサイトスクリプティング (XSS) に対するビルトインのブラウザー保護を提供できます。OWASP Secure Headers Project は、アプリケーションのセキュリティを向上するためにアプリケーションで使用することのできる HTTP 応答ヘッダーを記述しています。</p>
+
+      <p>B2C Commerce API と Storefront Reference Architecture (SFRA) でこの機能を提供しています。Response オブジェクトに対して<code>addHttpHeader()</code>メソッドを使用して、HTTP 応答に HTTP ヘッダーを設定します。ストアフロントまたはカートリッジが SFRA ベースの場合は、<code>httpHeadersConf.json</code> ファイルを使用して<em>すべて</em> の応答の HTTP 応答ヘッダーを自動的に設定できます。</p>
+      <p dir="ltr">HTTP ヘッダーでの宣言によるセキュリティコントロールと、その他のクライアントのブラウザーベースの保護は、クライアントのブラウザーがこの機能をサポートしている場合にのみ適用されます。ヘッダーに依存してすべてのサポートしているユーザー環境をカバーする前に、B2C Commerce のサポートされているブラウザーのリストを確認してください。</p>
+   
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_developer_authentication_and_authorization">
+<h1 class="slds-text-heading_large">B2C Commerce での認証と承認のベストプラクティス</h1>
+   
+   <p>アクセスコントロールの脆弱性を利用するのは、攻撃者の中核となるスキルです。攻撃者に対する保護を行うために、アカウント管理、注文管理、購入などのビジネス機能に対するサーバー側アクセスのコントロールチェックを強制します。 </p>
+
+            <p>機密オブジェクトへのアクセスをコントロールするには、認証と承認を使用します。機密オブジェクトの例を次に示します。</p>
+            <ul>
+                  <li>Order</li>
+
+                  <li>Customer</li>
+
+                  <li>CustomerPaymentInstrument</li>
+
+                  <li>OrderPaymentInstrument</li>
+
+                  <li>Basket</li>
+
+            </ul>
+
+            <p>B2C Commerce では、オブジェクト識別子 (汎用一意識別子 (UUID)、ID、トークン) を使用して Script API オブジェクトが識別されます。識別子によって、機密オブジェクトへの読み取りや書き込みのアクセスを付与しないようにします。すべてのリクエストを処理する前に、ストアフロントで追加の認証と承認を常に行います。一部の Script API では、セキュアなメソッドとセキュアではないメソッドの両方が提供されています。セキュアでないメソッドはレガシーのユースケースに対応するものです。セキュアなメソッドを使用することを強くお勧めします。</p>
+            <p>たとえば、クラス OrderMgr はメソッド getOrder に 2 つの署名を提供します: </p>
+            <pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>static getOrder(orderNumber : String)
+static getOrder(orderNumber : String, orderToken : String)</code></pre>
+            <p>2 番目の署名がセキュアなメソッドです。詳細については、クラス OrderMgr を参照してください。</p>
+        
+            <p><strong>認証</strong></p>
+      <p>カートリッジのパスで Storefront Reference Architecture (SFRA) を使用する場合は、<code>userLoggedIn</code> ミドルウェア機能を使用して、リクエストが認証されたユーザーからのものであるかどうかをチェックできます。このミドルウェアは <code>validateLoggedIn</code> 関数でユーザーが関数を呼び出すために認証されたかどうかをチェックします。また、<code>validateLoggedInAjax</code> 関数でユーザーが AJAX リクエストから認証されたかどうかをチェックします。</p>
+      <pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="codesegment">var userLoggedIn = require('*/cartridge/scripts/middleware/userLoggedIn');
+server.get(
+     'Show',
+     server.middleware.https,
+     userLoggedIn.validateLoggedIn,
+     consentTracking.consent,
+     function (req, res, next) {
+        var CustomerMgr = require('dw/customer/CustomerMgr');
+        var Resource = require('dw/web/Resource');
+        var URLUtils = require('dw/web/URLUtils');</code></pre>
+      <p>このコードのスニペットは、ミドルウェア <code>userLoggedIn</code> を公開されたビジネス関数として含んでいます。</p>
+      <p>カートリッジのパスで SiteGenesis を使用する場合は、コントローラー関数をエクスポートする際に、ガードを使用してコントローラー関数をラップできます。ガードモジュールで指定された関数が、リクエストのフィルターの役目を果たします。コントローラー機能への複数のレベルのアクセスを指定できます。</p>
+      <ul>
+         <li> HTTPS が必要です。</li>
+
+         <li> GET や POST などの特定の HTTP メソッドを要求または禁止します。</li>
+
+         <li> 現在のユーザーがログインしていることが要求されます。</li>
+
+      </ul>
+
+      <p>以下の例は、HTTPS とユーザーがログインしていることを要求する、プロフィールの編集のコントローラーを示しています。</p>
+      <pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="codesegment">exports.EditProfile = guard.ensure(['get', 'https', 'loggedIn'], editProfile);</code></pre>
+            <p><strong>承認</strong></p>
+            <p>ストアフロント処理を実装する場合には、自社のビジネスワークフローに合った承認チェックを行います。機密オブジェクトで管理操作を実行する場合は、そのオブジェクトに関するシークレットを使用してリクエストしているユーザーを認証します。たとえば、ゲストが注文手続きを完了した後にアカウントを作成し、B2C Commerce がそのゲストに注文を再割り当てした場合、その注文に関するシークレットを使用してユーザーを認証します。このアプローチを使用すると、リクエストを行っているユーザーがオブジェクトを作成したユーザーと同一人物であることに確信を持てます。</p>
+            <p>以下のセクションでは、登録済みの買い物客とゲスト買い物客に対する Order オブジェクトの承認チェックの例を示します。</p>
+            <p><strong>登録済み買い物客</strong></p>
+            <p>登録済み買い物客が注文にアクセスしたい場合は、ストアフロントで以下の情報を検証します。</p>
+            <ul>
+                  <li>買い物客が認証済みである。詳細については、このトピックで前述した認証情報を参照してください。 </li>
+
+                  <li>注文がキャンセル可能なステータスである。ステータスがキャンセル可能であるかどうかは、各ストアフロントの注文管理フローによって異なります。サポートされているステータスについてはクラス Order を参照してください。</li>
+
+               
+                  <li>キャンセルする注文は買い物客が所有します。</li>
+
+            </ul>
+
+            <pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>var orderCustomer = order.getCustomer();
+var sessionCustomer = session.getCustomer();
+If ( orderCustomer.ID === sessionCustomer.ID ) {
+    // The logged-in shopper is the owner of the order
+    // perform actions in accordance with the order management workflow
+    ...
+} else {
+    // A user attempts to access an order they don’t own
+    // Reject this request with an error message ( HTTP 401 unauthorized or a custom error page)
+    // Log an error message to track this occurrence
+}
+</code></pre>
+            <p><strong>ゲスト買い物客</strong></p>
+            <p>ゲスト (未登録の) 買い物客に適用される堅牢な認証と承認のスキームを実装することは、登録済み顧客よりも困難な課題です。不正利用のリスクを下げるために、自社のユースケースに合わせて、以下のオプションを考慮します。</p>
+            <ul>
+                  <li>ゲスト買い物客が既存の注文を変更することを禁止する。注文を変更しようとした場合にはアカウントの作成を求める。</li>
+
+                  <li>買い物客が注文番号、注文トークン、および以下のような注文に含まれるその他のデータの組み合わせを提供できる場合にのみアクセスを許可する。<ul>
+                              <li>Eメール</li>
+
+                              <li>姓</li>
+
+                              <li>郵便番号</li>
+
+                              <li>電話番号</li>
+
+                        </ul>
+</li>
+
+                  <li>ゲスト買い物客が、登録済みユーザーが所有する注文にアクセスすることは禁止します。</li>
+
+                  <li>許可される操作を最低限に制限します。以下に例を示します: <ul>
+                              <li>注文に保存されている支払情報や個人情報は表示しないようにします。</li>
+
+                              <li>悪意をもつユーザーが注文を変更できるような変更 (配送先住所の変更など) は許可しないでください。</li>
+
+                        </ul>
+</li>
+
+                  <li>ボット/スクリプトの保護コントロールを実装して、総当たり攻撃に対して保護します。以下に例を示します: <ul>
+                              <li>レート制限</li>
+
+                              <li>コンピュータと人間を区別するための完全自動公開チューリングテスト(CAPTCHA)</li>
+
+                        </ul>
+</li>
+
+            </ul>
+
+   
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_general_security_best_practices">
+<h1 class="slds-text-heading_large">B2C Commerce の一般的なセキュリティのベストプラクティス</h1>
+   <p>Salesforce では、データの機密性、整合性、可用性がビジネスに不可欠なものだと理解しています。当社ではお客様がセキュリティの脅威に対する最大の保護をサイトに実装することを推奨しています。また、Salesforce B2C Commerce 環境を設定する際には次の中核となるベストプラクティスに従うことをお勧めします。</p>
+
+<ul><li class="slds-p-bottom_small"><strong><a href="customer-3.html#b2c_use_2fa_on_all_privileged_accounts">権限をもつすべてのアカウントで 2FA を使用</a></strong><br>2 要素認証 (2FA) は、1 つのパスワードによる保護を超えた、追加の保護レイヤーです。この追加の保護には、知識 (知っていること)、所有物 (持っているもの)、または生体認証 (身体的特徴など) を使用できます。携帯電話 (持っているもの) などの 2 つ目の認証要素を使用することで、アカウントの乗っ取り、詐欺行為、データの損失、悪意をもったコード、フィッシング攻撃などの、一般的なセキュリティの脅威に対する追加の保護を提供できます。</li><li class="slds-p-bottom_small"><strong><a href="general-4.html#b2c_follow_the_principle_of_least_privilege">最小権限の原則の適用</a></strong><br>最小権限の原則は、ゼロトラストの中核をなす概念です。最小の権限を実装するとは、ユーザー、アプリケーション、システム、その他のコンポーネントに、それぞれのジョブを実行するために必要な最小限の権限レベルのみを付与することを意味します。</li><li class="slds-p-bottom_small"><strong><a href="general-1.html#b2c_apply_defense_in_depth">多層防御の適用</a></strong><br>多層防御とは、環境内で 1 つではなく複数の層のセキュリティを使用することを意味します。攻撃によって 1 つのセキュリティメカニズムが突破されても、システムを保護するために必要なセキュリティを他のメカニズムが提供できます。卵のようなセキュリティではなく、玉ねぎのようなセキュリティを作成することを考えてください。卵は落としてしまうと割れて飛び散ってしまいますが、玉ねぎにはいくつもの層があるため、少し傷がつくだけですみます。</li><li class="slds-p-bottom_small"><strong><a href="security-2.html#b2c_use_a_positive_security_model">ポジティブセキュリティモデルの使用</a></strong><br>ポジティブセキュリティモデルは、セーフリストアプローチとも呼ばれ、何を許可するかを定義し、それ以外はすべて拒否します。このアプローチを使用して、悪意をもつ可能性のある入力をすべて拒否する代わりに、既知の正規の入力のみを許可リストに追加できます。</li><li class="slds-p-bottom_small"><strong><a href="general-4.html#b2c_fail_securely">フェールセーフ</a></strong><br>フェールセーフとは、エラーが発生した場合にシステムを安全な状態にする決定ロジックを実装することを意味します。エラーを安全に処理することで、例外などのエラーパスによって、エラーが発生しなければ提供されることのない追加情報が公開されないようにします。攻撃者はこの追加情報を使用して、システムをどのように攻撃するかを学習することができます。</li><li class="slds-p-bottom_small"><strong><a href="#b2c_make_security_usable">セキュリティ機能の使い勝手の向上</a></strong><br>使用の難しいセキュリティ機能は、無効にされることが多くなります。セキュリティ機能は、ユーザーが理解しやすいように作成するようにします。ユーザーがセキュリティに関する決定を理解できるように、ユーザーがセキュリティ設定を可視化して制御できるようにします。</li><li class="slds-p-bottom_small"><strong><a href="general-7.html#b2c_use_secure_defaults">安全なデフォルトの使用</a></strong><br>管理者は、ユーザー体験を安全なものにし、デフォルトのセキュリティ設定の数を減らしたいと考えています。セキュリティ設定は、ユーザーがオプトインするのではなく、デフォルトのセキュリティ設定からオプトアウトしなければならないように構成します。セキュリティ上のリスクがある場合は、API またはユーザーインターフェイスで安全ではない機能を明確にラベルして、使用しないように促します。</li><li class="slds-p-bottom_small"><strong><a href="general-5.html#b2c_minimize_the_attack_surface">攻撃面の最小化</a></strong><br>安全な開発における全体的なリスクを軽減するには、潜在的な攻撃者にさらされる攻撃面を減らします。ポートを開くたびに、コードで外部ライブラリを使用するたびに、そしてユーザーにデータへのアクセスを付与するたびに、新しい攻撃面が作成されます。システムに対する全体的なリスクを軽減するには、攻撃面を最小限に抑えます。</li><li class="slds-p-bottom_small"><strong><a href="general-6.html#b2c_prevent_ecommerce_fraud">eコマースの不正行為の防止</a></strong><br>eコマースの不正行為は、増加しつつあるセキュリティ上の課題です。サイバー攻撃者は盗んだ認証情報のリストを使用して、ユーザーアカウントにアクセスし、承認されていないトランザクションを行うために総当たり攻撃を行います。</li><li class="slds-p-bottom_small"><strong><a href="https://help.salesforce.com/s/articleView?id=cc.b2c_incorporate_third-party_apps.htm&amp;language=ja&amp;type=5">サードパーティアプリの安全な導入</a></strong><br>ストアフロント機能とオンラインでの販売は Salesforce B2C Commerce の専門です。その他の作業に関しては、サードパーティのアプリケーションがストアフロントプラットフォームに専門知識を提供します。たとえば、オンラインでの税金の処理、クレジットカードでの支払い、配送業者などです。特定のプロセスを専門とする人々によって作成されたサードパーティアプリの使用は、B2C Commerce を柔軟にする要素の 1 つです。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_legacy_validate_new_certificate">
+<h1 class="slds-text-heading_large">新しい証明書の検証</h1>
+   
+   <p>管理プロセスまたは自己管理プロセスを使用して、新しい証明書を検証します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>         <tr class="">           <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+         </tr>       </tbody></table></div>
+
+      <ol><li>
+            <span>管理証明書を検証するには、<a target="_blank" href="#b2c_add_managed_ssl_certificates">管理 SSL 証明書の追加</a>を参照してください。</span>
+         </li><li>
+            <span>自己管理証明書を検証するには、<a target="_blank" href="#b2c_add_self_managed_ssl_certificates">自己管理 SSL 証明書の追加</a>を参照してください。</span>
+         </li></ol>
+
+     
+   
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_make_security_usable">
+<h1 class="slds-text-heading_large">セキュリティ機能の使い勝手の向上</h1>
+   
+   <p>使用の難しいセキュリティ機能は、無効にされることが多くなります。セキュリティ機能は、ユーザーが理解しやすいように作成するようにします。ユーザーがセキュリティに関する決定を理解できるように、ユーザーがセキュリティ設定を可視化して制御できるようにします。</p>
+
+      <p>次に例をいくつか示します。</p>
+      <ul>
+         <li> アプリの一部を破損するセキュリティ機能は有効にしないでください。この操作を行うと、ユーザーがこの機能を有効にしないリスクが大きくなります。 </li>
+
+         <li>エンドツーエンドの暗号化では、すべてのメッセージがインターネットを通じて送信される場合に透過的に暗号化されます。これらのメッセージでは、通過地点でメッセージが読み取られたり、不正に変更されることがありません。この機能は常にオンで、グループチャットへの新規メンバーの追加や、以前のメッセージの検索など、その他の機能と干渉することがありません。</li>
+
+      </ul>
+
+   
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_manually_migrate_users_to_unified_authentication">
+<h1 class="slds-text-heading_large">手動によるユーザーの統合認証への移動</h1>
+   
+   <p>場合によっては、ユーザーが Business Manager と Account Manager のプロフィールを自分でリンクできないことがあります。2 つのアカウントで異なる Eメールアドレスを使用している場合、ユーザーは統合認証に移行できません。ただし、管理者が Business Manager から Account Manager にユーザーを手動で移行することができます。これは、手動でユーザーを統合認証に移行する管理者のためのものです。管理者が B2C Commerce の使用を 2019 年 10 月以降に開始した場合は、組織が自動的に統合認証を使用しているため、このトラブルシューティングは該当しません。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>         <tr class="">           <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+         </tr>       </tbody></table></div>
+      <ol><li>
+            <span>Account Manager で、<strong class="uicontrol">ユーザー</strong>をクリックします。</span>
+         </li><li>
+            <span>ユーザーを選択します。</span>
+         </li><li>
+            <span>ユーザー ID をコピーします。</span>
+         </li><li>
+            <span>Business Manager で、アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、<strong class="uicontrol">管理 &gt; 組織 &gt; ユーザー</strong>の順に選択します。</span>
+         </li><li>
+            <span>ユーザーを選択します。</span>
+         </li><li>
+            <span>ユーザー ID を Account Manager ユーザー ID フィールドに貼り付けます。</span>
+         </li><li>
+            <span><strong class="uicontrol">適用</strong>をクリックします。</span>
+         </li></ol>
+
+   
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_network_access_restrictions">
+<h1 class="slds-text-heading_large">B2C Commerce でのネットワークアクセスの制限</h1>
+   <p>ネットワークレベルは、アセットにアクセスしようとする攻撃者に対する最初の防御ラインです。Salesforce B2C Commerce では、ストアフロントと Business Manager に対して 1 つずつ、2 つのメカニズムを使用しています。</p>
+
+<ul><li class="slds-p-bottom_small"><strong><a href="storefront-2.html#b2c_storefront_network_access">B2C Commerce でのストアフロントのネットワークアクセス</a></strong><br>ストアフロントへのネットワークアクセスを制限するために、B2C Commerce に付属の埋め込みコンテンツ配信ネットワーク (eCDN) を有効にします。組織で eCDN を有効にするには、Salesforce カスタマーサポートにお問い合わせください。</li><li class="slds-p-bottom_small"><strong><a href="get_started.html#b2c_business_manager_network_access">B2C Commerce での Business Manager のネットワークアクセス</a></strong><br>Business Manager へのネットワークアクセスを制限するには、セキュリティコントロールを構成して特定の IP アドレスや IP アドレスの範囲のアクセスを制限します。これらのネットワークアクセスの制限を設定する意図は、不法な手段で有効な認証情報を取得した攻撃者をロックアウトすることにあります。この機能を有効にするには、Business Managerへのアクセスを許可する許可リストの IP アドレスの範囲と、Business Managerへのアクセスを許可しないブロックリストの IP アドレスの範囲を指定します。IP アドレスがブロックリストと許可リストの両方に含まれている場合は、アクセスは拒否されます。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_ocapi_client_authentication_and_authorization">
+<h1 class="slds-text-heading_large">B2C Commerce での OCAPI クライアントの認証と承認</h1>
+   
+   <p>Open Commerce API (OCAPI) は、OCAPI クライアントが使用する RESTful インターフェイスを提供します (カスタムコード)。ここでは、OCAPI のクライアントの認証と承認を説明します。 </p>
+
+      <div id="b2c_ocapi_client_authentication_and_authorization__b2c_ocapi_client_authentication"><a name="b2c_ocapi_client_authentication_and_authorization__b2c_ocapi_client_authentication"></a><h2 class="slds-text-heading_medium slds-p-top_small">OCAPI クライアントの認証</h2><p>認証を行うには、Account Manager 管理者が Account Manager で新しいクライアントにクライアント認証情報をプロビジョニングします。ユーザー認証とは異なり、OCAPI クライアントのプロビジョニングは Account Manager でのみ実行できます。Account Manager によって、組織のすべての Business Manager インスタンスに対する認証が可能になります。
+            </p></div>
+      <div id="b2c_ocapi_client_authentication_and_authorization__b2c_ocapi_client_authorization"><a name="b2c_ocapi_client_authentication_and_authorization__b2c_ocapi_client_authorization"></a><h2 class="slds-text-heading_medium slds-p-top_small">OCAPI クライアントの承認</h2><p>グローバル認証とは異なり、OCAPI クライアントの承認ルールはローカルの Business Manager インスタンスで指定します。このインスタンスは独特の承認ルールをもつことができます。複数のインスタンスで同じ承認ルールを使用したい場合は、これを手動でプロビジョニングするか、最初のインスタンスからエクスポートして 2 番目のインスタンスにインポートします。ユーザーの承認と同様、Account Manager でクライアントを作成すると、そのクライアントには何も許可が与えられていません。認証を行っても、アクセスできる OCAPI エンドポイントはありません。これは、ベストプラクティスである「デフォルトで拒否」に従うものです。 
+            </p><p>ユーザーの承認とは異なり、OCAPI の承認は役割に基づくものではありません。代わりに、一連の承認ルールとして構成し、OCAPI Shop API と OCAPI Data API に対して別々に構成します。特定のサイト、またはインスタンスのすべてのサイトに対してルールを指定します。最小権限の原則に従うには、複数のクライアントを作成し、各クライアントには仕事に必要な承認ルールのみを付与します。</p></div>
+   
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_permissions">
+<h1 class="slds-text-heading_large">B2C Commerce の許可、ユーザー、および役割</h1>
+   
+   <p>B2C Commerce を使用する際のオペレーションとセキュリティの効率を向上させるために、定義した役割に応じてアクセスを割り当てて制限します。ユーザーと許可は、管理者役割をもつユーザーのみがコントロールできます。</p>
+
+      <p>ストアフロントのテストと開発中にアクセスを制限するには、ストアフロントのパスワード保護を構成します。</p>
+   
+<ul><li class="slds-p-bottom_small"><strong><a href="customer-3.html#b2c_organization_profile">組織プロフィールの定義</a></strong><br>B2C Commerce にユーザーを追加する前に、組織と最上位レベルのすべてのストアフロントを定義します。これには、すべてのストアフロントのデフォルト言語を設定することが含まれます。</li><li class="slds-p-bottom_small"><strong><a href="general-5.html#b2c_managing_demandware_platform_users">Salesforce B2C Commerce ユーザーの管理</a></strong><br>新しい B2C Commerce ユーザー (Business Manager ユーザーなど) を追加する際には、必要なモジュールのみへのアクセスを制限する役割を割り当てます。管理者がユーザーのリストを表示すると、ユーザーが最後にログインした日時やその後の経過日数を見ることができます。この情報は、インスタンスのタイムゾーンで表示されます。</li><li class="slds-p-bottom_small"><strong><a href="data_jobs-3.html#b2c_importing_and_exporting_roles_and_permissions">役割と許可のインポートとエクスポート</a></strong><br>Business Manager のサイトのインポート &amp; エクスポートモジュールを使用して、アクセスの役割とユーザーをインポートおよびエクスポートします。このトピックは、B2C Commerce に該当します。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_renew_a_certificate">
+<h1 class="slds-text-heading_large">B2C Commerce の証明書の更新</h1>
+ 
+ <p>自己管理の SSL 証明書を使用する場合、Development (開発)、Staging (ステージング)、および Production (本番) のゾーンの証明書を更新する必要があります。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>         <tr class="">           <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+         </tr>       </tbody></table></div>
+  <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> <a target="_blank" href="#b2c_add_managed_ssl_certificates">eCDN 管理 SSL 証明書</a>は自動更新されるため、更新は必要ありません。既存のホスト名で自動証明書を有効にする<a target="_blank" href="https://developer.salesforce.com/docs/commerce/commerce-api/guide/cdn-zones-automatic-certs.html">eCDN 自動証明書</a>。</div></div></div>
+<p>自己管理 SSL 証明書の有効期限が切れた場合、または SSL 証明書に割り当てられたホスト名を更新する場合は、Business Manager または CDN Zones API で証明書を更新します</p><p>証明書のローテーションには CDN Zones API を使用します。<a target="_blank" href="https://developer.salesforce.com/docs/commerce/commerce-api/references/cdn-api-process-apis?meta=Summary">CDN Zones</a> API を参照してください。</p></div>
+  <ol><li>
+    <span>新しい証明書は、お好みの CA から入手します。</span>
+   </li><li>
+    <span>CDN Zones API でこれらのメソッドを使用します。<a target="_blank" href="https://developer.salesforce.com/docs/commerce/commerce-api/references/cdn-api-process-apis?meta=getZonesInfo">getZonesInfo</a> を参照してください。</span>
+   </li><li>
+    <span>Staging (ステージング) ゾーン ID を取得するには、<code>GET /zones/info</code> エンドポイントを使用します。<a target="_blank" href="https://developer.salesforce.com/docs/commerce/commerce-api/references/cdn-api-process-apis?meta=getZonesInfo">getZonesInfo</a> を参照してください。</span>   
+   </li><li>
+    <span>ローテーションする証明書の ID を入手するには、<code>GET/zones/{zoneId}/certificates</code> を使用します。<a target="_blank" href="https://developer.salesforce.com/docs/commerce/commerce-api/references/cdn-api-process-apis?meta=getCertificates">getCertificates</a> を参照してください。</span>
+   </li><li>
+    <span>証明書がインストールされている各カスタムホスト名に対し、<code>PATCH /zones/{zoneid}/certificates/{certificateId}</code> エンドポイントを使用します。<a target="_blank" href="https://developer.salesforce.com/docs/commerce/commerce-api/references/cdn-api-process-apis?meta=updateCertificate">updateCertificate</a> を参照してください。</span>
+   </li></ol>
+
+ 
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_roles_and_permissions">
+<h1 class="slds-text-heading_large">B2C Commerce の役割と許可</h1>
+   
+   <p>モジュールへのアクセスは、そのモジュールを使用するユーザーのみに制限することをお勧めします。モジュールへのアクセスを制限および付与するには、役割と許可を使用します。適切に構成した場合、ユーザーが B2C Commerce にログインすると、そのジョブに必要なモジュールのみが表示されます。これにより混乱がなくなり、組織のセキュリティを向上できます。</p>
+
+      <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> ここで説明する役割と許可は、Business Manager のユーザーのみが対象となり、ストアフロントの顧客には適用されません。</div></div></div>
+
+      <div><h2 class="slds-text-heading_medium slds-p-top_small">役割</h2><p class="bodytext">役割は、グループ化された許可を表します。役割は、組織の範囲で定義します。ユーザーに複数の役割を割り当て、これらの役割に権限を関連付けます。ユーザーは、自分の各役割に割り当てられた許可を所有します。B2C Commerce では、SiteGenesis アプリケーションサイト用に、管理者役割などの役割のサンプルが定義されています。この役割には、管理 メニューの下にあるすべての Business Manager モジュールにおける許可が割り当てられています。サイトの組織の特定のニーズに応じて、独自の役割を作成します。割り当てられた役割 (インスタンスフィルターを含む) は、Account Manager のアカウント情報ページで確認します。</p></div>
+      <div><h2 class="slds-text-heading_medium slds-p-top_small">許可</h2><p>Business Manager <a title="モジュールの許可を使用して、特定の Business Manager モジュールへのアクセスを付与します。ログインしているユーザーが Business Manager モジュールへのアクセス許可を持っている場合、アプリケーションが左側のナビゲーションペインに表示されます。" href="#b2c_administrator_role">モジュールの許可</a>と<a title="機能の許可は、B2C Commerce のツールモジュールには関連付けられていません。機能の許可により、ユーザーは B2C Commerce の特定の機能を実行できるようになります。" href="#b2c_administrator_role">機能の許可</a>を構成します。モジュールの許可には、B2C Commerce データを転送、レプリケート、編集する許可が含まれています。また、ユーザーが顧客に代わって、または顧客としてログインできるようにする。これはサポートにとって便利です。ほとんどのデータに対して、1 つまたは複数のサイト、または組織内のすべてのサイトで、読み取りまたは書き込みのアクセスを指定します。</p><p class="bodytext">機能の許可により、ユーザーは B2C Commerce の特定の機能を実行できるようになります。データを編集するには、機能の許可と Business Manager モジュールの許可を組み合わせます。また、WebDAV の許可も付与できます。</p><p>特定の許可に割り当てられたすべてのユーザーのリストを表示するには、<a title="どのユーザーがモジュールへの読み取りまたは書き込みのアクセス権を持っているかを確認します。" href="#b2c_administrator_role">許可を監査</a>します。</p></div>
+      <div><h2 class="slds-text-heading_medium slds-p-top_small">Business Manager の例</h2><p>この例では、組織が複数のサイトを所有していて、異なるレベルの許可を異なるユーザーに割り当てる必要があるとします。 </p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col><col><col></colgroup><thead class="slds-text-title_caps">
+                  <tr class="">
+                     <th id="d192293e85" style="vertical-align:top;" class="slds-cell-wrap" scope="col">ユーザー名</th>
+                     <th id="d192293e88" style="vertical-align:top;" class="slds-cell-wrap" scope="col">タイトル</th>
+                     <th id="d192293e91" style="vertical-align:top;" class="slds-cell-wrap" scope="col">アクセスのニーズ</th>
+                  </tr>
+               </thead><tbody>
+                  <tr class="">
+                     <td headers="d192293e85" style="vertical-align:top;" class="slds-cell-wrap" data-label="ユーザー名">Marie</td>
+
+                     <td headers="d192293e88" style="vertical-align:top;" class="slds-cell-wrap" data-label="タイトル">副社長、マーケティング担当</td>
+
+                     <td headers="d192293e91" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクセスのニーズ">すべてのサイトの価格と在庫を表示できます。すべてのサイトのコンテンツアセットを表示できます。</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d192293e85" style="vertical-align:top;" class="slds-cell-wrap" data-label="ユーザー名">Traude</td>
+
+                     <td headers="d192293e88" style="vertical-align:top;" class="slds-cell-wrap" data-label="タイトル">サイトマーチャンダイザー</td>
+
+                     <td headers="d192293e91" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクセスのニーズ">ストアフロントのカタログ、価格、在庫を表示および編集できます。同一のレルム上でデータを共有したくない複数のビジネスが運営されている場合に、サイトマーチャンダイザーは重要です。サイトマーチャンダイザーは、自分のサイトのデータのみ表示できますが、他のサイトのデータは表示できません。</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d192293e85" style="vertical-align:top;" class="slds-cell-wrap" data-label="ユーザー名">Lucas</td>
+
+                     <td headers="d192293e88" style="vertical-align:top;" class="slds-cell-wrap" data-label="タイトル">サイト管理者</td>
+
+                     <td headers="d192293e91" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクセスのニーズ">カタログ、価格、在庫データは表示できません。WebDAV 経由でデータを転送できます。データをレプリケートできます。データをインポートまたはエクスポートできます。ジョブを実行できます。</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d192293e85" style="vertical-align:top;" class="slds-cell-wrap" data-label="ユーザー名">Henry</td>
+
+                     <td headers="d192293e88" style="vertical-align:top;" class="slds-cell-wrap" data-label="タイトル">eコマースのデベロッパー</td>
+
+                     <td headers="d192293e91" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクセスのニーズ">すべてのサイトに含まれるカタログ、価格、在庫データへのフルアクセス権が必要です。WebDAV 経由でデータを転送する、またはデータをレプリケートする許可をもちます。これらの許可は Henry の Sandbox (サンドボックス) でのみ機能します。</td>
+
+                  </tr>
+               </tbody></table><p>最初のステップとして、役割を作成します。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col><col><col></colgroup><thead class="slds-text-title_caps">
+                  <tr class="">
+                     <th id="d192293e163" style="vertical-align:top;" class="slds-cell-wrap" scope="col">役割</th>
+                     <th id="d192293e166" style="vertical-align:top;" class="slds-cell-wrap" scope="col">Business Manager の許可</th>
+                     <th id="d192293e169" style="vertical-align:top;" class="slds-cell-wrap" scope="col">機能の許可</th>
+                  </tr>
+               </thead><tbody>
+                  <tr class="">
+                     <td headers="d192293e163" style="vertical-align:top;" class="slds-cell-wrap" data-label="役割">企業</td>
+
+                     <td headers="d192293e166" style="vertical-align:top;" class="slds-cell-wrap" data-label="Business Manager の許可"><p>サイトごとに、次のサイトの許可を追加します: </p><ul>
+                           <li>商品とカタログ</li>
+
+                           <li>コンテンツ</li>
+
+                        </ul>
+</td>
+
+                     <td headers="d192293e169" style="vertical-align:top;" class="slds-cell-wrap" data-label="機能の許可">許可が割り当てられていません。</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d192293e163" style="vertical-align:top;" class="slds-cell-wrap" data-label="役割">マーチャンダイザー</td>
+
+                     <td headers="d192293e166" style="vertical-align:top;" class="slds-cell-wrap" data-label="Business Manager の許可"><p>特定のサイトについて、以下のサイト許可を追加します:</p><ul>
+                           <li>商品とカタログ</li>
+
+                           <li>コンテンツ</li>
+
+                           <li>検索</li>
+
+                           <li>オンラインマーケティング</li>
+
+                           <li>注文</li>
+
+                           <li>Analytics</li>
+
+                        </ul>
+</td>
+
+                     <td headers="d192293e169" style="vertical-align:top;" class="slds-cell-wrap" data-label="機能の許可"><p>次を割り当てます:</p><ul>
+                           <li>Manage_Site_Catalog</li>
+
+                           <li>Manage_Site_PriceBooks</li>
+
+                           <li>Manage_Site_Inventory</li>
+
+                        </ul>
+</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d192293e163" style="vertical-align:top;" class="slds-cell-wrap" data-label="役割">site_admin</td>
+
+                     <td headers="d192293e166" style="vertical-align:top;" class="slds-cell-wrap" data-label="Business Manager の許可"><p>次の組織の許可を追加します:</p><ul>
+                           <li>レプリケーション</li>
+
+                           <li>サイトの開発モジュール、インポート &amp; エクスポートおよびサイトのインポート &amp; エクスポート</li>
+
+                           <li>オペレーション</li>
+
+                        </ul>
+<p>特定のサイトについて、以下のサイト許可を追加します:</p><ul>
+                           <li>すべてのバッチ処理</li>
+
+                           <li>すべてのインポート &amp; エクスポートモジュール</li>
+
+                        </ul>
+</td>
+
+                     <td headers="d192293e169" style="vertical-align:top;" class="slds-cell-wrap" data-label="機能の許可"><p>次を割り当てます:</p><ul>
+                           <li>Replication_Run_For_Org</li>
+
+                           <li>WebDAV_Realm_Access</li>
+
+                           <li>WebDAV_Manage_Customization</li>
+
+                           <li>WebDAV_Transfer_Files</li>
+
+                        </ul>
+</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d192293e163" style="vertical-align:top;" class="slds-cell-wrap" data-label="役割">デベロッパー</td>
+
+                     <td headers="d192293e166" style="vertical-align:top;" class="slds-cell-wrap" data-label="Business Manager の許可"><ul>
+                           <li>すべてのサイトの開発モジュール</li>
+
+                           <li>オペレーション - カスタムログの設定、Pipeline Profiler</li>
+
+                        </ul>
+</td>
+
+                     <td headers="d192293e169" style="vertical-align:top;" class="slds-cell-wrap" data-label="機能の許可">許可が割り当てられていません。</td>
+
+                  </tr>
+               </tbody></table><p>役割を作成したら、ユーザーをその役割に割り当てます。 </p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col><col></colgroup><thead class="slds-text-title_caps">
+                  <tr class="">
+                     <th id="d192293e347" style="vertical-align:top;" class="slds-cell-wrap" scope="col">役割</th>
+                     <th id="d192293e350" style="vertical-align:top;" class="slds-cell-wrap" scope="col">許可</th>
+                  </tr>
+               </thead><tbody>
+                  <tr class="">
+                     <td headers="d192293e347" style="vertical-align:top;" class="slds-cell-wrap" data-label="役割">Marie</td>
+
+                     <td headers="d192293e350" style="vertical-align:top;" class="slds-cell-wrap" data-label="許可"><p style="margin-bottom:0;">企業</p></td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d192293e347" style="vertical-align:top;" class="slds-cell-wrap" data-label="役割">Traude</td>
+
+                     <td headers="d192293e350" style="vertical-align:top;" class="slds-cell-wrap" data-label="許可"><p>マーチャンダイザー </p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> すべてのサイトの価格と在庫を表示できるが、自分のサイトのデータしか編集できないようにしたい場合は、Traude を企業の役割に追加することもできます。 </div></div></div>
+</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d192293e347" style="vertical-align:top;" class="slds-cell-wrap" data-label="役割">Edward</td>
+
+                     <td headers="d192293e350" style="vertical-align:top;" class="slds-cell-wrap" data-label="許可">support_rep</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d192293e347" style="vertical-align:top;" class="slds-cell-wrap" data-label="役割">Lucas</td>
+
+                     <td headers="d192293e350" style="vertical-align:top;" class="slds-cell-wrap" data-label="許可"><p style="margin-bottom:0;">site_admin</p></td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d192293e347" style="vertical-align:top;" class="slds-cell-wrap" data-label="役割">Henry</td>
+
+                     <td headers="d192293e350" style="vertical-align:top;" class="slds-cell-wrap" data-label="許可">デベロッパー</td>
+
+                  </tr>
+               </tbody></table></div>
+   
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_security">
+<h1 class="slds-text-heading_large">B2C Commerce のセキュリティ設定</h1>
+   <p>Business Manager のセキュリティ設定を構成します。ログイン設定の構成は、統合認証に移行していないアカウントにのみ適用されます。統合認証は、すべての Business Manager インスタンスのログインを Account Manager ログインにリンクします。19.5 では、すべての新しいインスタンスは Account Manager ログインにリンクされます。</p>
+
+<ul><li class="slds-p-bottom_small"><strong><a href="data_jobs-1.html#b2c_configure_migration_to_unified_login">Account Manager 経由のユーザーの統合認証への移行</a></strong><br>ユーザーが Account Manager 経由でインスタンスにログインできるようにするには、ユーザーを統合認証に移行します。移行後、ユーザーは 1 つのログイン認証情報を管理するようになります。インスタンスのセキュリティを強化するには、Account Manager の 2 要素認証を使用します。このトピックは、B2C Commerce に該当します。</li><li class="slds-p-bottom_small"><strong><a href="general-5.html#b2c_login_settings">B2C Commerce でのログイン設定の構成</a></strong><br>Business Manager では、ユーザーパスワードの制約とログインのロックアウトポリシーを構成することが重要です。</li><li class="slds-p-bottom_small"><strong><a href="general-5.html#b2c_ip_address_settings">B2C Commerce のアクセス設定の構成</a></strong><br>IP アドレスに基づいてアクセスを制限します。許可リストまたはブロックリストを提供しない場合は、この機能はアクティブにはならず、これらの設定は効果をもちません。このトピックは、B2C Commerce に該当します。</li><li class="slds-p-bottom_small"><strong><a href="general-2.html#b2c_configure_enforce_https_global_preference">「HTTPS を強制する」グローバル環境設定の構成</a></strong><br>インスタンスのすべてのサイトで HTTPS の使用を強制します。この設定が有効な場合、URL は HTTPS プロトコルを使用して生成され、HTTP を使用する受信ページリクエストは HTTPS にリダイレクトされます。Open Commerce API (OCAPI) のセッションブリッジへの HTTP リクエストは受け入れられません。また、セッション Cookie とセキュアトークンの組み合わせの代わりに、誤った (誤検知の) セッションハイジャック検出を防止するセキュアセッション Cookie が使用されます。「HTTPS を強制する」グローバル環境設定を有効にすると、クロスサイトコンテキストでブラウザーが Cookie を送信できるようになります。このトピックは、B2C Commerce に該当します。</li><li class="slds-p-bottom_small"><strong><a href="get_started.html#b2c_configure_hsts_for_business_manager">グローバル環境設定での Business Manager に対する HSTS の設定</a></strong><br>HTTP Strict Transport Security (HSTS) を使用すると、Business Manager のセキュリティを大幅に向上できます。Business Manager を保護するため、HSTS は HTTPS のみを使用してドメインにアクセスするように Web ブラウザーに指示します。</li><li class="slds-p-bottom_small"><strong><a href="general-1.html#b2c_clear_sftp_known_good_hosts">B2C Commerce の Secure File Transfer Protocol (SFTP) の正常動作ホストのクリア</a></strong><br>Business Manager では、以前に SFTP に使用されたホストが記憶されます。これらの記憶された既知のホストをクリアします。</li><li class="slds-p-bottom_small"><strong><a href="general-2.html#b2c_configure_system_use_notification_message_settings">B2C Commerce でのシステム使用通知メッセージの追加</a></strong><br>ユーザーがログインしたときに表示されるシステム使用通知メッセージを作成します。また、ユーザーがログインする前に、このメッセージを確認しなければならないように設定できます。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_security_best_practices_for_administrators">
+<h1 class="slds-text-heading_large">B2C Commerce 管理者のためのセキュリティのベストプラクティス</h1>
+   <p>Business Manager を使用してサイトを保護し、買い物客のために安全なオンラインショッピング環境を確保できます。また、こうすることで Business Manager が保護され、以前に構成したセキュリティコントロールが攻撃者によって削除されるのを防ぐことができます。</p>
+
+<ul><li class="slds-p-bottom_small"><strong><a href="general-3.html#b2c_determine_how_to_block_attacks">B2C Commerce での攻撃のブロック方法の決定</a></strong><br>Salesforce B2C Commerce ではセキュリティ保護を提供していますが、セキュリティコントロールの構成と、デフォルトで有効になっているセキュリティコントロールを維持することはお客様の責任です。お使いの B2C Commerce インスタンスのセキュリティを維持するために、次のすべての面を考慮する必要があります。 </li><li class="slds-p-bottom_small"><strong><a href="#b2c_network_access_restrictions">B2C Commerce でのネットワークアクセスの制限</a></strong><br>ネットワークレベルは、アセットにアクセスしようとする攻撃者に対する最初の防御ラインです。Salesforce B2C Commerce では、ストアフロントと Business Manager に対して 1 つずつ、2 つのメカニズムを使用しています。</li><li class="slds-p-bottom_small"><strong><a href="general-6.html#b2c_secure_communications">B2C Commerce でのセキュアな接続</a></strong><br>セキュアな接続は、クレジットカード、個人を特定できる情報 (PII)、認証情報などの機密情報を攻撃者が読み取ったり、変更したりできないようにするために非常に重要です。Salesforce B2C Commerce では、以下の安全なプロトコルを使用してインタラクションを保護できます。</li><li class="slds-p-bottom_small"><strong><a href="general-6.html#b2c_secure_storage">B2C Commerce のセキュアなストレージ</a></strong><br>Salesforce B2C Commerce は多くのタイプの機密情報を保存しており、もっとも重要なものとしてはクレジットカード情報があります。</li><li class="slds-p-bottom_small"><strong><a href="#b2c_authentication_and_authorization">B2C Commerce での認証と承認</a></strong><br>認証と承認は、重要なセキュリティの概念です。セキュリティコントロールを構成するには、Business Manager にアクセスする必要があります。</li><li class="slds-p-bottom_small"><strong><a href="security-2.html#b2c_security_event_auditing">B2C Commerce でのセキュリティイベントの監査</a></strong><br>Salesforce B2C Commerce は、セキュリティログを含むさまざまなログファイルを提供しています。セキュリティログには Business Manager ログインのログエントリが含まれます。     </li><li class="slds-p-bottom_small"><strong><a href="api_integration.html#b2c_denial_of_service_protection">B2C Commerce での Dos 攻撃に対する保護</a></strong><br>DoS 攻撃では、攻撃者がネットワークのユーザーに対してコンピューターリソースを拒否することを試みます。攻撃者は通常、ターゲットのコンピューターシステムのリソースに大量の未承認のリクエストを送信し、一般のユーザーがネットワークにアクセスできないようにします。</li><li class="slds-p-bottom_small"><strong><a href="data_jobs-2.html#b2c_data_privacy_and_protection">B2C Commerce でのデータプライバシーと保護</a></strong><br>Salesforce B2C Commerce のサービスは、耐久性の高いデータセキュリティとプライバシープログラムを装備しています。データのプライバシーと保護、および関連するトピックについては、紹介されているリソースを参照してください。</li></ul>
+</div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="site_admin-2.html">&larr; サイト管理・ロケール・組織設定（2/2）</a><a href="security-2.html">セキュリティ・WAF・アクセス制御（2/2） &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=cc.b2c_getting_started.htm&type=5&language=ja">help.salesforce.com — Salesforce B2C Commerce（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>

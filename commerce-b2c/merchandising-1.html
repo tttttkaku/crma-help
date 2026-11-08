@@ -1,0 +1,2291 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>マーチャンダイジング（商品・カタログ・価格・在庫）（1/4） | B2C Commerce ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（36）</h2>
+    <ol>
+      <li><a href="#b2c_active_mapping_to_display_a_product_for_source_codes">B2C Commerce のソースコードをもつアクティブな URL マッピング</a></li>
+      <li><a href="#b2c_add_and_modify_and_edit_products_manually">商品の手動での追加、変更、編集</a></li>
+      <li><a href="#b2c_add_products_manually">商品の手動での追加</a></li>
+      <li><a href="#b2c_adding_excluded_products">B2C Commerce でのプロモーションへの除外商品の追加</a></li>
+      <li><a href="#b2c_analytic_reports_catalog">過去のレポート: カタログ</a></li>
+      <li><a href="#b2c_applying_variation_groups">バリエーショングループの適用</a></li>
+      <li><a href="#b2c_assign_multiple_products_to_multi_catg_catlg">複数の商品の複数のカタログと複数のカテゴリへの割り当て</a></li>
+      <li><a href="#b2c_assign_product_attributes">商品属性の割り当て</a></li>
+      <li><a href="#b2c_assign_products_to_a_category">カテゴリへの商品の割り当て</a></li>
+      <li><a href="#b2c_assign_products_to_a_category_grid_view">グリッド表示での商品のカテゴリへの割り当て</a></li>
+      <li><a href="#b2c_assign_variation_attributes">バリエーション属性の割り当て</a></li>
+      <li><a href="#b2c_assigning_a_pricebook_or_promotion_specific">B2C Commerce での特定の店舗への価格表またはプロモーションの割り当て</a></li>
+      <li><a href="#b2c_assigning_a_pricebook_or_promotion_to_a_specific_store">B2C Commerce での特定の店舗への価格表またはプロモーションの割り当て</a></li>
+      <li><a href="#b2c_assigning_a_pricebook_to_a_site">B2C Commerce でのサイトへの価格表の割り当て</a></li>
+      <li><a href="#b2c_assigning_an_inventory_list_to_a_site">サイトへの在庫リストの割り当て</a></li>
+      <li><a href="#b2c_assigning_catalogs_to_sites">カタログのサイトへの割り当て</a></li>
+      <li><a href="#b2c_associating_a_store_with_an_inventory_list">B2C Commerce での店舗と在庫リストの関連付け</a></li>
+      <li><a href="#b2c_catalog_design">カタログのデザイン</a></li>
+      <li><a href="#b2c_catalog_object_import_export">B2C Commerce でのカタログオブジェクトのインポート/エクスポート</a></li>
+      <li><a href="#b2c_catalog_scenarios">カタログのシナリオ</a></li>
+      <li><a href="#b2c_catalogs">カタログ</a></li>
+      <li><a href="#b2c_categories_and_products">B2C Commerce のカテゴリと商品</a></li>
+      <li><a href="#b2c_category_attributes">B2C Commerce のカテゴリ属性</a></li>
+      <li><a href="#b2c_category_linking">B2C Commerce のカテゴリのリンク</a></li>
+      <li><a href="#b2c_choice_of_bonus_product_discount">B2C Commerce での「ボーナス商品の選択」割引</a></li>
+      <li><a href="#b2c_classification_vs_primary_category">分類カテゴリと主要カテゴリ</a></li>
+      <li><a href="#b2c_configure_variation_groups_display_mode">バリエーショングループの表示モードの構成</a></li>
+      <li><a href="#b2c_configuring_product_and_content_locking">B2C Commerce の商品とコンテンツのロックの構成</a></li>
+      <li><a href="#b2c_configuring_variation_attributes_for_image_assignment">カタログによる画像割り当てのためのバリエーション属性の構成</a></li>
+      <li><a href="#b2c_cost_price">原価</a></li>
+      <li><a href="#b2c_create_a_catalog">カタログの作成</a></li>
+      <li><a href="#b2c_create_a_category">B2C Commerce のカテゴリの作成</a></li>
+      <li><a href="#b2c_create_a_main_product">バリエーションマスターの作成</a></li>
+      <li><a href="#b2c_create_a_product_set">商品セットの作成</a></li>
+      <li><a href="#b2c_create_a_product_variation_group">商品バリエーショングループの作成</a></li>
+      <li><a href="#b2c_create_a_subcategory">B2C Commerce のサブカテゴリの作成</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>マーチャンダイジング（商品・カタログ・価格・在庫）（1/4）</h1>
+      <div class="meta">Salesforce B2C Commerce ヘルプ · 36 記事 · 生成 2026-11-03</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="einstein-2.html">&larr; Einstein・レコメンデーション・パーソナライゼーション（2/2）</a><a href="merchandising-2.html">マーチャンダイジング（商品・カタログ・価格・在庫）（2/4） &rarr;</a></div>
+<section class="article" id="b2c_active_mapping_to_display_a_product_for_source_codes">
+<h1 class="slds-text-heading_large">B2C Commerce のソースコードをもつアクティブな URL マッピング</h1>
+   
+   <p> 顧客が入力できるフレンドリ URL をサポートします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>         <tr class="">           <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+         </tr>       </tbody></table></div>
+      <div><p>この URL は、商品 ID <code>S1916071</code> の検索結果を表示する対象ページなど、特定の商品ページに顧客を転送します。</p></div>
+      <ol><li>
+            <span><span class="menucascade"><strong class="uicontrol"><var>サイト名</var></strong> | <strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol">オンラインマーケティング</strong> | <strong class="uicontrol">ソースコードグループ</strong></span>を選択します。
+            </span>
+            <ol>
+               <li>
+                  <span>ソースコードグループページで、<strong class="uicontrol">検索</strong>をクリックしてソースコードグループのリストを表示します。</span>
+               </li>
+
+               <li>
+                  <span>選択したソースコードグループを開きます。</span>
+               </li>
+
+               <li>
+                  <span>ソースコードグループページの全般タブで、コードタブをクリックします。</span>
+               </li>
+
+               <li>
+                  <span>ソースコード仕様フィールドに <kbd>SpringSale</kbd> と入力し、<strong class="uicontrol">追加</strong>をクリックします。</span>
+               </li>
+
+               <li>
+                  <span>リダイレクトタブで、表示したい商品ページを参照ボタンを使って検索および選択し、<strong class="uicontrol">適用</strong>をクリックします。
+                  </span>
+               </li>
+
+            </ol>
+         </li><li>
+            <span><span class="menucascade"><strong class="uicontrol"><var>サイト名</var></strong> | <strong class="uicontrol">サイト環境設定</strong> | <strong class="uicontrol">ソースコード</strong></span>の順に選択します。</span>
+            <ol>
+               <li>
+                  <span>ソースコード環境設定ページで、URL パラメーター名に <kbd>src</kbd> と入力します。</span>
+               </li>
+
+               <li>
+                  <span><strong class="uicontrol">適用</strong>をクリックします。
+                  </span>
+               </li>
+
+            </ol>
+         </li><li>
+            <span><span class="menucascade"><strong class="uicontrol"><var>サイト名</var></strong> | <strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol">サイト URL</strong> | <strong class="uicontrol">エイリアス</strong></span>の順に選択します。
+            </span>
+            <ol>
+               <li>
+                  <span>エイリアスページで、<kbd>www.yourstore.com</kbd> と入力します。
+                  </span>
+               </li>
+
+               <li>
+                  <span><strong class="uicontrol">保存</strong>をクリックします。</span>
+               </li>
+
+            </ol>
+         </li><li>
+            <span><span class="menucascade"><strong class="uicontrol"><var>サイト名</var></strong> | <strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol">サイト URL </strong> | <strong class="uicontrol">動的マッピング</strong></span>の順に選択します。
+            </span>
+            <ol>
+               <li>
+                  <span>動的マッピングページで、以下の文字列を入力します。</span>
+                  <div>
+                     <pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>/specials/?src=* p,,,SourceCodeRedirect-Start,,src,{0}</code></pre>
+                  </div>
+               </li>
+
+               <li>
+                  <span><strong class="uicontrol">保存</strong>をクリックします。
+                  </span>
+               </li>
+
+            </ol>
+            <div>指定された対象ページが顧客に表示されます。</div>
+         </li></ol>
+
+   
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_add_and_modify_and_edit_products_manually">
+<h1 class="slds-text-heading_large">商品の手動での追加、変更、編集</h1>
+    <p>Business Manager では、手動による商品の追加、編集、変更がサポートされています。商品の手動による編集は、いくつかの商品を更新する場合に便利なオプションです。手動での商品の追加に加え、商品の詳細の編集や、商品のカテゴリの割り当ての変更、商品の属性の割り当ての変更を行うことができます。このトピックは、B2C Commerce に該当します。</p>
+
+<ul><li class="slds-p-bottom_small"><strong><a href="#b2c_add_products_manually">商品の手動での追加</a></strong><br>商品をマスターカタログに手動で追加します。このトピックは、B2C Commerce に該当します。</li><li class="slds-p-bottom_small"><strong><a href="merchandising-2.html#b2c_edit_product_details">商品詳細の編集</a></strong><br>Business Manager を使用して、個々の商品の商品詳細を編集します。このトピックは、B2C Commerce に該当します。</li><li class="slds-p-bottom_small"><strong><a href="merchandising-2.html#b2c_edit_multiple_products">複数の商品の編集</a></strong><br>Business Manager を使用して複数の商品を編集します。商品属性の更新や削除、カテゴリへの商品の再割り当て、商品のコピーや削除、ならびに価格の変更を行います。このトピックは、B2C Commerce に該当します。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_add_products_manually">
+<h1 class="slds-text-heading_large">商品の手動での追加</h1>
+   
+   <p>商品をマスターカタログに手動で追加します。このトピックは、B2C Commerce に該当します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+      <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+                  <tr class="">
+                     <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+
+                  </tr>
+               </tbody></table></div>
+      <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 薄く表示されているフィールドがある場合は、読み取り専用許可が付与されています。商品を検索したり、商品データを表示したりすることはできますが、変更はできません。異なる役割を通じて 1 つのモジュールに複数の許可が与えられている場合、B2C Commerce はより高いレベルのアクセスを付与します。書き込みアクセスが必要な場合は、管理者に連絡してください。</div></div></div>
+</div>
+      <ol><li>
+            <span>アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、<span class="menucascade"><strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol"><var>サイト名</var></strong> | <strong class="uicontrol">商品とカタログ</strong> | <strong class="uicontrol">商品</strong></span>の順に選択します。</span>
+         </li><li>
+            <span>ウィザードを開始するには、<strong class="uicontrol">新規</strong>をクリックします。</span>
+            <div>薄く表示されているフィールドがある場合は、読み取り専用許可が付与されています。書き込みアクセスが必要な場合は、管理者に連絡してください。</div>
+         </li><li>
+            <span>商品ページの全般タブで、一般的な商品情報を入力します:</span>
+            <div>
+               <ul>
+                  <li>ID: ID には、コンマやピリオドを含めないでください。これらの文字を含めると、商品の別の部分に支障をきたす可能性があります。</li>
+
+                  <li>カタログ: ドロップダウンから選択します (ドロップダウンを選択するのは、商品を作成するときのみです。)</li>
+
+                  <li>税区分: ドロップダウンから選択します。</li>
+
+                  <li>オンライン</li>
+
+                  <li>検索可能</li>
+
+                  <li>入手不可でも検索可能: 商品が入手不可の場合 (つまり、販売可能数量 (ATS) が 0 の場合) でも検索結果に表示されるようにする場合に、商品レベルでこのフィールドを使用して制御します。</li>
+
+                  <li>名前</li>
+
+                  <li>ブランド</li>
+
+                  <li>製造元</li>
+
+                  <li>製造元商品 ID</li>
+
+                  <li>説明</li>
+
+                  <li>特定の期間のオンライン/オフライン</li>
+
+                  <li>SEO、サイトマップ、検索ランキングなどの属性</li>
+
+               </ul>
+
+            </div>
+         </li><li>
+            <span>「<strong class="uicontrol">サイト固有の編集</strong>」ボタンをクリックして、サイト固有の属性を構成します。</span>
+         </li><li>
+            <span>オプションタブで、シェア商品の<a title="商品オプションでは、特定の商品を他の商品に関連付けることができるため、顧客は商品をカスタマイズすることができます。このトピックは、B2C Commerce に該当します。" href="merchandising-2.html#b2c_create_product_options">商品オプションの作成</a>を選択します。
+            </span>
+         </li><li>
+            <span>バリエーションタブで、マスター商品、可変商品属性のセット、および関連付けられたバリエーション商品で構成される<a title="バリエーション属性にはローカルとシェアがあります。シェアバリエーション属性はカタログの範囲内で作成し、そのカタログの一部またはすべての商品に適用します。ローカルバリエーション属性は特定の商品用に作成し、その商品のみに適用します。このトピックは、B2C Commerce に該当します。" href="merchandising-2.html#b2c_create_a_variation_product">バリエーション</a>商品を指定します。</span>
+         </li><li>
+            <span>価格設定タブで、商品に<a title="価格表は、商品の価格を定義する手段です。価格表には、通貨に基づいて、商品グループの価格定義が含まれます。価格表の各商品に複数の価格テーブルを設定して、各価格テーブルで異なる数量ごとに価格を定義できます。このトピックは、B2C Commerce に該当します。" href="merchandising-3.html#b2c_pricing_and_price_books">価格設定</a>を割り当てます。</span>
+         </li><li>
+            <span>在庫タブで、1 つの商品の<a title="ストアフロントの在庫データを管理するには、記録システムとして機能する外部在庫管理システムに B2C Commerce を接続します。基本的な追跡にはプラットフォームを利用するか、Salesforce Omnichannel Inventory を統合して高度な可用性機能にアクセスします。この統合により、正確な在庫レベルが保証され、複雑なフルフィルメントシナリオがサポートされます。" href="merchandising-3.html#b2c_inventory_management">在庫</a>レコードの設定を管理します。</span>
+         </li><li>
+            <span>カテゴリタブで、商品を<a title="カテゴリへの商品の割り当ては、商品エディターから、またはカテゴリページから行います。このトピックは、B2C Commerce に該当します。" href="#b2c_assign_products_to_a_category">カテゴリ</a>に割り当てます。
+            </span>
+         </li><li>
+            <span>リンクタブで、この商品と他の商品との<a title="商品エディターでリンクタブを使用して、商品間にリンクを作成します。商品からリンクするか、または商品にリンクします。このトピックは、B2C Commerce に該当します。" href="merchandising-3.html#b2c_linking_products">静的商品リンク</a>を作成します。</span>
+         </li><li>
+            <span>推奨項目タブで、この商品に<a title="B2C Commerce を使用し、さまざまなアプローチで推奨項目を実装します。" href="einstein-2.html#b2c_recommendations">関連付けられている商品</a>を次の推奨項目タイプのいずれかで指定します:</span>
+            <div>
+               <ul>
+                  <li>商品詳細ページ - クロスセリング</li>
+
+                  <li>カテゴリのランディングページ - おすすめの商品</li>
+
+                  <li>その他</li>
+
+               </ul>
+
+               <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 実際の構成では、ここにリストされているものと異なる推奨項目タイプが表示される場合があります。その場合は、組織に適したタイプを選択します。</div></div></div>
+
+            </div>
+         </li><li>
+            <span>バンドルタブで、この商品に<a title="複数の商品から商品バンドルを作成します。このトピックは、B2C Commerce に該当します。" href="merchandising-2.html#b2c_create_product_bundles">バンドル</a>される商品を指定します。</span>
+         </li><li>
+            <span>商品セットタブで、現在の商品の<a title="ストアフロントで商品セットとして表示する商品グループを構成します。このトピックは、B2C Commerce に該当します。" href="#b2c_create_a_product_set">商品セット</a>を表示します。</span>
+         </li><li>
+            <span>アクティブデータタブで、現在の商品の<a title="アクティブマーチャンダイジングデータは、ウェブ解析ツールや注文管理システム、その他のサードパーティのシステムによって収集または計算される商品や顧客のデータです。顧客ターゲットの絞り込み方法を向上させるためにアクティブデータを使用します。バックエンドシステムからデータをインポートして、Salesforce B2C Commerce でメトリクス計算にフィードできます。" href="general-1.html#b2c_active_merchandising">アクティブデータ</a>を表示します。</span>
+         </li><li>
+            <span>ページのメタタグルールタブで、<a title="Page meta tags are used in HTML documents to provide structured data about a web page. Meta tags are snippets of text that don't appear on the page itself, but in the page’s code, describing a page’s content. Common tags are title, robots, description, and social tags such as open graph tags. This topic applies to B2C Commerce." href="https://help.salesforce.com/s/articleView?id=cc.b2c_page_meta_tags.htm&amp;language=ja&amp;type=5">ページのメタタグ</a>を作成および管理します。</span>
+         </li><li>
+            <span><strong class="uicontrol">適用</strong>をクリックして変更を保存します。</span>
+         </li></ol>
+
+      <div><p>B2C Commerce カタログに商品を追加する方法については、このビデオをご覧ください。</p><p><iframe width="640" height="360" src="https://play.vidyard.com/wVTfpobCCwmXV1JnJvFe8J" class="doc_embedded_video"><!-- --></iframe></p><p>動画を全画面表示で視聴できない場合は、次のリンクを新しいタブで開きます。<a target="_blank" href="https://salesforce.vidyard.com/watch/wVTfpobCCwmXV1JnJvFe8J">B2C Commerce カタログに商品を追加します</a>。</p></div>
+   
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_adding_excluded_products">
+<h1 class="slds-text-heading_large">B2C Commerce でのプロモーションへの除外商品の追加</h1>
+   
+   <p> 注文プロモーションから除外する商品を指定します。たとえば、ギフト券に該当する商品 (SKU) や、価格表ですでに割引されているためプロモーション対象とならない商品などを除外できます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>         <tr class="">           <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+         </tr>       </tbody></table></div>
+      <div><p class="bodytext">このオプションは、「対象商品の金額に基づく」のタイプの注文プロモーションで利用できます。</p></div>
+      <ol><li>  
+            <span>アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>の順にクリックし、<span class="menucascade"><strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol">サイト名</strong> | <strong class="uicontrol">オンラインマーケティング</strong> | <strong class="uicontrol">プロモーション</strong></span>の順に選択します。
+            </span>
+         </li><li>
+            <span>プロモーションページで、一般的なプロモーション情報を入力または選択します。</span>
+         </li><li>
+            <span>プロモーションクラスに<strong class="uicontrol">注文</strong>を選択し、プロモーションタイプを選択します。</span>
+         </li><li>
+            <span><strong class="uicontrol">編集</strong>をクリックして除外商品を指定します。</span>
+         </li><li>
+            <span>含める商品/除外商品のウィンドウで、<code>除外</code> 商品のリストに<code>含める</code> 限定子、演算子、値、および商品のカタログを指定します。</span>
+            <div>
+               <p>限定子が ID の場合は、Business Manager の商品選択ポップアップページで、一度に複数の商品を検索して選択します。また、検索では名前と ID を組み合わせて使用することもできます (例: "S1653098, Nokia*")。</p>
+               
+            </div>
+         </li><li>
+            <span><strong class="uicontrol">追加</strong>をクリックして、リストに新しいタイプの商品を追加します。</span>
+         </li></ol>
+
+      <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-example"><img alt="例" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_example.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">例</span> 
+         <p class="bodytext">"$100 以上の購入で 10% 割引 (ギフト券は含まない)"。</p>
+         <p class="bodytext">ここでギフト券は、カタログ内で SKU として作成されたものとします。ストアフロントのユーザーインターフェイスには "10% item-level discount (10% の品目レベル割引)" と表示されるため、商品レベルのプロモーションではなく注文レベルのプロモーションとして設定することが重要です。</p>
+         <p class="bodytext">マーチャントは次のプロモーションを作成します:</p>
+         <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col><col></colgroup><thead class="slds-text-title_caps">
+                  <tr class="">
+                     <th id="d147994e138" style="vertical-align:top;" class="slds-cell-wrap" scope="col">設定</th>
+                     <th id="d147994e141" style="vertical-align:top;" class="slds-cell-wrap" scope="col">値</th>
+                  </tr>
+               </thead><tbody>
+                  <tr class="">
+                     <td headers="d147994e138" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">プロモーションクラス</td>
+
+                     <td headers="d147994e141" style="vertical-align:top;" class="slds-cell-wrap" data-label="値">注文</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d147994e138" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">プロモーションタイプ</td>
+
+                     <td headers="d147994e141" style="vertical-align:top;" class="slds-cell-wrap" data-label="値">対象商品の金額に基づく</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d147994e138" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">割引</td>
+
+                     <td headers="d147994e141" style="vertical-align:top;" class="slds-cell-wrap" data-label="値">$100 以上の購入で 10% 割引</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d147994e138" style="vertical-align:top;" class="slds-cell-wrap" data-label="設定">対象外商品</td>
+
+                     <td headers="d147994e141" style="vertical-align:top;" class="slds-cell-wrap" data-label="値">ギフト券</td>
+
+                  </tr>
+               </tbody></table>
+         <ul>
+            <li>顧客は $50 のギフト券と $60 の DVD を買い物カゴに入れます。合計注文金額は $110 です。$100 のしきい値に達していない ($110 - ギフト券 = $60) ため、注文プロモーションは適用されません。</li>
+
+            <li>顧客が買い物カゴに DVD を追加し、買い物カゴには現在 $50 のギフト券と $105 の DVD が入っています。これで $100 のしきい値に達したため、注文プロモーションが適用されます。10% 割引は、ギフト券を除いた注文金額に適用されます ($155 - ギフト券 = $105、割引 = $10.50)</li>
+
+         </ul>
+
+      </div></div></div>
+   
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_analytic_reports_catalog">
+<h1 class="slds-text-heading_large">過去のレポート: カタログ</h1>
+   
+
+   <p>B2C Commerce Business Manager の Analytics レポートは廃止されました。2021 年 1 月 1 日をもって、レポートにデータは表示されなくなりました。 </p>
+
+      <p>高度な分析とレポートの機能を使用して現在のデータにアクセスするには、<a title="B2C Commerce の Reports &amp; Dashboards ツールを使用すると、経時的な傾向を特定し、B2C Commerce データに基づいてビジネスに関する意思決定をスマートに行うことができます。2017 年 1 月 1 日より後のデータを使用できます。" href="analytics-2.html#b2c_reports_and_dashboards">Reports &amp; Dashboards</a> を使用します。</p>
+      <p>このレポートには、売れ筋商品の数量別と収益別のデータが含まれます。</p>
+      <div><h2 class="slds-text-heading_medium slds-p-top_small">注文商品レポート</h2><p class="bodytext">注文商品レポートでは、販売された商品の数、販売総数量、および商品の総売上高の概要が提供されます。これらの合計数に加え、このレポートには、売れ筋商品の数量別と収益別の詳細ビューが含まれます。このレポートは、経営上の観点から、ユーザーの店舗にとって収益拡大に貢献する商品のリストを提供します。</p><p class="subheading1">Summary by Quantity (数量ごとのサマリ)</p><p class="bodytext">販売された商品の数量別のリストは、売れ筋商品の記録です。この記録には、商品名、SKU、数量、合計販売数の割合、および選択した期間における商品の平均価格についての情報が含まれます。このビューには次のデータが表示されます: </p><ul>
+            <li>Product (商品名)</li>
+
+            <li>SKU</li>
+
+            <li>Manufacturer (製造元)</li>
+
+            <li>Average Price (選択した期間における商品の平均価格)</li>
+
+            <li>Quantity (数量)</li>
+
+            <li>Percentage (総売上高に対する割合)</li>
+
+         </ul>
+<p class="subheading1">Summary by Revenue (収益ごとのサマリ)</p><p class="bodytext">販売された商品の収益別のリストには、売れ筋商品および以下データが表示されます：</p><ul>
+            <li>Product (商品名)</li>
+
+            <li>SKU</li>
+
+            <li>Manufacturer (製造元)</li>
+
+            <li>Revenue (収益)</li>
+
+            <li>Quantity (数量)</li>
+
+            <li>Average Price (選択した期間における商品の平均価格)</li>
+
+            <li>Percentage (総売上高に対する割合)</li>
+
+         </ul>
+</div>
+   
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_applying_variation_groups">
+<h1 class="slds-text-heading_large">バリエーショングループの適用</h1>
+        
+        <p> さまざまな構成でバリエーショングループをストアフロントに適用します。このトピックは、B2C Commerce に該当します。</p>
+
+                <p>以下の操作を行うことができます: </p>
+                <ul>
+                        <li>標準のカタログのインポートプロセスを使用して、バリエーショングループをインポートする。B2C Commerce では、Catalog.xsd スキーマでバリエーショングループの商品タイプがサポートされています。B2C Commerce ではインポートで merge-mode (マージモード) がサポートされています。</li>
+
+                        <li>特定のバリエーションマスターに対して少なくとも 1 つのバリエーション属性を指定して、バリエーショングループを作成する。</li>
+
+                        <li>すべてのバリエーショングループを検索する。</li>
+
+                        <li>コンテンツスロットにバリエーショングループを割り当てる。 <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> ストアフロントでバリエーショングループが割り当てられたコンテンツスロットをクリックすると、バリエーションマスターの商品詳細ページが表示されます。商品詳細ページには、商品セットの紹介と同様の方法で、バリエーショングループの選択した属性が適切な画像とともに表示されます。</div></div></div>
+
+                        </li>
+
+                        <li>カテゴリの位置をバリエーショングループに割り当てる。これによって、すべてのレッドのハンドバッグをすべてのゴールドのハンドバッグの前に表示できます。</li>
+
+                        <li>バリエーションマスターが割り当てられている主要カテゴリやストアフロントカテゴリには関係なく、バリエーショングループをカテゴリやサブカテゴリに割り当てる。たとえば、任意のサイズのすべてのレッドのバリエーション商品をホリデーカテゴリで販売します。</li>
+
+                        <li>プロモーションにバリエーショングループを割り当てる。</li>
+
+                        <li>商品セットにバリエーショングループを割り当てると、特定の色のコーディネートを作成し、特定の商品を任意のサイズで販売できます。</li>
+
+                        <li>バリエーショングループが構成されている商品の検索環境設定を通じて、ストアフロントの検索の動作を制御する。</li>
+
+                </ul>
+
+                <p>B2C Commerce では:</p>
+                <ul>
+                        <li>マスター商品にバリエーショングループが存在する場合、スライスを無効にします。ただし、スライスはこの商品に対してのみ無効になります。他のすべての商品では、引き続きスライスを使用できます。</li>
+
+                        <li>属性値のフォールバックを使用して、バリエーショングループを含めます。たとえば、B2C Commerce ではまずバリエーション商品に属性値が設定されていることがチェックされ、その後、バリエーショングループ商品、最後にマスター商品がチェックされます。</li>
+
+                        <li>バリエーショングループのアクティブデータを収集します。バリエーショングループのアクティブデータは、グループ内に含まれるバリエーション商品の集計になります。</li>
+
+                </ul>
+
+                <p>また、B2C Commerce Script API を使用して、ランディングページ、カテゴリページ、およびカスタマイズされた検索体験にバリエーショングループを表示します。</p>
+        
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_assign_multiple_products_to_multi_catg_catlg">
+<h1 class="slds-text-heading_large">複数の商品の複数のカタログと複数のカテゴリへの割り当て</h1>
+   
+   <p>複数のカタログに含まれるカテゴリに、シングルステップで商品を割り当てることができます。このトピックは、B2C Commerce に該当します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+      <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+                  <tr class="">
+                     <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+
+                  </tr>
+               </tbody></table></div>
+      <ol><li>
+            <span>アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、次に<span class="menucascade"><strong class="uicontrol">マーチャンダイザーツール</strong> | <strong class="uicontrol"><var>サイト</var> </strong> | <strong class="uicontrol">商品とカタログ</strong> | <strong class="uicontrol">商品</strong></span>の順に選択します。</span>
+         </li><li>
+            <span>割り当てる商品を検索して選択します。 </span>
+            <div>カテゴリにバリエーションマスターまたはバリエーショングループを割り当てると、すべてのバリエーション商品がそのカテゴリに割り当てられます。また、バリエーションマスターを割り当てずに、1 つのバリエーション商品をカテゴリに割り当てることもできます。</div>
+         </li><li>
+            <span><strong class="uicontrol">割り当てる</strong>をクリックします。</span>
+         </li><li>
+            <span>ドロップダウンリストで、商品の追加先のカタログを選択します。</span>
+         </li><li>
+            <span>カテゴリツリーで、商品の追加先のカテゴリを選択します。</span>
+            <div>変更を確定する前に、リストされているカタログとカテゴリの商品の割り当てを確認します。</div>
+         </li><li>
+            <span>商品の割り当てが完了したら、<strong class="uicontrol">次へ</strong>をクリックします。</span>
+         </li><li>
+            <span>カタログと、カテゴリの選択を、確認して確定します。</span>
+            <div>変更を行うには<strong class="uicontrol">前へ</strong>をクリックします。<p>操作を中止するには<strong class="uicontrol">キャンセル</strong>をクリックします。</p>
+            </div>
+         </li><li>
+            <span>各カタログで、新しく割り当てられた商品に主要カテゴリを割り当てます。主要カテゴリを割り当てると、以前にこの商品に設定した主要カテゴリと置き換えられます。主要カテゴリを現在のままにするには、<strong class="uicontrol">なし</strong>を選択します。</span>
+         </li><li>
+            <span>割り当てられた商品に分類カテゴリを割り当てます。</span>
+            <div>分類カテゴリは 1 つのみ割り当てることができます。分類カテゴリを現在のままにするには、<strong class="uicontrol">なし</strong>を選択します。<div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span>  B2C Commerce では、ドロップダウンの最初の分類またはカテゴリが、以前に分類カテゴリまたは主要カテゴリが割り当てられていない商品に割り当てられます。</div></div></div>
+</div>
+            </div>
+         </li><li>
+            <span><strong class="uicontrol">完了: バッチ処理に進む</strong>または<strong class="uicontrol">完了: 商品に進む</strong>に移動します。どちらの選択肢でもバッチ処理が開始され、新しい割り当てが完了します。</span>
+         </li></ol>
+
+   
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_assign_product_attributes">
+<h1 class="slds-text-heading_large">商品属性の割り当て</h1>
+   
+   <p>ストアフロントに表示する商品属性を設定します。このトピックは、B2C Commerce に該当します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+      <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+                  <tr class="">
+                     <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+
+                  </tr>
+               </tbody></table></div>
+      <ol><li>
+            <span>アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、次に<span class="menucascade"><strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol"><var>サイト名</var> </strong> | <strong class="uicontrol">商品とカタログ</strong> | <strong class="uicontrol">カタログ</strong> | <strong class="uicontrol"><var>カタログ名</var></strong></span> の順に選択します。</span>
+            <div>商品属性定義が商品属性グループに属していることを確認します。</div>
+         </li><li>
+            <span>カタログペインで、カタログの横にある<strong class="uicontrol">編集</strong>をクリックします。</span>
+         </li><li>
+            <span><strong class="uicontrol">商品属性定義</strong>をクリックします。
+            </span>
+            <div>
+               <p>このタブで指定する属性は、以下の場合を含むすべてのストアフロントでの商品表示方法に影響を与えます。</p>
+               <ul>
+                  <li>商品詳細ページでの表示</li>
+
+                  <li>検索結果セット内での表示</li>
+
+                  <li>商品比較の操作中の表示</li>
+
+               </ul>
+
+            </div>
+         </li><li>
+            <span>属性グループを作成します。</span>
+         </li><li>
+            <span>属性グループに ID と名前を指定して<strong class="uicontrol">追加</strong>をクリックします。
+            </span>
+            <div>
+               <p>新しく作成されたグループが表に表示されます。 </p>
+            </div>
+         </li><li>
+            <span>適切なグループの属性の列で<strong class="uicontrol">編集</strong>リンクをクリックして、グループに属性を追加します。</span>
+         </li><li>
+            <span>属性の割り当てページで、<strong class="uicontrol">省略記号 (...)</strong> をクリックして (組織用に定義された) 属性を表から選択します。または、既存の属性の名前または ID を入力して<strong class="uicontrol">追加</strong>をクリックします。</span>
+         </li><li>
+            <span>グループに含めたい属性を選択して<strong class="uicontrol">適用</strong>をクリックします。(属性は複数のグループに属することができます。) グループに含まれる属性定義を示す表が表示されます。</span>
+            <div>
+               <p>この表で、属性を追加または割り当て解除し、属性を並べ替えます。順序を変更したい属性を選択してから、並べ替え矢印を使用して、リスト内で属性を上または下に移動します。</p>
+            </div>
+         </li><li>
+            <span>商品属性定義の詳細ページで、新しい属性を作成します。</span>
+         </li><li>
+            <span>商品のインデックスを再作成して、これらの変更を有効にします。</span>
+         </li></ol>
+
+   
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_assign_products_to_a_category">
+<h1 class="slds-text-heading_large">カテゴリへの商品の割り当て</h1>
+   
+   <p>カテゴリへの商品の割り当ては、商品エディターから、またはカテゴリページから行います。このトピックは、B2C Commerce に該当します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+      <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+                  <tr class="">
+                     <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+
+                  </tr>
+               </tbody></table></div>
+      <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 同様に、カテゴリから商品の割り当てを解除します。</div></div></div>
+</div>
+      <ol><li>
+            <span>アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、<span class="menucascade"><strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol"><var>サイト名</var></strong> | <strong class="uicontrol">商品とカタログ</strong> | <strong class="uicontrol">商品</strong></span>の順に選択します。</span>
+         </li><li>
+            <span><strong class="uicontrol">商品</strong>を選択します。</span>
+            <div>カテゴリにバリエーションマスターまたはバリエーショングループを割り当てると、すべてのバリエーション商品がそのカテゴリに割り当てられます。また、バリエーションマスターを割り当てずに、1 つのバリエーション商品のみをカテゴリに割り当てることもできます。</div>
+         </li><li>
+            <span>商品をロックします。</span>
+         </li><li>
+            <span><strong class="uicontrol">カテゴリ</strong>タブをクリックします。</span>
+         </li><li>
+            <span>商品ページのカテゴリタブにリストされているカテゴリは、すでに割り当てられているカテゴリです。</span>
+         </li><li>
+            <span>カテゴリの割り当てまたは割り当て解除を行うには、<strong class="uicontrol">カテゴリの編集</strong>をクリックして、カテゴリツリーからカテゴリを選択または選択解除します。</span>
+         </li><li>
+            <span>カテゴリがリストされていない (または適切なカテゴリがない) 場合は、<strong class="uicontrol">カテゴリの編集</strong>をクリックしてカテゴリを割り当てます。(この方法で 1 つのページから複数のカテゴリを割り当てることができます。)このインターフェイスは次の目的で使用できます:</span>
+            <div>
+               <ul>
+                  <li>カテゴリの検索</li>
+
+                  <li>カテゴリツリーの展開と折りたたみ</li>
+
+                  <li>1 つまたは複数のカテゴリの選択</li>
+
+                  <li>終了したら<strong class="uicontrol">適用</strong>をクリックします。</li>
+
+               </ul>
+
+            </div>
+         </li><li>
+            <span>商品の詳細ページのカテゴリタブで、商品属性セットに使用するカテゴリと、ストアフロントで使用するカテゴリを指定します。</span>
+            <div>
+               <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:14.992503748125937%"><col style="width:85.00749625187406%"></colgroup><thead class="slds-text-title_caps">
+                        <tr class="">
+                           <th id="d178340e159" style="vertical-align:top;" class="slds-cell-wrap" scope="col">オプション</th>
+                           <th id="d178340e162" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+                        </tr>
+                     </thead><tbody>
+                        <tr class="">
+                           <td headers="d178340e159" style="vertical-align:top;" class="slds-cell-wrap" data-label="オプション">分類</td>
+
+                           <td headers="d178340e162" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">このカテゴリで、商品の属性セットを定義します。</td>
+
+                        </tr>
+                        <tr class="">
+                           <td headers="d178340e159" style="vertical-align:top;" class="slds-cell-wrap" data-label="オプション">主要</td>
+
+                           <td headers="d178340e162" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">このカテゴリはデフォルトのカテゴリです。商品がカテゴリ外からアクセスされたときに表示する属性の定義に使用されます。(たとえば直接検索や、商品番号または ID に基づいて)。</td>
+
+                        </tr>
+                     </tbody></table>
+            </div>
+         </li><li>
+            <span>主要列でオプションボタンをクリックして、<strong class="uicontrol">適用</strong>をクリックします。
+            </span>
+         </li><li>
+            <span>カタログモジュールでカテゴリに商品を割り当てることもできます (<span class="menucascade"><strong class="uicontrol"><var>サイト名</var> </strong> | <strong class="uicontrol">商品とカタログ</strong> | <strong class="uicontrol">カタログ</strong> | <strong class="uicontrol"><var>カタログ名</var></strong></span> の順に選択します。)</span>
+            <div>ドラッグによるユーザーインターフェイスを使用する場合は、<code>分類</code>カテゴリと<code>主要</code>カテゴリを割り当てることはできません。代わりに、商品モジュールで選択を行います。</div>
+            <ol>
+               <li>
+                  <span>商品セクションで<strong class="uicontrol">割り当てる</strong>をクリックします。現在のカタログのすべての商品が表示されます。</span>
+               </li>
+
+               <li>
+                  <span>商品の選択ページで、カテゴリに割り当てる商品を選択します。</span>
+               </li>
+
+               <li>
+                  <span>チェックボックスを使用して、特定の商品を選択します。</span>
+               </li>
+
+               <li>
+                  <span><strong class="uicontrol">選択</strong>をクリックします。</span>
+               </li>
+
+               <li>
+                  <span>ページにあるすべての商品を選択するには、<strong class="uicontrol">すべて選択</strong>リンクをクリックしてから<strong class="uicontrol">選択</strong>をクリックします。 
+                  </span>
+                  <div>更新された商品ページに移動する前に、<strong class="uicontrol">選択</strong>をクリックします。より大きな商品グループを選択するには、100 または 1000 をクリックして、ページごとに表示される商品の数を変更します。</div>
+               </li>
+
+            </ol>
+         </li></ol>
+
+      <div><p>カテゴリに商品を追加する方法については、このビデオをご覧ください。</p><p>
+         <iframe width="640" height="360" src="https://salesforce.vidyard.com/watch/1ZEcPZ5TPA7JRaUJzWDgdU" class="doc_embedded_video"><!-- --></iframe>
+         </p><p>動画を全画面表示で視聴できない場合は、次のリンクを新しいタブで開きます。<a target="_blank" href="https://salesforce.vidyard.com/watch/1ZEcPZ5TPA7JRaUJzWDgdU" class="doc_video_play_button">B2C Commerce で商品をカテゴリに割り当てる</a>。</p></div>
+   
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_assign_products_to_a_category_grid_view">
+<h1 class="slds-text-heading_large">グリッド表示での商品のカテゴリへの割り当て</h1>
+   
+   <p>カタログで商品を検索し、グリッド表示から商品ページに追加して配置します。このトピックは、B2C Commerce に該当します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+      <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+                  <tr class="">
+                     <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+
+                  </tr>
+               </tbody></table></div>
+      <ol><li>
+            <span>アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、次に<span class="menucascade"><strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol"><var>サイト</var></strong> | <strong class="uicontrol">商品とカタログ</strong> | <strong class="uicontrol">カタログ</strong></span>の順に選択します。</span>
+         </li><li>
+            <span>編集したいカタログカテゴリを選択します。</span>
+         </li><li>
+            <span>商品リストで、グリッド表示アイコン<span style="vertical-align:text-bottom;display:inline-block;"><img alt="グリッド表示" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_products_gridview.png" style="margin-bottom:0;"></span>をクリックします。</span>
+         </li><li>
+            <span><strong class="uicontrol">割り当てる</strong>をクリックして、検索条件を入力します。</span>
+         </li><li>
+            <span>検索結果から商品を選択して、カテゴリに追加します。</span>
+            <div>希望する位置に商品をドラッグするか、商品位置を開始位置番号フィールドに入力して、<strong class="uicontrol">OK</strong> をクリックします。</div>
+         </li></ol>
+
+   
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_assign_variation_attributes">
+<h1 class="slds-text-heading_large">バリエーション属性の割り当て</h1>
+   
+   <p>マスター商品、グループ、または商品に属性を割り当てます。このトピックは、B2C Commerce に該当します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+      <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+                  <tr class="">
+                     <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+
+                  </tr>
+               </tbody></table></div>
+      <div><p>バリエーション値を共有する 2 つのマスター商品を作成し、一方のマスター商品に独自のバリエーション値を設定するには、次のようにします。</p></div>
+      <ol><li>
+            <span>アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、次に<span class="menucascade"><strong class="uicontrol">管理</strong> | <strong class="uicontrol">サイトの開発</strong> | <strong class="uicontrol">システムオブジェクトタイプ</strong> | <strong class="uicontrol">商品</strong></span>の順に選択します。商品システムオブジェクトにカラー属性定義があることを確認し、必要に応じて作成します。</span>
+         </li><li>
+            <span>アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、次に<span class="menucascade"><strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol"><var>サイト</var></strong> | <strong class="uicontrol">商品とカタログ</strong> | <strong class="uicontrol">バリエーション属性</strong> | <strong class="uicontrol">カタログ</strong></span>の順に選択して、色の属性定義と少なくとも 1 つの色の値を使用するバリエーション属性を作成します。</span>
+         </li><li>
+            <span>アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、次に<span class="menucascade"><strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol"><var>サイト</var></strong> | <strong class="uicontrol">商品とカタログ</strong> | <strong class="uicontrol">商品</strong></span>の順に選択した後、マスター商品を選択します。<strong class="uicontrol">バリエーション</strong>タブを選択し、<strong class="uicontrol">ロック</strong>をクリックします。</span>
+         </li><li>
+            <span>バリエーション属性セクションで、省略記号 (...) をクリックします。作成した共有属性を選択して、<strong class="uicontrol">適用</strong>をクリックします。</span>
+         </li><li>
+            <span>アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、次に<span class="menucascade"><strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol"><var>サイト</var></strong> | <strong class="uicontrol">商品とカタログ</strong> | <strong class="uicontrol">商品</strong></span>の順に選択し、マスター商品を選択します。<strong class="uicontrol">バリエーション</strong>タブを選択します。この商品は、前に編集した商品とは異なるバリエーション商品であることが必要です。</span>
+         </li><li>
+            <span>バリエーション属性セクションで、省略記号 (...) をクリックします。作成した共有属性を選択して、<strong class="uicontrol">適用</strong>をクリックします。</span>
+         </li><li>
+            <span>アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、次に<span class="menucascade"><strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol"><var>サイト</var></strong> | <strong class="uicontrol">商品とカタログ</strong> | <strong class="uicontrol">商品</strong></span>の順に選択した後、マスター商品を選択します。<strong class="uicontrol">バリエーション</strong>タブを選択し、<strong class="uicontrol">ロック</strong>をクリックします。この商品は、前に編集した商品とは異なるバリエーション商品であることが必要です。</span>
+         </li><li>
+            <span><strong class="uicontrol">新規</strong>をクリックします。</span>
+         </li><li>
+            <span>新規ローカルバリエーション属性ページでローカルバリエーション属性を追加し、<strong class="uicontrol">適用</strong>をクリックします。</span>
+         </li></ol>
+
+      <div><p>ここで編集した最初の 2 つのマスター商品は同じ色のバリエーションをもち、最後のマスター商品は異なる色のバリエーションをもつようになります。</p></div>
+   
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_assigning_a_pricebook_or_promotion_specific">
+<h1 class="slds-text-heading_large">B2C Commerce での特定の店舗への価格表またはプロモーションの割り当て</h1>
+   
+   <p> 店舗固有の価格設定とプロモーションでは、最大 2,000 の店舗に価格表を選択します。この割り当てフレームワークにより、マーチャントとデベロッパーは、プロモーションなどの特定の体験をアクティブにする限定子 (店舗など) を設定できます。また、特定の店舗にプロモーションを割り当てることもできます。この機能は、XML のインポートを通じてのみサポートされています。サイト割り当てを使用するには、まずデベロッパーが、店舗割り当てを含むように割り当ての XML を編集する必要があります。現在、割り当てとしてリストできるのは店舗のみです。</p>
+
+      <ol><li>  
+              <span>アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、次に<span class="menucascade"><strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol">サイト</strong> | <strong class="uicontrol">オンラインマーケティング</strong> | <strong class="uicontrol">インポート &amp; エクスポート</strong></span>の順に選択します。
+         </span>
+            </li><li>
+            <span>割り当てセクションで、<strong class="uicontrol">インポート</strong>をクリックします。</span>
+         </li><li>
+            <span>割り当てを含むファイルを選択して、<strong class="uicontrol">次へ</strong>をクリックします。</span>
+         </li><li>
+            <span>以下に、割り当てのサンプルコードを示します。</span>
+            <div>
+               <pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-html">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;assignments xmlns="http://www.demandware.com/xml/impex/assignment/2020-11-30"&gt;
+    &lt;assignment assignment-id="Storeassignment_A"&gt;
+        &lt;description xml:lang="x-default"&gt;Price books and promotions assigned to Store A&lt;/description&gt;
+        &lt;description xml:lang="zh-CN"&gt;万能青年旅店&lt;/description&gt;
+        &lt;enabled-flag&gt;true&lt;/enabled-flag&gt;
+        &lt;start-date&gt;2020-11-24T00:00:00.000Z&lt;/start-date&gt;
+        &lt;end-date&gt;2025-11-24T00:00:00.000Z&lt;/end-date&gt;
+        &lt;assigned-sites&gt;
+            &lt;site&gt;SiteGenesis&lt;/site&gt;
+            &lt;site&gt;SiteGenesisGlobal&lt;/site&gt;
+        &lt;/assigned-sites&gt;
+        &lt;qualifiers match-mode="any"&gt;
+            &lt;qualifier type="STORE"&gt;Store A&lt;/qualifier&gt;
+        &lt;/qualifiers&gt;
+        &lt;experiences&gt;
+            &lt;pricebooks&gt;
+                &lt;pricebook-id&gt;list_pricebook&lt;/pricebook-id&gt;
+                &lt;pricebook-id&gt;sale_pricebook&lt;/pricebook-id&gt;
+            &lt;/pricebooks&gt;
+            &lt;promotions&gt;
+                &lt;promotion-id&gt;20%Off_promotion&lt;/promotion-id&gt;
+            &lt;/promotions&gt;
+        &lt;/experiences&gt;
+    &lt;/assignment&gt;
+​
+&lt;/assignments&gt;</code></pre>
+            </div>
+         </li></ol>
+
+      <div id="b2c_assigning_a_pricebook_or_promotion_specific__result_km4_vsx_p4b"><a name="b2c_assigning_a_pricebook_or_promotion_specific__result_km4_vsx_p4b"></a><p>ファイルのステータスを確認します。インポートが完了するまで、更新を繰り返しクリックします。インポートには数分間かかる場合があります。</p></div>
+        <div id="b2c_assigning_a_pricebook_or_promotion_specific__postreq_kg4_fh4_r4b"><a name="b2c_assigning_a_pricebook_or_promotion_specific__postreq_kg4_fh4_r4b"></a><p>ストアフロントに店舗固有の体験を表示するには、デベロッパーが Salesforce Reference Architecture (SFRA) カートリッジを更新するか、セッションで店舗を設定するための Open Commerce API (OCAPI) フックを作成する必要があります。SFRA のセッションで店舗 ID を設定するには、<code>setStoreIDToSession()</code> メソッドを使用します。例えば、<code>StoreMgr.setStoreIDToSession('0335')</code> です。</p><p>Shopper Commerce API (SCAPI) では、XML で設定した修飾子タイプに応じて、<a target="_blank" href="https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-context?meta=createShopperContext">createShopperContext</a>と<a target="_blank" href="https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-context?meta=updateShopperContext">updateShopperContext</a>の修飾子で大文字と小文字が区別されます。以下がその例です: </p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code>{
+    "assignmentQualifiers": {
+        "STORE": "0335"
+    }
+}
+</code></pre></div>
+   
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="プロモーション設定の多くをサイト環境設定で構成すると、プロモーションの処理方法を非常に柔軟に調整できます。これらの設定には、「X の購入で Y をゲット」のプロモーション処理、割引精度、割引適用品目の課税基準の計算方法などがあります。" href="promotions-1.html#b2c_configuring_promotion_preferences">B2C Commerce のプロモーション環境設定の構成</a></li><li><a title="B2C Commerce でキャンペーン、A/B テスト、プロモーション、コンテンツスロットをスケジュールします。スケジュールされた体験 (プロモーションまたはコンテンツスロット) は、コンテナ (キャンペーンまたは A/B テスト) と同時に行う必要があります。一致させないと、実行できません。" href="data_jobs-3.html#b2c_schedules">B2C Commerce のプロモーションスケジュール</a></li><li><a title="割引を階層化して、買い物客が購入する商品または金額が増加するほど割引金額が増加するようにします。条件パラメーターに複数のしきい値レベルがあるプロモーションでは、割引がしきい値によって異なり、組み合わせることができない階層割引を構成します。" href="general-7.html#b2c_tiered_discounts">B2C Commerce での階層割引</a></li><li><a title="互換性ルールを使用して、プロモーションの適用をコントロールします。互換性ルールでは、買い物客が可能なすべてのプロモーションの対象となることを防止できます。ランクおよび除外のシステム属性を使用して、プロモーションの互換性を管理します。" href="promotions-2.html#b2c_promotion_compatibility">B2C Commerce のプロモーション互換性</a></li><li><a title="最大適用数の制限を使用して、注文ごとに適用できるプロモーションの回数を制限します。" href="promotions-2.html#b2c_maximum_application_for_promotions">B2C Commerce のプロモーションの最大適用数</a></li><li><a title="限定子を使用して、体験の対象者とプロモーションの利用方法を指定します。限定子には、顧客グループ、クーポン、またはソースコードがあります。プロモーションに限定子を追加するには、キャンペーンに限定子を割り当てる (すべての対象のプロモーションに影響) か、特定のプロモーションに限定子を割り当てるかの 2 つの方法があります。" href="general-1.html#b2c_add_a_qualifier_to_an_experience">B2C Commerce での体験の対象者の指定</a></li><li><a title="対象商品、買い物客が購入する商品、および割引の対象となる金額を指定するプロモーションを定義します。また、どの商品が割引されるかも指定します。" href="merchandising-4.html#b2c_qualifying_and_discounted_products">B2C Commerce の対象商品と割引商品</a></li><li><a title="制約を設定すると、商品の選択が同一商品に制限されます。商品プロモーションルールで制約を設定すると、複数の商品に適用される単一商品プロモーションを構成することになります。" href="merchandising-4.html#b2c_restricting_promotions_to_identical_products">同一商品のみのプロモーション制限</a></li><li><a title="価格表の条件を使用して、商品をプロモーションに含めたり、プロモーションから除外したりします。" href="merchandising-4.html#b2c_qualify_disqualify_promotions_based_on_active_price_book">アクティブな価格表に基づくプロモーションの対象資格</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_assigning_a_pricebook_or_promotion_to_a_specific_store">
+<h1 class="slds-text-heading_large">B2C Commerce での特定の店舗への価格表またはプロモーションの割り当て</h1>
+   
+   <p> 店舗固有の価格設定とプロモーションでは、最大 2,000 の店舗に価格表を選択します。この割り当てフレームワークによって、マーチャントとデベロッパーは、店舗などの限定子を設定してプロモーションなどの特定の体験をアクティブにできます。また、特定の店舗にプロモーションを割り当てることもできます。この機能は、XML のインポートを通じてのみサポートされています。サイト割り当てを使用するには、まずデベロッパーが、店舗割り当てを含むように割り当ての XML を編集する必要があります。現在、割り当てとしてリストできるのは店舗のみです。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>         <tr class="">           <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+         </tr>       </tbody></table></div>
+      <ol><li>
+             <span>アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、次に<span class="menucascade"><strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol">サイト</strong> | <strong class="uicontrol">オンラインマーケティング</strong> | <strong class="uicontrol">インポート &amp; エクスポート</strong></span>の順に選択します。
+             </span>
+            </li><li>
+            <span>割り当てセクションで、<strong class="uicontrol">インポート</strong>をクリックします。</span>
+         </li><li>
+            <span>割り当てを含むファイルを選択して、<strong class="uicontrol">次へ</strong>をクリックします。</span>
+         </li><li>
+            <span>以下に、割り当てのサンプルコードを示します。</span>
+            <div>
+               <pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-html">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;assignments xmlns="http://www.demandware.com/xml/impex/assignment/2020-11-30"&gt;
+    &lt;assignment assignment-id="Storeassignment_A"&gt;
+        &lt;description xml:lang="x-default"&gt;Price books and promotions assigned to Store A&lt;/description&gt;
+        &lt;description xml:lang="zh-CN"&gt;万能青年旅店&lt;/description&gt;
+        &lt;enabled-flag&gt;true&lt;/enabled-flag&gt;
+        &lt;start-date&gt;2020-11-24T00:00:00.000Z&lt;/start-date&gt;
+        &lt;end-date&gt;2025-11-24T00:00:00.000Z&lt;/end-date&gt;
+        &lt;assigned-sites&gt;
+            &lt;site&gt;SiteGenesis&lt;/site&gt;
+            &lt;site&gt;SiteGenesisGlobal&lt;/site&gt;
+        &lt;/assigned-sites&gt;
+        &lt;qualifiers match-mode="any"&gt;
+            &lt;qualifier type="Store"&gt;Store A&lt;/qualifier&gt;
+        &lt;/qualifiers&gt;
+        &lt;experiences&gt;
+            &lt;pricebooks&gt;
+                &lt;pricebook-id&gt;list_pricebook&lt;/pricebook-id&gt;
+                &lt;pricebook-id&gt;sale_pricebook&lt;/pricebook-id&gt;
+            &lt;/pricebooks&gt;
+            &lt;promotions&gt;
+                &lt;promotion-id&gt;20%Off_promotion&lt;/promotion-id&gt;
+            &lt;/promotions&gt;
+        &lt;/experiences&gt;
+    &lt;/assignment&gt;
+​
+&lt;/assignments&gt;</code></pre>
+            </div>
+         </li></ol>
+
+      <div id="b2c_assigning_a_pricebook_or_promotion_to_a_specific_store__result_km4_vsx_p4b"><a name="b2c_assigning_a_pricebook_or_promotion_to_a_specific_store__result_km4_vsx_p4b"></a><p>ファイルのステータスを確認します。インポートが完了するまで、更新を繰り返しクリックします。インポートには数分間かかる場合があります。</p></div>
+        <div id="b2c_assigning_a_pricebook_or_promotion_to_a_specific_store__postreq_kg4_fh4_r4b"><a name="b2c_assigning_a_pricebook_or_promotion_to_a_specific_store__postreq_kg4_fh4_r4b"></a><p>ストアフロントに店舗固有の体験を表示するには、デベロッパーが Salesforce Reference Architecture (SFRA) カートリッジを更新するか、セッションで店舗を設定するための Open Commerce API (OCAPI) フックを作成する必要があります。</p></div>
+   
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_assigning_a_pricebook_to_a_site">
+<h1 class="slds-text-heading_large">B2C Commerce でのサイトへの価格表の割り当て</h1>
+   
+   <p>価格表をストアフロントで有効にするには、その価格表をサイトに割り当てます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>         <tr class="">           <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+         </tr>       </tbody></table></div>
+      <ol><li>
+            <span>アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、次に<span class="menucascade"><strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol">サイト</strong> | <strong class="uicontrol">商品とカタログ</strong> | <strong class="uicontrol">価格表</strong></span>の順に選択します。
+            </span>
+            <div>
+               <p>薄く表示されているフィールドがある場合は、読み取り専用許可が付与されています。価格表データを検索し、詳細を表示します。価格表は、変更、削除、または作成できません。異なる役割を通じて 1 つのモジュールに複数の許可が与えられている場合は、最も高いレベルのアクセスが付与されます。書き込みアクセスが必要な場合は、管理者に連絡してください。</p>
+               <p>読み取り専用アクセスでは、機能の許可 (<em>Manage_PriceBooks</em> (すべての価格表へのグローバルな読み取り専用アクセス) または <em>Manage_Site_PriceBooks</em>) が役割に必要です。</p>
+            </div>
+         </li><li>
+            <span>価格表ページで、価格表リンクをクリックして価格を選択します。</span>
+         </li><li>
+            <span>価格表のサイトの割り当てタブで、価格表を割り当てたいサイトを選択します。</span>
+         </li><li>
+            <span><strong class="uicontrol">適用</strong>をクリックします。
+            </span>
+            <div>価格表を複数のサイトに同時に割り当てます。また、通貨が同じであれば複数の価格表を 1 つのサイトに割り当てます。</div>
+         </li></ol>
+
+   
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_assigning_an_inventory_list_to_a_site">
+<h1 class="slds-text-heading_large">サイトへの在庫リストの割り当て</h1>
+   
+   
+   <p>1 つまたは複数のサイトに在庫リストを割り当てる。このトピックは、B2C Commerce に該当します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>         <tr class="">           <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+         </tr>       </tbody></table></div>
+      <div><p>サイトは、1 つの在庫リストのみに割り当てることができます。</p></div>
+      <ol><li>
+            <span>アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、次に<span class="menucascade"><strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol">サイト</strong> | <strong class="uicontrol">商品とカタログ</strong> | <strong class="uicontrol">在庫</strong></span>の順に選択します。
+            </span>
+            <div>
+               <p>薄く表示されているフィールドがある場合は、読み取り専用許可が付与されています。在庫リストを検索し、詳細を表示することができます。在庫リストは、変更、削除、または作成することはできません。異なる役割を通じて 1 つのモジュールに複数の許可が与えられている場合は、最も高いレベルのアクセスが付与されます。書き込みアクセスが必要な場合は、管理者に連絡してください。</p>
+               <p>読み取り専用アクセスでも、機能の許可 <code>Manage_Inventory</code> (すべての在庫リストのグローバルの許可) または <code>Manage_Site_Inventory</code> (選択したサイトの許可) が役割に必要です。</p>
+            </div>
+         </li><li>
+            <span>在庫リストの<strong class="uicontrol">編集</strong>をクリックします。</span>
+         </li><li>
+            <span><strong class="uicontrol">サイトの割り当て</strong>タブを選択します。</span>
+         </li><li>
+            <span>在庫リストを割り当てたいサイトを選択します。</span>
+            <div>サイトにすでに割り当て済みのリストがある場合、そのリストの割り当てが解除されます。</div>
+         </li><li>
+            <span><strong class="uicontrol">適用</strong>をクリックします。
+            </span>
+            <div>在庫リストを一度に複数のサイトに割り当てる。特定のサイトへの在庫リストの割り当ては、初回のサイトのインポートによってインポートできます。各サイトでは在庫リストの ID を参照できます。その場合、割り当てをアクティブにするには、インポートされたサイトの個別の割り当てで参照されている同じ ID の在庫リストを作成 (またはインポート) します。在庫リストが削除された場合、サイトの割り当ては保持され、同じ ID の在庫リストを作成すると再びアクティブになります。</div>
+         </li></ol>
+
+   
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_assigning_catalogs_to_sites">
+<h1 class="slds-text-heading_large">カタログのサイトへの割り当て</h1>
+   
+
+   <p>カタログ定義エディターの サイトの割り当て タブでカタログをサイトに割り当てます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>         <tr class="">           <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+         </tr>       </tbody></table></div>
+      <div><p>カタログをサイトに割り当てると、以前そのサイトに割り当てられていたカタログの割り当ては自動的に解除されます。一度に 1 つのカタログのみをサイトに割り当てます。サイトからカタログの割り当てを解除しても、代替カタログは自動的には割り当てられません。新しいカタログをサイトに手動で割り当てます。</p></div>
+      <ol><li>
+            <span><span class="menucascade"><strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol">サイト名</strong> | <strong class="uicontrol">商品とカタログ</strong> | <strong class="uicontrol">カタログ</strong></span>の順に選択します。
+            </span>
+         </li><li>
+            <span>管理したいカタログの<strong class="uicontrol">編集</strong>をクリックします。</span>
+         </li><li>
+            <span><strong class="uicontrol">サイトの割り当て</strong>タブをクリックします。</span>
+         </li><li>
+            <span>このカタログの割り当て先となるサイトを選択して<strong class="uicontrol">適用</strong>をクリックします。</span>
+            <div>カタログは必要な数のサイトに割り当てます。カタログをサイトに割り当てると、カタログ内で定義されたカテゴリ構造が、割り当てられたストアフロントサイトのナビゲーション構造になります。
+            <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> カタログ内の商品を検索に含めるには、商品検索インデックスを再作成します。<span class="menucascade"><strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol">サイト名</strong> | <strong class="uicontrol">検索</strong> | <strong class="uicontrol">検索インデックス</strong></span>の順に選択します。再作成するには、インデックスを選択して、<strong class="uicontrol">再作成</strong>をクリックします。
+                  </div></div></div>
+</div>
+            </div>
+         </li></ol>
+
+   
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_associating_a_store_with_an_inventory_list">
+<h1 class="slds-text-heading_large">B2C Commerce での店舗と在庫リストの関連付け</h1>
+   
+
+   <p>ストアフロント内で店舗<em>から受け取り</em>機能を顧客に提供します。 </p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>         <tr class="">           <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+         </tr>       </tbody></table></div>
+      <div><p>ストアフロント内で店舗<em>から受け取り</em>機能を顧客に提供します。</p><p>Salesforce B2C Commerce で、<em>注文</em> API を使用し、買い物カゴの商品品目と在庫リストを関連付けて「店舗で受け取り」シナリオを実装します。Business Manager を使用して在庫リストに店舗を割り当てます。その後、関連付けられた商品在庫リストを、プログラムにより <em>Store</em> (店舗) オブジェクトから取得します。<a title="ストアフロントの在庫データを管理するには、記録システムとして機能する外部在庫管理システムに B2C Commerce を接続します。基本的な追跡にはプラットフォームを利用するか、Salesforce Omnichannel Inventory を統合して高度な可用性機能にアクセスします。この統合により、正確な在庫レベルが保証され、複雑なフルフィルメントシナリオがサポートされます。" href="merchandising-3.html#b2c_inventory_management">在庫管理</a>を参照してください。</p></div>
+      <div class="p">
+            <span>Business Manager で店舗を在庫リストに関連付けます。</span>
+            <ol>
+               <li>
+                  <span>在庫リストを定義します。<a title="Business Manager を使用して在庫リストとレコードを作成します。このトピックは、B2C Commerce に該当します。" href="merchandising-2.html#b2c_creating_inventory_records">在庫リストとレコードの作成</a>を参照してください。</span>
+               </li>
+
+               <li>
+                  <span>店舗を定義します。<a title="Business Manager を使用して、住所、所在地、営業時間など、ストアフロントに表示される店舗の位置情報を管理します。" href="general-3.html#b2c_creating_stores">B2C Commerce での店舗の作成</a>を参照してください。</span>
+               </li>
+
+               <li>
+                  <span>店舗と在庫リストを関連付けます。<a title="Business Manager を使用して、住所、所在地、営業時間など、ストアフロントに表示される店舗の位置情報を管理します。" href="general-3.html#b2c_creating_stores">B2C Commerce での店舗の作成</a>を参照してください。</span>
+               </li>
+
+            </ol>
+         </div>
+
+   
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_catalog_design">
+<h1 class="slds-text-heading_large">カタログのデザイン</h1>
+   
+
+   <p>B2C Commerce Business Manager では商品データを手動で入力するか、XML ファイルからデータをインポートして編集できます。ほとんどの顧客は、独自の商品情報管理システムまたはその他の記録システムから商品データをインポートして、そのデータを Business Manager で強化します。</p>
+
+      <p>カタログをデザインする場合、商品データは、バリエーション、説明、画像、ビデオ、価格、在庫を含むように構成できます。</p>
+      <p>カタログのカテゴリとサブカテゴリは、ストアフロントのナビゲーションとして機能させることもできます。カテゴリナビゲーションを構成して、顧客が探している商品を簡単に見つけ、さらに購入を意図していなかった商品まで見つけられるようにします。カタログを定義して、顧客が商品に移動し、おすすめ商品やプロモーションを表示できるようにします。</p>
+      <p>ベストプラクティスとして、標準カタログとストアフロントカタログの 2 つのカタログを作成することをお勧めします。</p>
+      
+         <ul>
+            <li>マスターカタログは、外部の商品記録システムと同じ構造を提供します。このカタログはサイトに割り当てられません。このカタログにはマーチャンダイズしたい商品が含まれており、在庫、フルフィルメント、商品管理システムの構成を反映しています。</li>
+
+            <li>ストアフロントカタログでは、ストアフロントに表示するカテゴリを作成します。商品をストアフロントのカテゴリに割り当てて、ストアフロントに表示します。ストアフロントは、ストアフロントカタログという 1 つのカタログをもちます。ストアフロントカタログで作成したカテゴリ構造が、ストアフロントナビゲーションに使用されます。</li>
+
+         </ul>
+
+      
+      <p class="subheading1">カタログの構成</p>
+      <p>カテゴリでの商品の構成に加え、さらにカタログを定義してストアフロントに機能を追加します。標準カタログを作成した後に、カテゴリの作成、属性の設定、画像パスの定義、検索の定義の確定、およびページのメタタグルールの割り当てを行うことで、ストアフロントカタログの定義を完成します。これらのオプションは Business Manager のタブにあります。 </p>
+      <p class="subheading1">カタログの保守管理とデプロイ</p>
+      <p>Staging (ステージング) インスタンスでカタログを作成および管理し、テストのために Development (開発) インスタンスにレプリケートします。カタログのテストが完了したら、Staging (ステージング) インスタンスから Production (本番) インスタンスにレプリケートします。</p>
+   
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_catalog_object_import_export">
+<h1 class="slds-text-heading_large">B2C Commerce でのカタログオブジェクトのインポート/エクスポート</h1>
+   
+   <p>カタログ全体を一度にインポートします。インポート操作には、カタログと、カタログ内のカテゴリと商品が含まれます。エクスポートでも同様に、カタログ全体を一度にエクスポートできます。このトピックは、B2C Commerce に該当します。</p>
+
+      <p class="bodytext">カタログのインポート/エクスポートは、以下を念頭に設計されています:</p>
+      <a name="b2c_catalog_object_import_export__ul_fcw_x2k_hwb"></a><ul id="b2c_catalog_object_import_export__ul_fcw_x2k_hwb" class="listbullet">
+         <li class="listbullet">ストアフロントカタログは、マスターカタログとは別にインポートできます。</li>
+
+         <li class="listbullet">ストアフロントカタログカテゴリは、そのカテゴリに表示される商品を参照できます。</li>
+
+         <li class="listbullet">他のストアフロントカタログのインポートは、すでに作成された商品/カテゴリの割り当てには影響しません。</li>
+
+         <li class="listbullet">マスターカタログの商品更新インポートは、ストアフロントカタログへの割り当てには影響しません。</li>
+
+         <li class="listbullet">カタログインポートセマンティックは、商品カタログとストアフロントカタログが互いに分離された自己完結データユニットになるよう調整されるため、互いのデータ構造を削除せずにインポートできます。</li>
+
+      </ul>
+
+      <div><h2 class="slds-text-heading_medium slds-p-top_small"> Business Manager のインポート/エクスポートの場所</h2><p class="bodytext"><span class="menucascade"><strong class="uicontrol"><var>サイト名</var></strong> | <strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol">商品とカタログ</strong> | <strong class="uicontrol">インポート &amp; エクスポート</strong></span>の順に選択します。
+         </p></div>
+      <div><h2 class="slds-text-heading_medium slds-p-top_small">カタログのインポート</h2><p class="bodytext"><a title="B2C Commerce Business Manager では、XML 形式および CSV 形式によるカタログのインポートとエクスポートがサポートされています。読みやすく編集が簡単なバージョンが必要な場合は、CSV ファイルとしてエクスポートします。" href="general-3.html#b2c_csv_file">CSV</a>または XML ファイルタイプからカタログをインポートします。CSV ファイルはマージモードでのみアップロードでき、インポート処理を続行する前にアップロードするカタログを指定します。Development (開発) 環境と Production (本番) 環境にカタログデータをインポートすると、Staging (ステージング) に同じカタログが存在する場合、エラーが発生します。カタログデータは Staging (ステージング) からレプリケートすることをお勧めします。</p><p class="bodytext">カタログインポートは 2 パスのインポートとして実装されています。</p><ol class="listnumber">
+            <li class="listnumber">第 1 のパスで、オブジェクトを作成、更新、削除します。</li>
+
+            <li class="listnumber">第 2 のパスで、オブジェクト間の関係を築きます。</li>
+
+         </ol><p class="bodytext">このインポートプロセスにより、category 要素と product 要素をフィード内で順不同で表示できます。インポート中、この 2 つのパスを操作することはありません。各オブジェクトのインポート後に、デフォルトのトランザクションモードによって変更が確定されます。1 回目のパスと 2 回目のパスの間でインポートが中止されると、作成または更新されたオブジェクトが後に残されることがあります。この場合、オブジェクトに対して関係は作成されません。オブジェクトが後に残されないように、カタログに対応するすべてのエンティティを 1 つの XML ファイルに含めます。</p><p class="bodytext">マージモードまたは置換モードでインポートされた新しい商品は、ステータスがインポートファイルで指定されていない場合、デフォルトで<em>オフライン</em> ステータスになります。</p><ul class="listbullet">
+            <li class="listbullet">更新、マージ、置換の各モードでインポートされた既存の商品については、オンライン/オフラインステータスは、そのステータスがインポートファイルで指定されていない限り変わりません。</li>
+
+            <li class="listbullet">各商品のオンライン/オフラインステータスがインポートファイルで指定されている場合、この変更はカタログインポートの既存の動作には影響しません。</li>
+
+         </ul>
+<p>インポートスキーマ <code>catalog.xsd</code> では、&lt;value-definition&gt; 要素で下位要素 &lt;value&gt; を宣言する必要があります。指定される値が空白であってはならず、前または後にも空白を入れないようにします。</p></div>
+      <div><h2 class="slds-text-heading_medium slds-p-top_small">カタログのエクスポート</h2><p class="bodytext">選択した商品のデータを Business Manager またはカスタムパイプラインを使用してエクスポートします。カタログのエクスポート中、B2C Commerce では前後の空白が自動的に削除され、商品画像パスに保存された改行文字も削除されます。カタログを XML または<a title="CSV ファイルを使用すれば、マーチャンダイザーは、エクスポートしたカタログを簡単に読んで編集できます。" href="merchandising-2.html#b2c_export_a_catalog_as_csv">CSV</a>としてエクスポートします。</p><p>Business Manager カタログのエクスポートモードである「<code>特定商品をエクスポートする</code>」では、選択した商品のリストおよびこれらの商品のカテゴリ割り当てのみが含まれます。<span class="menucascade"><strong class="uicontrol"><var>サイト名</var></strong> | <strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol">商品とカタログ</strong> | <strong class="uicontrol">インポート &amp; エクスポート</strong> | <strong class="uicontrol">カタログのエクスポート</strong> | <strong class="uicontrol">カタログ</strong> | <strong class="uicontrol">商品名</strong></span>の順に選択します。<a title="簡易検索を使用すると、カタログ内で商品をすばやく見つけることができます。このトピックは、B2C Commerce に該当します。" href="search-2.html#b2c_simple_search">商品の簡易検索</a>で説明されているように、標準の商品検索機能を使用することも、ベータ版の検索機能を使用することもできます。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> B2C Commerce サポートでは、ベータ版の検索機能が有効になります。</div></div></div>
+</div>
+      <div><h2 class="slds-text-heading_medium slds-p-top_small">ページのメタタグのインポート/エクスポート </h2><p>ページのメタタグのルールと定義は、独立した「ページのメタタグ」セクションでインポートおよびエクスポートされるようになりました。<a title="Page meta tags are used in HTML documents to provide structured data about a web page. Meta tags are snippets of text that don't appear on the page itself, but in the page’s code, describing a page’s content. Common tags are title, robots, description, and social tags such as open graph tags. This topic applies to B2C Commerce." href="https://help.salesforce.com/s/articleView?id=cc.b2c_page_meta_tags.htm&amp;language=ja&amp;type=5">ページのメタタグ</a>を参照してください。</p><p>カタログ、ライブラリ、およびサイト ImPex 内では、割り当てのみがインポートおよびエクスポートされます。</p></div>
+      <div><h2 class="slds-text-heading_medium slds-p-top_small">パイプレット</h2><p class="tablebodytext">ImportCatalog</p><p class="tablebodytext">ImportFile で指定されたカタログデータを、指定されたモードでシステムにインポートします。このパイプレットには、インポート前にカタログを削除するためのインポート構成が用意されています。この手法は、特にカタログ内のオブジェクトが不明な場合に、カタログを空にするための高パフォーマンスの方法として使用します。また、更新モードまたはマージモードを使用する場合は、インポート前にカスタム属性を削除します。詳細については、<a title="古くなったオブジェクトを削除する方法は、バックエンドシステムのデータに Business Manager の属性を追加してエンリッチ化するかどうかによって異なります。また、削除するビジネスオブジェクトのタイプによっても異なります。B2C Commerce では一般的に、データがエンリッチ化されているかどうかにかかわらず、削除するオブジェクトのフィードを作成し、削除モードを使用してインポートすることによって、すべてのタイプのオブジェクトを安全に削除することをお勧めします。" href="general-6.html#b2c_removing_outdated_objects">古くなったオブジェクトの削除</a>を参照してください。
+         </p><p>カスタム商品属性定義のインポートは、パイプレット ImportCatalog を使用してのみ行えます。Business Manager カタログインポートを使用して商品オブジェクトのカスタム属性定義をインポートすることはできません。カスタム商品属性定義のインポートを有効にするには、ImportCatalog パイプレットの ImportConfiguration パラメーターを<code>ImportAttributeDefinitions = true に設定します。</code>ImportConfiguration にこのパラメーターがない場合、または <code>false</code> に設定されている場合は、商品属性定義はインポートされません。 </p><p>カタログインポートファイルに商品属性定義を指定したが、<code>ImportAttributeDefinitions = false </code>または指定されていない場合、またはファイルが Business Manager でインポートされた場合は、データエラーがログされます。この場合、product-attribute-definitions 要素は、更新、マージ、置換のインポートモードでは無視されます。</p><p class="tablebodytext">ExportCatalog</p><p><code>ExportCatalog</code>パイプレットのパラメーター<code>ExportCategoryAssignments=True で、</code><code>Products</code>イテレーターを指定すると、エクスポートファイルには、エクスポートされた商品のリストのカテゴリ割り当てまたはカテゴリ割り当てのみが含まれます。<code>Products</code> イテレーターが指定されていない場合は、すべてのカテゴリ割り当てがエクスポートされます。</p><p class="bodytext">
+            <em>粒度:</em> 渡されたカテゴリ、渡されたカテゴリの商品、渡されたカテゴリのカテゴリ割り当て、カタログのすべての推奨商品、カタログのすべてのシェア商品オプション)。</p></div>
+      <div class="subheading1"><h2 class="slds-text-heading_medium slds-p-top_small">スキーマ要素</h2><p class="bodytext"> このセクションでは、catalog.xsd に含まれる要素、およびその要素の値を作成する際に考慮すべきことについて説明します。</p><p class="subheading1">要素: Category (カテゴリ)</p><p class="bodytext">category 要素をインポートする際には、要素固有の詳細を考慮してください。</p><ul class="listbullet">
+            <li class="listbullet">category 要素はフィード内で順不同で表示されます。</li>
+
+            <li class="listbullet">削除モードはカテゴリ要素レベルで指定し、インポート処理モードを上書きします (例: <em>&lt;category category-id="Electronics" mode="delete"/&gt;)。</em>
+            </li>
+
+            <li class="listbullet">カタログのルートカテゴリを削除モードで削除することはできません。また、置換モードでも削除できません。ただし、置換モードでは更新されます。</li>
+
+            <li class="listbullet">カテゴリを削除すると、カテゴリのカテゴリ割り当て (カテゴリ内の商品ではない)、カテゴリのリンク (受信と送信)、およびすべての下位カテゴリが削除されます。</li>
+
+            <li class="listbullet">ルートカテゴリの表示名と説明も、カタログの表示名および説明として設定されます。</li>
+
+            <li class="listbullet">フィードに用意されていない場合、一部の category 下位要素には、特別なセマンティックまたはデフォルトのセットが含まれています。以下の表に詳細を示します。</li>
+
+         </ul>
+<p class="subheading2">属性: online-from および online-to</p><p>カタログインポート処理中に、<em>online-from</em> および <em>online-to</em> カテゴリ属性値をリセットしなければならない場合があります。たとえば、これらの要素を XML で空白の値 ( <code>例: &lt;online-from/&gt;</code> ) で送信すると、XML 検証は失敗します。カタログインポート処理中に、<em>online-from</em>および<em>online-to</em>カテゴリ属性をリセットします。</p><p>カタログインポート処理中にこれらの属性値をリセットするには、インポートファイルが次の XML 形式の例に準拠している必要があります:</p><div><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-markup"> &lt;category category-id="RESET_ME"&gt;
+ &lt;!-- デフォルトの online-from 値をリセット --&gt;
+ &lt;online-from xsi:nil="true" /&gt;
+ &lt;!-- デフォルトの online-to 値をリセット --&gt;
+ &lt;online-to xsi:nil="true" /&gt; &lt;/category&gt;</code></pre></div><p>カタログインポートファイルに以下を追加します:</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-markup"> xsi:noNamespaceSchemaLocation="catalog.xsd"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"</code></pre><p>以下に例を示します。</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-markup"> &lt;catalog xmlns="http://www.demandware.com/xml/impex/catalog/2006-10-31"
+ xsi:noNamespaceSchemaLocation="catalog.xsd"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" catalog-id="catalog"&gt;
+</code></pre><p class="subheading2">更新モードを使用する場合: </p><p>カタログの差分ファイルを作成してカタログを更新できる顧客は、更新モードの動作を理解することが重要です。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> カタログのインポート中に古いデータを削除するには、置換モードを使用します。</div></div></div>
+<ul>
+            <li>カテゴリリンクのリンク先のカテゴリをインポートするときに、リンク元のカテゴリがないと、リンクは削除されません。</li>
+
+            <li>子カテゴリをもつカテゴリをインポートし、その子カテゴリがないと、子カテゴリは削除されません。</li>
+
+         </ul>
+<table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col><col></colgroup><thead class="slds-text-title_caps">
+                  <tr class="">
+                     <th id="d10234e352" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">下位要素</th>
+                     <th id="d10234e355" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">コメント</th>
+                  </tr>
+               </thead><tbody>
+                  <tr class="">
+                     <td headers="d10234e352" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">display-name</td>
+
+                     <td headers="d10234e355" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント">要素が省略される場合: 属性は変更されない</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e352" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">description</td>
+
+                     <td headers="d10234e355" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント">要素が省略される場合: 属性は変更されない</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e352" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">online-flag</td>
+
+                     <td headers="d10234e355" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント"><p>作成中に要素が省略される場合: デフォルトは「False」に設定</p><p style="margin-bottom:0;">更新中に要素が省略される場合: 属性は変更されない</p></td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e352" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">parent</td>
+
+                     <td headers="d10234e355" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント">要素が省略される場合: DATAWARNING がログされ、デフォルトは "root" になる</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e352" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">position</td>
+
+                     <td headers="d10234e355" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント">要素が省略される場合: 属性は変更されない</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e352" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">thumbnail</td>
+
+                     <td headers="d10234e355" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント">要素が省略される場合: 属性は変更されない</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e352" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">image</td>
+
+                     <td headers="d10234e355" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント">要素が省略される場合: 属性は変更されない</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e352" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">template</td>
+
+                     <td headers="d10234e355" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント">要素が省略される場合: 属性は変更されない</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e352" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">sitemap-included-flag</td>
+
+                     <td headers="d10234e355" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント">要素が省略される場合: 属性は変更されない</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e352" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">sitemap-changefrequency</td>
+
+                     <td headers="d10234e355" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント">要素が省略される場合: 属性は変更されない</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e352" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">sitemap-priority</td>
+
+                     <td headers="d10234e355" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント">要素が省略される場合: 属性は変更されない</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e352" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">page-attributes</td>
+
+                     <td headers="d10234e355" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント"><p>要素が省略される場合: 属性は変更されない</p><p style="margin-bottom:0;">要素が表示される: 各属性と地域情報のマージセマンティック</p></td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e352" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">custom-attributes</td>
+
+                     <td headers="d10234e355" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント"><p>要素が省略される場合: 属性は変更されない</p><p style="margin-bottom:0;">要素が表示される: 各属性と地域情報のマージセマンティック</p></td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e352" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">category-links</td>
+
+                     <td headers="d10234e355" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント"><p>要素が省略される場合: カテゴリリンクは変更されない</p><p>要素が表示される: 送信カテゴリリンクの置換セマンティック</p><p style="margin-bottom:0;">category-link 要素の表記順によって、並べ替え順序が決まる</p></td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e352" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">attribute-groups</td>
+
+                     <td headers="d10234e355" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント"><p>要素が省略される場合: グループは変更されない</p><p>要素が表示される: 置換セマンティック</p><p>ttribute-groups の表記順によって、並べ替え順序が決まる</p><p style="margin-bottom:0;">属性の表記順によって、並べ替え順序が決まる</p></td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e352" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">refinement-definitions</td>
+
+                     <td headers="d10234e355" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント"><p>要素が省略される場合: 絞り込みは変更されない</p><p>要素が表示される: 置換セマンティック</p><p style="margin-bottom:0;">refinement-definition 要素の表記順によって、並べ替え順序が決まる</p></td>
+
+                  </tr>
+               </tbody></table><p class="subheading1">要素: 商品</p><p class="bodytext">product 要素をインポートする際には、要素固有の詳細を考慮してください。</p><ul class="listbullet">
+            <li class="listbullet">product 要素はフィード内で順不同で表示されます。</li>
+
+            <li class="listbullet">削除モードは商品要素レベルで指定し、インポート処理モードを上書きします。例: <em>&lt;product product-id="PN00001" mode="delete"/&gt;。</em>
+            </li>
+
+            <li class="listbullet">バンドル、商品セット、マスター商品の各商品タイプは互いに排他的です。このため、bundled-products、product-set-products、variations の各要素は互いに排他的です。</li>
+
+            <li class="listbullet">バンドル、商品セット、マスター商品の各商品タイプのバリアントは指定できません。</li>
+
+            <li class="listbullet">各商品バリエーションとバリエーショングループを 1 つのマスター商品が所有します。このオーナーシップを 1 つのマスター商品から別のマスター商品に 1 回のインポート処理で変更できます。</li>
+
+            <li>マスター商品がない状態でバリエーション商品をインポートすると、その商品はバリエーションのままになります。</li>
+
+            <li>バリエーション商品なしでマスター商品をインポートした場合、 &lt;バリエーション商品&gt; セクションで指定した商品はマスター商品に関連付けられたままになります。他のバリエーション商品はマスター商品からリンク解除され、通常の商品になります。</li>
+
+            <li>上位の商品セットなしで商品セットをインポートした場合、そのセットのメンバーのままになります。</li>
+
+            <li>バンドルされた商品をそのバンドルなしでインポートした場合、そのバンドルのメンバーのままになります。</li>
+
+            <li>商品リンクのリンク先の商品をインポートするときに、リンク元の商品がないと、リンクは削除されません。</li>
+
+            <li class="listbullet">バンドルを削除しても、バンドルされた商品は削除されません。</li>
+
+            <li class="listbullet">マスター商品を削除すると、バリエーション商品も削除されます。</li>
+
+         </ul>
+<p class="subheading2">商品属性のリセット</p><p>マージモードでのインポート中、商品属性の値を削除しなければならないケースもあります。</p><p>カタログインポート中に以下の属性をリセットします: </p><ul>
+            <li>online-from</li>
+
+            <li>online-to</li>
+
+            <li>search-rank</li>
+
+            <li>search-placement</li>
+
+            <li>sitemap-included-flag</li>
+
+            <li>sitemap-changefrequency</li>
+
+            <li>sitemap-priority</li>
+
+         </ul>
+<div><p>XML 形式の例: </p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-markup">&lt;product product-id="RESET_ME"&gt;
+    &lt;!-- デフォルトの online-from 値をリセット --&gt;
+    &lt;online-to xsi:nil="true" /&gt;
+
+    &lt;!-- デフォルトの search-placement 値をリセット --&gt;
+    &lt;search-placement xsi:nil="true" /&gt;
+
+    &lt;!-- サイト固有の search-placement 値をリセット --&gt;
+    &lt;search-placement site-id="YourSite" xsi:nil="true" /&gt;
+&lt;/product&gt;
+</code></pre></div><div><p>インポートファイルのルート要素に</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-markup">xsi:noNamespaceSchemaLocation="catalog.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+</code></pre><p>を追加して、以下のようになります: </p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-markup">&lt;catalog xmlns="http://www.demandware.com/xml/impex/catalog/2006-10-31" xsi:noNamespaceSchemaLocation="catalog.xsd" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" catalog-id="catalog"&gt;
+</code></pre><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> カタログ要素が XML ファイルの 1 行に収まるようにしてください。</div></div></div>
+</div><p class="subheading2">下位要素の特別処理</p><p>フィードに用意されていない場合、一部の product 下位要素には、特別なセマンティックまたはデフォルトのセットが含まれています。以下の表に詳細を示します。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:49.8%"><col style="width:50.2%"></colgroup><thead class="slds-text-title_caps">
+                  <tr class="">
+                     <th id="d10234e681" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">下位要素</th>
+                     <th id="d10234e684" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" scope="col">コメント</th>
+                  </tr>
+               </thead><tbody>
+                  <tr class="">
+                     <td headers="d10234e681" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">ean</td>
+
+                     <td headers="d10234e684" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント">要素が省略される場合: 属性は変更されない</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e681" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">upc</td>
+
+                     <td headers="d10234e684" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント">要素が省略される場合: 属性は変更されない</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e681" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">unit</td>
+
+                     <td headers="d10234e684" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント"><p>作成中に要素が省略される場合: デフォルトは空白文字列に設定</p><p style="margin-bottom:0;">更新中に要素が省略される場合: 属性は変更されない</p></td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e681" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">min-order-quantity</td>
+
+                     <td headers="d10234e684" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント"><p>作成中に要素が省略される場合: デフォルトは 1 に設定</p><p style="margin-bottom:0;">更新中に要素が省略される場合: 属性は変更されない</p></td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e681" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">step-quantity</td>
+
+                     <td headers="d10234e684" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント"><p>作成中に要素が省略される場合: デフォルトは 1 に設定</p><p style="margin-bottom:0;">更新中に要素が省略される場合: 属性は変更されない</p></td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e681" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">display-name</td>
+
+                     <td headers="d10234e684" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント">要素が省略される場合: 属性は変更されない</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e681" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">short-description</td>
+
+                     <td headers="d10234e684" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント">要素が省略される場合: 属性は変更されない</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e681" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">long-description</td>
+
+                     <td headers="d10234e684" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント">要素が省略される場合: 属性は変更されない</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e681" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">online-flag</td>
+
+                     <td headers="d10234e684" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント"><p>作成中に要素が省略される場合: デフォルトは「True」に設定</p><p style="margin-bottom:0;">更新中に要素が省略される場合: 属性は変更されない</p></td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e681" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">online-from</td>
+
+                     <td headers="d10234e684" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント">要素が省略される場合: 属性は変更されない</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e681" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">online-to</td>
+
+                     <td headers="d10234e684" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント">要素が省略される場合: 属性は変更されない</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e681" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">available-flag</td>
+
+                     <td headers="d10234e684" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント"><p>作成中に要素が省略される場合: デフォルトは「True」に設定</p><p style="margin-bottom:0;">更新中に要素が省略される場合: 属性は変更されない</p></td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e681" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">searchable-flag</td>
+
+                     <td headers="d10234e684" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント"><p>作成中に要素が省略される場合: デフォルトは「True」に設定</p><p style="margin-bottom:0;">更新中に要素が省略される場合: 属性は変更されない</p></td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e681" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">image</td>
+
+                     <td headers="d10234e684" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント">要素が省略される場合: 属性は変更されない</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e681" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">thumbnail</td>
+
+                     <td headers="d10234e684" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント">要素が省略される場合: 属性は変更されない</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e681" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">template</td>
+
+                     <td headers="d10234e684" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント">要素が省略される場合: 属性は変更されない</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e681" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">tax-class-id</td>
+
+                     <td headers="d10234e684" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント">要素が省略される場合: 属性は変更されない</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e681" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">brand</td>
+
+                     <td headers="d10234e684" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント">要素が省略される場合: 属性は変更されない</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e681" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">manufacturer-name</td>
+
+                     <td headers="d10234e684" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント">要素が省略される場合: 属性は変更されない</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e681" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">manufacturer-sku</td>
+
+                     <td headers="d10234e684" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント">要素が省略される場合: 属性は変更されない</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e681" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">search-placement</td>
+
+                     <td headers="d10234e684" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント">要素が省略される場合: 属性は変更されない</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e681" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">search-rank</td>
+
+                     <td headers="d10234e684" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント">要素が省略される場合: 属性は変更されない</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e681" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">sitemap-included-flag</td>
+
+                     <td headers="d10234e684" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント">要素が省略される場合: 属性は変更されない</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e681" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">sitemap-changefrequency</td>
+
+                     <td headers="d10234e684" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント">要素が省略される場合: 属性は変更されない</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e681" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">sitemap-priority</td>
+
+                     <td headers="d10234e684" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント">要素が省略される場合: 属性は変更されない</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e681" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">page-attributes</td>
+
+                     <td headers="d10234e684" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント"><p>要素が省略される場合: 属性は変更されない</p><p style="margin-bottom:0;">要素が表示される: 各属性と地域情報のマージセマンティック</p></td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e681" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">custom-attributes</td>
+
+                     <td headers="d10234e684" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント"><p>要素が省略される場合: 属性は変更されない</p><p>要素が表示される: 各属性と地域情報のマージセマンティック</p><p>カスタム属性の値はマージされません。 </p><p>マージでは、オブジェクトが存在しない場合はオブジェクトが作成され、その後、既存のオブジェクトが変更されます。フィードで渡されなかったオブジェクト属性はそのままになります。</p><p style="margin-bottom:0;">カスタム属性の値が XML ファイルにある場合は、商品でこのファイルの値が取得され、以前に選択されていたその他の値は選択が解除されます。マージモードのインポートでは、値自体ではなく、属性がインポートされます。(バリエーション属性の値など) 一部の値では特定のマージモードを利用できますが、参照しているカスタム属性は利用できません。</p></td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e681" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">bundled-products</td>
+
+                     <td headers="d10234e684" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント"><p>要素が省略される場合: 関係は変更されない</p><p>要素が表示される: 置換セマンティック</p><p style="margin-bottom:0;">bundled-product 要素の表記順によって、並べ替え順序が決まる。</p></td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e681" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">product-set-products</td>
+
+                     <td headers="d10234e684" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント"><p>要素が省略される場合: 関係は変更されない</p><p>要素が表示される: 置換セマンティック</p><p style="margin-bottom:0;">product-set-product 要素の表記順によって、並べ替え順序が決まる</p></td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e681" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">options</td>
+
+                     <td headers="d10234e684" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント"><p>要素が省略される場合: オプションは変更されない</p><p>要素が表示される: すべての非公開オプションおよびシェアオプションの置換セマンティック (非公開オプションの削除/作成、シェアオプションのバインドの解除/バインド)</p><p style="margin-bottom:0;">option 要素および shared-option 要素の表記順によって、並べ替え順序が決まる</p></td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e681" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">variations</td>
+
+                     <td headers="d10234e684" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント"><p>要素 variations が省略される場合: 属性と関係は変更されない</p><p>要素属性が省略される場合: 属性は変更されない</p><p>属性要素の表記順によって、並べ替え順序が決まる</p><p>要素バリアントが省略される場合: 関係は変更されない</p><p>merge-mode 属性によって、マージセマンティックにかかわらず、バリエーションが追加、削除、または置換されるかどうかが決まります。 </p><p style="margin-bottom:0;">merge-mode 属性が指定されていない場合、インポーターはデフォルトで置換セマンティックを使用します。この動作は、この要素のレガシーの動作です。</p></td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e681" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">product-links</td>
+
+                     <td headers="d10234e684" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント"><p>要素が省略される場合: 商品リンクは変更されない</p><p>要素が表示される: 送信商品リンクの置換セマンティック</p><p style="margin-bottom:0;">Product-link 要素の表記順によって、並べ替え順序が決まる</p></td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d10234e681" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="下位要素">classification-category</td>
+
+                     <td headers="d10234e684" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="コメント">要素が省略される場合: 関係は変更されない</td>
+
+                  </tr>
+               </tbody></table><p class="subheading2">サイト特有の属性</p><p><code>&lt;product&gt;</code> import/export 要素<code>&lt;online-flag&gt;、</code><code>&lt;online-from&gt;</code>、<code>&lt;online-to&gt;</code>、<code>&lt;searchable-flag&gt;</code>、<code>&lt;search-rank&gt;</code>、<code>&lt;search-placement&gt;</code>、<code>&lt;sitemap-included-flag&gt;</code>、<code>&lt;sitemap-priority&gt;</code>、<code>&lt;sitemap-changefrequency&gt;</code>、<code>および &lt;custom-attribute&gt;</code>の各要素では、属性値がサイト固有であることを示すオプションの<em>site-id</em>。サイト固有の値を指定するには、人間が判読できるサイト ID を使用します。以下がその例です: </p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-markup">&lt;online-flag site-id="MySiteEurope"&gt;false&lt;/online-flag&gt;</code></pre><p class="subheading1">要素: Images</p><p>カタログのインポートでは、&lt;images&gt; セクションで <code>merge-mode</code> 属性がサポートされています。この属性には、次の 2 つの設定可能な値があります:</p><ul>
+            <li>
+               <code>マージ</code>: デフォルト値です。</li>
+
+            <li>
+               <code>置換</code>: 保存されている商品の画像情報をすべて消去してから、再インポートする場合に使用します。たとえば、さまざまな画像を設定するために、バリエーションマスターで使用するバリエーション属性を変更した場合などにこの値を使用します。</li>
+
+         </ul>
+<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> <code>merge-mode</code> 属性がサポートされている他のケースと同様、インポートモードが全般的に更新またはマージである場合に、この属性を使用してください。</div></div></div>
+<p class="subheading1">要素: Category-Assignment</p><p class="bodytext">インポート中、catalog.xsd の一部として product-category 割り当てが保持されるため、事前設定された商品割り当てをカテゴリとともにワンステップでインポートできます。この動作は、単一の (分類) カタログを複数のサイト固有 (ナビゲーション) カタログと同時に使用する場合に特に役立ちます。</p><p class="bodytext"><code>variation-configuration</code> 要素とコンプレックスタイプ <code>VariationConfiguration</code> によって、カテゴリレベルでバリエーション商品のスライスを構成できます。</p><p>Business Manager でカテゴリに商品の位置値を割り当てると、各商品の位置値はシーケンス番号として表示されます。商品をインポート/エクスポートする際には、<code>category-assignment</code> の <code>position</code> 要素には <code>auto</code> の値が割り当てられます。共通する値を解決して商品の位置を決定するには、ファイル内での順番によって各商品の実際の位置が決まります。</p><p>たとえば、Business Manager によってカテゴリに商品 A の位置 1 と商品 B の位置 2 が割り当てられているとします。インポート中に、両方の商品の <code>position</code> 要素は <code>auto</code> に設定されます。商品 A はファイル内で最初にあるため、商品 A が最初に表示され、商品 B が 2 番目に表示されます。</p><p class="subheading1">要素: Product-Attribute-Definitions</p><p>product-attribute-definitions 要素は、サードパーティまたはバックエンドシステムからのフィード経由で商品オブジェクトの属性定義をサポートすることを目的とするものです。インポートによって属性のメタデータを一般的な方法でインポートすることが趣旨ではありません。商品属性定義メタデータはエクスポートできません。<code>product-attribute-definitions</code> 要素にシステム属性の定義が含まれている場合、インポートファイルは無効です。</p><p>属性定義は ImportCatalog パイプレットでのみインポートでき、Business Manager のインポートでインポートすることはできません。カタログインポートで作成された商品属性には、以下のデフォルト値があります:</p><ul>
+            <li>order-required は <code>false</code> に設定されます
+            </li>
+
+            <li>searchable は <code>false</code> に設定されます
+            </li>
+
+            <li>externally-defined は <code>true</code> に設定されます
+            </li>
+
+         </ul>
+<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> これらの属性の値は Business Manager で変更できます。これらの属性はストアフロントの他の部分、特に注文手続きの処理に大きな影響を与えることがあります。カタログインポートは、バックエンドシステムから自動的に商品属性定義を作成できるようにすることを目的としていて、変更は明示的に別個に行う必要があるため、誤ってストアフロントに問題を起こすことはありません。</div></div></div>
+<p><code>product-attribute-definitions</code>要素がインポートファイルで定義されていない場合、インポートによって既存の商品属性定義が変更されることはありません。</p><p>インポートでは、マージ、置換、更新の各モードで要素が同じように処理されます。インポートファイルで<code>product-attribute-definitions</code>要素を定義すると、インポートでは、属性定義がデータベース内にすでに存在するかどうかチェックされ、以下が実行されます:</p><ul>
+            <li>新しい属性定義が追加され、B2C Commerce データベースで externally-defined フラグが <code>true</code> に設定されます。</li>
+
+            <li>B2C Commerce データベースで externally-defined フラグが true に設定されている既存の属性定義は更新されますが、置換はされません。</li>
+
+            <li>B2C Commerce データベースで externally-defined フラグが <code>false</code> に設定されている既存の属性定義はインポートで無視され、データエラーがログされます。</li>
+
+            <li>インポートでは、無効な属性定義はスキップされます。同じ ID をもつ既存の属性があり、<code>externally-defined-flag</code>が true に設定されている場合、インポートによってその属性が削除されます。インポートによって、B2C Commerce データベースからその属性に構成された値もすべて削除されます。</li>
+
+            <li>B2C Commerce データベースで externally-defined フラグが true に設定されている属性定義であり、その属性がインポートフィードに含まれていない場合、その属性は削除されます。インポートによって、B2C Commerce データベースからその属性に構成された値もすべて削除されます。 <p>バックエンドシステムでは古くなった情報についての情報を提供できないことが珍しくないため、B2C Commerce では、インポートフィードに含まれていない外部定義属性が削除されます。古くなった属性の自動削除により、データベースに多数の古い属性が累積されないようになっています。 </p>
+            </li>
+
+         </ul>
+<p>インポートモードが DELETE の場合、インポートファイルで定義されている<code>product-attribute-definitions</code>要素はすべて無視されます。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 新しい値タイプや新しいローカライズ可能ステータスが付随する既存の属性定義のインポートは、新しい属性定義と見なされ、既存の属性定義は同じ ID で置換されます。</div></div></div>
+<p class="subheading1">コンプレックスタイプ: AttributeDefinition</p><p>catalog.xsd のコンプレックスタイプ <code>AttributeDefinition</code> では、<code>site-specific-flag</code> 属性がサポートされます。</p><p class="subheading2">属性: System</p><p>システム属性のサイト固有値はカタログのインポートおよびエクスポートでサポートされます。</p><p class="subheading2">属性: Custom</p><p>カスタム属性のサイト固有値はカタログのインポートおよびエクスポートでサポートされます。</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-markup">&lt;online-flag site-id="MySiteAmerica"&gt;false&lt;/online-flag&gt;</code></pre><p class="subheading1">要素: Variants</p><p class="subheading2">属性: Merge-Mode</p><p><code>merge-mode</code> 属性は、更新、マージ、置換の各モードで、特定の <code>variants</code> 要素の指定されたマージセマンティックを上書きします。属性に使用できる値は、<code>add、merge、replace、</code>および <code>remove</code> です。
+         </p><p>置換モードでは、すべてのバリエーション商品が、フィードにリストされているバリエーション商品に置換される前に自動的に削除されるため、このモードでは属性を使用する必要がありません。</p><p>バリエーションを別々に追加または削除するには、バリエーションを別々の<code>variants</code>要素に配置します。1 つの variations 要素と商品につき、1 つの variants 要素とモードのみを使用します。</p><div><p>例 1: 新しいバリエーションを 2 つ追加します。</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-markup">&lt;product product-id="28447"&gt;
+    ...
+    &lt;variations&gt;
+        &lt;variants merge-mode="add"&gt;
+                &lt;variation product-id="883239585285"/&gt;
+                &lt;variation product-id="883239585289"/&gt;
+        &lt;/variants&gt;       
+    &lt;/variations&gt;
+&lt;/product&gt;</code></pre></div><div><p>例 2: バリエーションを 3 つ削除します。</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-markup">&lt;product product-id="28447"&gt;
+    ...
+    &lt;variations&gt;
+        &lt;variants merge-mode="remove"&gt;
+                &lt;variation product-id="883239585281"/&gt;
+                &lt;variation product-id="883239585282"/&gt;
+                &lt;variation product-id="883239585283"/&gt;
+        &lt;/variants&gt;
+    &lt;/variations&gt;
+&lt;/product&gt;</code></pre></div><div><p>例 3: 3 つ目のバリエーションの属性値を置換します。</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-markup">&lt;product product-id="28447"&gt;
+    ...
+    &lt;variations&gt;
+        &lt;variants merge-mode="replace"&gt;
+                &lt;variation product-id="883239585287"/&gt;
+        &lt;/variants&gt;
+    &lt;/variations&gt;
+&lt;/product&gt;</code></pre></div><p class="subheading2">インポート時のバリエーション商品とバリエーションの属性値の並べ替え</p><p>カタログインポート時のバリエーション商品とバリエーションの属性値の並べ替えを制御します。この機能は、インポートのときに既存のバリエーション商品とバリエーションの属性値の並べ替えを保持する必要がある場合に役立ちます。</p><p><code>variation-attribute-values</code>要素と<code>variants</code>要素の<code>merge-mode</code>属性に<code>merge</code>を指定した場合、インポーターは次の処理を行います。</p><ul>
+               <li>インポートファイルに指定されているすべての新しい値を、インポートファイルに指定されている順序と同じ順序でリストの最後に追加します。</li>
+
+               <li>インポートファイルに指定されている既存の値をすべて更新します。この動作は、インポートファイルに指定されている場合、表示名などの値のすべての属性がインポーターによって更新されることを意味します。既存の値の位置は更新されません。インポーターは、インポートファイルに指定されていない既存の値をすべて削除します。<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> バリエーション商品は削除されませんが、バリエーションマスターとのリンクが解除され、独立した商品になります。</div></div></div>
+
+               </li>
+
+            </ul>
+<div><p><code>merge-mode</code> 属性がファイルで指定されていない場合、システムに格納されているリストは、インポーターによってインポートファイル内の値に完全に置換されます。インポートでは、要素のリストにデフォルトの <code>replace</code> セマンティックが使用されます。 </p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> これら要素の処理は、カタログインポートで使用される最上位レベルのインポートモードから独立しています。</div></div></div>
+</div></div>
+
+   
+<div id="b2c_import_export_for_recommendations" lang="ja-jp" aria-labelledby="ariaid-title2" class="nested1"><a name="b2c_import_export_for_recommendations"></a>
+  <h2 class="slds-text-heading_medium slds-p-top_small">B2C Commerce での推奨項目のインポート/エクスポート</h2>
+  
+  <p>推奨項目は、その項目が含まれるカタログの一部としてインポートされます。推奨項目は、カタログスキーマの最上位要素として表示されます。推奨項目要素は、&lt;product&gt;、&lt;category&gt;、および&lt;category-assignment&gt; 要素と同位になります。このトピックは、B2C Commerce に該当します。</p>
+
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 以下のスニペットは、具体例を示すことのみを目的としています。詳細については、スキーマファイルを参照してください。</div></div></div>
+
+    <div><h3 class="slds-text-heading_small slds-p-top_small">スキーマファイル (Catalog.xsd)</h3><p class="bodytext">以下のスニペットは、カタログスキーマの一部です:</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-markup">&lt;!-- Recommendation --&gt;
+&lt;xsd:complexType name="complexType.Recommendation" mixed="false"&gt;
+    &lt;xsd:sequence&gt;
+        &lt;xsd:element name="display-name" type="sharedType.LocalizedString" minOccurs="0" maxOccurs="unbounded" /&gt;
+        &lt;xsd:element name="short-description" type="sharedType.LocalizedString" minOccurs="0" maxOccurs="unbounded" /&gt;
+        &lt;xsd:element name="long-description" type="sharedType.LocalizedString" minOccurs="0" maxOccurs="unbounded" /&gt;
+        &lt;xsd:element name="callout-message" type="sharedType.LocalizedString" minOccurs="0" maxOccurs="unbounded" /&gt;
+        &lt;xsd:element name="image" type="simpleType.Generic.String.256" minOccurs="0" maxOccurs="1" /&gt;
+        &lt;xsd:element name="custom-attributes" type="sharedType.CustomAttributes" minOccurs="0" maxOccurs="1" /&gt;
+    &lt;/xsd:sequence&gt;</code></pre></div>
+    <div><h3 class="slds-text-heading_small slds-p-top_small">例</h3><p class="bodytext">以下は、カタログスキーマファイルの中で RecommendationTypes を処理する部分です:</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-markup">&lt;xsd:simpleType name="simpleType.RecommendationType"&gt;
+  &lt;xsd:annotation&gt;
+    &lt;xsd:documentation&gt;Allowed string values are the 'int' values defined for the Recommendation.recommendationType attribute, and additionally the values 'cross-sell', 'up-sell', and 'other' for backward compatibility.&lt;/xsd:documentation&gt;
+  &lt;/xsd:annotation&gt;
+  &lt;xsd:restriction base="simpleType.Generic.String" /&gt;
+&lt;/xsd:simpleType&gt;</code></pre><p class="bodytext">RecommendationTypes を使用する場合、インポートプロセスは正の整数値がこのフィールドに渡されることを想定します。また、インポートプロセスはレガシー値 <em>cross-sell</em>、<em>up-sell</em>、<em>other</em> のうちの 1 つ (内部でそれぞれ 1、2、3 に変換される) も受け入れます。他の値が渡された場合、インポート処理によってエラーが報告され、推奨項目はインポートされません。インポートプロセスでは、渡された整数の検証は行われません。渡された値が構成されている属性値のうちの 1 つと等しくない場合でも、インポートプロセスでは、渡されたタイプを使用して推奨項目が作成されます。</p><p class="bodytext">Business Manager で RecommendationTypes のリストを定義します。たとえば、次のサンプルで示すように、XML ファイルに表示される新しいタイプ 4=="down-sell" または 5=="upside down sell" を定義します:</p><pre class="line-numbers slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium slds-scrollable_x"><code class="language-markup">&lt;recommendation type="4" target-id="PN0002" source-type="product" source-id="PN0001" /&gt;
+&lt;recommendation type="5" target-id="S1965524" source-type="product" source-id="S1937231"/&gt;</code></pre></div>
+    <div><h3 class="slds-text-heading_small slds-p-top_small">並べ替え</h3><p class="bodytext">推奨項目は、ソースオブジェクトとタイプの範囲で並び替えられます。この並べ替えは Business Manager とカタログのインポート処理によって処理されます。</p><p class="bodytext">インポート処理では、カタログのインポートファイルに表示されるのと同じ順序で推奨項目が配置されます。インポートされた推奨項目の位置は以下のいずれかになります:</p><ul class="listbullet">
+        <li class="listbullet">REPLACE モードで既存の推奨項目の場合、およびMERGE モードで新しい推奨項目の場合は、既存の推奨項目のリストの最下部に追加</li>
+
+        <li class="listbullet">MERGE モードで既存の推奨項目の場合は、現在の位置をキープ</li>
+
+      </ul>
+</div>
+  
+</div>
+</div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_catalog_scenarios">
+<h1 class="slds-text-heading_large">カタログのシナリオ</h1>
+   
+
+   <p>このトピックは、B2C Commerce に該当します。以下に、カタログを構成および使用して商品をマーチャンダイズする際の一般的な方法を示します。</p>
+
+      <div><h2 class="slds-text-heading_medium slds-p-top_small">商品を 1 つのカタログで管理する</h2><p>すべての商品を 1 つのカタログで管理し、ストアフロントと同じカタログ構造を希望するとします。</p><p class="subheading2">解決策</p><p>カタログを 1 つ作成します。たとえば、標準カタログと同じカテゴリ定義、商品定義、および内部分類をもつカタログ A を作成します。これは在庫システムと同じ構造です。カタログ A をストアフロントに関連付けると、そのカテゴリがストアフロントのナビゲーション構造になります。</p><p>
+            <span style="vertical-align:text-bottom;display:inline-block;"><img alt="カテゴリ定義をもつカタログ A" width="NaN" height="NaN" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_catalogs_catalog_scenarios_1.svg" style="margin-bottom:0;"></span>
+         </p></div>
+      <div><h2 class="slds-text-heading_medium slds-p-top_small">異なるカテゴリ構成での商品管理 </h2><p>ストアフロントを 1 つもっていると仮定し、組織内とは異なる方法でストアフロントの商品を整理したいとします。</p><p class="subheading2">解決策</p><p>標準カタログと同じカテゴリ定義、商品定義、および内部分類を使用してカタログ A を作成します。カタログ B を作成して、カテゴリを定義します。カタログ A で定義した商品を、カタログ B のカテゴリに割り当てます。その後、カタログ B をストアフロントに割り当てます。カテゴリ B がストアフロントナビゲーションのための構造を提供します。</p><p>
+            <span style="vertical-align:text-bottom;display:inline-block;"><img alt="異なるカテゴリ定義をもつカタログ A とカタログ B" width="NaN" height="NaN" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_catalogs_catalog_scenarios_2.svg" style="margin-bottom:0;"></span>
+         </p></div>
+      <div><h2 class="slds-text-heading_medium slds-p-top_small">複数のストアフロントで商品を共有する</h2><p>2 つの異なるストアフロントで販売したい商品があり、その商品を在庫システムで使用しているものと同じ構造で編集したいとします。</p><p class="subheading2">解決策</p><p>標準カタログと同じカテゴリ定義、商品定義、および内部分類を使用してカタログ A を作成します。カタログ A はストアフロントには割り当てません。
+  </p><p>希望する機能と、ストアフロント 1 のナビゲーションに使用したいカテゴリの構成を使用してカタログ B を作成して、ストアフロント 1 に割り当てます。カタログ A に属している商品を、カタログ B のカテゴリに割り当てます。</p><p>希望する機能と、ストアフロント 2 のナビゲーションに使用したいカテゴリの構成を使用してカタログ C を作成して、ストアフロント 2 に割り当てます。カタログ A に属している商品をカタログ C のカテゴリに追加します。
+  </p><p>ストアフロントカタログに含まれる商品のみがそのサイトに表示されます。たとえば、PN003 はストアフロント C でのみ表示されます。
+  </p><p>このシナリオでは、ストアフロント B で販売される商品の一部はストアフロント C でも提供されますが、そうでないものもあります。たとえば、ここに示すように、商品 PN004 はストアフロントサイト B とストアフロントサイト C で購入可能です。</p><p>また、商品は複数のカテゴリで購入可能にすることができます。たとえば、PN004 はストアフロントサイト B のビデオとセールのカテゴリで購入可能です。</p><p>
+            <span style="vertical-align:text-bottom;display:inline-block;"><img alt="複数のストアフロントで商品を共有する" width="NaN" height="NaN" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_catalogs_catalog_scenarios_3.svg" style="margin-bottom:0;"></span>
+         </p></div>
+      <div><h2 class="slds-text-heading_medium slds-p-top_small">2 つのストアフロント間で商品を共有する</h2><p>2 つのストアフロントがあるとします。ストアフロント A は変化せず、セール用のストアフロント B は毎月変化します。</p><p class="subheading2">解決策</p><p>両方のストアフロントのすべての商品定義と、ストアフロント A のカテゴリ定義を含むカタログ A を作成します。そして、ストアフロント特有のいくつかの商品と、ストアフロント B のカテゴリを含むカタログ B を作成します。</p><p>
+            <span style="vertical-align:text-bottom;display:inline-block;"><img alt="2 つのストアフロント間で商品を共有する" width="NaN" height="NaN" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/b2c_catalogs_catalog_scenarios_4.svg" style="margin-bottom:0;"></span>
+         </p></div>
+   
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_catalogs">
+<h1 class="slds-text-heading_large">カタログ</h1>
+   <p>このトピックは、B2C Commerce に該当します。B2C Commerce では、商品データがカタログに保存されます。カタログとは、販売する商品を集め、異なるカテゴリに整理したものです。</p>
+
+<ul><li class="slds-p-bottom_small"><strong><a href="#b2c_catalog_design">カタログのデザイン</a></strong><br>B2C Commerce Business Manager では商品データを手動で入力するか、XML ファイルからデータをインポートして編集できます。ほとんどの顧客は、独自の商品情報管理システムまたはその他の記録システムから商品データをインポートして、そのデータを Business Manager で強化します。</li><li class="slds-p-bottom_small"><strong><a href="merchandising-3.html#b2c_manage_catalogs">カタログの管理</a></strong><br>B2C Commerce Business Manager を使用して、カタログを作成および編集し、カタログをサイトに割り当てます。</li><li class="slds-p-bottom_small"><strong><a href="#b2c_catalog_scenarios">カタログのシナリオ</a></strong><br>このトピックは、B2C Commerce に該当します。以下に、カタログを構成および使用して商品をマーチャンダイズする際の一般的な方法を示します。</li><li class="slds-p-bottom_small"><strong><a href="general-3.html#b2c_csv_file">マスターカタログの CSV ファイル</a></strong><br>B2C Commerce Business Manager では、XML 形式および CSV 形式によるカタログのインポートとエクスポートがサポートされています。読みやすく編集が簡単なバージョンが必要な場合は、CSV ファイルとしてエクスポートします。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_categories_and_products">
+<h1 class="slds-text-heading_large">B2C Commerce のカテゴリと商品</h1>
+   
+
+   <p>カタログ内およびカタログ間で複数のカテゴリに商品を割り当てる。このトピックは、B2C Commerce に該当します。</p>
+
+      <p> たとえば、マスターカタログにエレクトロニクス製品のカテゴリがあり、その中に携帯電話、コンピューター、テレビのサブカテゴリがあるとします。ストアフロントのカタログで、去年のモデルのテレビをテレビとエレクトロニクス製品セールの 2 つのカテゴリに割り当てます。さらに、クリアランス商品を販売するマイクロサイトストアフロントがあるとします。マイクロストアフロントのカタログでも、去年のテレビのモデルをクリアランスのテレビのカテゴリに割り当てることができます。</p>
+   
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_category_attributes">
+<h1 class="slds-text-heading_large">B2C Commerce のカテゴリ属性</h1>
+   
+
+   <p>デフォルトのカテゴリ属性を変更し、カテゴリに適したカスタム属性を作成します。このトピックは、B2C Commerce に該当します。</p>
+
+      <p>たとえば、ワンピースの主要カテゴリがレディースワンピースであるとします。レディースワンピースのカテゴリで、ワンピースのサイズ表をワンピースとともに表示したいとします。サイズ表を表示するには、ワンピースのサイズ表のカスタムカテゴリ属性を作成して、レディースワンピースカテゴリの属性に割り当てます。</p>
+      <p>カテゴリ属性は、Category システムオブジェクトの属性定義で定義します。カテゴリシステムオブジェクトは、Business Manager の管理 &gt; サイトの開発 &gt; システムオブジェクトタイプ &gt; Category の順に移動して変更します。</p>
+      <p>デフォルトのカテゴリ属性には、SEO の設定、サイトマップ、プレゼンテーション、検索ランキング、および顧客属性のオプションがあります。サイトのカテゴリ属性オプションをカスタマイズするには、カテゴリシステムオブジェクトで属性を設定、追加、または削除します。</p>
+   
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_category_linking">
+<h1 class="slds-text-heading_large">B2C Commerce のカテゴリのリンク</h1>
+   <p>カテゴリを互いにリンクして、あるカテゴリ内の商品を別のカテゴリに属するものとして識別できるようにします。たとえば、レディースカテゴリにアクセサリーカテゴリをリンクします。リンクを使用して、レディースカテゴリ内の特定の商品 (スカーフ、ジュエリー、ベルト、シューズなど) をアクセサリーとして識別します。このトピックは、B2C Commerce に該当します。</p>
+
+
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_choice_of_bonus_product_discount">
+<h1 class="slds-text-heading_large">B2C Commerce での「ボーナス商品の選択」割引</h1>
+   
+   <p>買い物客に割引としてボーナス商品の選択肢を提供します。たとえば、リビングルーム家具 100,000 円以上購入で、3 種類のテレビから 1 種類をもらえるというものがあるとします。このトピックは、B2C Commerce に該当します。</p>
+
+      <p class="bodytext">B2C Commerce では、ボーナス商品がオンラインで注文可能な場合、そのボーナス商品が買い物カゴに追加されます。在庫リストがサイトに割り当てられている場合、販売可能数量が割り当てられている場合、または、在庫リストがサイトに割り当てられていない場合 (販売可能数量は評価されません) に、商品は注文可能です。</p>
+      <p>詳細については、Salesforce B2C Commerce API  のドキュメンテーションの ProductAvailabilityModel.isOrderable() を参照してください。</p>
+      <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> マスター商品は注文可能ではないため、ボーナス割引をマスター商品に割り当てることはできません。</div></div></div>
+
+      <p>ボーナス商品を構成するには、Business Manager でルールを定義するか、またはリスト機能を使用してアプリケーションをカスタマイズします。ルールベースのボーナス商品割引では、候補となるボーナス商品のプールとして、特定の商品 ID ではなくカテゴリを使用できます。</p>
+      <p>例: </p>
+      <ul>
+         <li>ルールベース: 10,000 円の買い物で<var>割引商品ルール</var>から商品を 1 点ゲット
+         </li>
+
+         <li>リストベース: 10,000 円の買い物で次の商品リストから商品を 1 点ゲット: P123、P456、P789</li>
+
+      </ul>
+
+      <p>いずれかの割引が買い物カゴに適用された場合、ボーナス商品の適用資格を表す <code>BonusDiscountLineItem</code> が買い物カゴに追加されます。</p>
+      
+      <p>以下の表で、2 種類の割引の異なる点について説明します。</p>
+      <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col><col><col></colgroup><thead class="slds-text-title_caps">
+               <tr class="">
+                  <th id="d209446e66" style="vertical-align:top;" class="slds-cell-wrap" scope="col">特徴</th>
+                  <th id="d209446e69" style="vertical-align:top;" class="slds-cell-wrap" scope="col">ルールベース</th>
+                  <th id="d209446e72" style="vertical-align:top;" class="slds-cell-wrap" scope="col">リストベース</th>
+               </tr>
+            </thead><tbody>
+               <tr class="">
+                  <td headers="d209446e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="特徴">階層プロモーション</td>
+
+                  <td headers="d209446e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="ルールベース">階層プロモーションには、ルールベースのボーナス選択割引を含めることはできません。</td>
+
+                  <td headers="d209446e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="リストベース">階層プロモーションにはリストベースの選択を含めることができます。この場合、各階層に無料または価格の決まったボーナス商品を設定します。</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d209446e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="特徴">事前計算</td>
+
+                  <td headers="d209446e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="ルールベース"><p style="margin-bottom:0;">ルールベースのボーナス選択割引では事前計算を利用できません。</p></td>
+
+                  <td headers="d209446e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="リストベース">無効なプロモーションによって有効なプロモーションの適用がブロックされないように、B2C Commerce によってボーナス商品がオンラインで入手可能かどうかが事前に評価されます。そういった商品がない場合は、プロモーションは無効とみなされ、適用資格がある場合でもその資格は買い物カゴに追加されません。この動作によって、除外ルールによってブロックされた商品プロモーションが適切に適用されます。</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d209446e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="特徴">
+                     <code>BonusChoiceDiscount</code> クラス</td>
+
+                  <td headers="d209446e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="ルールベース">表現済み</td>
+
+                  <td headers="d209446e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="リストベース">表現済み</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d209446e66" style="vertical-align:top;" class="slds-cell-wrap" data-label="特徴">アプリケーションのカスタマイズ</td>
+
+                  <td headers="d209446e69" style="vertical-align:top;" class="slds-cell-wrap" data-label="ルールベース">必要なし</td>
+
+                  <td headers="d209446e72" style="vertical-align:top;" class="slds-cell-wrap" data-label="リストベース">必要あり</td>
+
+               </tr>
+            </tbody></table>
+      <div><h2 class="slds-text-heading_medium slds-p-top_small">ルールベース</h2><p>ルールベースの<a title="商品プロモーションは、特定の商品、商品やブランドのグループ、または購入商品の金額に対して定義します。このトピックは、B2C Commerce に該当します。" href="merchandising-3.html#b2c_product_promotions">商品</a>プロモーションや<a title="Salesforce B2C Commerce を使用して、割引率、定額割引、送料無料などの注文プロモーションを構成します。ボーナス商品、またはボーナス商品の選択を提示し、注文割引を階層化します。このトピックは、B2C Commerce に該当します。" href="promotions-2.html#b2c_order_promotions">注文</a>プロモーションを構成する場合と同様に、ボーナス商品の選択ルールを構成できます。この割引タイプを使用する場合、商品の結果セットが膨大になることがあります。SiteGenesis アプリケーションのウィンドウには 1 ページに最高 10 個の商品が表示されます。SiteGenesis アプリケーションでは、プロモーション ID <code>RuleBasedChoiceOfBonusProduct</code> によってこの機能が実装されます。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> グローバル商品除外を有効にしている場合に、ルールベースの割引の検索結果に除外商品が含まれていると、ルールベースの商品が表示されるエリアは空白になります。</div></div></div>
+<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> この割引タイプを作成した場合は、商品インデックスを再作成します。</div></div></div>
+</div>
+      <div><h2 class="slds-text-heading_medium slds-p-top_small">リストベース</h2><p>割引を構成してストアフロントアプリケーションを変更する必要があります。Business Manager で割引を構成しただけでは、その割引はストアフロントに表示されません。この割引がストアフロントで適用されると、割引の情報を含むプレースホルダーが買い物カゴに追加されます。買い物客は、無料商品を買い物カゴに追加できます。</p><p>この割引で、買い物客は以下を行えます。</p><ul>
+            <li>ボーナス商品リストから商品を選択する</li>
+
+            <li>ボーナス商品を選択せずに注文手続きに移動する</li>
+
+            <li>オプションのボーナス商品のオプションを構成する</li>
+
+            <li>ボーナス商品がマスター商品の場合はバリエーションを構成する</li>
+
+            <li>特定の商品を購入し、任意のボーナスギフトを指定価格で購入する</li>
+
+            <li>特定金額を使って対象商品を購入し、選択肢のセットの中から特定価格のボーナスギフトを選択する</li>
+
+         </ul>
+<p>すべてのボーナス商品が、オフライン、ストアフロントカタログへの割り当てが解除されている、在庫切れ、または商品がなくなっている場合、プロモーションは適用されません。ボーナスプロモーションの除外やランクによって、別の商品プロモーションが以前ブロックされていた場合、以前非表示になっていたプロモーションが代わりに適用されます。このプロセスは、他のボーナス割引の仕組みと似ています。</p><p class="subheading1">プロモーションクラスとタイプ</p><p>Business Manager で、ボーナス商品の選択 (リスト) 割引に関連付けるボーナス商品を 50 個まで選択します。この制限があまり大きくない理由は、パフォーマンスを考慮しているためです。商品が表示される順序を設定します。ボーナス商品はオンラインでなければならず、ストアフロントカタログに割り当てる必要があります。買い物客が選択できるボーナス品目を最大 10 個まで設定します。このプロモーションでは、買い物客は異なる価格が設定されている複数の商品は選択できません。プローモーションを同時に多数の商品に適用することが目的の場合は、他のプロモーションタイプを使用することを検討してください。</p></div>
+      <div><h2 class="slds-text-heading_medium slds-p-top_small">商品タイプ</h2><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col><col></colgroup><thead class="slds-text-title_caps">
+                  <tr class="">
+                     <th id="d209446e228" style="vertical-align:top;" class="slds-cell-wrap" scope="col">商品タイプ</th>
+                     <th id="d209446e231" style="vertical-align:top;" class="slds-cell-wrap" scope="col">詳細</th>
+                  </tr>
+               </thead><tbody>
+                  <tr class="">
+                     <td headers="d209446e228" style="vertical-align:top;" class="slds-cell-wrap" data-label="商品タイプ">バリエーション</td>
+
+                     <td headers="d209446e231" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">マスター商品またはそのバリエーション商品のサブセットを「ボーナス商品の選択」プロモーションに含めます。マスター商品がリストに含まれている場合、買い物客はそのバリエーション商品をどれでも選択できます。割引を複数のボーナス商品に指定できる場合、買い物客は複数のバリエーション商品を選択できます。選択を変更するには、買い物客は選択済みの商品を削除し、異なるバリエーション商品を選択します。特定のバリエーション商品がリストに表示されている場合、買い物客はそのバリエーション商品からのみ選択できます。この場合、各バリアントが異なる選択肢として表示され、バリエーション属性値を変更する方法はありません。</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d209446e228" style="vertical-align:top;" class="slds-cell-wrap" data-label="商品タイプ">オプション</td>
+
+                     <td headers="d209446e231" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">買い物客は、ボーナス選択ページでどのオプションでも選択することができます。買い物客は選択済みの商品を削除して、別のオプションでその商品を再度追加することで、オプション選択項目を変更できます。</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d209446e228" style="vertical-align:top;" class="slds-cell-wrap" data-label="商品タイプ">バンドル</td>
+
+                     <td headers="d209446e231" style="vertical-align:top;" class="slds-cell-wrap" data-label="詳細">バンドルされた商品は、最大ボーナス商品数に加算されません。バンドルは 1 つの商品としてのみカウントされるためです。バンドルにマスター商品が含まれている場合、買い物客はバンドルを買い物カゴに追加する前にバリエーションを選択する必要があります。この場合、マスター商品のすべてのバリエーション商品が選択可能です。バンドルにオプション商品が含まれている場合、買い物客はバンドルを買い物カゴに追加する前にオプションを選択する必要があります。買い物客は選択済みの商品を削除して、別のオプションでその商品を再度追加することで、オプション選択項目を変更できます。</td>
+
+                  </tr>
+               </tbody></table><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 商品セットはこの割引に使用できません。</div></div></div>
+<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 「ボーナス商品の選択」の割引に含まれるバリエーショングループの構成済みプロモーション固有価格は、プロモーションの評価には影響を与えません。</div></div></div>
+</div>
+   
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_classification_vs_primary_category">
+<h1 class="slds-text-heading_large">分類カテゴリと主要カテゴリ</h1>
+   
+   <p>商品をカテゴリに割り当てる場合、主要 カテゴリと分類 カテゴリを使用して、ストアフロントの商品に表示する情報を決定します。このトピックは、B2C Commerce に該当します。</p>
+
+      <p>分類カテゴリと主要カテゴリは、商品に使用する URL とサイトマップ属性を決定するために、SEO でも使用されます。</p>
+      <a name="b2c_classification_vs_primary_category__ul_d31_msv_2wb"></a><ul id="b2c_classification_vs_primary_category__ul_d31_msv_2wb">
+         <li>分類カテゴリ - ストアフロントカタログでは、分類カテゴリによって、商品に表示する属性が決定されます。商品が属するカタログ内。このカテゴリ内で商品を管理します。</li>
+
+         <li>主要カテゴリ - 顧客が商品を検索する際に使用するカテゴリです。このカテゴリはストアフロントカタログ内にあり、商品の定義に使用される属性を設定します。</li>
+
+      </ul>
+
+      <p>各商品には、分類カテゴリと主要カテゴリがそれぞれ 1 つずつあります。ただし商品は、他のカテゴリに割り当てることができます。カテゴリがストアフロントカタログにある場合、それらのカテゴリで商品を販売することができます。</p>
+      <div><h2 class="slds-text-heading_medium slds-p-top_small">商品詳細ページのパンくずリスト</h2><p>商品に設定した主要カテゴリによって、その商品の検索結果またはコンテンツの詳細ページのパンくずリストが決定します。商品に主要カテゴリが設定されていない場合、カテゴリリンクの決定には分類カテゴリが使用されます。商品をどのカテゴリ内で表示しても、このパンくずリストは同じです。 </p><p>たとえば、顧客が男性用のブーツを検索した場合には、検索のパンくずリストは男性用ブーツなど絞り込んだカテゴリをポイントすることが望ましいといえます。パンくずリストは、シューズなどの幅広いカテゴリや、レディースシューズなどの該当しないカテゴリをポイントしないようにしなければなりません。選択した分類によって、検索結果に表示される属性が決定します。分類値が設定されていない場合は、主要カテゴリの属性値が使用されます。</p></div>
+      <div><h2 class="slds-text-heading_medium slds-p-top_small">商品 URL</h2><p>商品 URL の優先順位は以下のとおりです:</p><p>1. ストアフロントカタログ内の商品の主要カテゴリです。商品に主要カテゴリが割り当てられていない場合、またはストアフロントカタログに主要カテゴリが存在しない場合は、次のステップに進みます。</p><p>2. ストアフロントカタログ内の商品の分類カテゴリ。商品に分類カテゴリが割り当てられていない場合、またはストアフロントカタログに分類カテゴリが存在しない場合は、次のステップに進みます。</p><p>3. ストアフロントカタログ内で最初に商品に割り当てられたカテゴリです。サイト内で商品を使用可能にするには、ストアフロントカタログ内の少なくとも 1 つのカテゴリに商品を割り当てる必要があります。</p><p>4. 商品の主要カテゴリまたは分類カテゴリのサイト URL 属性に値が指定されていない場合は、デフォルト URL で設定したデフォルト設定が使用されます。</p><p>URL ジェネレーターによって生成された商品 URL を上書きするには、PageURL 属性を使用します。</p></div>
+      <div><h2 class="slds-text-heading_medium slds-p-top_small">サイトマップ属性</h2><p>Change Frequency (変更頻度) およびPriority (優先度) の値の優先順位は以下のとおりです:</p><p>1. 項目のページ専用の属性。</p><p>2. 次に、商品の分類カテゴリ。</p><p>3. 次に、商品の主要カテゴリ。</p><p>4. いずれのカテゴリ属性も見つからなかった場合は、カタログフィードで構成されたデフォルトの設定が使用されます。</p></div>
+   
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_configure_variation_groups_display_mode">
+<h1 class="slds-text-heading_large">バリエーショングループの表示モードの構成</h1>
+   
+   <p>バリエーショングループの表示設定を有効にします。このトピックは、B2C Commerce に該当します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+      <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+                  <tr class="">
+                     <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+
+                  </tr>
+               </tbody></table></div>
+      <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> この機能はデフォルトでは無効になっています。バリエーショングループの表示設定を有効にするには、Business Manager で <span class="menucascade"><strong class="uicontrol">管理</strong> | <strong class="uicontrol">グローバル環境設定</strong> | <strong class="uicontrol">機能スイッチ</strong></span>の順に進んで、「バリエーショングループに対しマージされた表示 / 個々の表示の設定を有効化」の環境設定にチェックを入れます。</div></div></div>
+</div>
+      <ol><li>
+            <span>キーワード検索では、<span class="menucascade"><strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol"><var>サイト</var> </strong> | <strong class="uicontrol">サイト環境設定</strong> | <strong class="uicontrol">検索の環境設定</strong></span>で、「マージされたバリエーショングループの表示モード」を有効にします。</span>
+         </li><li>
+            <span>カタログのナビゲーションの場合は、<span class="menucascade"><strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol"><var>サイト</var></strong> | <strong class="uicontrol">商品とカタログ</strong> | <strong class="uicontrol">カタログ</strong> | <strong class="uicontrol"><var>カタログ</var></strong> | <strong class="uicontrol">編集</strong> | <strong class="uicontrol">カテゴリ属性</strong></span>の順に進み、バリエーショングループの表示モードを設定します。</span>
+         </li><li>
+            <span>マージ — 結果を組み合わせてマスター商品として表示します。</span>
+         </li><li>
+            <span>個々 — 結果を個々のバリエーショングループとして表示します。</span>
+         </li></ol>
+
+   
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_configuring_product_and_content_locking">
+<h1 class="slds-text-heading_large">B2C Commerce の商品とコンテンツのロックの構成</h1>
+   
+   <p>編集中に商品やコンテンツをロックする時間を (分数で) 定義します。この間、他のユーザーはその商品レコードやコンテンツアセットを編集できません。(商品の編集前に適用された) ロックはこの時間が過ぎると解除されます。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>         <tr class="">           <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+         </tr>       </tbody></table></div>
+      <div><p>バリエーションマスターをロックする場合、関連するバリエーション商品も自動的にロックされます (他のユーザーがロックしていない場合に限る)。この手法により、バリエーションを編集するときに必要なクリック回数が減ります。バリエーションマスターをロック解除すると、、バリエーション商品もロック解除されます (他のユーザーがロックしていない場合に限る)。</p></div>
+      <ol><li>
+            <span>Business Manager で、アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、次に<span class="menucascade"><strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol"><var>サイト</var></strong> | <strong class="uicontrol">サイト環境設定</strong> | <strong class="uicontrol">ロック</strong></span>の順に選択します。
+            </span>
+         </li><li>
+            <span>ロックの環境設定ページで、商品レコードをロックするデフォルトの時間を分で指定します。</span>
+         </li><li>
+            <span>コンテンツアセットをロックするデフォルトの時間を分で指定します。</span>
+            <div>値に 0 を指定すると、コンテンツアセットのロックはサイトで無効になります。</div>
+         </li><li>
+            <span>変更を保存するには<strong class="uicontrol">適用</strong>を、システムのデフォルト値である 60 分に戻すには<strong class="uicontrol">リセット</strong>をそれぞれクリックします。</span>
+            <div>
+               <p>完全な許可または制限付きの許可 (現在選択されているサイトのストアフロントカタログに制限されている許可) が割り当てられている場合は、商品をロックします。この許可は、選択した地域情報とは関係がありません。</p>
+               <p>許可が割り当てられていない場合は、商品をロックできません。</p>
+            </div>
+         </li></ol>
+
+   
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_configuring_variation_attributes_for_image_assignment">
+<h1 class="slds-text-heading_large">カタログによる画像割り当てのためのバリエーション属性の構成</h1>
+   
+   
+   <p>B2C Commerce のカタログ画像設定では、複数のバリエーション属性を指定できます。この設定では、すべての新規商品のバリエーション属性の組み合わせに画像を指定できます (例: カラー (赤、緑、青) と ファブリック (レザー、布地))。</p>
+
+      <div><p>グローバルカタログ画像設定を構成する場合、指定したノードが階層構造に自動的に表示されます。たとえば、カラーはカタログレベルで指定します。新しい商品を作成して画像を追加すると、マスター商品ノードと、カラーに対するサブノードが表示されます。
+    </p></div>
+      <ol><li>
+            <span>アプリケーションランチャー <span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>の順にクリックし、 <span class="menucascade"><strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol">サイト名</strong> | <strong class="uicontrol">商品と</strong> | <strong class="uicontrol">カタログ</strong> | <strong class="uicontrol">カタログ</strong> | <strong class="uicontrol">編集画像設定タブの順に選択します。</strong></span></span>
+         </li><li>
+            <span>以下の項目を指定します: </span>
+            <ol>
+               <li>
+                  <span>画像の場所 - 「内部」または「外部」を指定します。内部には、カタログの画像ディレクトリ内の特別なフォルダーを指すベースパス (たとえば、<code>/your/special/images/</code>) を指定します。最初のベースパス ("/") は、カタログの画像ディレクトリのルートフォルダーを指します。外部 には、Http URL (必須) と Https URL を指定します。</span>
+               </li>
+
+               <li>
+                  <span>表示タイプ: 表示タイプ名を入力します。デフォルトは、large (ラージ)、medium (ミディアム)、small (スモール)、swatch (スウォッチ) です。表示タイプを追加するには、<strong class="uicontrol">表示タイプの追加</strong>をクリックします。値を入力して、<strong class="uicontrol">適用</strong>をクリックします。表示タイプを削除するには、表示タイプのフィールドをクリアして<strong class="uicontrol">適用</strong>をクリックします。表示タイプは、カタログごとに一意である必要があります。</span>
+               </li>
+
+               <li>
+                  <span>バリエーション属性 ID - バリエーション属性 ID を入力します。ID を追加すると、その属性は画像マネージャーウィンドウでデフォルトのグループ化として使用されます。たとえば <kbd>color</kbd> と入力すると、ツリーの最初のレベルに、画像マネージャーウィンドウで商品に使用できるカラーの値が含められます。ここで使用する属性 ID をバリエーションマスター商品に割り当てます。</span>
+               </li>
+
+               <li>
+                  <span>デフォルト画像の代替 - デフォルトの代替画像テキストを入力します。${productname}, ${variation value}, ${viewtype} を入力します。</span>
+               </li>
+
+               <li>
+                  <span>デフォルトの画像タイトル - デフォルトの画像タイトルを入力します。${productname}, ${variationvalue} を入力します。</span>
+               </li>
+
+            </ol>
+         </li><li>
+            <span>変更を保存するには、<strong class="uicontrol">適用</strong>をクリックします。</span>
+         </li></ol>
+
+   
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_cost_price">
+<h1 class="slds-text-heading_large">原価</h1>
+   
+   <p>原価とは、計算の目的で B2C Commerce にインポートされた固定原価のことです。原価はサイト固有の値で、サイトで購入に使用されるものと同じ通貨で表す必要があります。</p>
+
+      <p class="bodytext">原価は: </p>
+      <ul class="listbullet">
+         <li class="listbullet">ステージングされておらず、値は各インスタンスに固有です。</li>
+
+         <li class="listbullet">マスター商品と商品セットでは、特別な処理が必要です。</li>
+
+      </ul>
+
+      <div><h2 class="slds-text-heading_medium slds-p-top_small">標準商品</h2><p class="bodytext">マスター商品や商品セットではない標準商品では、原価はインポートされるため、デフォルト値はありません。</p></div>
+      <div><h2 class="slds-text-heading_medium slds-p-top_small">マスター商品</h2><p class="bodytext">マスター商品の原価は、すべてのバリエーション商品の平均原価と同じです。B2C Commerce は、以下の数式を使用して原価を計算します:</p><p class="bodytext">
+            <code> Cost Price( <em>mp</em> ) = SUM(Cost Price( <em>vpX</em> )) / <em>X</em> </code>
+         </p><p class="bodytext">この場合: </p><p class="listcontinue">
+            <em>mp</em> がマスター商品 </p><p class="listcontinue">
+            <em>vpX</em> がマスター商品のオンラインバリエーション。商品をオンラインバリエーション商品としてカウントするには、<code>IsOnline</code> 属性を true に設定する必要があります。 </p><p class="listcontinue">
+            <em>X</em> がオンラインバリエーション商品の数。 </p><p class="subheading1">例 1: バリエーション商品にオンラインではない商品が含まれている場合</p><p>この例では、すべてのバリエーション商品がオンラインではない場合に、B2C Commerce が原価をどのように計算するかを示します。この場合、商品 1 はオンラインですが、商品 2 はオンラインではありません。</p><p class="bodytext"> バリエーション商品 1 - IsOnline: true </p><p class="bodytext">原価: 5.50</p><p class="bodytext"> バリエーション商品 2 - IsOnline: false </p><p class="bodytext">原価: 10.75</p><p class="bodytext">
+    マスター商品 </p><p class="bodytext">原価: (5.50) / 1 = 5.50</p><p class="subheading1">例 2: すべてのバリエーション商品がオンラインである場合</p><p>この例では、すべてのバリエーション商品がオンラインである場合に、B2C Commerce で原価がどのように計算されるかを示します。</p><p class="bodytext">
+    バリエーション商品 1 - IsOnline: true </p><p class="bodytext">原価: 7.50</p><p class="bodytext"> バリエーション商品 2 - IsOnline: true </p><p class="bodytext">原価: 2.50</p><p class="bodytext"> マスター商品 </p><p class="bodytext">原価: (7.50 + 2.50) / 2 = 5.00</p></div>
+      <div><h2 class="slds-text-heading_medium slds-p-top_small">商品セット</h2><p class="bodytext">商品セットの原価 (Cost Price) は、セット内の各商品の原価の合計です。</p><p class="bodytext">
+            <code> Cost Price( <em>sp</em> ) = SUM(Cost Price( <em>cpX</em> )) </code>
+         </p><p class="bodytext">この場合: </p><p class="listcontinue">
+            <em>sp </em> が商品セット
+    </p><p class="listcontinue">
+            <em>cpX </em> がセット内のオンライン商品 </p><p class="subheading1">例 1: オンラインではない商品が含まれている場合</p><p>この例では、セット内にオンラインではない商品が含まれている場合に、B2C Commerce が原価をどのように計算するかを示します。この場合、商品 1 はオンラインですが、商品 2 はオンラインではありません。</p><p class="bodytext"> セット内の商品 1 - IsOnline: true </p><p class="bodytext">原価: 5.50</p><p class="bodytext">
+    セット内の商品 2 - IsOnline: false </p><p class="bodytext">原価: 10.75</p><p class="bodytext"> 商品セット </p><p class="bodytext">原価: 5.50</p><p class="subheading1">例 2: すべての商品がオンラインの場合</p><p>この例では、セット内のすべての商品がオンラインである場合に、B2C Commerce で原価がどのように計算されるかを示します。</p><p class="bodytext">
+    セット内の商品 1 - IsOnline: true </p><p class="bodytext">原価: 7.50</p><p class="bodytext"> セット内の商品 2 - IsOnline: true </p><p class="bodytext">原価: 2.50</p><p class="bodytext"> 商品セット </p><p class="bodytext">原価: (7.50 + 2.50) = 10.00</p></div>
+   
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_create_a_catalog">
+<h1 class="slds-text-heading_large">カタログの作成</h1>
+   
+   
+
+   <p>カテゴリや商品データを構成する前に、カタログを作成します。Business Manager を使用して組織のカタログを作成および管理します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>         <tr class="">           <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+         </tr>       </tbody></table></div>
+      <ol><li>
+            <span>アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、次に<span class="menucascade"><strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol">商品とカタログ</strong> | <strong class="uicontrol">カタログ</strong></span>の順に選択します。 </span>
+         </li><li>
+            <span><strong class="uicontrol">新規</strong>をクリックします。</span>
+         </li><li>
+            <span>全般タブで、カタログに関する以下の情報を指定します。</span>
+            <div>
+               <ul>
+                  <li>
+                     <strong>言語</strong> – カタログを表示するデフォルト言語を選択します。</li>
+
+                  <li>
+                     <strong>カタログ ID</strong> – カタログの一意の ID を入力します。カタログの作成後、この ID を変更することはできません。 <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> サイトと同じ ID のカタログは作成しないでください。</div></div></div>
+
+                  </li>
+
+                  <li>
+                     <strong>名前</strong> – カタログ名を入力します。</li>
+
+                  <li>
+                     <strong>説明</strong> – (オプション) 目的を含め、カタログの詳しい説明を任意で入力します。</li>
+
+               </ul>
+
+            </div>
+         </li><li>
+            <span><strong class="uicontrol">適用</strong>をクリックします。</span>
+            <div>カタログ定義を完成させるには、カタログをサイトに割り当て、ページ画像設定を行い、カテゴリを作成し、属性を設定し、検索の定義を確定し、並べ替えルールを設定し、ページのメタタグルールを割り当てます。これらのオプションは Business Manager のタブにあります。</div>
+         </li></ol>
+
+   
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_create_a_category">
+<h1 class="slds-text-heading_large">B2C Commerce のカテゴリの作成</h1>
+   
+
+   <p>Business Manager でカテゴリを作成します。このトピックは、B2C Commerce に該当します。このトピックは、B2C Commerce に該当します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>         <tr class="">           <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+         </tr>       </tbody></table></div>
+      <ol><li>
+            <span>アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、次に<span class="menucascade"><strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol">サイト</strong> | <strong class="uicontrol">商品とカタログ</strong> | <strong class="uicontrol">カタログ</strong></span>の順に選択します。</span>
+         </li><li>
+            <span>カテゴリの追加先となるカタログをクリックします。</span>
+         </li><li>
+            <span>カテゴリページで<strong class="uicontrol">新規</strong>をクリックします。</span>
+         </li><li>
+            <span>一意のカテゴリ ID と名前を入力します。</span>
+            <div>カテゴリの設定によっては、カテゴリ名がストアフロントに表示されることがあります。また、URL ルールによっては、カテゴリ ID が URL に表示されることがあります。 </div>
+         </li><li>
+            <span>ストアフロントにカテゴリを表示するには、オンラインチェックボックスを選択します。</span>
+         </li><li>
+            <span>(オプション) カテゴリの簡単な説明を入力します。</span>
+         </li><li>
+            <span><strong class="uicontrol">適用</strong>をクリックします。</span>
+            <div>
+               <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> ストアフロントのメニューナビゲーションにカテゴリを表示するには、利用可能な商品をサブカテゴリに割り当て、カテゴリ属性タブで「メニューナビゲーションに表示」チェックボックスを選択します。</div></div></div>
+
+            </div>
+         </li><li>
+            <span>カテゴリを編集するには、編集するカテゴリをクリックします。変更を行い、<strong class="uicontrol">適用</strong>をクリックします。</span>
+         </li></ol>
+
+   
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_create_a_main_product">
+<h1 class="slds-text-heading_large">バリエーションマスターの作成</h1>
+   
+   <p>バリエーションマスターを作成するには、まずバリエーションマスターを作成し、次にそのバリエーションマスターにバリエーション商品を割り当てます。このトピックは、B2C Commerce に該当します。シナリオ 1</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+      <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+                  <tr class="">
+                     <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+
+                  </tr>
+               </tbody></table></div>
+
+      <ol><li>
+            <span>アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、次に<span class="menucascade"><strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol">商品とカタログ</strong> | <strong class="uicontrol">商品</strong></span>の順に選択します。</span>
+         </li><li>
+            <span>商品の検索ページで<strong class="uicontrol">新規</strong>をクリックします。</span>
+         </li><li>
+            <span>商品ページで<strong class="uicontrol">全般</strong>タブを選択し、必要に応じて商品詳細を入力します。「オンライン」と「検索可能」のオプションが「はい」に設定されていることを確認します。</span>
+         </li><li>
+            <span><strong class="uicontrol">カテゴリ</strong>タブを選択し、<strong class="uicontrol">カテゴリの編集</strong>をクリックします。</span>
+         </li><li>
+            <span>新しい商品バリエーションの割り当て先となるカテゴリまで展開し、<strong class="uicontrol">適用</strong>をクリックします。</span>
+         </li><li>
+            <span><strong class="uicontrol">在庫</strong>タブを選択し、商品の在庫を割り当てるサイトを選択して、<strong class="uicontrol">作成</strong>をクリックします。</span>
+         </li><li>
+            <span><strong class="uicontrol">無期限</strong>を選択します。
+            </span>
+         </li><li>
+            <span>割り当て数を設定して、<strong class="uicontrol">作成</strong>をクリックします。
+            </span>
+         </li><li>
+            <span><strong class="uicontrol">戻る</strong>をクリックします。</span>
+         </li><li>
+            <span><strong class="uicontrol">バリエーション</strong>タブを選択し、新しく作成した商品にバリエーション商品を割り当てます。</span>
+            <div>
+               <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> マスター商品をバリエーションマスターとして商品リストに表示するには、この商品にバリエーション商品を割り当てます。</div></div></div>
+
+            </div>
+         </li></ol>
+
+   
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_create_a_product_set">
+<h1 class="slds-text-heading_large">商品セットの作成</h1>
+   
+   <p>ストアフロントで商品セットとして表示する商品グループを構成します。このトピックは、B2C Commerce に該当します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+      <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+                  <tr class="">
+                     <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+
+                  </tr>
+               </tbody></table></div>
+      <ol><li>
+            <span>アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、<span class="menucascade"><strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol"><var>サイト</var></strong> | <strong class="uicontrol">商品とカタログ</strong> | <strong class="uicontrol">商品セット</strong> | <strong class="uicontrol">商品セット</strong></span>の順に選択します。</span>
+         </li><li>
+            <span>商品セット検索ページで、1 つまたは複数の商品セットを以下の条件で検索します。</span>
+            <div>
+               <ul>
+                  <li>商品名または ID を入力して、<strong class="uicontrol">検索</strong>をクリックします。
+                  </li>
+
+                  <li>商品名または ID を入力せずに<strong class="uicontrol">検索</strong>をクリックして、すべての商品セットのリストを表示します。</li>
+
+                  <li><strong class="uicontrol">詳細</strong>または <strong class="uicontrol">ID 別</strong>ボタンをクリックします。</li>
+
+               </ul>
+
+            </div>
+         </li><li>
+            <span>新規商品セットを作成するには、<strong class="uicontrol">新規</strong>をクリックします。</span>
+            <div>薄く表示されているフィールドがある場合は、読み取り専用許可が付与されています。書き込みアクセスが必要な場合は、管理者に連絡してください。</div>
+         </li><li>
+            <span>新規商品セットページの全般タブで、以下を指定します:</span>
+            <div>
+               <ul>
+                  <li>ID</li>
+
+                  <li>カタログ</li>
+
+                  <li>税区分</li>
+
+                  <li>オンライン/オフライン、オンライン開始、オンライン終了の日付</li>
+
+                  <li>検索可能</li>
+
+                  <li>名前と説明 (HTML エディターを使用)</li>
+
+                  <li>商品詳細 (HTML エディターを使用)</li>
+
+               </ul>
+
+            </div>
+         </li><li>
+            <span><strong class="uicontrol">適用</strong>をクリックします。その他のタブがアクティブになります。</span>
+         </li><li>
+            <span><strong class="uicontrol">カテゴリ</strong>タブをクリックします。このタブを使用して、以下の操作を行います:</span>
+            <div>
+               <ul>
+                  <li>商品セットのカテゴリを定義します。</li>
+
+                  <li><code>分類</code>カテゴリを設定して、商品セットの属性を定義します。1 つだけ選択します。</li>
+
+                  <li><code>主要</code>カテゴリを設定して、商品がカテゴリ以外からアクセスされたときに表示する属性を定義します。(たとえば直接検索や、商品番号または ID に基づいて)。1 つだけ選択します。</li>
+
+               </ul>
+
+            </div>
+         </li><li>
+            <span>商品セットページでカテゴリタブをクリックし、<strong class="uicontrol">商品</strong>タブをクリックして、商品セットに含める商品を選択します。</span>
+            <div>検索で商品セットを使用する場合、<code>検索可能</code>フラグが<em>オンライン</em> フラグにどのように関連しているかを理解することが重要です。 <ul>
+                  <li>商品セットの検索可能フラグが <code>true</code> かつ商品セットが<code>オンライン</code>である場合にのみ、その商品セットは検索結果に表示されます。商品セットは、商品セットがオンラインで、かつそのセット内の少なくとも 1 つの商品もオンラインである場合に、オンラインとなります。オンライン/オフラインの設定は、検索可能の設定よりも優先されます。</li>
+
+                  <li>オンラインかつ検索可能な商品セットは、検索がそのセットやセット内のオンライン商品と一致する場合に検索結果に表示されます。含まれている商品の検索可能フラグの設定にはかかわらず、検索結果は商品セットを返します。</li>
+
+                  <li>商品セットの検索可能フラグが <code>false </code>に設定されている場合は、その商品セットは検索できません<code>。</code>
+                  </li>
+
+               </ul>
+
+            </div>
+         </li><li>
+            <span>商品セットページで商品タブをクリックし、<strong class="uicontrol">推奨項目</strong>タブをクリックして、この商品セットの推奨項目として表示する商品を指定します。</span>
+         </li><li>
+            <span>推奨項目タブで推奨項目を作成するには:</span>
+            <ol>
+               <li>
+                  <span>カタログを選択するには、<strong class="uicontrol">新規</strong>をクリックします。</span>
+               </li>
+
+               <li>
+                  <span><strong class="uicontrol">次へ &gt;&gt;</strong> をクリックして推奨項目タイプを指定します。</span>
+               </li>
+
+               <li>
+                  <span><strong class="uicontrol">次へ &gt;&gt;</strong> をクリックして 1 つまたは複数の商品を選択します。必要な場合は検索を使用してください。</span>
+               </li>
+
+               <li>
+                  <span><strong class="uicontrol">完了</strong>をクリックします。
+                  </span>
+               </li>
+
+               <li>
+                  <span>(推奨項目 タブで) 推奨項目の<strong class="uicontrol">編集</strong>をクリックして、各推奨項目を定義します。</span>
+               </li>
+
+               <li>
+                  <span>希望する順序で表示されるように、推奨商品を並べ替えます。</span>
+               </li>
+
+            </ol>
+         </li><li>
+            <span><strong class="uicontrol">アクティブデータタブ</strong>をクリックして、現在の商品のアクティブデータを表示します。</span>
+         </li></ol>
+
+   
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_create_a_product_variation_group">
+<h1 class="slds-text-heading_large">商品バリエーショングループの作成</h1>
+   
+   <p>バリエーショングループをインポートするか、バリエーショングループを作成します。このトピックは、B2C Commerce に該当します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+      <div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+                  <tr class="">
+                     <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+
+                  </tr>
+               </tbody></table></div>
+      <ol><li>
+            <span>アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、<span class="menucascade"><strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol"><var>サイト名</var></strong> | <strong class="uicontrol">商品とカタログ</strong> | <strong class="uicontrol">商品</strong></span>の順に選択します。</span>
+         </li><li>
+            <span>バリエーショングループを作成するバリエーションマスター商品を検索します。</span>
+         </li><li>
+            <span>商品ページの全般タブで、<strong class="uicontrol">バリエーション</strong>タブをクリックします。</span>
+         </li><li>
+            <span><strong class="uicontrol">ロック</strong>をクリックします。</span>
+            <div>
+               <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 商品がロックされていないと、バリエーショングループを作成することはできません。</div></div></div>
+
+            </div>
+         </li><li>
+            <span>バリエーション商品を追加して、すべてのバリエーション属性の値を設定します。これらの値は、バリエーショングループに対して選択する前に作成してください。</span>
+         </li><li>
+            <span>バリエーショングループで、バリエーショングループに一意の ID を入力し、<strong class="uicontrol">追加</strong>をクリックします。<strong class="uicontrol">OK</strong> をクリックして続行する前に、表示される警告を確認します。</span>
+            <div>
+               <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> <strong class="uicontrol">クローン</strong>をクリックして、既存のバリエーショングループをクローンすることもできます。</div></div></div>
+
+            </div>
+         </li><li>
+            <span>少なくとも 1 つのバリエーション属性の値を選択します。</span>
+         </li><li>
+            <span><strong class="uicontrol">適用</strong>をクリックします。</span>
+         </li><li>
+            <span>バリエーショングループに割り当てられている SKU のリストを表示するには、グループ <strong class="uicontrol">ID</strong> をクリックします。</span>
+         </li><li>
+            <span>全般タブで<strong class="uicontrol">ロック</strong>をクリックします。</span>
+         </li><li>
+            <span>バリエーショングループを、プロパティを継承する順序に並べます。詳細については、プロパティの継承のセクションを参照してください。</span>
+         </li><li>
+            <span>検索可能リストで、バリエーショングループの検索を可能にするサイトを選択します。</span>
+         </li><li>
+            <span>オンラインリストで、バリエーショングループを表示するカテゴリを含むサイトを選択します。<strong class="uicontrol">適用</strong>をクリックします。</span>
+         </li><li>
+            <span><strong class="uicontrol">カテゴリ</strong>タブをクリックします。</span>
+         </li><li>
+            <span><strong class="uicontrol">編集</strong>をクリックして、バリエーショングループを表示するカテゴリにバリエーショングループを割り当てます。</span>
+         </li><li>
+            <span>変更を保存するには、<strong class="uicontrol">適用</strong>をクリックします。</span>
+         </li><li>
+            <span>カテゴリの位置を使用して、カテゴリ内でバリエーショングループの位置を配置します。または、バリエーショングループを希望する位置にドラッグします。</span>
+         </li><li>
+            <span>商品インデックスを再作成します。</span>
+         </li></ol>
+
+   
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_create_a_subcategory">
+<h1 class="slds-text-heading_large">B2C Commerce のサブカテゴリの作成</h1>
+   
+
+   <p>複数のレイヤーのサブカテゴリを作成して、ストアフロントで商品を表示する方法を詳細に調整します。このトピックは、B2C Commerce に該当します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>         <tr class="">           <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+         </tr>       </tbody></table></div>
+      <ol><li>
+            <span>アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、<span class="menucascade"><strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol">サイト</strong> | <strong class="uicontrol">商品とカタログ</strong> | <strong class="uicontrol">カタログ</strong></span>の順に選択します。</span>
+         </li><li>
+            <span>サブカテゴリの追加先となるカテゴリをクリックします。</span>
+         </li><li>
+            <span>ストアフロントにカテゴリを表示するには、カテゴリフィールドに入力し、「オンライン」チェックボックスを選択します。</span>
+            <div>
+               <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> ストアフロントのメニューナビゲーションにカテゴリを表示するには、利用可能な商品をサブカテゴリに割り当て、カテゴリ属性タブで「メニューナビゲーションに表示」チェックボックスを選択します。 </div></div></div>
+
+            </div>
+         </li><li>
+            <span><strong class="uicontrol">適用</strong>をクリックします。</span>
+         </li></ol>
+
+   
+</div></div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="einstein-2.html">&larr; Einstein・レコメンデーション・パーソナライゼーション（2/2）</a><a href="merchandising-2.html">マーチャンダイジング（商品・カタログ・価格・在庫）（2/4） &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=cc.b2c_getting_started.htm&type=5&language=ja">help.salesforce.com — Salesforce B2C Commerce（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>

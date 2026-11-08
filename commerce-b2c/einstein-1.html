@@ -1,0 +1,1578 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Einstein・レコメンデーション・パーソナライゼーション（1/2） | B2C Commerce ヘルプ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #5e6c84;
+  --accent: #0176d3;
+  --border: #e5e5e5;
+  --code-bg: #f4f6f9;
+  --table-head: #f3f2f2;
+  --table-border: #dddbda;
+  --tip-bg: #eef4fb;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Salesforce Sans", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { position: static !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--border); }
+}
+nav.toc {
+  position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+  padding: 24px 20px; border-right: 1px solid var(--border); background: #fafafa;
+}
+nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc li { margin: 0 0 8px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; border-radius: 4px; font-size: 14px; }
+nav.toc a:hover { background: #eef4fb; color: var(--accent); }
+main { padding: 32px 48px 80px; max-width: 920px; }
+@media (max-width: 700px) { main { padding: 24px 16px 60px; } }
+header.doc-header { padding: 24px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header.doc-header h1 { font-size: 28px; margin: 0 0 6px; color: var(--fg); }
+header.doc-header .meta { color: var(--muted); font-size: 13px; }
+
+section.article { padding: 24px 0; scroll-margin-top: 16px; }
+section.article + .article-sep + section.article { border-top: 2px solid var(--border); }
+hr.article-sep { display: none; }
+
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 21px; margin: 32px 0 10px; }
+h3 { font-size: 17px; margin: 24px 0 8px; }
+h3.slds-text-title_caps { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+h4 { font-size: 15px; margin: 20px 0 8px; }
+p { margin: 10px 0; }
+a { color: var(--accent); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+strong { color: #161616; }
+kbd { background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; padding: 4px; background: #fafafa; }
+table { border-collapse: collapse; margin: 14px 0; max-width: 100%; }
+table.slds-table { border: 1px solid var(--table-border); }
+table.slds-table th, table.slds-table td { border: 1px solid var(--table-border); padding: 8px 12px; vertical-align: top; }
+table.slds-table thead th { background: var(--table-head); font-weight: 600; text-align: left; }
+table.slds-table.edition td, table.slds-table.permission td { font-size: 14px; }
+.slds-section { margin: 18px 0; padding: 14px 16px; background: var(--tip-bg); border-left: 3px solid var(--accent); border-radius: 4px; }
+.slds-section .slds-section__title h3 { margin-top: 0; }
+.slds-section table { background: #fff; }
+
+/* See Also block */
+section.article h4 + ul { background: #f7f9fc; padding: 12px 16px 12px 24px; border-radius: 4px; }
+
+.source-list { color: var(--muted); font-size: 13px; padding: 24px; border-top: 1px solid var(--border); margin-top: 40px; }
+.source-list ul { padding-left: 18px; }
+
+.back-to-top { position: fixed; right: 24px; bottom: 24px; padding: 10px 14px; background: var(--accent); color: white; border-radius: 24px; text-decoration: none; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.back-to-top:hover { background: #015a9f; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc">
+    <h2><a href="index.html" style="color:inherit;text-decoration:none;">&larr; トピック一覧</a></h2>
+    <h2 style="margin-top:18px;">目次（23）</h2>
+    <ol>
+      <li><a href="#b2c_commerce_cloud_einstein">Commerce Einstein</a></li>
+      <li><a href="#b2c_configure_einstein_deployment">B2C Commerce Einstein のデプロイのためのカタログと注文フィードの構成</a></li>
+      <li><a href="#b2c_configuring_recommenders">B2C Commerce Einstein Recommender の構成</a></li>
+      <li><a href="#b2c_configuring_slots_for_predictive_recommendations">B2C Commerce Einstein での Product Recommendations のコンテンツスロットの設定</a></li>
+      <li><a href="#b2c_connected_comm_setup_personalization">買い物客通知の Salesforce Personalization の有効化</a></li>
+      <li><a href="#b2c_creating_recommendations">明示的な推奨の作成</a></li>
+      <li><a href="#b2c_einstein_activity_required_fields">Einstein アクティビティ追跡:必須フィールド</a></li>
+      <li><a href="#b2c_einstein_additional_resources">B2C Commerce Einstein の追加リソース</a></li>
+      <li><a href="#b2c_einstein_and_data">B2C Commerce Einstein とデータ</a></li>
+      <li><a href="#b2c_einstein_commerce_insights">B2C Commerce Einstein インサイト</a></li>
+      <li><a href="#b2c_einstein_consent_management">B2C Commerce Einstein の同意管理</a></li>
+      <li><a href="#b2c_einstein_consent_mgmt_how">同意管理のしくみ</a></li>
+      <li><a href="#b2c_einstein_dashboard">Einstein ダッシュボード</a></li>
+      <li><a href="#b2c_einstein_data_privacy">B2C Commerce Einstein データの共有</a></li>
+      <li><a href="#b2c_einstein_data_usage_features">機能別の Einstein データ使用量</a></li>
+      <li><a href="#b2c_einstein_dnt_feature_impact">B2C Commerce Einstein の追跡拒否の影響</a></li>
+      <li><a href="#b2c_einstein_implement_prod_recs">B2C Commerce Einstein Product Recommendations の実装</a></li>
+      <li><a href="#b2c_einstein_privacy_and_consent">B2C Commerce Einstein のプライバシーと同意</a></li>
+      <li><a href="#b2c_einstein_recommendation_validator">B2C Commerce Einstein Recommendation Validator</a></li>
+      <li><a href="#b2c_einstein_recommendations_reporting">B2C Commerce Einstein Recommendations レポートのレビュー</a></li>
+      <li><a href="#b2c_einstein_self_serv_deployment">B2C Commerce Einstein ステータスダッシュボード</a></li>
+      <li><a href="#b2c_einstein_self_service_support">B2C Commerce Einstein セルフサービスサポート</a></li>
+      <li><a href="#b2c_einstein_set_privacy_preferences">B2C Commerce Einstein のプライバシー環境設定</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="doc-header">
+      <h1>Einstein・レコメンデーション・パーソナライゼーション（1/2）</h1>
+      <div class="meta">Salesforce B2C Commerce ヘルプ · 23 記事 · 生成 2026-11-03</div>
+    </header>
+    <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;"><a href="search-2.html">&larr; 検索・リファインメント・ソート（2/2）</a><a href="einstein-2.html">Einstein・レコメンデーション・パーソナライゼーション（2/2） &rarr;</a></div>
+<section class="article" id="b2c_commerce_cloud_einstein">
+<h1 class="slds-text-heading_large">Commerce Einstein</h1>
+   <p>Commerce Einstein は人工知能を利用したマーチャンダイジングツールを提供し、実用的なインサイトとカスタマイズされた顧客体験を提供します。このトピックは、B2C Commerce に該当します。</p>
+
+   
+<ul><li class="slds-p-bottom_small"><strong><a href="get_started.html#b2c_einstein_overview_what_is">B2C Commerce Einstein とは</a></strong><br>Salesforce B2C Commerce Einstein は人工知能を利用したマーチャンダイジングツールのスイートです。このトピックは、B2C Commerce に該当します。</li><li class="slds-p-bottom_small"><strong><a href="#b2c_einstein_self_serv_deployment">B2C Commerce Einstein ステータスダッシュボード</a></strong><br>Einstein ステータスダッシュボードを使用して、ストアフロントのカタログと注文のフィードをスケジュールおよび実行し、サイトの B2C Commerce Einstein 機能のアクティブ化を行います。このトピックは、B2C Commerce に該当します。</li><li class="slds-p-bottom_small"><strong><a href="#b2c_einstein_privacy_and_consent">B2C Commerce Einstein のプライバシーと同意</a></strong><br>B2C Commerce Einstein を設定する際は、買い物客の同意を念頭に、デフォルトのプライバシー環境設定とアカウントを設定します。このトピックは、B2C Commerce に該当します。</li><li class="slds-p-bottom_small"><strong><a href="einstein-2.html#b2c_einstein_site_recommendations">B2C Commerce Einstein Product Recommendations</a></strong><br>Einstein Product Recommendations を使用して Recommender を作成および管理し、個々の買い物客にとって最も関連性の高い商品を予測する戦略を割り当てます。このトピックは、B2C Commerce に該当します。</li><li class="slds-p-bottom_small"><strong><a href="#b2c_einstein_recommendation_validator">B2C Commerce Einstein Recommendation Validator</a></strong><br>Einstein Recommendation Validator は Chrome の拡張機能で、マーケットプレイスで B2C Commerce Einstein の推奨項目と並べ替えルールを検証およびデバッグします。この拡張機能を使用して、Einstein サイトのアクティビティ追跡と推奨項目を検証します。このトピックは、B2C Commerce に該当します。</li><li class="slds-p-bottom_small"><strong><a href="#b2c_einstein_recommendations_reporting">B2C Commerce Einstein Recommendations レポートのレビュー</a></strong><br>Reports &amp; Dashboards アプリの Einstein ダッシュボードを使用して、Einstein Recommendations のパフォーマンスを確認します。このトピックは、B2C Commerce に該当します。</li><li class="slds-p-bottom_small"><strong><a href="#b2c_einstein_commerce_insights">B2C Commerce Einstein インサイト</a></strong><br>B2C Commerce Einstein Commerce Insights レポートは買い物客、注文、商品のデータを取り込み、同時購入される頻度の高い商品を表示します。このトピックは、B2C Commerce に該当します。</li><li class="slds-p-bottom_small"><strong><a href="search-1.html#b2c_einstein_search_dict">B2C Commerce Einstein 検索辞書</a></strong><br>Einstein Search Dictionaries は、有効になっている場合、すべてのサイトの検索と検索関連の設定を使用して、買い物客が検索しているが辞書には登録されていない用語を表示します。このトピックは、B2C Commerce に該当します。</li><li class="slds-p-bottom_small"><strong><a href="search-1.html#b2c_einstein_predictive_sort">B2C Commerce Einstein Predictive Sort</a></strong><br>Predictive Sort は、既存の B2C Commerce B2C Commerce の並べ替えルールのアプローチを B2C Commerce Einstein のパワーと組み合わせます。このトピックは、B2C Commerce に該当します。</li><li class="slds-p-bottom_small"><strong><a href="search-1.html#b2c_einstein_search_recommendations">B2C Commerce Einstein Search Recommendations</a></strong><br>B2C Commerce Einstein では先行入力 (タイプアヘッド) による誘導で検索を改善できます。この機能は、AI 駆動のパーソナル化された検索の提案をリアルタイムで買い物客に提供します。</li><li class="slds-p-bottom_small"><strong><a href="#b2c_einstein_additional_resources">B2C Commerce Einstein の追加リソース</a></strong><br> B2C Commerce Einstein の体験を最適化するために、いくつかのリソースを用意しました。このトピックは、B2C Commerce に該当します。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_configure_einstein_deployment">
+<h1 class="slds-text-heading_large">B2C Commerce Einstein のデプロイのためのカタログと注文フィードの構成</h1>
+   
+   <p> Einstein へのカタログと注文のデータフィードを構成、スケジュール、デプロイします。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>         <tr class="">           <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+         </tr>       </tbody></table></div>
+      <div id="b2c_configure_einstein_deployment__context_ezv_cvy_2mb"><a name="b2c_configure_einstein_deployment__context_ezv_cvy_2mb"></a><p>Einstein 機能を使用するには、まず B2C Commerce Einstein のカタログフィードと注文フィードを構成する必要があります。マスターカタログの商品と買い物客の注文に関するデータは、これらのフィードを経由して送信されます。これらのフィードでは、マスターカタログと注文に関する重要なプロパティが B2C Commerce Einstein にエクスポートされます。
+            </p><p>Einstein はこのデータを使用して、ストアフロントで有効にした B2C Commerce Einstein 機能のための結果の生成に使用される機械学習モデルのトレーニングを行います。また、データは Einstein Configurator ツールにもフィードされます。Einstein Configurator を使用して、システムで推奨が生成される方法を調整するビジネスルールを構成します。</p><p>これらのフィードを構成することで、カタログと注文のデータをエクスポートする頻度を制御します。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> カタログと注文のフィードは Production (本番) インスタンスでのみ構成します。</div></div></div>
+<p>カタログと注文のフィードを構成するには: </p></div>
+      <ol><li>
+            <span>Business Manager で、アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、次に<span class="menucascade"><strong class="uicontrol">管理</strong> | <strong class="uicontrol">オペレーション</strong> | <strong class="uicontrol">Einstein ステータスダッシュボード</strong></span>の順に選択します。</span>
+         </li><li>
+            <span>各サイトの右側にあるドロップダウンメニューを使用して、<strong>構成</strong>を選択します。</span>
+            <div>
+               <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> ホストフィールドは、空の場合以外はそのままにして次のステップに進みます。</div></div></div>
+
+            </div>
+         </li><li>
+            <span>ホストフィールドが空の場合は、現在のサイトのホスト URL を指定します。</span>
+            <div>たとえば、www.myCompanyName.com などです。<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> ホスト URL を指定する場合は、'https://' は含めないでください。</div></div></div>
+</div>
+         </li><li>
+            <span>デプロイ構成セクションで、<strong>地域</strong>を選択します。</span>
+            <div>地域はサイトごとに 1 回のみ選択します。この設定では、主な業務地域に対応する地域を指定します。システムはこの情報を使用して、予測データを保管および処理する場所を決定します。Production (本番) インスタンスと Staging (ステージング) インスタンスで地域設定が構成されていることを確認してください。</div>
+         </li><li>
+            <span>以下の表を使用して、特定の操作を定義します。</span>
+            <div>
+               <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+                        <tr class="">
+                           <th id="d41561e130" style="vertical-align:top;" class="slds-cell-wrap" scope="col">操作</th>
+                           <th id="d41561e133" style="vertical-align:top;" class="slds-cell-wrap" scope="col">選択する項目... </th>
+                        </tr>
+                     </thead><tbody>
+                        <tr class="">
+                           <td headers="d41561e130" style="vertical-align:top;" class="slds-cell-wrap" data-label="操作">現在在庫切れのページに対し、商品詳細ページで商品の推奨項目を生成する。</td>
+
+                           <td headers="d41561e133" style="vertical-align:top;" class="slds-cell-wrap" data-label="選択する項目..."><p>在庫切れ商品</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> このオプションでは、Einstein が在庫切れ商品のカタログ情報を保存し、買い物客が表示する在庫切れ商品の ID を引き続き認識し、適用された Recommender ルールを使用することができます。 </div></div></div>
+</td>
+
+                        </tr>
+                        <tr class="">
+                           <td headers="d41561e130" style="vertical-align:top;" class="slds-cell-wrap" data-label="操作">商品タイプを利用するストアフロントカタログ: <strong>バリエーショングループ</strong>。</td>
+
+                           <td headers="d41561e133" style="vertical-align:top;" class="slds-cell-wrap" data-label="選択する項目...">バリエーショングループの商品</td>
+
+                        </tr>
+                        <tr class="">
+                           <td headers="d41561e130" style="vertical-align:top;" class="slds-cell-wrap" data-label="操作">デフォルトの地域情報以外の商品のデータを含むマスターカタログ。</td>
+
+                           <td headers="d41561e133" style="vertical-align:top;" class="slds-cell-wrap" data-label="選択する項目...">複数地域情報</td>
+
+                        </tr>
+                     </tbody></table>
+            </div>
+         </li><li>
+            <span>特定の日付以降に作成された注文をエクスポートするには、「次の日時以降に作成された注文をエクスポート」フィールドで値を指定します。</span>
+            <div>
+               <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> この値を指定する場合は、サイトが B2C Commerce でライブになった日付、または 2 年間のうち、短い方を指定します。</div></div></div>
+
+            </div>
+         </li><li>
+            <span>実行あたりの最大注文数を定義します。</span>
+            <div>この値は、ピーク日に予想される注文数です。デフォルト値は 10,000 です。参考までに、注文数を 100,000 件に設定すると、注文フィードの処理には約 30 分間かかります。<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 大規模な注文履歴をもつ新しいサイトに対して実行あたりの最大注文数を構成する際には、注文数を 10,000 件を超えるように増やすことを推奨します。この設定では、現在の日付に追いつくまで何日もかかるのではなく、注文フィードがもっとも最近の日付から注文をインポートできます。注文フィードが最新でないと、Commerce Insights が生成されない場合があります。Commerce Insights には、過去 7 日間の買い物客の買い物カゴのビジュアル化が表示されます。 </div></div></div>
+</div>
+         </li><li>
+            <span>(オプション) カタログフィードと注文フィードをすぐに実行するには、<strong>保存</strong>をクリックします。 </span>
+         </li><li>
+            <span>カタログと注文フィードのスケジュールのスイッチを<strong>オン</strong>に設定します。</span>
+            <div>スイッチが無効の場合は、カタログと注文のフィードはサイトに対してスケジュールされません。</div>
+         </li><li>
+            <span>カタログフィードのスケジュールを定義します。</span>
+            <div>
+               <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+                        <tr class="">
+                           <th id="d41561e241" style="vertical-align:top;" class="slds-cell-wrap" scope="col">フィールド</th>
+                           <th id="d41561e244" style="vertical-align:top;" class="slds-cell-wrap" scope="col">推奨</th>
+                        </tr>
+                     </thead><tbody>
+                        <tr class="">
+                           <td headers="d41561e241" style="vertical-align:top;" class="slds-cell-wrap" data-label="フィールド">開始日時</td>
+
+                           <td headers="d41561e244" style="vertical-align:top;" class="slds-cell-wrap" data-label="推奨"><p>Einstein が確実に最新の商品情報や新製品の立ち上げを受け取るように、Staging (ステージング) から Production (本番) へのレプリケーションが完了した直後に実行するようにジョブをスケジュールします。</p><p style="margin-bottom:0;">Staging (ステージング) から Production (本番) へのレプリケーションジョブの完了時刻は、<span class="menucascade"><strong class="uicontrol">Staging (ステージング) インスタンス</strong> | <strong class="uicontrol">アプリケーションランチャー</strong> | <strong class="uicontrol">管理</strong> | <strong class="uicontrol">レプリケーション</strong> | <strong class="uicontrol">データレプリケーション処理</strong> | <strong class="uicontrol">次のタイプの終了時刻を表示: 転送 &amp; 公開</strong></span>の順に選択して確認できます。</p></td>
+
+                        </tr>
+                        <tr class="">
+                           <td headers="d41561e241" style="vertical-align:top;" class="slds-cell-wrap" data-label="フィールド">時間単位</td>
+
+                           <td headers="d41561e244" style="vertical-align:top;" class="slds-cell-wrap" data-label="推奨">日</td>
+
+                        </tr>
+                        <tr class="">
+                           <td headers="d41561e241" style="vertical-align:top;" class="slds-cell-wrap" data-label="フィールド">頻度</td>
+
+                           <td headers="d41561e244" style="vertical-align:top;" class="slds-cell-wrap" data-label="推奨"><p>1</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Einstein がすべての変更に関して最新の状態を保てるように、カタログフィードは毎日実行することをお勧めします。Einstein では、最初の実行時にのみカタログ全体がエクスポートされます。毎日のランタイムを短くするために、その後の実行には差分のみが含まれます。</div></div></div>
+</td>
+
+                        </tr>
+                     </tbody></table>
+            </div>
+         </li><li>
+            <span>注文フィードのスケジュールを定義します。</span>
+            <div>
+               <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+                        <tr class="">
+                           <th id="d41561e327" style="vertical-align:top;" class="slds-cell-wrap" scope="col">フィールド</th>
+                           <th id="d41561e330" style="vertical-align:top;" class="slds-cell-wrap" scope="col">推奨</th>
+                        </tr>
+                     </thead><tbody>
+                        <tr class="">
+                           <td headers="d41561e327" style="vertical-align:top;" class="slds-cell-wrap" data-label="フィールド">開始日時</td>
+
+                           <td headers="d41561e330" style="vertical-align:top;" class="slds-cell-wrap" data-label="推奨">注文がピークでない時間帯にジョブをスケジュールします。</td>
+
+                        </tr>
+                        <tr class="">
+                           <td headers="d41561e327" style="vertical-align:top;" class="slds-cell-wrap" data-label="フィールド">時間単位</td>
+
+                           <td headers="d41561e330" style="vertical-align:top;" class="slds-cell-wrap" data-label="推奨">日</td>
+
+                        </tr>
+                        <tr class="">
+                           <td headers="d41561e327" style="vertical-align:top;" class="slds-cell-wrap" data-label="フィールド">頻度</td>
+
+                           <td headers="d41561e330" style="vertical-align:top;" class="slds-cell-wrap" data-label="推奨"><p>1</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 過去 7 日間の注文が使用されるため、Commerce Insights 機能を最新の状態に保つには毎日の注文フィードの構成が重要になります。また注文フィードは、Product Recommendations 戦略の商品アフィニティアルゴリズムでも使用されます。</div></div></div>
+</td>
+
+                        </tr>
+                     </tbody></table>
+            </div>
+         </li><li>
+            <span><strong class="uicontrol">保存</strong>をクリックします。</span>
+            <div>Business Manager で構成が保存されます。 </div>
+         </li><li>
+            <span>デプロイが完了するまで、少なくとも 24 時間から 48 時間待ちます。</span> 
+         </li><li>
+            <span>Salesforce サポートにチケットを記録し、Configurator に最初のサイト管理者を追加するよう依頼します。</span>
+         </li><li>
+            <span>サイト管理者として追加されたら、Einstein Configurator を開き、<span class="menucascade"><strong class="uicontrol">管理</strong> | <strong class="uicontrol">ユーザー管理</strong></span>に移動します。必要に応じてユーザーを追加します。</span>
+            <div>ユーザーは関連する組織の Account Manager アカウントを持っている必要がありますが、特定の Account Manager 役割は必要ありません。</div>
+         </li></ol>
+
+      <div><p>その他の参照項目</p><ul>
+            <li><a target="_blank" href="https://youtu.be/5YKKqpNuqds?si=kwSoyakQjLI9JX9n">B2C Commerce Einstein のデプロイのためのカタログと注文フィードの構成</a></li>
+
+         </ul>
+</div>
+   
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_configuring_recommenders">
+<h1 class="slds-text-heading_large">B2C Commerce Einstein Recommender の構成</h1>
+   
+   <p>B2C Commerce Einstein のデプロイ後、商品詳細ページ (PDP) と最近見た商品の Recommender はそのまますぐに使用できます。またマーチャントは、Einstein の戦略とルールを利用して、カスタムの Recommender を作成できます。このトピックは、B2C Commerce に該当します。</p>
+
+      <p>Recommender の目的は次のとおりです。</p>
+      <a name="b2c_configuring_recommenders__ul_ej5_kfy_cmb"></a><ul id="b2c_configuring_recommenders__ul_ej5_kfy_cmb">
+         <li>商品 ID のリストの生成に使用するアプローチ、またはアルゴリズムを制御する。</li>
+
+         <li>商品 ID のリストを操作するには、リストをストアフロントに渡す前に商品 ID を削除するか、順番を変更します。</li>
+
+      </ul>
+
+      <p>Recommender の構成では、1 つまたは複数の<em>戦略</em> を指定して、商品 ID のリストを生成するためにシステムで使用するアプローチを決定します。必要ではありませんが、構成の際に 1 つまたは複数の<em>ルール</em> を指定して、推奨項目のリストを調整し、リストの内容や順番を制御できます。</p>
+      <p>Recommender を構成する際には、固有の名前を付ける必要があります。この名前は、Recommender によって生成された推奨項目に対して<a title="コンテンツスロットを使用して、ストアフロントで Product Recommendations を表示します。このトピックは、B2C Commerce に該当します。" href="#b2c_configuring_slots_for_predictive_recommendations">コンテンツスロット設定を作成</a>する際に、Business Manager に表示されます。</p>
+      <div id="b2c_configuring_recommenders__pi_strategies"><a name="b2c_configuring_recommenders__pi_strategies"></a><p>Recommender タイプと戦略の詳細については、<a title="Einstein Product Recommendations を使用して Recommender を作成および管理し、個々の買い物客にとって最も関連性の高い商品を予測する戦略を割り当てます。このトピックは、B2C Commerce に該当します。" href="einstein-2.html#b2c_einstein_site_recommendations">B2C Commerce Einstein Product Recommendations</a>を参照してください。</p></div>
+   
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_configuring_slots_for_predictive_recommendations">
+<h1 class="slds-text-heading_large">B2C Commerce Einstein での Product Recommendations のコンテンツスロットの設定</h1>
+   
+   <p> コンテンツスロットを使用して、ストアフロントで Product Recommendations を表示します。このトピックは、B2C Commerce に該当します。</p>
+
+      <p>推奨商品は、コンテンツスロットを使用してストアフロントページに表示されます。コンテンツスロットの設定の詳細については、<a title="Salesforce B2C Commerce では、すべてのテンプレートがスキャンされ、定義されているスロットの場所が特定されます。結果リストは、コンテンツスロットのページに表示されます。" href="storefront-1.html#b2c_managing_and_creating_content_slot_configurations">スロット設定の管理と作成</a>を参照してください。 </p>
+     <p>Product Recommendations のためにコンテンツスロットを設定する際には、以下の作業を行います。</p><a name="b2c_configuring_slots_for_predictive_recommendations__ul_pcv_lht_vnb"></a><ul id="b2c_configuring_slots_for_predictive_recommendations__ul_pcv_lht_vnb">
+            <li>コンテキストがグローバルであるコンテンツスロットを選択します。</li>
+
+            <li>コンテンツタイプフィールドを推奨項目に設定します。</li>
+
+            <li>Recommender フィールドの値を選択します。</li>
+
+            <li><code>slots/recommendation</code> フォルダーから適切なレンダリングテンプレートを選択します。</li>
+
+         </ul>
+
+      <p>Recommender フィールドには、Einstein Configurator ツールで定義する<em>Recommender</em>と呼ばれるビジネスルールの名前付きリストが含まれています。これらのルールによって、B2C Commerce Einstein が推奨商品を出力する方法を制御します。 </p>
+   
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_connected_comm_setup_personalization">
+<h1 class="slds-text-heading_large">買い物客通知の Salesforce Personalization の有効化</h1>
+ 
+ 
+ <p>パーソナライゼーションを使用すると、買い物客の通知で関連性の高いパーソナライズされた体験を提供できます。買い物客への通知を使用するためにパーソナル化は必要ありません。 </p>
+
+  <div><p>買い物客への通知にパーソナライズされたおすすめ商品を追加するには、パーソナライゼーションライセンスが必要です ( <a target="_blank" href="https://help.salesforce.com/s/articleView?id=mktg.persnl_basics.htm&amp;language=ja&amp;type=5">「パーソナライゼーション」</a>を参照)。また、B2C Commerce ドメインデータを Data 360 に取り込むには、<a target="_blank" href="data_jobs-1.html#b2c_data_cloud_iceberg_domain_data">Apache Iceberg Connector</a>を設定する必要があります。</p></div>
+  <ol><li>
+    <span>B2C Commerce のナビゲーションサイドバーで、<span class="menucascade"><strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol">サイト</strong> | <strong class="uicontrol">サイト環境設定</strong> | <strong class="uicontrol">Salesforce Data Cloud</strong> | <strong class="uicontrol">機能構成</strong> | <strong class="uicontrol">パーソナライゼーション</strong></span>の順に選択します。 </span>
+   </li><li>
+    <span>「<strong class="uicontrol">パーソナライゼーションを有効にする</strong>」をクリックします。</span>
+   </li></ol>
+
+  <div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-warning"><img alt="重要" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_important.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">重要</span> パーソナル化 Recommender のトレーニングが終了するのを待ってから、買い物客への通知にパーソナライズされた推奨項目を追加します。「個人用設定が有効になりました」と表示されるまで、このページを更新します。このプロセスには最大 30 分かかることがあり、トレーニングは 24 時間ごとに更新されます。<a target="_blank" href="https://help.salesforce.com/s/articleView?id=mktg.persnl_recommender_recommender_training_track_status.htm&amp;language=ja&amp;type=5">「パーソナル化 Recommender のトレーニング</a>」を参照してください。</div></div></div>
+</div>
+ 
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_creating_recommendations">
+<h1 class="slds-text-heading_large">明示的な推奨の作成</h1>
+   
+   <p> 明示的な推奨機能を使用して、B2C Commerce で明示的な推奨を作成および管理します。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>         <tr class="">           <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+         </tr>       </tbody></table></div>
+      <div><p class="bodytext">明示的な推奨を使用すると、次の操作が可能です: </p><ul class="listbullet">
+            <li class="listbullet">明示的な推奨を作成、更新、並べ替え、削除する。</li>
+
+            <li class="listbullet">追加機能に標準またはカスタム属性を使用する。</li>
+
+            <li class="listbullet">カタログを使用して推奨項目をインポートおよびエクスポートする。</li>
+
+         </ul>
+<p class="bodytext">Business Manager では、明示的な推奨項目がソースオブジェクトごとに整理されます。これは、ソースオブジェクト内で並べ替え順が設定されているためです。明示的な推奨機能を拡張します。推奨項目タイプはシステム属性です。構成するには、<span class="menucascade"><strong class="uicontrol">管理</strong> | <strong class="uicontrol">サイトの開発</strong> | <strong class="uicontrol">システムオブジェクトタイプ の順</strong></span>に選択します。たとえば、タイプを追加して、ラベルを構成します。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 以下の手順は明示的な推奨にのみ使用でき、<em>Product Recommendations</em> には使用できません。</div></div></div>
+</div>
+      <ol><li>
+            <span>推奨項目を作成するには、アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、<span class="menucascade"><strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol"><var>サイト</var></strong> | <strong class="uicontrol">商品とカタログ</strong> | <strong class="uicontrol">推奨項目</strong></span>を選択 (または商品エディターから商品の推奨項目タブにアクセス) します。</span>
+            <ol>
+               <li>
+                  <span>カタログの選択ページで、推奨項目を追加するカタログを選択します。</span>
+               </li>
+
+               <li>
+                  <span>商品の推奨項目タブで、<strong class="uicontrol">新規</strong>をクリックします。
+                  </span>
+               </li>
+
+               <li>
+                  <span>推奨項目ソースの選択ページで、推奨項目を作成する商品の有効な商品 ID を入力するか、商品リストを参照します。</span>
+               </li>
+
+               <li>
+                  <span>省略記号をクリックして商品を参照します。</span>
+               </li>
+
+               <li>
+                  <span>商品の選択ページで、商品を検索するか、検索フィールドに商品 ID を入力します。</span>
+                  <div>
+                     <p>商品 ID が入力された状態で、推奨項目ソースの選択ページが再度開きます。</p>
+                  </div>
+               </li>
+
+               <li>
+                  <span><strong class="uicontrol">次へ &gt;&gt;</strong> をクリックします。
+                  </span>
+               </li>
+
+               <li>
+                  <span>推奨項目タイプの選択ページで、作成する推奨項目タイプを選択します。</span>
+                  <div>
+                     <p>
+                        <strong class="uicontrol">1 (商品詳細ページ – クロスセル):</strong> SiteGenesis。商品は、商品詳細ページの「<em>類似商品</em>」セクションに表示されます。通常はこれを選択します。</p>
+                     <p>
+                        <strong class="uicontrol">2 (カテゴリのランディングページ - おすすめの商品): </strong>SiteGenesis では実装されていません。新しいテンプレートが必要です。</p>
+                     <p>
+                        <strong class="uicontrol">3 (その他): </strong>SiteGenesis では実装されていません。新しいテンプレートが必要です。</p>
+                  </div>
+               </li>
+
+               <li>
+                  <span>推奨する商品をリストから選択します。</span>
+               </li>
+
+               <li>
+                  <span>推奨項目のターゲットの選択ページで、<strong class="uicontrol">完了</strong>をクリックします。
+                  </span>
+               </li>
+
+            </ol>
+         </li><li>
+            <span>カテゴリ推奨項目を作成するには、アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、<span class="menucascade"><strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol"><var>サイト</var></strong> | <strong class="uicontrol">商品とカタログ</strong> | <strong class="uicontrol">推奨項目</strong></span>の順に選択 (または商品エディターから商品の推奨項目タブにアクセス) します。</span>
+            <ol>
+               <li>
+                  <span>必要なカタログを選択します。</span>
+               </li>
+
+               <li>
+                  <span>カテゴリ推奨項目タブで、<strong class="uicontrol">新規</strong>をクリックします。</span>
+               </li>
+
+               <li>
+                  <span>推奨項目を作成するカテゴリの有効なカテゴリ ID を入力するか、カテゴリリストを参照します。</span>
+               </li>
+
+               <li>
+                  <span>省略記号をクリックしてカテゴリを参照します。</span>
+               </li>
+
+               <li>
+                  <span>カテゴリの選択ページで、カテゴリを検索するか、検索フィールドにカテゴリ ID を入力します。</span>
+               </li>
+
+               <li>
+                  <span><strong class="uicontrol">選択</strong>をクリックします。
+                  </span>
+                  <div>
+                     <p>カテゴリ ID が入力された状態で、推奨項目ソースの選択ページが再度開きます。</p>
+                  </div>
+               </li>
+
+               <li>
+                  <span><strong class="uicontrol">次へ &gt;&gt;</strong> をクリックします。
+                  </span>
+               </li>
+
+               <li>
+                  <span>推奨項目タイプを選択します。</span>
+               </li>
+
+               <li>
+                  <span>推奨する商品をリストから選択します。</span>
+               </li>
+
+               <li>
+                  <span><strong class="uicontrol">完了</strong>をクリックします。
+                  </span>
+               </li>
+
+            </ol>
+         </li><li>
+            <span>既存の推奨項目を編集するには、アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、<span class="menucascade"><strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol"><var>サイト</var></strong> | <strong class="uicontrol">商品とカタログ</strong> | <strong class="uicontrol">推奨項目</strong></span>の順に選択します。</span>
+            <ol>
+               <li>
+                  <span>カタログを選択します。</span>
+               </li>
+
+               <li>
+                  <span>商品の推奨項目タブ、またはカテゴリ推奨項目タブで<strong class="uicontrol">編集</strong>をクリックします。
+                  </span>
+                  <div>ターゲット商品のプロパティ (推奨項目タイプ、説明、コールアウトメッセージ、画像の仕様など) を変更します。</div>
+               </li>
+
+               <li>
+                  <span>商品の推奨項目の詳細ページ、またはカテゴリ推奨項目の詳細ページで<strong class="uicontrol">並べ替え</strong>をクリックします。
+                  </span>
+                  <div>商品の推奨項目ページ、またはカテゴリの推奨項目ページで、ターゲット商品がストアフロントで表示される順序を変更できます。必要であれば、まず推奨項目タイプを選択し、並べ替えの矢印を使用して位置を変更します。</div>
+               </li>
+
+               <li>
+                  <span>推奨商品をリストから削除するには、商品の推奨項目タブ、またはカテゴリ推奨項目タブで、1 つ以上の商品またはカテゴリを選択し、<strong class="uicontrol">削除</strong>をクリックします。</span>
+               </li>
+
+            </ol>
+         </li></ol>
+
+   
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_einstein_activity_required_fields">
+<h1 class="slds-text-heading_large">Einstein アクティビティ追跡:必須フィールド</h1>
+  
+  <p>ハイブリッドストアフロントまたはカスタムストアフロントに Einstein アクティビティ追跡を実装する場合は、各アクティビティタイプに特定のフィールドを含めます。このトピックでは、適切なデータ収集とアトリビューションのために Einstein API で想定される必須フィールドの一覧を示します。</p>
+
+    <div><p>Storefront Reference Architecture (SFRA) または SiteGenesis を使用している場合、ストアフロントは<code>isobject</code>タグを使用して必要なアクティビティフィールドを追跡します。ただし、ハイブリッドストアフロントまたはカスタムストアフロントを作成する場合は、必須項目を必ず追跡してください。必須フィールドを追跡することで、Einstein でデータを処理できるようになります。</p><p>項目が欠落していたり、形式が正しくなかったりすると、Einstien が重要なアクティビティを誤って除外し、Einstein ダッシュボードと推奨項目のデータが不完全になる可能性があります。</p></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">すべてのアクティビティに必要なフィールド</h2><p>すべての Einstein アクティビティには、次の基本フィールドが必要です。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:25%"><col style="width:25%"><col style="width:50%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d188069e55" style="vertical-align:top;" class="slds-cell-wrap" scope="col">フィールド</th>
+              <th id="d188069e58" style="vertical-align:top;" class="slds-cell-wrap" scope="col">タイプ</th>
+              <th id="d188069e61" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d188069e55" style="vertical-align:top;" class="slds-cell-wrap" data-label="フィールド"><code>クッキー ID</code></td>
+
+              <td headers="d188069e58" style="vertical-align:top;" class="slds-cell-wrap" data-label="タイプ">文字列</td>
+
+              <td headers="d188069e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">買い物客のセッションの一意の識別子。この値は、アクティビティを特定の買い物客にリンクします。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d188069e55" style="vertical-align:top;" class="slds-cell-wrap" data-label="フィールド"><code>王国</code></td>
+
+              <td headers="d188069e58" style="vertical-align:top;" class="slds-cell-wrap" data-label="タイプ">文字列</td>
+
+              <td headers="d188069e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">B2C Commerce レルム識別子。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d188069e55" style="vertical-align:top;" class="slds-cell-wrap" data-label="フィールド"><code>siteId</code></td>
+
+              <td headers="d188069e58" style="vertical-align:top;" class="slds-cell-wrap" data-label="タイプ">文字列</td>
+
+              <td headers="d188069e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">アクティビティが発生したサイト ID。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d188069e55" style="vertical-align:top;" class="slds-cell-wrap" data-label="フィールド"><code>instanceType (インスタンスタイプ)</code></td>
+
+              <td headers="d188069e58" style="vertical-align:top;" class="slds-cell-wrap" data-label="タイプ">文字列</td>
+
+              <td headers="d188069e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">インスタンスタイプ (Production (本番) インスタンスの場合は<code>prd</code> )。Einstein では、本番以外のインスタンスのレポートは生成されません。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d188069e55" style="vertical-align:top;" class="slds-cell-wrap" data-label="フィールド"><code>activityType (アクティビティタイプ)</code></td>
+
+              <td headers="d188069e58" style="vertical-align:top;" class="slds-cell-wrap" data-label="タイプ">文字列</td>
+
+              <td headers="d188069e61" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明">アクティビティのタイプ。有効な値: <code>viewProduct</code>、<code>viewReco</code>、<code>clickReco</code>、<code>addToCart</code>、<code>finishCheckout</code>、<code>viewCategory</code>、<code>viewSearch</code>、<code>clickCategory</code>、<code>clickSearch</code>。</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">アクティビティタイプ別のその他のフィールド</h2><p>基本フィールドに加えて、各アクティビティタイプには次の特定のフィールドが必要です。</p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:22.22222222222222%"><col style="width:33.33333333333333%"><col style="width:44.44444444444444%"></colgroup><thead class="slds-text-title_caps">
+            <tr class="">
+              <th id="d188069e190" style="vertical-align:top;" class="slds-cell-wrap" scope="col">アクティビティの種類</th>
+              <th id="d188069e193" style="vertical-align:top;" class="slds-cell-wrap" scope="col">必須フィールド</th>
+              <th id="d188069e196" style="vertical-align:top;" class="slds-cell-wrap" scope="col">注</th>
+            </tr>
+          </thead><tbody>
+            <tr class="">
+              <td headers="d188069e190" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクティビティの種類"><code>viewProduct</code></td>
+
+              <td headers="d188069e193" style="vertical-align:top;" class="slds-cell-wrap" data-label="必須フィールド"><ul>
+                  <li><code>product.id</code></li>
+
+                </ul>
+</td>
+
+              <td headers="d188069e196" style="vertical-align:top;" class="slds-cell-wrap" data-label="注">買い物客が商品詳細ページを表示したときに発生します。最近表示した Recommender とリアルタイムのパーソナル化を有効にします。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d188069e190" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクティビティの種類"><code>ビューレコ</code></td>
+
+              <td headers="d188069e193" style="vertical-align:top;" class="slds-cell-wrap" data-label="必須フィールド"><ul>
+                  <li><code>recommenderName (recommender名)</code></li>
+
+                  <li><code>products[].id</code></li>
+
+                </ul>
+</td>
+
+              <td headers="d188069e196" style="vertical-align:top;" class="slds-cell-wrap" data-label="注">買い物客が推奨項目を含むページを表示したときに発生します。<code>recommenderName</code>が Business Manager で構成されている Recommender と一致することを確認します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d188069e190" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクティビティの種類"><code>clickReco</code></td>
+
+              <td headers="d188069e193" style="vertical-align:top;" class="slds-cell-wrap" data-label="必須フィールド"><ul>
+                  <li><code>recommenderName (recommender名)</code></li>
+
+                  <li><code>products[].id</code></li>
+
+                  <li><code>products[].sku</code></li>
+
+                </ul>
+</td>
+
+              <td headers="d188069e196" style="vertical-align:top;" class="slds-cell-wrap" data-label="注">買い物客が推奨商品をクリックするとアクティベートされます。推奨項目のクリックスルーアトリビューションに必要です。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d188069e190" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクティビティの種類"><code>addToCart</code></td>
+
+              <td headers="d188069e193" style="vertical-align:top;" class="slds-cell-wrap" data-label="必須フィールド"><ul>
+                  <li><code>product.id</code></li>
+
+                  <li><code>商品.SKU</code></li>
+
+                  <li><code>product.alt_id</code></li>
+
+                </ul>
+</td>
+
+              <td headers="d188069e196" style="vertical-align:top;" class="slds-cell-wrap" data-label="注">買い物客が商品を買い物カゴに追加したときに発生します。買い物カゴ関連のアトリビューションに必要です。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d188069e190" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクティビティの種類"><code>finishCheckout</code></td>
+
+              <td headers="d188069e193" style="vertical-align:top;" class="slds-cell-wrap" data-label="必須フィールド"><ul>
+                  <li><code>products[].id</code></li>
+
+                  <li><code>products[].sku</code></li>
+
+                  <li><code>products[].price</code></li>
+
+                  <li><code>products[].数量</code></li>
+
+                </ul>
+</td>
+
+              <td headers="d188069e196" style="vertical-align:top;" class="slds-cell-wrap" data-label="注">買い物客が注文を完了したときに発生します。収益のアトリビューションとコンバージョンのトラッキングに必要です。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d188069e190" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクティビティの種類"><code>viewCategory</code></td>
+
+              <td headers="d188069e193" style="vertical-align:top;" class="slds-cell-wrap" data-label="必須フィールド"><ul>
+                  <li><code>category.id</code></li>
+
+                </ul>
+</td>
+
+              <td headers="d188069e196" style="vertical-align:top;" class="slds-cell-wrap" data-label="注">買い物客がカテゴリグリッドページを表示したときに発生します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d188069e190" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクティビティの種類"><code>viewSearch</code></td>
+
+              <td headers="d188069e193" style="vertical-align:top;" class="slds-cell-wrap" data-label="必須フィールド"><ul>
+                  <li><code>検索テキスト</code></li>
+
+                </ul>
+</td>
+
+              <td headers="d188069e196" style="vertical-align:top;" class="slds-cell-wrap" data-label="注">買い物客が検索結果を表示したときに発生します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d188069e190" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクティビティの種類"><code>clickCategory (クリックカテゴリ)</code></td>
+
+              <td headers="d188069e193" style="vertical-align:top;" class="slds-cell-wrap" data-label="必須フィールド"><ul>
+                  <li><code>category.id</code></li>
+
+                  <li><code>product.id</code></li>
+
+                </ul>
+</td>
+
+              <td headers="d188069e196" style="vertical-align:top;" class="slds-cell-wrap" data-label="注">買い物客がカテゴリページから商品詳細ページをクリックしたときに発生します。</td>
+
+            </tr>
+            <tr class="">
+              <td headers="d188069e190" style="vertical-align:top;" class="slds-cell-wrap" data-label="アクティビティの種類"><code>クリック検索</code></td>
+
+              <td headers="d188069e193" style="vertical-align:top;" class="slds-cell-wrap" data-label="必須フィールド"><ul>
+                  <li><code>検索テキスト</code></li>
+
+                  <li><code>product.id</code></li>
+
+                </ul>
+</td>
+
+              <td headers="d188069e196" style="vertical-align:top;" class="slds-cell-wrap" data-label="注">買い物客が検索結果から商品詳細ページをクリックしたときに発生します。</td>
+
+            </tr>
+          </tbody></table></div>
+    <div><h2 class="slds-text-heading_medium slds-p-top_small">トラブルシューティング</h2><p>Einstein ダッシュボードにアクティビティが表示されない場合は、以下の一般的な問題を確認してください。</p><ul>
+        <li><strong>非本番インスタンスタイプ</strong>— Einstein では、<code>prd</code>以外の<code>instanceType</code>値をもつアクティビティのレポートは生成されません。</li>
+
+        <li><strong>欠落または空のアクティビティタイプ</strong>— Einstein では、有効な<code>activityType</code>がないアクティビティはレポートされません。</li>
+
+        <li><strong>Recommender 名の欠落</strong>—<code>viewReco</code>、<code>clickReco</code>、およびレコメンデーションから買い物カゴへのアクティビティでは、<code>recommenderName</code>がないと適切なアトリビューションが行われません。</li>
+
+        <li><strong>無効な商品 ID</strong> - 商品 ID が商品カタログの ID と一致していることを確認します。</li>
+
+      </ul>
+<p><a title="Einstein Recommendation Validator は Chrome の拡張機能で、マーケットプレイスで B2C Commerce Einstein の推奨項目と並べ替えルールを検証およびデバッグします。この拡張機能を使用して、Einstein サイトのアクティビティ追跡と推奨項目を検証します。このトピックは、B2C Commerce に該当します。" href="#b2c_einstein_recommendation_validator">B2C Commerce Recommendation Validator</a>の Chrome 拡張機能を使用して、ストアフロントから送信されるアクティビティデータを検査します。</p></div>
+  
+<div class="slds-p-top_small"><h4 class="slds-text-title_caps slds-p-bottom_small">関連項目:</h4><ul style="list-style-type:none"><li><a title="B2C Commerce Einstein 機能を使用しているサイトに移動すると、Validator によって推奨アクティビティと並べ替えルールがただちに検証されます。その後、検出されたアクティビティに基づいて、特定の応答が提供されます。このトピックは、B2C Commerce に該当します。" href="einstein-2.html#b2c_einstein_validator_responses">B2C Commerce Einstein での Validator の応答</a></li><li><a title="以下に、Recommendation Validator を使用する際に発生することがある一般的なエラーの一部と、その修正方法を説明します。このトピックは、B2C Commerce に該当します。" href="general-2.html#b2c_common_validator_errors">Commerce Einstein での Recommendation Validator の一般的なエラー</a></li><li><a title="Einstein Recommendation Validator は Chrome の拡張機能で、マーケットプレイスで B2C Commerce Einstein の推奨項目と並べ替えルールを検証およびデバッグします。この拡張機能を使用して、Einstein サイトのアクティビティ追跡と推奨項目を検証します。このトピックは、B2C Commerce に該当します。" href="#b2c_einstein_recommendation_validator">B2C Commerce Einstein Recommendation Validator</a></li></ul></div>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_einstein_additional_resources">
+<h1 class="slds-text-heading_large">B2C Commerce Einstein の追加リソース</h1>
+   
+   <p> B2C Commerce Einstein の体験を最適化するために、いくつかのリソースを用意しました。このトピックは、B2C Commerce に該当します。</p>
+
+      <p>以下の表には、B2C Commerce Einstein 機能のベストプラクティス、推奨事項、FAQ、Einstein Recommendations API へのリンク、および B2C Commerce Einstein Trailhead ドキュメントへのリンクをまとめてあります。</p>
+      <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:33.33333333333333%"><col style="width:66.66666666666666%"></colgroup><thead class="slds-text-title_caps">
+               <tr class="">
+                  <th id="d161987e33" style="vertical-align:top;" class="slds-cell-wrap" scope="col">情報のタイプ</th>
+                  <th id="d161987e36" style="vertical-align:top;" class="slds-cell-wrap" scope="col">ドキュメントへのリンク</th>
+               </tr>
+            </thead><tbody>
+               <tr class="">
+                  <td headers="d161987e33" style="vertical-align:top;" class="slds-cell-wrap" data-label="情報のタイプ">ベストプラクティス、推奨事項、および手順</td>
+
+                  <td headers="d161987e36" style="vertical-align:top;" class="slds-cell-wrap" data-label="ドキュメントへのリンク"><a name="b2c_einstein_additional_resources__ul_rgx_4hc_lmb"></a><ul id="b2c_einstein_additional_resources__ul_rgx_4hc_lmb">
+                        <li> <a target="_blank" href="https://resources.docs.salesforce.com/rel1/doc/en-us/static/pdf/How_To_Send_External_Order_Feeds.pdf">外部店舗注文フィードに関するハウツー</a></li>
+
+                        <li> <a target="_blank" href="https://salesforce.vidyard.com/watch/VWnJ8xdQz7UkzAQ7nWgXsC">Einstein のバリエーショングループのアクティブ化と有効化チェックリスト</a></li>
+
+                        <li> <a target="_blank" href="https://resources.docs.salesforce.com/rel1/doc/en-us/static/pdf/Passing_Vgroup_ID_in_Past_Builds.pdf">viewProduct アクティビティのバリエーショングループ ID を渡す</a></li>
+
+                        <li> <a target="_blank" href="https://resources.docs.salesforce.com/rel1/doc/en-us/static/pdf/Commerce_Cloud_Einstein_Recommendations_Best_Practices.pdf">Einstein Recommendations のベストプラクティス</a></li>
+
+                        <li> <a target="_blank" href="https://org62.my.salesforce.com/sfc/p/#000000000062/a/0M000000OLr7/NcCDcw29pTFvMN26QRA5OZPYAi4CPgIztvr8I7UuGyo">Einstein のページと Recommender のユースケース</a></li>
+
+                        <li> <a target="_blank" href="https://resources.docs.salesforce.com/rel1/doc/en-us/static/pdf/CommerceCloud_EinsteinDevelopmentQualityAssuranceChecks.pdf">Einstein 開発の QA チェック</a></li>
+
+                        <li> <a target="_blank" href="https://org62.my.salesforce.com/sfc/p/#000000000062/a/0M000000OLqn/A6J.LX9_DiDKCtf1eIsJ1IOTVUBoas6agz6eIrb_5vM">Einstein A/B テスト</a></li>
+
+                        <li> <a target="_blank" href="https://resources.docs.salesforce.com/rel1/doc/en-us/static/pdf/CommerceCloud_CommerceInsightsUserGuide_Overview.pdf">Einstein Commerce Insights の概要とユーザーガイド</a></li>
+
+                        <li> <a target="_blank" href="https://salesforce.vidyard.com/watch/TjFxUGMbFwjp9p5rgY3FYK">Commerce Insights の Einstein Configurator へのユーザーの追加</a> (ビデオ) </li>
+
+                        <li> <a target="_blank" href="https://resources.docs.salesforce.com/rel1/doc/en-us/static/pdf/SFCC_EinsteinPredictiveSort.pdf">Einstein Predictive Sort の概要とベストプラクティス</a></li>
+
+                        <li><a target="_blank" href="https://resources.docs.salesforce.com/rel1/doc/en-us/static/pdf/einstein-cart-product-anchor.pdf">買い物カゴレコメンデーション最適化テスト</a></li>
+
+                     </ul>
+</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d161987e33" style="vertical-align:top;" class="slds-cell-wrap" data-label="情報のタイプ">Einstein に関するよくある質問 (FAQ)</td>
+
+                  <td headers="d161987e36" style="vertical-align:top;" class="slds-cell-wrap" data-label="ドキュメントへのリンク"><a name="b2c_einstein_additional_resources__ul_vk3_ygc_lmb"></a><ul id="b2c_einstein_additional_resources__ul_vk3_ygc_lmb">
+                        
+                        <li> <a target="_blank" href="https://resources.docs.salesforce.com/rel1/doc/en-us/static/pdf/Complete_the_Set_Customer_Enablement_and_FAQ.pdf">セットを完成に関するよくある質問 (FAQ)</a></li>
+
+                        <li> <a target="_blank" href="https://salesforce.vidyard.com/watch/VWnJ8xdQz7UkzAQ7nWgXsC?">Einstein バリエーショングループサポートに関するよくある質問 (FAQ)</a></li>
+
+                        <li> <a target="_blank" href="https://resources.docs.salesforce.com/rel1/doc/en-us/static/pdf/EinsteinSearchRecommendations-ExternalFAQ-v1_7-FINAL.pdf">Einstein Search Recommendations に関するよくある質問 (FAQ)</a></li>
+
+                     </ul>
+</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d161987e33" style="vertical-align:top;" class="slds-cell-wrap" data-label="情報のタイプ">B2C Commerce API - Salesforce B2C Commerce デベロッパーポータル</td>
+
+                  <td headers="d161987e36" style="vertical-align:top;" class="slds-cell-wrap" data-label="ドキュメントへのリンク"> <a target="_blank" href="https://developer.salesforce.com/docs/commerce/einstein-api/guide/commerce-einstein-api.html">B2C Commerce Einstein API</a></td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d161987e33" style="vertical-align:top;" class="slds-cell-wrap" data-label="情報のタイプ">Einstein デベロッパーのガイダンス</td>
+
+                  <td headers="d161987e36" style="vertical-align:top;" class="slds-cell-wrap" data-label="ドキュメントへのリンク"> <a target="_blank" href="https://partners.salesforce.com/search?type=Files&amp;keywords=CommerceCloud_Einstein">Salesforce Partner Community</a> (顧客アカウントが必要)</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d161987e33" style="vertical-align:top;" class="slds-cell-wrap" data-label="情報のタイプ">Trailhead ドキュメント</td>
+
+                  <td headers="d161987e36" style="vertical-align:top;" class="slds-cell-wrap" data-label="ドキュメントへのリンク"><a name="b2c_einstein_additional_resources__ul_c2l_2tj_lmb"></a><ul id="b2c_einstein_additional_resources__ul_c2l_2tj_lmb">
+                        <li> <a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/trails/deploy-commerce-cloud-einstein">B2C Commerce Einstein のデプロイ</a> (トレイル)<a name="b2c_einstein_additional_resources__ul_jfv_ltj_lmb"></a><ul id="b2c_einstein_additional_resources__ul_jfv_ltj_lmb">
+                              <li> <a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/modules/cc-einstein-plan-and-implement?trail_id=deploy-commerce-cloud-einstein">B2C Commerce Einstein の実装</a> (モジュール)</li>
+
+                              <li> <a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/modules/cc-einstein-product-recommendations?trail_id=deploy-commerce-cloud-einstein">B2C Commerce の Einstein Product Recommendations</a> (モジュール)</li>
+
+                              <li> <a target="_blank" href="https://trailhead.salesforce.com/ja/content/learn/modules/cc-einstein-smarter-search?trail_id=deploy-commerce-cloud-einstein">Commerce Cloud Einstein を使用したよりスマートな検索</a> (モジュール)</li>
+
+                           </ul>
+</li>
+
+                     </ul>
+</td>
+
+               </tr>
+            </tbody></table>
+   
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_einstein_and_data">
+<h1 class="slds-text-heading_large">B2C Commerce Einstein とデータ</h1>
+   
+   <p> B2C Commerce Einstein では、買い物客の行動から収集される入力データが必要です。Einstein はこのデータを使用して、ベンチマーキングと分析を行い、データ駆動型のインテリジェントなパーソナル化を可能にします。このトピックは、B2C Commerce に該当します。</p>
+
+      <p>収集したデータを使用して、Einstein は以下を実行できます。</p>
+      <a name="b2c_einstein_and_data__ul_kss_dbd_hmb"></a><ul id="b2c_einstein_and_data__ul_kss_dbd_hmb">
+         <li>推奨項目をパーソナル化する。</li>
+
+         <li>検索結果とカテゴリグリッドの並べ替えをパーソナル化する。</li>
+
+         <li>新しい検索同義語を識別する。</li>
+
+         <li>買い物客の買い物カゴを分析して、同時購入される頻度の高い商品を識別する。</li>
+
+         <li>予測入力検索ガイダンス、買い物客が最近行った検索、および、よく使用されるストアフロント検索を買い物客に提供する。</li>
+
+      </ul>
+
+      <p>このレベルの買い物客のパーソナル化を提供するために、Einstein は以下の 3 つのソースからデータを収集して使用します。</p>
+      
+         <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col><col></colgroup><thead class="slds-text-title_caps">
+                  <tr class="">
+                     <th id="d224010e52" style="vertical-align:top;" class="slds-cell-wrap" scope="col">データソース</th>
+                     <th id="d224010e55" style="vertical-align:top;" class="slds-cell-wrap" scope="col">説明</th>
+                  </tr>
+               </thead><tbody>
+                  <tr class="">
+                     <td headers="d224010e52" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="データソース">Catalog</td>
+
+                     <td headers="d224010e55" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p style="margin-bottom:0;">カタログから商品情報を収集するには、Production (本番) インスタンスに対してカタログフィードを実行します。</p></td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d224010e52" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="データソース">注文数</td>
+
+                     <td headers="d224010e55" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p style="margin-bottom:0;">ストアフロントから注文情報を収集するには、Production (本番) インスタンスに対して注文フィードを実行します。</p></td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d224010e52" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="データソース">クリックストリーム</td>
+
+                     <td headers="d224010e55" style="vertical-align:top;" class="slds-cell-wrap" data-label="説明"><p>クリックストリームのデータは、ピクセル追跡を使用してリアルタイムでサイトから自動収集されます。このデータを収集するためにアクションを実行する必要はありません。</p><p>次のアクティビティが自動的に追跡されます。</p><a name="b2c_einstein_and_data__ul_xdl_fwq_cmb"></a><ul id="b2c_einstein_and_data__ul_xdl_fwq_cmb">
+                           <li>商品のビュー数</li>
+
+                           <li>買い物カゴへの追加</li>
+
+                           <li>注文手続きの完了</li>
+
+                           <li>おすすめ商品の表示</li>
+
+                        </ul>
+</td>
+
+                  </tr>
+               </tbody></table>
+      
+      <p>B2C Commerce Einstein は機械学習モデルを使用して、収集したデータを分析します。 </p>
+   
+<ul><li class="slds-p-bottom_small"><strong><a href="#b2c_einstein_data_usage_features">機能別の Einstein データ使用量</a></strong><br>Einstein の顧客は、B2C Commerce と B2B Commerce の商品でどのデータが使用されているかを知ることが重要です。次の表に、各機能で使用されるデータを示します。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_einstein_commerce_insights">
+<h1 class="slds-text-heading_large">B2C Commerce Einstein インサイト</h1>
+   <p>B2C Commerce Einstein Commerce Insights レポートは買い物客、注文、商品のデータを取り込み、同時購入される頻度の高い商品を表示します。このトピックは、B2C Commerce に該当します。</p>
+
+   
+<ul><li class="slds-p-bottom_small"><strong><a href="analytics-1.html#b2c_configure_insight_reports">B2C Commerce Einstein Insights の表示</a></strong><br>B2C Commerce Einstein Commerce Insights を使用して買い物客の買い物カゴの分析を行います。</li><li class="slds-p-bottom_small"><strong><a href="analytics-2.html#b2c_reading_insight_reports">B2C Commerce Einstein Insights ダッシュボードでの商品のレビュー</a></strong><br>買い物カゴと商品の詳細は、Commerce Insights ダッシュボードから表示します。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_einstein_consent_management">
+<h1 class="slds-text-heading_large">B2C Commerce Einstein の同意管理</h1>
+    <p>Einstein では、クリックのたびに買い物客の閲覧イベントが収集され、買い物客の予測モデルがリアルタイムで更新されて、買い物客に対して最も関連性の高い体験が計算されます。このトピックは、B2C Commerce に該当します。</p>
+
+<ul><li class="slds-p-bottom_small"><strong><a href="#b2c_einstein_consent_mgmt_how">同意管理のしくみ</a></strong><br>Einstein は特定の追跡拒否の Cookie を使用して、追跡を希望しない買い物客の追跡を制限します。このトピックは、B2C Commerce に該当します。</li><li class="slds-p-bottom_small"><strong><a href="#b2c_einstein_dnt_feature_impact">B2C Commerce Einstein の追跡拒否の影響</a></strong><br>買い物客が追跡に同意しない場合、Einstein の機能が受ける影響は、機能によって異なります。このトピックは、B2C Commerce に該当します。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_einstein_consent_mgmt_how">
+<h1 class="slds-text-heading_large">同意管理のしくみ</h1>
+    
+    <p>Einstein は特定の追跡拒否の Cookie を使用して、追跡を希望しない買い物客の追跡を制限します。このトピックは、B2C Commerce に該当します。</p>
+
+        <p>Business Manager の B2C Commerce のプライバシー環境設定を使用して、追跡拒否の Cookie とユーザーの同意を管理します。この環境設定では、マーチャントのサイトで作成されたすべての新規セッションのデフォルトの追跡動作を設定します。</p>
+    
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_einstein_dashboard">
+<h1 class="slds-text-heading_large">Einstein ダッシュボード</h1>
+   
+
+   <p>B2C Commerce Reports &amp; Dashboards Einstein ダッシュボードを使用して、Einstein Recommendations のパフォーマンスを確認します。このデータは、コンバージョンと収益を向上させるための推奨項目の戦略策定に役立ちます。</p>
+<p>このダッシュボードには、平均注文金額、買い物カゴへの追加数、および買い物カゴのコンバージョンのメトリクスがあり、Einstein Recommendations を経時的に表示します。 </p><p>デフォルトでは、すべてのサイトの概要がダッシュボードに表示されますが、サイトごとの詳細を見ることもできます。また、サイトや日付範囲でフィルターすることもできます。</p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Einstein ダッシュボードのデータは 48 時間の遅延期間がありますが、他のダッシュボードレポートの遅延期間は 24 時間です。Einstein のパフォーマンスデータは量が多いために処理時間が長くなり、通常 2 日間遅れで提供されます。</div></div></div>
+<div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Einstein ダッシュボードは Production (本番) インスタンスでのみ使用できます。On-Demand Sandbox (ODS)、Development (開発) インスタンス、Staging (ステージング) インスタンスなどの非 Production (本番) インスタンスでは使用できません。</div></div></div>
+<table summary="ダッシュボードの定義" class="slds-table slds-table_bordered slds-m-bottom_small"><caption>ダッシュボードの定義</caption><colgroup><col style="width:19.493177387914233%"><col style="width:80.50682261208577%"></colgroup><thead class="slds-text-title_caps">
+               <tr class="">
+                  <th id="d14315e40" style="vertical-align:top;" class="slds-cell-wrap" scope="col">用語</th>
+                  <th id="d14315e43" style="vertical-align:top;" class="slds-cell-wrap" scope="col">定義</th>
+               </tr>
+            </thead><tbody>
+               <tr class="">
+                  <td headers="d14315e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="用語">Recommendation Name (推奨項目名)</td>
+
+                  <td headers="d14315e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="定義">推奨項目ゾーン、または Einstein データの Recommender と呼ばれます。Recommender は常に 1 つまたは複数のコンテンツスロットに関連付けられています。</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d14315e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="用語">Views (ビュー数)</td>
+
+                  <td headers="d14315e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="定義">指定した期間中に、Recommender に関連付けられたコンテンツスロットがサイトの訪問者に表示された回数。画面をスクロールしなければ見えない場所にスロットが表示されたかどうかは関係ありません。サイトの訪問者が表示したページにコンテンツスロットが含まれていれば、そのコンテンツスロットは表示されたとみなされます。</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d14315e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="用語">Clicks (クリック数)</td>
+
+                  <td headers="d14315e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="定義">Recommender に関連付けられたコンテンツスロットに表示された任意の商品を、ユーザーがクリックした回数。</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d14315e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="用語">CTR</td>
+
+                  <td headers="d14315e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="定義">「クリック数/ビュー数」として測定されるクリックスルー率。</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d14315e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="用語">Adds To Cart (買い物カゴへの追加数)</td>
+
+                  <td headers="d14315e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="定義">買い物客が Recommender 内で最初にクリックした商品で、買い物カゴに追加された個別の商品の数。買い物カゴへの追加は、同じセッション内、またはクリックイベントから 7 日以内に発生することが必要です。買い物客がクリックして、連続して 7 日以内に買い物カゴに追加した商品のみが、その Recommender によるものと考慮されます。</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d14315e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="用語">ATC Rate (買い物カゴへの追加率)</td>
+
+                  <td headers="d14315e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="定義">買い物カゴへの追加率は、「買い物カゴへの追加数/クリック数」として計算されます。</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d14315e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="用語">Conversions or products purchased (コンバージョン数または購入された商品数)</td>
+
+                  <td headers="d14315e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="定義">商品が Recommender 内でクリックされた最初のものである場合に、購入された一意の商品の数 (確定した注文ではありません)。購入は、同じセッション内、またはクリックイベントから 7 日以内に発生することが必要です。</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d14315e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="用語">Conversion Rate (コンバージョン率)</td>
+
+                  <td headers="d14315e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="定義">「コンバージョン数/買い物カゴへの追加数」として計算されます。</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d14315e40" style="vertical-align:top;" class="slds-cell-wrap" data-label="用語">Attributed Revenue (起因する収益)</td>
+
+                  <td headers="d14315e43" style="vertical-align:top;" class="slds-cell-wrap" data-label="定義"><p>コンバージョンされた商品の金額。 </p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> B2C Commerce は、以下の場合に収益を Recommender に帰属させます。 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<ul>
+                           <li>買い物カゴへの追加イベントが、同じセッション内、または関連する Recommender のクリックイベントから 7 日以内に発生した場合。</li>
+
+                           <li>注文手続きイベントが、関連付けられている買い物カゴへの追加イベントと同じセッション内、または買い物カゴへの追加イベントから 7 日以内に発生した場合。</li>
+
+                        </ul>
+ Recommender に関連付けられた収益は、Recommender のクリックイベントから最長 14 日間発生する場合があります。 </div></div></div>
+</td>
+
+               </tr>
+            </tbody></table><p>
+         <strong>Attributed Revenue (起因する収益)</strong>
+      </p><p>起因する収益のレポートでは、ページの推奨項目スロットから直接買い物カゴに追加されて購入された商品が毎日の収益に与える影響を通貨レベルで追跡します。プラスのトレンドは、推奨項目が収益に影響を与えていることを示します。マイナスのトレンドは、推奨項目の戦略を変更する必要があることを示します。</p><p>収益を追跡するために、メトリクスでは Einstein を起因とする 4 つの 買い物客イベントが監視されます。Recommender の表示、Recommender の商品のクリック、買い物カゴへの追加、および注文手続きです。B2C Commerce では、買い物客が前回の Einstein Recommender のクリックから 7 日以内に品目を買い物カゴに追加し、買い物カゴへの追加のアクションから 7 日以内に注文手続きが行われた場合にのみ、収益が Einstein に帰属します。 </p><p>以下に例を示します: </p>
+      <ul>
+         <li><strong>1 日目 Recommender の表示</strong> – 買い物客 A が XYZ T⁻シャツの Recommender からサイトのページを訪問します。</li>
+
+         <li><strong>1 日目 Recommender の商品のクリック</strong> – 買い物客 A が XYT T-シャツの同じ Recommender をクリックします。</li>
+
+         <li><strong>7 日目 買い物カゴに追加</strong> – 買い物客 A が XYZ T⁻シャツを買い物カゴに追加します。</li>
+
+         <li><strong>14 日目 注文手続き</strong> – 買い物客 A が T⁻シャツの注文手続きを完了します。</li>
+
+      </ul>
+ <p>このシナリオでは、B2C Commerce は、買い物客が最後に XYZ T-シャツの Recommender をクリックした、1 日目に完了した注文の収益を Einstein に起因させます。B2C Commerce では、買い物客が前回の Einstein Recommender のクリックから 7 日以内に品目を買い物カゴに追加し、買い物カゴへの追加のアクションから 7 日以内に注文手続きが行われた場合にのみ、収益が Einstein に帰属します。Recommender に関連付けられた収益は、Recommender のクリックイベントから最長 14 日間発生する場合があります。</p> <p>
+         <strong>Click Through Rate (クリックスルー率)</strong>
+      </p><p>クリックスルー率レポートは、クリックスルーにつながった Einstein 推奨項目の割合をプロットします。クリックスルー率は、買い物客が推奨項目にどのように反応しているかに関するインサイトを提供します。たとえば、プラスのトレンドは、推奨項目が商品に対する興味を生み出していることを示唆します。</p><p>
+         <strong>Adds To Cart (買い物カゴへの追加数)</strong>
+      </p><p>買い物カゴへの追加数のレポートは、Einstein 推奨項目のクリックスルーの結果、買い物客の買い物カゴに追加された品目の数をプロットします。買い物カゴへの追加数のデータを使用して、推奨項目の全般的な成功を経時的に評価します。たとえば、推奨項目の戦略が成功している場合は、買い物カゴへの追加数がプラスのトレンドを示しています。 </p><p>
+         <strong>Cart Conversion Rate (買い物カゴコンバージョン率)</strong>
+      </p><p>買い物カゴコンバージョン率レポートには、注文による購入につながった推奨項目のクリックの割合が表示されます。コンバージョン率が高い場合は、買い物客が推奨項目の戦略に肯定的に反応していることを示唆します。</p><p>
+         <strong>Performance by Recommendation (推奨項目別パフォーマンス)</strong>
+      </p><p>推奨項目別パフォーマンスレポートを使用して、個々の Einstein 推奨項目のパフォーマンスを評価します。このレポートには、各推奨項目に対して以下のメトリクスがリストされます。</p><ul>
+         <li>Clicks (クリック数)</li>
+
+         <li>CTR</li>
+
+         <li>Adds To Cart (買い物カゴへの追加数)</li>
+
+         <li>Conversions (コンバージョン)</li>
+
+         <li>Attributed Revenue (起因する収益)</li>
+
+      </ul>
+<p>このレポートを使用して、顧客が特定の推奨項目にどのように反応しているかを評価します。たとえば、クリック数が多くてもコンバージョン率が低い推奨項目は、推奨項目のターゲットを変更する必要がある可能性を示しています。</p><p>
+         <strong>Value of Conversion (コンバージョンの価値)</strong>
+      </p><p>Performance by Recommendation (推奨項目別パフォーマンス) テーブルにリストされている推奨項目を選択し、その推奨項目のコンバージョンデータを確認します。選択した推奨項目に対し、テーブルに推奨項目名と以下のメトリクスがリストされます。</p><ul>
+         <li>Views (ビュー数)</li>
+
+         <li>Clicks (クリック数)</li>
+
+         <li>Cart Adds (買い物カゴへの追加数)</li>
+
+         <li>Products purchased (購入された商品)</li>
+
+         <li>Attributed Revenue (起因する収益)</li>
+
+      </ul>
+<p>推奨項目の対象となる商品のコンバージョンメトリクスを確認します。テーブルには、各商品に対して以下のメトリクスがリストされます。</p><ul>
+         <li>ID</li>
+
+         <li>Product Name (商品名)</li>
+
+         <li>Views (ビュー数)</li>
+
+         <li>Clicks (クリック数)</li>
+
+         <li>CTR</li>
+
+         <li>Cart Adds (買い物カゴへの追加数)</li>
+
+         <li>ATC Rate (買い物カゴへの追加率)</li>
+
+         <li>Products purchased (購入された商品)</li>
+
+         <li>Cart Conversion (買い物カゴコンバージョン)</li>
+
+         <li>Revenue Attributed (起因となった収益)</li>
+
+      </ul>
+
+   
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_einstein_data_privacy">
+<h1 class="slds-text-heading_large">B2C Commerce Einstein データの共有 </h1>
+   
+   <p>B2C Commerce Einstein Search Dictionaries は、B2C Commerce のマーチャントコミュニティ全体で機能固有のデータを共有できる唯一の Einstein 機能です。</p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div>
+      <div id="b2c_einstein_data_privacy__prereq_zmj_zgx_kwb"><a name="b2c_einstein_data_privacy__prereq_zmj_zgx_kwb"></a><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>
+                  <tr class="">
+                     <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+
+                  </tr>
+               </tbody></table></div><div><div><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> この同意書に同意するには、共有データベースへの情報の提供に同意した他のマーチャントにおすすめ商品を提供する目的で、お客様の検索辞書データを共有データベースに提供することに同意するものとします。Salesforce では、他のマーチャントに対し、お客様を特定できる形でお客様の検索辞書のデータを公開することはないことを表明および保証いたします。お客様はさらに、Salesforce が、トレーニングや、Einstein Search Dictionary、および現在または将来の同様の、または関連する機能、商品、サービスの向上の目的で、B2C Commerce に送信されたお客様の検索辞書データにアクセスできることに同意します。</div></div></div>
+</div><p>検索辞書データを共有データベースに提供するには：</p></div>
+      <ol><li><span>Business Manager で、アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、<span class="menucascade"><strong class="uicontrol">管理</strong> | <strong class="uicontrol">グローバル環境設定</strong> | <strong class="uicontrol">Einstein 検索辞書のオプトイン</strong></span>の順に選択します。</span></li><li><span>「<strong class="uicontrol">これらの条件に同意します。</strong>」を選択して、<strong class="uicontrol">保存</strong>をクリックします。</span></li></ol>
+
+         
+   
+</div></div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_einstein_data_usage_features">
+<h1 class="slds-text-heading_large">機能別の Einstein データ使用量</h1>
+   
+   <p>Einstein の顧客は、B2C Commerce と B2B Commerce の商品でどのデータが使用されているかを知ることが重要です。次の表に、各機能で使用されるデータを示します。</p>
+
+      <p>この表には、主要サービス契約 (MSA) で定義されているとおりに、顧客が Salesforce サービスに送信した顧客データがリストされます。また、この表には、顧客データでトレーニングされたグローバルモデルを使用する機能と、使用される使用状況データ (Salesforce とのユーザインタラクションに関連するデータ) も示されています。</p>
+      <p>Einstein 機能に送信されたデータは、AI モデルのトレーニング、サービスや機能の改善、追加コストなしでアクセスできる新機能の開発に使用される場合があります。このモデルでは、複数の Salesforce 顧客間で集計されたトレンドが検索されます。</p>
+
+      <div><h2 class="slds-text-heading_medium slds-p-top_small">グローバルモデルタイプ</h2><p><strong>カタロググローバルモデル</strong> :さまざまな顧客のカタログ間で機能する機械学習モデル。カタログをプールして、商品または商品の属性をより適切に分類します。カタロググローバルモデルでは、マスターカタログのフィールド (名前、説明、主要カテゴリ、カテゴリリスト、価格、カスタム属性など) を使用し、画像などのリンクアセットも使用します。このモデルは、カタログのグローバルモデリングをオプトアウトしていない顧客間でトレーニングされます。カタログ グローバル モデルは、オプトアウトした顧客に使用されますが、そのデータはモデルのトレーニングには使用されません。</p><p><strong>マーチャントグローバルモデル</strong> :検索辞書など、顧客間でマーチャントのアクティビティ/設定を共有する機械学習モデル – Einstein は、マーチャント間の検索アクティビティに基づいて、一般的な商品名の同義語を提案します。</p></div>
+
+      <div><h2 class="slds-text-heading_medium slds-p-top_small">カスタマーコントロール</h2><p>お客様は、自分のデータがグローバルモデルに寄与するかどうかを制御できます。Einstein 機能でグローバルモデルを使用する場合、顧客はオプトアウトできます。データの使用方法を管理については、コマースサポートチームにお問い合わせください。</p></div>
+
+      <div><h2 class="slds-text-heading_medium slds-p-top_small">機能別のデータ使用量</h2><p><strong>B2C Commerce の機能</strong></p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col><col><col><col></colgroup><thead class="slds-text-title_caps">
+                  <tr class="">
+                     <th id="d127116e70" style="vertical-align:top;" class="slds-cell-wrap" scope="col">機能</th>
+                     <th id="d127116e73" style="vertical-align:top;" class="slds-cell-wrap" scope="col">使用される顧客データと Salesforce オブジェクト</th>
+                     <th id="d127116e76" style="vertical-align:top;" class="slds-cell-wrap" scope="col">カタログ・グローバル・モデルを使用</th>
+                     <th id="d127116e79" style="vertical-align:top;" class="slds-cell-wrap" scope="col">マーチャントグローバルモデルを使用</th>
+                  </tr>
+               </thead><tbody>
+                  <tr class="">
+                     <td headers="d127116e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="機能">Einstein Product Recommendations</td>
+
+                     <td headers="d127116e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用される顧客データと Salesforce オブジェクト">買い物客のアクティビティ追跡とカタログデータ</td>
+
+                     <td headers="d127116e76" style="vertical-align:top;" class="slds-cell-wrap" data-label="カタログ・グローバル・モデルを使用">はい*</td>
+
+                     <td headers="d127116e79" style="vertical-align:top;" class="slds-cell-wrap" data-label="マーチャントグローバルモデルを使用">なし</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d127116e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="機能">セットを完成</td>
+
+                     <td headers="d127116e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用される顧客データと Salesforce オブジェクト">買い物客のアクティビティ追跡とカタログデータ</td>
+
+                     <td headers="d127116e76" style="vertical-align:top;" class="slds-cell-wrap" data-label="カタログ・グローバル・モデルを使用">あり</td>
+
+                     <td headers="d127116e79" style="vertical-align:top;" class="slds-cell-wrap" data-label="マーチャントグローバルモデルを使用">なし</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d127116e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="機能">Einstein Commerce Insights</td>
+
+                     <td headers="d127116e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用される顧客データと Salesforce オブジェクト">買い物客のアクティビティ追跡とカタログデータ</td>
+
+                     <td headers="d127116e76" style="vertical-align:top;" class="slds-cell-wrap" data-label="カタログ・グローバル・モデルを使用">なし</td>
+
+                     <td headers="d127116e79" style="vertical-align:top;" class="slds-cell-wrap" data-label="マーチャントグローバルモデルを使用">なし</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d127116e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="機能">Einstein Search Suggestions</td>
+
+                     <td headers="d127116e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用される顧客データと Salesforce オブジェクト">買い物客のアクティビティ追跡とカタログデータ</td>
+
+                     <td headers="d127116e76" style="vertical-align:top;" class="slds-cell-wrap" data-label="カタログ・グローバル・モデルを使用">なし</td>
+
+                     <td headers="d127116e79" style="vertical-align:top;" class="slds-cell-wrap" data-label="マーチャントグローバルモデルを使用">なし</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d127116e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="機能">Einstein Predictive Sort</td>
+
+                     <td headers="d127116e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用される顧客データと Salesforce オブジェクト">買い物客のアクティビティ追跡とカタログデータ</td>
+
+                     <td headers="d127116e76" style="vertical-align:top;" class="slds-cell-wrap" data-label="カタログ・グローバル・モデルを使用">あり</td>
+
+                     <td headers="d127116e79" style="vertical-align:top;" class="slds-cell-wrap" data-label="マーチャントグローバルモデルを使用">なし</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d127116e70" style="vertical-align:top;" class="slds-cell-wrap" data-label="機能">Einstein 辞書管理</td>
+
+                     <td headers="d127116e73" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用される顧客データと Salesforce オブジェクト">買い物客のアクティビティ追跡と同義語辞書</td>
+
+                     <td headers="d127116e76" style="vertical-align:top;" class="slds-cell-wrap" data-label="カタログ・グローバル・モデルを使用">なし</td>
+
+                     <td headers="d127116e79" style="vertical-align:top;" class="slds-cell-wrap" data-label="マーチャントグローバルモデルを使用">あり</td>
+
+                  </tr>
+               </tbody></table><p>*すべての推奨項目戦略でカタロググローバルモデルが使用されるわけではありません。</p><p><strong>B2B Commerce の機能</strong></p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col><col><col><col></colgroup><thead class="slds-text-title_caps">
+                  <tr class="">
+                     <th id="d127116e200" style="vertical-align:top;" class="slds-cell-wrap" scope="col">機能</th>
+                     <th id="d127116e203" style="vertical-align:top;" class="slds-cell-wrap" scope="col">使用される顧客データと Salesforce オブジェクト</th>
+                     <th id="d127116e206" style="vertical-align:top;" class="slds-cell-wrap" scope="col">カタログ・グローバル・モデルを使用</th>
+                     <th id="d127116e209" style="vertical-align:top;" class="slds-cell-wrap" scope="col">マーチャントグローバルモデルを使用</th>
+                  </tr>
+               </thead><tbody>
+                  <tr class="">
+                     <td headers="d127116e200" style="vertical-align:top;" class="slds-cell-wrap" data-label="機能">Einstein Product Recommendations</td>
+
+                     <td headers="d127116e203" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用される顧客データと Salesforce オブジェクト">買い物客のアクティビティ追跡とカタログデータ</td>
+
+                     <td headers="d127116e206" style="vertical-align:top;" class="slds-cell-wrap" data-label="カタログ・グローバル・モデルを使用">はい*</td>
+
+                     <td headers="d127116e209" style="vertical-align:top;" class="slds-cell-wrap" data-label="マーチャントグローバルモデルを使用">なし</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d127116e200" style="vertical-align:top;" class="slds-cell-wrap" data-label="機能">Einstein セマンティック検索</td>
+
+                     <td headers="d127116e203" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用される顧客データと Salesforce オブジェクト">買い物客のアクティビティ追跡とカタログデータ</td>
+
+                     <td headers="d127116e206" style="vertical-align:top;" class="slds-cell-wrap" data-label="カタログ・グローバル・モデルを使用">あり</td>
+
+                     <td headers="d127116e209" style="vertical-align:top;" class="slds-cell-wrap" data-label="マーチャントグローバルモデルを使用">なし</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d127116e200" style="vertical-align:top;" class="slds-cell-wrap" data-label="機能">カタログの推奨項目</td>
+
+                     <td headers="d127116e203" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用される顧客データと Salesforce オブジェクト">カタログデータ</td>
+
+                     <td headers="d127116e206" style="vertical-align:top;" class="slds-cell-wrap" data-label="カタログ・グローバル・モデルを使用">なし</td>
+
+                     <td headers="d127116e209" style="vertical-align:top;" class="slds-cell-wrap" data-label="マーチャントグローバルモデルを使用">なし</td>
+
+                  </tr>
+               </tbody></table><p>*すべての推奨項目戦略でカタロググローバルモデルが使用されるわけではありません。</p><p><strong>D2C Commerce の機能</strong></p><table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col><col><col><col></colgroup><thead class="slds-text-title_caps">
+                  <tr class="">
+                     <th id="d127116e283" style="vertical-align:top;" class="slds-cell-wrap" scope="col">機能</th>
+                     <th id="d127116e286" style="vertical-align:top;" class="slds-cell-wrap" scope="col">使用される顧客データと Salesforce オブジェクト</th>
+                     <th id="d127116e289" style="vertical-align:top;" class="slds-cell-wrap" scope="col">カタログ・グローバル・モデルを使用</th>
+                     <th id="d127116e292" style="vertical-align:top;" class="slds-cell-wrap" scope="col">マーチャントグローバルモデルを使用</th>
+                  </tr>
+               </thead><tbody>
+                  <tr class="">
+                     <td headers="d127116e283" style="vertical-align:top;" class="slds-cell-wrap" data-label="機能">Einstein Product Recommendations</td>
+
+                     <td headers="d127116e286" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用される顧客データと Salesforce オブジェクト">買い物客のアクティビティ追跡とカタログデータ</td>
+
+                     <td headers="d127116e289" style="vertical-align:top;" class="slds-cell-wrap" data-label="カタログ・グローバル・モデルを使用">はい*</td>
+
+                     <td headers="d127116e292" style="vertical-align:top;" class="slds-cell-wrap" data-label="マーチャントグローバルモデルを使用">なし</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d127116e283" style="vertical-align:top;" class="slds-cell-wrap" data-label="機能">Einstein セマンティック検索</td>
+
+                     <td headers="d127116e286" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用される顧客データと Salesforce オブジェクト">買い物客のアクティビティ追跡とカタログデータ</td>
+
+                     <td headers="d127116e289" style="vertical-align:top;" class="slds-cell-wrap" data-label="カタログ・グローバル・モデルを使用">あり</td>
+
+                     <td headers="d127116e292" style="vertical-align:top;" class="slds-cell-wrap" data-label="マーチャントグローバルモデルを使用">なし</td>
+
+                  </tr>
+                  <tr class="">
+                     <td headers="d127116e283" style="vertical-align:top;" class="slds-cell-wrap" data-label="機能">カテゴリの推奨項目</td>
+
+                     <td headers="d127116e286" style="vertical-align:top;" class="slds-cell-wrap" data-label="使用される顧客データと Salesforce オブジェクト">カタログデータ</td>
+
+                     <td headers="d127116e289" style="vertical-align:top;" class="slds-cell-wrap" data-label="カタログ・グローバル・モデルを使用">なし</td>
+
+                     <td headers="d127116e292" style="vertical-align:top;" class="slds-cell-wrap" data-label="マーチャントグローバルモデルを使用">なし</td>
+
+                  </tr>
+               </tbody></table><p>*すべての推奨項目戦略でカタロググローバルモデルが使用されるわけではありません。</p></div>
+   
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_einstein_dnt_feature_impact">
+<h1 class="slds-text-heading_large">B2C Commerce Einstein の追跡拒否の影響</h1>
+    
+    <p>買い物客が追跡に同意しない場合、Einstein の機能が受ける影響は、機能によって異なります。このトピックは、B2C Commerce に該当します。</p>
+
+        <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 全体的な機能の影響は、追跡からオプトアウトする買い物客の数に関連します。</div></div></div>
+
+        <p>以下の表で、追跡拒否 (DNT) Cookie の使用が Einstein Product Recommendations に与える影響を説明します。</p>
+        <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col><col><col></colgroup><thead class="slds-text-title_caps">
+                    <tr class="">
+                        <th id="d69734e35" style="vertical-align:top;" class="slds-cell-wrap" scope="col"><p style="margin-bottom:0;">Recommender 戦略</p></th>
+                        <th id="d69734e41" style="vertical-align:top;" class="slds-cell-wrap" scope="col"><p style="margin-bottom:0;">影響</p></th>
+                        <th id="d69734e47" style="vertical-align:top;" class="slds-cell-wrap" scope="col"><p style="margin-bottom:0;">結果</p></th>
+                    </tr>
+                </thead><tbody>
+                    <tr class="">
+                        <td headers="d69734e35" style="vertical-align:top;" class="slds-cell-wrap" data-label="Recommender 戦略"><p style="margin-bottom:0;">最近の売れ筋商品</p></td>
+
+                        <td headers="d69734e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="影響"><p style="margin-bottom:0;">機能します</p></td>
+
+                        <td headers="d69734e47" style="vertical-align:top;" class="slds-cell-wrap" data-label="結果">買い物客に引き続きおすすめ商品を表示できますが、買い物客の購入行動は、戦略的なおすすめ商品の向上には使用されません。</td>
+
+                    </tr>
+                    <tr class="">
+                        <td headers="d69734e35" style="vertical-align:top;" class="slds-cell-wrap" data-label="Recommender 戦略"><p style="margin-bottom:0;">この商品を見た買い物客が他に見た商品</p></td>
+
+                        <td headers="d69734e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="影響"><p style="margin-bottom:0;">機能します</p></td>
+
+                        <td headers="d69734e47" style="vertical-align:top;" class="slds-cell-wrap" data-label="結果">買い物客に引き続きおすすめ商品を表示できますが、買い物客の行動は、戦略的なおすすめ商品の向上には使用されません。</td>
+
+                    </tr>
+                    <tr class="">
+                        <td headers="d69734e35" style="vertical-align:top;" class="slds-cell-wrap" data-label="Recommender 戦略"><p style="margin-bottom:0;">この商品を見た買い物客が最終的に購入した商品</p></td>
+
+                        <td headers="d69734e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="影響"><p style="margin-bottom:0;">機能します</p></td>
+
+                        <td headers="d69734e47" style="vertical-align:top;" class="slds-cell-wrap" data-label="結果"><p style="margin-bottom:0;">買い物客に引き続きおすすめ商品を表示できますが、買い物客の行動は、戦略的なおすすめ商品の向上には使用されません。</p></td>
+
+                    </tr>
+                    <tr class="">
+                        <td headers="d69734e35" style="vertical-align:top;" class="slds-cell-wrap" data-label="Recommender 戦略"><p style="margin-bottom:0;">この商品を購入した買い物客が他に購入した商品</p></td>
+
+                        <td headers="d69734e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="影響"><p style="margin-bottom:0;">機能します</p></td>
+
+                        <td headers="d69734e47" style="vertical-align:top;" class="slds-cell-wrap" data-label="結果">買い物客に引き続きおすすめ商品を表示できますが、買い物客の行動は、戦略的なおすすめ商品の向上には使用されません。</td>
+
+                    </tr>
+                    <tr class="">
+                        <td headers="d69734e35" style="vertical-align:top;" class="slds-cell-wrap" data-label="Recommender 戦略"><p style="margin-bottom:0;">商品アフィニティアルゴリズム</p></td>
+
+                        <td headers="d69734e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="影響"><p style="margin-bottom:0;">機能します</p></td>
+
+                        <td headers="d69734e47" style="vertical-align:top;" class="slds-cell-wrap" data-label="結果">買い物客に引き続きおすすめ商品を表示できますが、買い物客の行動は、戦略的なおすすめ商品の向上には使用されません。</td>
+
+                    </tr>
+                    <tr class="">
+                        <td headers="d69734e35" style="vertical-align:top;" class="slds-cell-wrap" data-label="Recommender 戦略"><p style="margin-bottom:0;">最近もっともよく閲覧されている商品</p></td>
+
+                        <td headers="d69734e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="影響"><p style="margin-bottom:0;">機能します</p></td>
+
+                        <td headers="d69734e47" style="vertical-align:top;" class="slds-cell-wrap" data-label="結果">買い物客に引き続きおすすめ商品を表示できますが、買い物客の行動は、戦略的なおすすめ商品の向上には使用されません。</td>
+
+                    </tr>
+                    <tr class="">
+                        <td headers="d69734e35" style="vertical-align:top;" class="slds-cell-wrap" data-label="Recommender 戦略">セットを完成</td>
+
+                        <td headers="d69734e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="影響">機能します</td>
+
+                        <td headers="d69734e47" style="vertical-align:top;" class="slds-cell-wrap" data-label="結果">「セットを完成」の推奨項目機能は予想通りに機能します。追跡拒否 (Do-Not-Track) Cookie は、個々の買い物客のアクティビティに対してパーソナル化されないため、「セットを完成」の推奨項目には影響を与えません。</td>
+
+                    </tr>
+                    <tr class="">
+                        <td headers="d69734e35" style="vertical-align:top;" class="slds-cell-wrap" data-label="Recommender 戦略"><p style="margin-bottom:0;">最近見た商品</p></td>
+
+                        <td headers="d69734e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="影響"><p style="margin-bottom:0;">機能しません</p></td>
+
+                        <td headers="d69734e47" style="vertical-align:top;" class="slds-cell-wrap" data-label="結果"><p style="margin-bottom:0;">追跡拒否はアクティビティ追跡を無効にするため、買い物客の最近の閲覧行動を追跡することはできません。</p></td>
+
+                    </tr>
+                    <tr class="">
+                        <td headers="d69734e35" style="vertical-align:top;" class="slds-cell-wrap" data-label="Recommender 戦略"><p style="margin-bottom:0;">リアルタイムのパーソナル化</p></td>
+
+                        <td headers="d69734e41" style="vertical-align:top;" class="slds-cell-wrap" data-label="影響"><p style="margin-bottom:0;">機能しません</p></td>
+
+                        <td headers="d69734e47" style="vertical-align:top;" class="slds-cell-wrap" data-label="結果"><p style="margin-bottom:0;">追跡拒否はアクティビティ追跡を無効にするため、買い物客の動向を追跡しておすすめ商品をパーソナル化することはできません。</p></td>
+
+                    </tr>
+                </tbody></table>
+        <p>以下の表は、Einstein Commerce Insights と Einstein Search Dictionaries への一般的な影響を説明しています。</p>
+        <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:46.08294930875576%"><col style="width:53.91705069124424%"></colgroup><tbody>
+                    <tr class="">
+                        <td style="vertical-align:top;" class="slds-cell-wrap">Einstein Commerce Insights</td>
+
+                        <td style="vertical-align:top;" class="slds-cell-wrap">Einstein Commerce Insights では引き続き結果が表示されますが、オプトアウトした買い物客のデータは除外されます。</td>
+
+                    </tr>
+                    <tr class="">
+                        <td style="vertical-align:top;" class="slds-cell-wrap">Einstein Search Dictionaries</td>
+
+                        <td style="vertical-align:top;" class="slds-cell-wrap">Einstein Search Dictionaries は引き続き使用できます。追跡を拒否した買い物客からの検索クエリは、おすすめ商品の提案には使用されません。</td>
+
+                    </tr>
+                </tbody></table>
+        <p>以下の表で、追跡拒否 (DNT) Cookie の使用が Einstein Predictive Sort に与える影響を説明します。</p>
+        <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 買い物客が追跡に同意しない場合、Predictive Sort のスコアは計算されません。</div></div></div>
+
+        <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col><col><col></colgroup><thead class="slds-text-title_caps">
+                    <tr class="">
+                        <th id="d69734e278" style="vertical-align:top;" class="slds-cell-wrap" scope="col"><p style="margin-bottom:0;">構成</p></th>
+                        <th id="d69734e284" style="vertical-align:top;" class="slds-cell-wrap" scope="col"><p style="margin-bottom:0;">影響</p></th>
+                        <th id="d69734e290" style="vertical-align:top;" class="slds-cell-wrap" scope="col"><p style="margin-bottom:0;">結果</p></th>
+                    </tr>
+                </thead><tbody>
+                    <tr class="">
+                        <td headers="d69734e278" style="vertical-align:top;" class="slds-cell-wrap" data-label="構成"><p style="margin-bottom:0;">Predictive Sort を唯一の属性として使用</p></td>
+
+                        <td headers="d69734e284" style="vertical-align:top;" class="slds-cell-wrap" data-label="影響"><p style="margin-bottom:0;">機能しません</p></td>
+
+                        <td headers="d69734e290" style="vertical-align:top;" class="slds-cell-wrap" data-label="結果"><p style="margin-bottom:0;">マーチャントが Predictive Sort を唯一の並べ替えルールとして使用している場合、フォールバックの並べ替え順序は検索インデックスにおいて商品がインデックス付けされた順番と同等になります。ページに並べ替えルールがない場合は、同じ並べ替え順序になります。</p></td>
+
+                    </tr>
+                    <tr class="">
+                        <td headers="d69734e278" style="vertical-align:top;" class="slds-cell-wrap" data-label="構成"><p style="margin-bottom:0;">Predictive Sort を並べ替えルールの属性の 1 つとして使用</p></td>
+
+                        <td headers="d69734e284" style="vertical-align:top;" class="slds-cell-wrap" data-label="影響"><p style="margin-bottom:0;">機能します</p></td>
+
+                        <td headers="d69734e290" style="vertical-align:top;" class="slds-cell-wrap" data-label="結果"><p style="margin-bottom:0;">Predictive Sort 属性は、実質的に無視されます。</p></td>
+
+                    </tr>
+                    <tr class="">
+                        <td headers="d69734e278" style="vertical-align:top;" class="slds-cell-wrap" data-label="構成"><p style="margin-bottom:0;">Predictive Sort を動的属性の一部として使用</p></td>
+
+                        <td headers="d69734e284" style="vertical-align:top;" class="slds-cell-wrap" data-label="影響"><p style="margin-bottom:0;">機能します</p></td>
+
+                        <td headers="d69734e290" style="vertical-align:top;" class="slds-cell-wrap" data-label="結果"><p style="margin-bottom:0;">計算は通常通り行われますが、Predictive Sort スコアは省略されます。</p></td>
+
+                    </tr>
+                </tbody></table>
+        <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> 
+            <p>Predictive Sort に対する追跡拒否のリスクを軽減するために、ベストプラクティスとして、Predictive Sort を既存の動的並べ替えルールに含めます。この方法では、異なる属性の組み合わせとして並べ替えルールを含めます。 </p>
+            <p>たとえば、並べ替えルールはデータで重み付けされます。たとえば、このデータにはキーワード検索結果ページにおけるテキストの関連性や、カテゴリグリッドページにおけるアクティブデータなどが含まれる場合があります。</p>
+        </div></div></div>
+
+        <p>以下の表で、追跡拒否 (DNT) Cookie の使用が Einstein Search Recommendations に与える影響を説明します。</p>
+        <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col><col><col></colgroup><thead class="slds-text-title_caps">
+                    <tr class="">
+                        <th id="d69734e389" style="vertical-align:top;" class="slds-cell-wrap" scope="col"><p style="margin-bottom:0;">推奨項目のタイプ</p></th>
+                        <th id="d69734e395" style="vertical-align:top;" class="slds-cell-wrap" scope="col"><p style="margin-bottom:0;">影響</p></th>
+                        <th id="d69734e401" style="vertical-align:top;" class="slds-cell-wrap" scope="col"><p style="margin-bottom:0;">結果</p></th>
+                    </tr>
+                </thead><tbody>
+                    <tr class="">
+                        <td headers="d69734e389" style="vertical-align:top;" class="slds-cell-wrap" data-label="推奨項目のタイプ"><p style="margin-bottom:0;">よく使用される検索</p></td>
+
+                        <td headers="d69734e395" style="vertical-align:top;" class="slds-cell-wrap" data-label="影響"><p style="margin-bottom:0;">機能します</p></td>
+
+                        <td headers="d69734e401" style="vertical-align:top;" class="slds-cell-wrap" data-label="結果">買い物客に引き続きおすすめ商品を表示できますが、買い物客の行動は、戦略的なおすすめ商品の向上には使用されません。</td>
+
+                    </tr>
+                    <tr class="">
+                        <td headers="d69734e389" style="vertical-align:top;" class="slds-cell-wrap" data-label="推奨項目のタイプ"><p style="margin-bottom:0;">最近の検索</p></td>
+
+                        <td headers="d69734e395" style="vertical-align:top;" class="slds-cell-wrap" data-label="影響"><p style="margin-bottom:0;">機能しません</p></td>
+
+                        <td headers="d69734e401" style="vertical-align:top;" class="slds-cell-wrap" data-label="結果"><p style="margin-bottom:0;">追跡拒否はアクティビティ追跡を無効にするため、買い物客の最近の閲覧行動を追跡することはできません。</p></td>
+
+                    </tr>
+                    <tr class="">
+                        <td headers="d69734e389" style="vertical-align:top;" class="slds-cell-wrap" data-label="推奨項目のタイプ"><p style="margin-bottom:0;">検索の提案</p></td>
+
+                        <td headers="d69734e395" style="vertical-align:top;" class="slds-cell-wrap" data-label="影響"><p style="margin-bottom:0;">機能しません</p></td>
+
+                        <td headers="d69734e401" style="vertical-align:top;" class="slds-cell-wrap" data-label="結果"><p style="margin-bottom:0;">最近の検索に依存します。</p></td>
+
+                    </tr>
+                </tbody></table>
+    
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_einstein_implement_prod_recs">
+<h1 class="slds-text-heading_large">B2C Commerce Einstein Product Recommendations の実装</h1>
+   
+   <p> B2C Commerce Einstein Product Recommendations を実装するには、さまざまなコンポーネントの構成、実行、および変更が必要です。これらの各タスクは、さまざまな役割が実行されます。このトピックは、B2C Commerce に該当します。</p>
+
+      <p>以下の表は、Product Recommendations を使用する前に必要な一般的なステップを説明しています。また、各ステップを実行する担当者の役割も示してあります。</p>
+      <table class="slds-table slds-table_bordered slds-m-bottom_small"><colgroup><col style="width:69.96996996996997%"><col style="width:30.03003003003003%"></colgroup><thead class="slds-text-title_caps">
+               <tr class="">
+                  <th id="d153403e33" style="vertical-align:top;" class="slds-cell-wrap" scope="col">ステップ</th>
+                  <th id="d153403e36" style="vertical-align:top;" class="slds-cell-wrap" scope="col">ステップの担当者</th>
+               </tr>
+            </thead><tbody>
+               <tr class="">
+                  <td headers="d153403e33" style="text-align:left;vertical-align:top;" class="slds-cell-wrap" data-label="ステップ">Production (本番) インスタンスに対してカタログと注文のフィードを構成する。</td>
+
+                  <td headers="d153403e36" style="vertical-align:top;" class="slds-cell-wrap" data-label="ステップの担当者"><p style="margin-bottom:0;">管理者</p></td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d153403e33" style="vertical-align:top;" class="slds-cell-wrap" data-label="ステップ">Einstein Configurator ツールを使用して Recommender を構成する。</td>
+
+                  <td headers="d153403e36" style="vertical-align:top;" class="slds-cell-wrap" data-label="ステップの担当者">マーチャント</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d153403e33" style="vertical-align:top;" class="slds-cell-wrap" data-label="ステップ">Internet Store Markup Language (ISML) テンプレートを変更して、推奨コンテンツスロットを作成し、Product Recommendations を表示する。</td>
+
+                  <td headers="d153403e36" style="vertical-align:top;" class="slds-cell-wrap" data-label="ステップの担当者">デベロッパー</td>
+
+               </tr>
+               <tr class="">
+                  <td headers="d153403e33" style="vertical-align:top;" class="slds-cell-wrap" data-label="ステップ">コンテンツスロットを設定して、Product Recommendations の表示に使用するテンプレートと Recommender を制御する。</td>
+
+                  <td headers="d153403e36" style="vertical-align:top;" class="slds-cell-wrap" data-label="ステップの担当者">マーチャント</td>
+
+               </tr>
+            </tbody></table>
+      <p>Product Recommendations は、商品 ID (推奨商品の ID) のリストの形で提供されます。このリストがストアフロントに渡される前に、システムによってビジネスルール (Einstein Configurator ツールを使用して定義する <em>Recommender </em>) が適用されます。これらのルールは商品 ID のリストの構成を制御し、一部の ID を削除したり、ID の順番を変更したりできます。つまり、このルールでは、どの商品を表示、非表示、昇格、および降格するかを制御できます。</p>
+      <p>ストアフロントで推奨商品の最終的なリストが表示される際には、ルールの定義にしたがった最適な順番になっています。</p>
+      <p>Product Recommendations はコンテンツスロットに表示されます。デベロッパーは ISML テンプレート内でコンテンツスロットを定義する必要があります。コンテンツスロットを作成したら、スロットの設定を作成できます。コンテンツスロットの設定 (コンテンツタイプを必ず推奨項目に設定) で、推奨商品の表示に使用するテンプレートを制御します。また、推奨商品 ID のリストに適用するビジネスルールも制御します。 </p>
+   
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_einstein_privacy_and_consent">
+<h1 class="slds-text-heading_large">B2C Commerce Einstein のプライバシーと同意</h1>
+    <p>B2C Commerce Einstein を設定する際は、買い物客の同意を念頭に、デフォルトのプライバシー環境設定とアカウントを設定します。このトピックは、B2C Commerce に該当します。</p>
+
+<ul><li class="slds-p-bottom_small"><strong><a href="#b2c_einstein_set_privacy_preferences">B2C Commerce Einstein のプライバシー環境設定</a></strong><br>Business Manager で、追跡に関するプライバシー環境設定のデフォルト設定を構成します。 </li><li class="slds-p-bottom_small"><strong><a href="#b2c_einstein_consent_management">B2C Commerce Einstein の同意管理</a></strong><br>Einstein では、クリックのたびに買い物客の閲覧イベントが収集され、買い物客の予測モデルがリアルタイムで更新されて、買い物客に対して最も関連性の高い体験が計算されます。このトピックは、B2C Commerce に該当します。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_einstein_recommendation_validator">
+<h1 class="slds-text-heading_large">B2C Commerce Einstein Recommendation Validator</h1>
+   <p>Einstein Recommendation Validator は Chrome の拡張機能で、マーケットプレイスで B2C Commerce Einstein の推奨項目と並べ替えルールを検証およびデバッグします。この拡張機能を使用して、Einstein サイトのアクティビティ追跡と推奨項目を検証します。このトピックは、B2C Commerce に該当します。</p>
+
+<ul><li class="slds-p-bottom_small"><strong><a href="general-4.html#b2c_install_validator">B2C Commerce Einstein の Recommendation Validator のインストール</a></strong><br>B2C Commerce Einstein Recommendation Validator を使用して、Salesforce B2C Commerce Einstein インテグレーションの事前検証を行います。</li><li class="slds-p-bottom_small"><strong><a href="general-7.html#b2c_use_validator">B2C Commerce Einstein Recommendation Validator の使用</a></strong><br>Recommendation Validator はインストール後に実行してすぐに使い始めることができます。</li><li class="slds-p-bottom_small"><strong><a href="einstein-2.html#b2c_einstein_validator_responses">B2C Commerce Einstein での Validator の応答</a></strong><br>B2C Commerce Einstein 機能を使用しているサイトに移動すると、Validator によって推奨アクティビティと並べ替えルールがただちに検証されます。その後、検出されたアクティビティに基づいて、特定の応答が提供されます。このトピックは、B2C Commerce に該当します。</li><li class="slds-p-bottom_small"><strong><a href="#b2c_einstein_activity_required_fields">Einstein アクティビティ追跡:必須フィールド</a></strong><br>ハイブリッドストアフロントまたはカスタムストアフロントに Einstein アクティビティ追跡を実装する場合は、各アクティビティタイプに特定のフィールドを含めます。このトピックでは、適切なデータ収集とアトリビューションのために Einstein API で想定される必須フィールドの一覧を示します。</li><li class="slds-p-bottom_small"><strong><a href="general-2.html#b2c_common_validator_errors">Commerce Einstein での Recommendation Validator の一般的なエラー</a></strong><br>以下に、Recommendation Validator を使用する際に発生することがある一般的なエラーの一部と、その修正方法を説明します。このトピックは、B2C Commerce に該当します。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_einstein_recommendations_reporting">
+<h1 class="slds-text-heading_large">B2C Commerce Einstein Recommendations レポートのレビュー</h1>
+    
+    <p>Reports &amp; Dashboards アプリの Einstein ダッシュボードを使用して、Einstein Recommendations のパフォーマンスを確認します。このトピックは、B2C Commerce に該当します。</p>
+
+        <p>Einstein ダッシュボードには、平均注文金額、買い物カゴへの追加数、および買い物カゴのコンバージョンのメトリクスがあります。またこのダッシュボードには、推奨項目のパフォーマンスが表示されます。</p>
+    
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_einstein_self_serv_deployment">
+<h1 class="slds-text-heading_large">B2C Commerce Einstein ステータスダッシュボード</h1>
+   <p>Einstein ステータスダッシュボードを使用して、ストアフロントのカタログと注文のフィードをスケジュールおよび実行し、サイトの B2C Commerce Einstein 機能のアクティブ化を行います。このトピックは、B2C Commerce に該当します。</p>
+
+<ul><li class="slds-p-bottom_small"><strong><a href="#b2c_einstein_and_data">B2C Commerce Einstein とデータ</a></strong><br> B2C Commerce Einstein では、買い物客の行動から収集される入力データが必要です。Einstein はこのデータを使用して、ベンチマーキングと分析を行い、データ駆動型のインテリジェントなパーソナル化を可能にします。このトピックは、B2C Commerce に該当します。</li><li class="slds-p-bottom_small"><strong><a href="#b2c_configure_einstein_deployment">B2C Commerce Einstein のデプロイのためのカタログと注文フィードの構成</a></strong><br> Einstein へのカタログと注文のデータフィードを構成、スケジュール、デプロイします。</li><li class="slds-p-bottom_small"><strong><a href="einstein-2.html#b2c_monitor_einstein_deployment_status">B2C Commerce Einstein ステータスダッシュボードのモニター</a></strong><br> カタログと注文のデプロイのステータスを確認し、データの品質を検証します。</li><li class="slds-p-bottom_small"><strong><a href="#b2c_einstein_self_service_support">B2C Commerce Einstein セルフサービスサポート</a></strong><br>B2C Commerce Einstein ステータスダッシュボードでは、カタログと注文のデプロイステータスと、データの品質を検証する機能を確認できます。またこのダッシュボードには、カタログ、注文、推奨項目、またはデプロイに関して B2C Commerce Einstein で発生したエラーや警告も表示されます。このトピックは、B2C Commerce に該当します。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_einstein_self_service_support">
+<h1 class="slds-text-heading_large">B2C Commerce Einstein セルフサービスサポート</h1>
+   <p>B2C Commerce Einstein ステータスダッシュボードでは、カタログと注文のデプロイステータスと、データの品質を検証する機能を確認できます。またこのダッシュボードには、カタログ、注文、推奨項目、またはデプロイに関して B2C Commerce Einstein で発生したエラーや警告も表示されます。このトピックは、B2C Commerce に該当します。</p>
+
+<ul><li class="slds-p-bottom_small"><strong><a href="api_integration.html#b2c_self_service_error_messages">一般的なエラーメッセージ</a></strong><br>エラーメッセージは、何らかの理由によって B2C Commerce Einstein のデプロイや自動化が妨げられていることを示します。このトピックは、B2C Commerce に該当します。</li><li class="slds-p-bottom_small"><strong><a href="api_integration.html#b2c_self_service_warning_messages">警告メッセージ</a></strong><br>警告メッセージは、B2C Commerce Einstein のデプロイまたは自動化で問題があることを示します。このトピックは、B2C Commerce に該当します。</li></ul>
+</div></content>
+</section>
+
+<hr class="article-sep">
+
+<section class="article" id="b2c_einstein_set_privacy_preferences">
+<h1 class="slds-text-heading_large">B2C Commerce Einstein のプライバシー環境設定</h1>
+    
+    <p>Business Manager で、追跡に関するプライバシー環境設定のデフォルト設定を構成します。 </p>
+<div class="slds-section slds-is-open" id="hiddenTables"><div class="slds-section__title"><h3 class="slds-text-title_caps">必要なエディション</h3></div><div><table class="slds-table slds-table_bordered slds-m-bottom_small edition"><colgroup><col></colgroup><tbody>         <tr class="">           <td style="vertical-align:top;" class="slds-cell-wrap">使用可能なソリューション: <strong>B2C Commerce</strong></td>
+         </tr>       </tbody></table></div>
+        <div><p>特定の買い物客に対して設定が明示的に変更された場合を除き、Einstein はこの設定を使用して、ブラウザーベースのアクティビティの追跡を可能にします。これにより、サイトでの買い物客のアクティビティがリアルタイムで追跡されます。 </p><div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> Einstein はデフォルトのプライバシー設定を使用する唯一のサービスではありません。 </div></div></div>
+<p>デフォルトのプライバシー環境設定を設定するには、以下の手順に従います。</p></div>
+        <a name="b2c_einstein_set_privacy_preferences__steps_twf_t4r_cmb"></a><ol id="b2c_einstein_set_privacy_preferences__steps_twf_t4r_cmb"><li>
+                <span>Business Manager で、アプリケーションランチャー<span style="vertical-align:text-bottom;display:inline-block;"><img alt="アプリケーションランチャー" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/appLauncher.png" style="margin-bottom:0;"></span>をクリックし、<span class="menucascade"><strong class="uicontrol">マーチャントツール</strong> | <strong class="uicontrol"><var>サイト</var></strong> | <strong class="uicontrol">サイト環境設定</strong> | <strong class="uicontrol">プライバシー設定</strong></span>の順に選択します。
+                </span>
+            </li><li>
+                <span>新規ストアフロントセッションの顧客追跡に関するデフォルトアクションを選択します。</span>
+                <div>
+                    <p>無効 - 追跡はデフォルトで無効になり、カスタムコードを使用してセッションごとに有効にできます。</p>
+                    <p>有効 - 追跡はデフォルトで有効になり、カスタムコードを使用してセッションごとに無効にできます。</p>
+                </div>
+            </li><li>
+                <span>「クリックストリームでセッションの DNT を使用」の設定を選択します。</span>
+                <div>
+                    <p>買い物客のセッションでは、その買い物客の最後の 50 件のトップレベルリクエスト (パイプラインの呼び出しなど) を含むクリックストリームオブジェクトが保持されます。SiteGenesis ではこの機能を使用して、買い物客が最後に訪問した商品を判定し、買い物客の便宜のために履歴を表示します。現在のセッションからクリックストリームエントリを取得するスクリプト API があります。</p>
+                    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-top_medium slds-m-bottom_medium"><div class="slds-media slds-media_responsive"><div class="slds-media__figure"><span class="slds-icon_container slds-icon_container_circle slds-icon-note-note"><img alt="メモ" src="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-cc-b2c_merchandiser_administrator-262-0-0-production-jajp/d94ad954-de01-4190-b5be-944f2d181506/images/icon_note.png" style="margin-bottom:0;"></span></div><div style="padding-top:.5rem;padding-bottom:.5rem;" class="slds-media__body"><span class="slds-text-title_caps">メモ</span> この設定はクリックストリーム API <code>dw.web.Clickstream</code>のみに関連するもので、B2C Commerce の他のクリックストリーム機能を制御することはありません。</div></div></div>
+
+                
+                
+                            <p>はい – クリックストリームでストアフロントの DNT (追跡拒否) セッションステータスが使用されます。</p>
+                            <p>セッションで DNT が true の場合、クリックストリームイベントは収集されません。</p>
+                            <p>セッションで DNT が false の場合、クリックストリームイベントは収集されます。</p>
+                        
+                            <p>いいえ – セッションの DNT ステータスに関わらず、クリックストリームイベントは収集されます。</p>
+                  
+                </div>
+            </li><li>
+                <span><strong class="uicontrol">適用</strong>をクリックします。</span>
+            </li></ol>
+
+    
+</div></div></content>
+</section>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;font-size:14px;"><a href="search-2.html">&larr; 検索・リファインメント・ソート（2/2）</a><a href="einstein-2.html">Einstein・レコメンデーション・パーソナライゼーション（2/2） &rarr;</a></div>
+    <div class="source-list"><strong>出典</strong>
+      <ul><li><a href="https://help.salesforce.com/s/articleView?id=cc.b2c_getting_started.htm&type=5&language=ja">help.salesforce.com — Salesforce B2C Commerce（日本語）</a></li></ul>
+    </div>
+  </main>
+</div>
+<a class="back-to-top" href="#">↑ 上へ</a>
+<script>
+// Highlight current section in TOC
+const links = document.querySelectorAll('nav.toc a[href^="#"]');
+const map = new Map();
+links.forEach(a => { const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if (el) map.set(el, a); });
+function update() {
+  let current = null;
+  for (const [el, a] of map) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= 80) current = a;
+  }
+  links.forEach(a => a.style.fontWeight = '');
+  if (current) current.style.fontWeight = '700';
+}
+window.addEventListener('scroll', update, { passive: true });
+update();
+</script>
+</body>
+</html>
